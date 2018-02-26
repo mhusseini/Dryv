@@ -12,7 +12,7 @@ namespace Dryv
             var rules = RulesHelper.GetClientRulesForProperty(
                 context.ModelMetadata.ContainerType,
                 context.ModelMetadata.PropertyName);
-            context.Attributes.Add("data-dryv", rules);
+            context.Attributes.Add("data-val-dryv", rules);
         }
     }
 }
