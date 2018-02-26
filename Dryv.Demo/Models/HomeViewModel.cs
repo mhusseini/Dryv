@@ -9,11 +9,11 @@ namespace Dryv.Demo.Models
             .Rule(m => m.Email,
                 m => m.Age <= 18 || !string.IsNullOrWhiteSpace(m.Email)
                     ? Result.Success
-                    : "The email must be specifies")
+                    : "The email must be specified")
             .Rule(m => m.ParentsEmail,
                 m => m.Age >= 18 || !string.IsNullOrWhiteSpace(m.ParentsEmail)
                     ? Result.Success
-                    : "The parents email must be specifies");
+                    : "The parents email must be specified");
 
         public int Age { get; set; }
 
