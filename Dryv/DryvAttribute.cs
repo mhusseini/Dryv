@@ -9,13 +9,10 @@ namespace Dryv
     {
         public void AddValidation(ClientModelValidationContext context)
         {
-            //var rules = RulesHelper.GetClientRulesForProperty(
-            //    context.ModelMetadata.ContainerType,
-            //    context.ModelMetadata.PropertyName);
-            var propertyRules = context.ActionContext.HttpContext.GetDryvClientRules(
+            var rules = RulesHelper.GetClientRulesForProperty(
                 context.ModelMetadata.ContainerType,
                 context.ModelMetadata.PropertyName);
-            context.Attributes.Add("data-dryv", propertyRules.Content);
+            context.Attributes.Add("data-dryv", rules);
         }
     }
 }

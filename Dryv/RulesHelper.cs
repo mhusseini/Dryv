@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace Dryv
 {
@@ -35,6 +36,9 @@ namespace Dryv
         public static string GetClientRulesForProperty(Type objectType, string propertyName) =>
             TranslateRules(GetRulesForProperty(GetRulesForType(objectType), propertyName));
 
+        private static readonly Regex RegexNewLine = new Regex(@"[\r\n]+", RegexOptions.Compiled);
+        private static readonly Regex RegexWhiteSpace = new Regex(@"\t+|\s{2,}", RegexOptions.Compiled);
+
         public static string TranslateRules(IEnumerable<Expression> rulesForProperty) =>
             $@"[{
                     string.Join(",",
@@ -42,7 +46,7 @@ namespace Dryv
                         select ClientRules.GetOrAdd(rule, r =>
                         {
                             var translator = new JavaScriptTranslator();
-                            return translator.Translate(rule);
+                            return RegexWhiteSpace.Replace(RegexNewLine.Replace(translator.Translate(rule), " "), string.Empty);
                         }))
                 }]";
     }
