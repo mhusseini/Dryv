@@ -4,26 +4,26 @@ namespace Dryv.Demo.Models
 {
     public class HomeViewModel
     {
-        public static readonly Rules Rules = Rules
+        public static readonly DryvRules Rules = DryvRules
             .For<HomeViewModel>()
             .Rule(m => m.Email,
                 m => m.Age <= 18 || !string.IsNullOrWhiteSpace(m.Email)
-                    ? Result.Success
+                    ? DryvResult.Success
                     : "The email must be specified")
             .Rule(m => m.ParentsEmail,
                 m => m.Age >= 18 || !string.IsNullOrWhiteSpace(m.ParentsEmail)
-                    ? Result.Success
+                    ? DryvResult.Success
                     : "The parents email must be specified");
 
         public int Age { get; set; }
 
-        [Dryv]
+        [DryvRules]
         public string Email { get; set; }
 
         [Required]
         public string Name { get; set; }
 
-        [Dryv]
+        [DryvRules]
         public string ParentsEmail { get; set; }
     }
 }

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 namespace Dryv
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    public class DryvAttribute : ValidationAttribute, IClientModelValidator
+    public class DryvRulesAttribute : ValidationAttribute, IClientModelValidator
     {
         private const string ClientAttributeName = "data-val-dryv";
 
@@ -25,7 +25,7 @@ namespace Dryv
                 metadata.ContainerType, 
                 metadata.PropertyName);
 
-        private static IEnumerable<Func<object, Result>> GetCompiledRules(ValidationContext validationContext) =>
+        private static IEnumerable<Func<object, DryvResult>> GetCompiledRules(ValidationContext validationContext) =>
             RulesHelper.GetCompiledRulesForProperty(
                 validationContext.ObjectType, 
                 validationContext.MemberName);

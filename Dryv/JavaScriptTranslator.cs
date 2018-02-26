@@ -9,9 +9,9 @@ namespace Dryv
 {
     internal class JavaScriptTranslator : Translator
     {
-        private static readonly MemberInfo ErrorMember = typeof(Result).GetMember("Error").First();
+        private static readonly MemberInfo ErrorMember = typeof(DryvResult).GetMember("Error").First();
 
-        private static readonly MemberInfo SuccessMember = typeof(Result).GetMember("Success").First();
+        private static readonly MemberInfo SuccessMember = typeof(DryvResult).GetMember("Success").First();
 
         private static readonly Dictionary<ExpressionType, string> Terminals = new Dictionary<ExpressionType, string>
         {
@@ -304,7 +304,7 @@ namespace Dryv
                     }
                     break;
 
-                case nameof(Result.Error):
+                case nameof(DryvResult.Error):
                     if (expression.Method != ErrorMember)
                     {
                         throw new MethodCallNotAllowed(expression);

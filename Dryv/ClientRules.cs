@@ -1,6 +1,6 @@
 ﻿namespace Dryv
 {
-    public class ClientRules
+    internal class ClientRules
     {
         public string Name { get; set; }
 
