@@ -17,11 +17,13 @@ namespace Dryv.Demo.Models
 
         public int Age { get; set; }
 
+        [Dryv]
         public string Email { get; set; }
 
         [Required]
         public string Name { get; set; }
 
+        [Dryv]
         public string ParentsEmail { get; set; }
     }
 }
