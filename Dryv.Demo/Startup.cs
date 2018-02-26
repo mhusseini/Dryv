@@ -14,13 +14,15 @@ namespace Dryv.Demo
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: string.Empty,
-                    template: "{controller}/{action?}",
-                    defaults: new { controller = "Home", action = nameof(HomeController.Index) });
-            });
+            app
+                .UseStaticFiles()
+                .UseMvc(routes =>
+                {
+                    routes.MapRoute(
+                        name: string.Empty,
+                        template: "{controller}/{action?}",
+                        defaults: new { controller = "Home", action = nameof(HomeController.Index) });
+                });
         }
 
         public void ConfigureServices(IServiceCollection services)

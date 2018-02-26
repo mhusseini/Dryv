@@ -12,22 +12,23 @@ namespace Dryv
     {
         private const string ClientAttributeName = "data-val-dryv";
 
-        public void AddValidation(ClientModelValidationContext context) =>
-            context.Attributes.Add(
-                ClientAttributeName, 
-                GetClientRules(context.ModelMetadata));
+        public void AddValidation(ClientModelValidationContext context)
+        {
+            context.Attributes.Add("data-val", "true");
+            context.Attributes.Add(ClientAttributeName, GetClientRules(context.ModelMetadata));
+        }
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext) =>
             GetValidationResult(GetFirstErrorMessage(validationContext));
 
         private static string GetClientRules(ModelMetadata metadata) =>
             RulesHelper.GetClientRulesForProperty(
-                metadata.ContainerType, 
+                metadata.ContainerType,
                 metadata.PropertyName);
 
         private static IEnumerable<Func<object, DryvResult>> GetCompiledRules(ValidationContext validationContext) =>
             RulesHelper.GetCompiledRulesForProperty(
-                validationContext.ObjectType, 
+                validationContext.ObjectType,
                 validationContext.MemberName);
 
         private static IEnumerable<string> GetErrorMessages(ValidationContext validationContext) =>

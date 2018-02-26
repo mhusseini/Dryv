@@ -15,7 +15,8 @@ namespace Dryv.Demo.Models
                     ? DryvResult.Success
                     : "The parents email must be specified");
 
-        public int Age { get; set; }
+        [Required]
+        public int? Age { get; set; }
 
         [DryvRules]
         public string Email { get; set; }

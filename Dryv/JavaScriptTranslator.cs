@@ -102,6 +102,8 @@ namespace Dryv
             [ExpressionType.IsFalse] = "!== false",
         };
 
+        public bool UseLowercaseMembers { get; set; }
+
         public override void Visit(BinaryExpression expression, IndentingStringWriter writer, bool negated = false)
         {
             this.Visit((dynamic)expression.Left, writer);
@@ -312,17 +314,27 @@ namespace Dryv
 
                     writer.Write(expression.Arguments.First());
                     break;
+
                 case nameof(string.IsNullOrEmpty):
-                    writer.Write("!(");
+                    if (!negated)
+                    {
+                        writer.Write("!");
+                    }
+                    writer.Write("(");
                     this.Visit((dynamic)expression.Arguments.First(), writer);
                     writer.Write(")");
                     break;
 
                 case nameof(string.IsNullOrWhiteSpace):
-                    writer.Write(@"!/\S/.test((");
+                    if (!negated)
+                    {
+                        writer.Write("!");
+                    }
+                    writer.Write(@"/\S/.test((");
                     this.Visit((dynamic)expression.Arguments.First(), writer);
                     writer.Write(@") || """")");
                     break;
+
                 default:
                     throw new MethodCallNotAllowed(expression);
                     //this.Visit((dynamic)expression.Object, writer);
@@ -427,9 +439,11 @@ namespace Dryv
 
         private string FormatIdentifier(string name)
         {
-            return name.Length == 1
-                ? name.ToLower()
-                : name.Substring(0, 1).ToLower() + name.Substring(1);
+            return this.UseLowercaseMembers
+                ? name.Length == 1
+                    ? name.ToLower()
+                    : name.Substring(0, 1).ToLower() + name.Substring(1)
+                : name;
         }
 
         private void WriteArguments(IEnumerable<Expression> arguments, IndentingStringWriter writer)
