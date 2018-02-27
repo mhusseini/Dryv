@@ -1,6 +1,5 @@
 # Dryv
-Server- and client-based model validation for ASP.NET Core 2.0 with rules written once in C#.
-
+ 
 [<img src="https://mhusseini.visualstudio.com/_apis/public/build/definitions/218da33c-9e6e-4d3f-bd06-17943f115076/3/badge"/>](https://mhusseini.visualstudio.com/_apis/public/build/definitions/218da33c-9e6e-4d3f-bd06-17943f115076/3/badge)
 
 ![NuGet](https://img.shields.io/nuget/v/Dryv.svg)
@@ -15,7 +14,7 @@ You can declaratively specify validation rules in one place (in the model class)
 
 While this is the case for simple validation rules, applying complex validations rules is a different story. For instance, see the foloowing model.
 
-```
+```csharp
 public class Customer
 {
 	[Required]
@@ -39,7 +38,7 @@ validation rules and implementing them in C# as well as JavaScript can become a 
 That's where Dryv comes in. The name "Dryv" is derived from the term "DRY Validation".Using Dryv, you define the rules using C# expressions
 and some inner magic will translate them to JavaScript. Taking teh example above, using Dryv it would look like this:
 
-```
+```csharp
 public class Customer
 {
     public static readonly DryvRules Rules = DryvRules

@@ -2,6 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
+    <Version>1.0.0-preview.1</Version>
+    <Copyright>2018 Munir Husseini</Copyright>
+    <PackageProjectUrl>https://github.com/mhusseini/dryv</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/mhusseini/Dryv/blob/master/LICENSE</PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/mhusseini/Dryv.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>asp-net-core, asp-net-core-mvc, model-validation</PackageTags>
+    <Description>Server- and client-based model validation for ASP.NET Core 2.0 with rules written once in C#.</Description>
   </PropertyGroup>
 
   <ItemGroup>
