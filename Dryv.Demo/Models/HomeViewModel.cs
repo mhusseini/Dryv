@@ -7,13 +7,13 @@ namespace Dryv.Demo.Models
         public static readonly DryvRules Rules = DryvRules
             .For<HomeViewModel>()
             .Rule(m => m.Email,
-                m => m.Age <= 18 || !string.IsNullOrWhiteSpace(m.Email)
+                m => m.Age < 18 || !string.IsNullOrWhiteSpace(m.Email)
                     ? DryvResult.Success
                     : "The email must be specified")
             .Rule(m => m.ParentsEmail,
                 m => m.Age >= 18 || !string.IsNullOrWhiteSpace(m.ParentsEmail)
                     ? DryvResult.Success
-                    : "The parents email " + m.Age + " must be specified");
+                    : "The parents email must be specified");
 
         [Required]
         public int? Age { get; set; }
