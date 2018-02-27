@@ -18,8 +18,4 @@
     <ProjectReference Include="..\Dryv\Dryv.csproj" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="mkdir wwwroot\js&#xD;&#xA;copy ..\Dryv.Client.JqueryUnobtrusive\app.js wwwroot\js\" />
-  </Target>
-
 </Project>

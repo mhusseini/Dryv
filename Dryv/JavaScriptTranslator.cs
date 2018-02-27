@@ -9,13 +9,13 @@ namespace Dryv
 {
     internal class JavaScriptTranslator : Translator
     {
-        private static readonly MemberInfo ErrorMember = typeof(DryvResult).GetMember("Error").First();
+        private static readonly MethodCallTranslator MethodCallTranslator = new MethodCallTranslator();
 
         private static readonly MemberInfo SuccessMember = typeof(DryvResult).GetMember("Success").First();
 
         private static readonly Dictionary<ExpressionType, string> Terminals = new Dictionary<ExpressionType, string>
         {
-            //[ExpressionType.Add] = "",
+            [ExpressionType.Add] = "+",
             //[ExpressionType.AddChecked] = "",
             [ExpressionType.And] = "&&",
             [ExpressionType.AndAlso] = "&&",
@@ -75,7 +75,7 @@ namespace Dryv
             //[ExpressionType.RuntimeVariables] = "",
             //[ExpressionType.Loop] = "",
             //[ExpressionType.Switch] = "",
-            //[ExpressionType.Throw] = "",
+            //[ExpressionType.Throw] = "throw",
             //[ExpressionType.Try] = "",
             //[ExpressionType.Unbox] = "",
             [ExpressionType.AddAssign] = "+=",
@@ -106,16 +106,17 @@ namespace Dryv
 
         public override void Visit(BinaryExpression expression, IndentingStringWriter writer, bool negated = false)
         {
-            this.Visit((dynamic)expression.Left, writer);
-            writer.Write(" ");
+            this.VisitWithBrackets(expression.Left, writer);
 
-            if (!TryWriteTerminal(expression, writer) && expression.Method != null)
+            if (!TryWriteTerminal(expression, writer))
             {
-                writer.Write($"[{this.FormatIdentifier(expression.Method.Name)}]");
+                throw expression.Method != null
+                    ? (Exception)new MethodCallNotAllowedException(expression)
+                    : new ExpressionTypeNotSupportedException(expression);
             }
 
-            writer.Write(" ");
-            this.Visit((dynamic)expression.Right, writer);
+
+            this.VisitWithBrackets(expression.Right, writer);
         }
 
         public override void Visit(BlockExpression expression, IndentingStringWriter writer, bool negated = false)
@@ -125,27 +126,23 @@ namespace Dryv
                 writer.WriteLine($"var {this.FormatIdentifier(variable.Name)};");
             }
 
-            base.Visit(expression, writer);
+            base.Visit(expression, writer, negated);
         }
 
         public override void Visit(ConditionalExpression expression, IndentingStringWriter writer, bool negated = false)
         {
-            writer.Write("(");
-            this.Visit((dynamic)expression.Test, writer);
-            writer.WriteLine(")");
+            this.VisitWithBrackets(expression.Test, writer);
             writer.IncrementIndent();
-            writer.Write(" ? (");
-            this.Visit((dynamic)expression.IfTrue, writer);
-            writer.WriteLine(")");
-            writer.Write(" : (");
-            this.Visit((dynamic)expression.IfFalse, writer);
-            writer.Write(")");
+            writer.Write(" ? ");
+            this.VisitWithBrackets(expression.IfTrue, writer);
+            writer.Write(" : ");
+            this.VisitWithBrackets(expression.IfFalse, writer);
             writer.DecrementIndent();
         }
 
         public override void Visit(ConstantExpression expression, IndentingStringWriter writer, bool negated = false)
         {
-            var text = QuoteValue(expression.Value);
+            var text = MethodCallTranslator.QuoteValue(expression.Value);
 
             writer.Write(text);
         }
@@ -153,7 +150,7 @@ namespace Dryv
         public override void Visit(DefaultExpression expression, IndentingStringWriter writer, bool negated = false)
         {
             var value = this.GetDefaultValue(expression.Type);
-            var text = QuoteValue(value);
+            var text = MethodCallTranslator.QuoteValue(value);
 
             writer.Write(text);
         }
@@ -188,10 +185,9 @@ namespace Dryv
 
         public override void Visit(InvocationExpression expression, IndentingStringWriter writer, bool negated = false)
         {
+            this.VisitWithBrackets(expression.Expression, writer);
             writer.Write("(");
-            this.Visit((dynamic)expression.Expression, writer);
-            writer.Write(")(");
-            this.WriteArguments(expression.Arguments, writer);
+            MethodCallTranslator.WriteArguments(this, expression.Arguments, writer);
             writer.Write(")");
         }
 
@@ -258,93 +254,8 @@ namespace Dryv
 
         public override void Visit(MethodCallExpression expression, IndentingStringWriter writer, bool negated = false)
         {
-            switch (expression.Method.Name)
-            {
-                case nameof(object.Equals):
-                    this.Visit((dynamic)expression.Object, writer);
-                    writer.Write(negated ? "!==" : " === ");
-                    this.WriteArguments(expression.Arguments, writer);
-                    break;
-
-                case nameof(string.Contains):
-                    this.Visit((dynamic)expression.Object, writer);
-                    writer.Write(".indexOf(");
-                    this.WriteArguments(expression.Arguments, writer);
-                    writer.Write(negated ? ") < 0" : ") >= 0");
-                    break;
-
-                case nameof(string.StartsWith):
-                    this.Visit((dynamic)expression.Object, writer);
-                    writer.Write(".indexOf(");
-                    this.WriteArguments(expression.Arguments, writer);
-                    writer.Write(negated ? ") !== 0" : ") === 0");
-                    break;
-
-                case nameof(string.ToLower):
-                    if (!negated)
-                    {
-                        writer.Write("!(");
-                    }
-                    this.Visit((dynamic)expression.Object, writer);
-                    writer.Write(".toLowerCase()");
-                    if (!negated)
-                    {
-                        writer.Write(")");
-                    }
-                    break;
-
-                case nameof(string.ToUpper):
-                    if (!negated)
-                    {
-                        writer.Write("!(");
-                    }
-                    this.Visit((dynamic)expression.Object, writer);
-                    writer.Write(".toUpperCase()");
-                    if (!negated)
-                    {
-                        writer.Write(")");
-                    }
-                    break;
-
-                case nameof(DryvResult.Error):
-                    if (expression.Method != ErrorMember)
-                    {
-                        throw new MethodCallNotAllowed(expression);
-                    }
-
-                    writer.Write(expression.Arguments.First());
-                    break;
-
-                case nameof(string.IsNullOrEmpty):
-                    if (!negated)
-                    {
-                        writer.Write("!");
-                    }
-                    writer.Write("(");
-                    this.Visit((dynamic)expression.Arguments.First(), writer);
-                    writer.Write(")");
-                    break;
-
-                case nameof(string.IsNullOrWhiteSpace):
-                    if (!negated)
-                    {
-                        writer.Write("!");
-                    }
-                    writer.Write(@"/\S/.test((");
-                    this.Visit((dynamic)expression.Arguments.First(), writer);
-                    writer.Write(@") || """")");
-                    break;
-
-                default:
-                    throw new MethodCallNotAllowed(expression);
-                    //this.Visit((dynamic)expression.Object, writer);
-                    //writer.Write(".");
-                    //writer.Write(this.FormatIdentifier(expression.Method.Name));
-                    //writer.Write("(");
-                    //this.WriteArguments(expression.Arguments, writer);
-                    //writer.Write(")");
-                    //break;
-            }
+            var translator = this;
+            MethodCallTranslator.TranslateMethodCall(translator, expression, writer, negated);
         }
 
         public override void Visit(NewArrayExpression expression, IndentingStringWriter writer, bool negated = false)
@@ -357,7 +268,7 @@ namespace Dryv
             writer.Write("new ");
             writer.Write(expression.Constructor.MemberType);
             writer.Write("(");
-            this.WriteArguments(expression.Arguments, writer);
+            MethodCallTranslator.WriteArguments(this, expression.Arguments, writer);
             writer.Write(")");
         }
 
@@ -417,13 +328,18 @@ namespace Dryv
             this.Visit((dynamic)expression.Operand, writer, negatedExpression);
         }
 
-        private static string QuoteValue(object value)
+        private static bool GetNeedsBrackets(Expression expression)
         {
-            return value == null
-                ? "null"
-                : (value.GetType().IsPrimitive
-                    ? value.ToString()
-                    : $@"""{value}""");
+            switch (expression)
+            {
+                case ConstantExpression _:
+                case MethodCallExpression _:
+                case MemberExpression _:
+                case UnaryExpression _:
+                    return false;
+            }
+
+            return true;
         }
 
         private static bool TryWriteTerminal(Expression expression, TextWriter writer)
@@ -446,14 +362,20 @@ namespace Dryv
                 : name;
         }
 
-        private void WriteArguments(IEnumerable<Expression> arguments, IndentingStringWriter writer)
+        public void VisitWithBrackets(Expression expression, IndentingStringWriter writer)
         {
-            var sep = string.Empty;
-            foreach (var argument in arguments)
+            var needsBrackets = GetNeedsBrackets(expression);
+
+            if (needsBrackets)
             {
-                writer.Write(sep);
-                this.Visit((dynamic)argument, writer);
-                sep = ", ";
+                writer.Write("(");
+            }
+
+            this.Visit((dynamic)expression, writer);
+
+            if (needsBrackets)
+            {
+                writer.Write(") ");
             }
         }
     }
