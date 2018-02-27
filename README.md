@@ -1,10 +1,6 @@
 # Dryv
  
-[<img src="https://mhusseini.visualstudio.com/_apis/public/build/definitions/218da33c-9e6e-4d3f-bd06-17943f115076/3/badge"/>](https://mhusseini.visualstudio.com/_apis/public/build/definitions/218da33c-9e6e-4d3f-bd06-17943f115076/3/badge)
-
-![NuGet](https://img.shields.io/nuget/v/Dryv.svg)
-
-![NuGet](https://img.shields.io/nuget/dt/Dryv.svg)
+[<img src="https://mhusseini.visualstudio.com/_apis/public/build/definitions/218da33c-9e6e-4d3f-bd06-17943f115076/3/badge"/>](https://mhusseini.visualstudio.com/_apis/public/build/definitions/218da33c-9e6e-4d3f-bd06-17943f115076/3/badge) ![NuGet](https://img.shields.io/nuget/v/Dryv.svg) ![NuGet](https://img.shields.io/nuget/dt/Dryv.svg)
 
 ## Overview
 According to [Rick Anderson](https://twitter.com/RickAndMSFT), "One of the design tenets of MVC is DRY ("Don't Repeat Yourself")" and 
