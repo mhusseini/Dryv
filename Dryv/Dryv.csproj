@@ -10,6 +10,8 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>asp-net-core, asp-net-core-mvc, model-validation</PackageTags>
     <Description>Server- and client-based model validation for ASP.NET Core 2.0 with rules written once in C#.</Description>
+    <Authors>Munir husseini</Authors>
+    <Company>Munir husseini</Company>
   </PropertyGroup>
 
   <ItemGroup>
