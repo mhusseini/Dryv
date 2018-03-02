@@ -1,6 +1,6 @@
 # Dryv
  
-![NuGet](https://img.shields.io/nuget/v/Dryv.svg) ![NuGet](https://img.shields.io/nuget/dt/Dryv.svg)
+[![NuGet version](https://badge.fury.io/nu/dryv.svg)](https://badge.fury.io/nu/dryv)
 
 ## Overview
 According to [Rick Anderson](https://twitter.com/RickAndMSFT), "One of the design tenets of MVC is DRY ("Don't Repeat Yourself")" and 
