@@ -42,7 +42,7 @@ namespace Dryv.Tests
             var regexp = (method.Object as Literal)?.Value as RegExp;
 
             Assert.AreEqual(pattern, regexp?.Pattern);
-            Assert.AreEqual(RegExpFlags.IgnoreCase, regexp?.Flags);
+            Assert.AreEqual(RegExpFlags.None, regexp?.Flags);
             Assert.AreEqual("test", method.Name);
         }
     }

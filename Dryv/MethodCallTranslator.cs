@@ -22,7 +22,7 @@ namespace Dryv
                     : $@"""{value}""");
         }
 
-        public void TranslateMethodCall(JavaScriptTranslator translator, MethodCallExpression expression, IndentingStringWriter writer, bool negated)
+        public string TranslateMethodCall(JavaScriptTranslator translator, MethodCallExpression expression, IndentingStringWriter writer, bool negated)
         {
             switch (expression.Method.Name)
             {
@@ -198,12 +198,14 @@ namespace Dryv
                         writer.Write(".test(");
                         this.WriteArguments(translator, expression.Arguments, writer);
                         writer.Write(")");
-                        break;
+                        return nameof(Match.Success);
                     }
 
                 default:
                     throw new MethodCallNotAllowedException(expression);
             }
+
+            return null;
         }
 
         public void WriteArguments(Translator translator, IEnumerable<Expression> arguments, IndentingStringWriter writer)
