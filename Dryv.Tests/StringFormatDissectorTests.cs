@@ -1,3 +1,4 @@
+using Dryv.MethodCallTranslation;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Dryv.Tests

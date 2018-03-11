@@ -4,8 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Dryv.MethodCallTranslation;
 
-namespace Dryv
+namespace Dryv.Translation
 {
     internal class JavaScriptTranslator : Translator
     {
@@ -269,8 +270,17 @@ namespace Dryv
 
         public override object Visit(MethodCallExpression expression, IndentingStringWriter writer, bool negated = false)
         {
-            var translator = this;
-            return MethodCallTranslator.TranslateMethodCall(translator, expression, writer, negated);
+            var options = new MethodTranslationOptions
+            {
+                Translator = this,
+                Expression = expression,
+                Writer = writer,
+                Negated = negated
+            };
+
+            MethodCallTranslator.Translate(options);
+
+            return options.Result;
         }
 
         public override object Visit(NewArrayExpression expression, IndentingStringWriter writer, bool negated = false)

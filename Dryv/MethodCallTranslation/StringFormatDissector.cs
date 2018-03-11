@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace Dryv
+namespace Dryv.MethodCallTranslation
 {
     internal class StringFormatDissector
     {

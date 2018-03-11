@@ -3,7 +3,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dryv
+namespace Dryv.Translation
 {
     internal class IndentingStringWriter : StringWriter
     {

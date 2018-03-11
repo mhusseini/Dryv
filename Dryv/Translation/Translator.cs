@@ -2,7 +2,7 @@
 using System.Linq.Expressions;
 using System.Text;
 
-namespace Dryv
+namespace Dryv.Translation
 {
     internal abstract class Translator
     {

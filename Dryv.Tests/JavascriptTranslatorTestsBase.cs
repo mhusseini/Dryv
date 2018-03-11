@@ -2,6 +2,7 @@ using Escape;
 using Escape.Ast;
 using System;
 using System.Linq;
+using Dryv.Translation;
 
 namespace Dryv.Tests
 {
