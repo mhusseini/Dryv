@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Dryv.Demo.Models
 {
@@ -6,25 +7,22 @@ namespace Dryv.Demo.Models
     {
         public static readonly DryvRules Rules = DryvRules
             .For<HomeViewModel>()
-            .Rule(m => m.Email,
-                m => m.Age < 18 || !string.IsNullOrWhiteSpace(m.Email)
+            .Rule(m => m.TaxId,
+                m => string.IsNullOrWhiteSpace(m.Company) || !string.IsNullOrWhiteSpace(m.TaxId)
                     ? DryvResult.Success
-                    : "The email must be specified")
-            .Rule(m => m.ParentsEmail,
-                m => m.Age >= 18 || !string.IsNullOrWhiteSpace(m.ParentsEmail)
-                    ? DryvResult.Success
-                    : "The parents email must be specified");
-
-        [Required]
-        public int? Age { get; set; }
-
-        [DryvRules]
-        public string Email { get; set; }
+                    : $"The tax ID for {m.Company} must be specified.")
+            .Rule(m => m.Company,
+                m => m.Company.Equals("Oscorp", StringComparison.OrdinalIgnoreCase)
+                    ? "Sorry, no evil corporations"
+                    : DryvResult.Success);
 
         [Required]
         public string Name { get; set; }
 
+        public string Company { get; set; }
+
         [DryvRules]
-        public string ParentsEmail { get; set; }
+        public string TaxId { get; set; }
+
     }
 }

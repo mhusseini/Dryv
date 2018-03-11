@@ -6,18 +6,18 @@ namespace Dryv
 {
     public class MethodCallNotAllowedException : Exception
     {
-        public MethodCallNotAllowedException(MethodCallExpression expression)
-        : this(expression.Method)
+        public MethodCallNotAllowedException(MethodCallExpression expression, string message = null)
+        : this(expression.Method, message)
         {
         }
 
-        public MethodCallNotAllowedException(BinaryExpression expression)
-            : this(expression.Method)
+        public MethodCallNotAllowedException(BinaryExpression expression, string message = null)
+            : this(expression.Method, message)
         {
         }
 
-        public MethodCallNotAllowedException(MethodInfo method)
-            : base($"Calls to the method {method.Name} are not allowed.")
+        public MethodCallNotAllowedException(MethodInfo method, string message = null)
+            : base($"Calls to the method {method.Name} are not allowed. {message ?? string.Empty}")
         {
         }
     }
