@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using Dryv.Translation;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using Dryv.Translation;
 
 namespace Dryv.MethodCallTranslation
 {
@@ -10,9 +11,9 @@ namespace Dryv.MethodCallTranslation
     {
         protected static readonly StringFormatDissector StringFormatDissector = new StringFormatDissector();
 
-        public abstract bool Translate(MethodTranslationOptions options);
+        protected virtual Dictionary<string, Action<MethodTranslationOptions>> MethodTranslators { get; }
 
-        public string QuoteValue(object value)
+        public static string QuoteValue(object value)
         {
             return value == null
                 ? "null"
@@ -20,7 +21,8 @@ namespace Dryv.MethodCallTranslation
                     ? value.ToString()
                     : $@"""{value}""");
         }
-        public void WriteArguments(Translator translator, IEnumerable<Expression> arguments, IndentingStringWriter writer)
+
+        public static void WriteArguments(Translator translator, IEnumerable<Expression> arguments, IndentingStringWriter writer)
         {
             var sep = string.Empty;
             foreach (var argument in arguments)
@@ -30,6 +32,23 @@ namespace Dryv.MethodCallTranslation
                 sep = ", ";
             }
         }
+
+        public virtual bool Translate(MethodTranslationOptions options)
+        {
+            if (!this.MethodTranslators.TryGetValue(options.Expression.Method.Name, out var translator))
+            {
+                throw new MethodCallNotAllowedException(options.Expression);
+            }
+
+            translator(options);
+            return true;
+        }
+
+        protected static bool ArgumentIs<T>(MethodTranslationOptions options, int index, T value)
+        {
+            return Equals((options.Expression.Arguments[index] as ConstantExpression)?.Value, value);
+        }
+
         protected static T FindValue<T>(params Expression[] expressions) =>
                             FindValue<T>((IList<Expression>)expressions);
 

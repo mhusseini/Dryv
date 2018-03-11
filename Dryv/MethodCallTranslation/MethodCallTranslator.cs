@@ -10,7 +10,7 @@ namespace Dryv.MethodCallTranslation
     {
         private static readonly MemberInfo ErrorMember = typeof(DryvResult).GetMember("Error").First();
 
-        private readonly Dictionary<Type, MethodCallTranslatorBase> Translators = new Dictionary<Type, MethodCallTranslatorBase>
+        private readonly Dictionary<Type, MethodCallTranslatorBase> translators = new Dictionary<Type, MethodCallTranslatorBase>
         {
             [typeof(string)] = new StringMethodCallTranslator(),
             [typeof(Regex)] = new RegexMethodCallTranslator()
@@ -18,7 +18,7 @@ namespace Dryv.MethodCallTranslation
 
         public override bool Translate(MethodTranslationOptions options)
         {
-            if (this.Translators.TryGetValue(options.Expression.Method.DeclaringType, out var translator))
+            if (this.translators.TryGetValue(options.Expression.Method.DeclaringType, out var translator))
             {
                 return translator.Translate(options);
             }

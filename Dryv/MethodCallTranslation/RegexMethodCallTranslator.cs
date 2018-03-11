@@ -1,4 +1,6 @@
-﻿using System.Linq.Expressions;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -6,49 +8,11 @@ namespace Dryv.MethodCallTranslation
 {
     internal class RegexMethodCallTranslator : MethodCallTranslatorBase
     {
-        public override bool Translate(MethodTranslationOptions options)
+        protected override Dictionary<string, Action<MethodTranslationOptions>> MethodTranslators { get; } = new Dictionary<string, Action<MethodTranslationOptions>>
         {
-            switch (options.Expression.Method.Name)
-            {
-                case nameof(Regex.IsMatch):
-                    {
-                        var result = FindRegularExpression(options.Expression.Object);
-
-                        if (result == null)
-                        {
-                            throw new MethodCallNotAllowedException(options.Expression, "Could not determine regular options.Expression.");
-                        }
-
-                        var clientRegexp = $"/{result.Value.Pattern}/{TranslateRegexOptions(result.Value.Options)}";
-                        options.Writer.Write(clientRegexp);
-                        options.Writer.Write(".test(");
-                        this.WriteArguments(options.Translator, options.Expression.Arguments, options.Writer);
-                        options.Writer.Write(")");
-                        return true;
-                    }
-
-                case nameof(Regex.Match):
-                    {
-                        var result = FindRegularExpression(options.Expression.Object);
-
-                        if (result == null)
-                        {
-                            throw new MethodCallNotAllowedException(options.Expression, "Could not determine regular options.Expression.");
-                        }
-
-                        var clientRegexp = $"/{result.Value.Pattern}/{TranslateRegexOptions(result.Value.Options)}";
-                        options.Writer.Write(clientRegexp);
-                        options.Writer.Write(".test(");
-                        this.WriteArguments(options.Translator, options.Expression.Arguments, options.Writer);
-                        options.Writer.Write(")");
-                        options.Result = nameof(Match.Success);
-                        return true;
-                    }
-
-                default:
-                    throw new MethodCallNotAllowedException(options.Expression);
-            }
-        }
+            [nameof(Regex.IsMatch)] = IsMatch,
+            [nameof(Regex.Match)] = Match
+        };
 
         private static (string Pattern, RegexOptions Options)? FindRegularExpression(Expression exp)
         {
@@ -79,6 +43,39 @@ namespace Dryv.MethodCallTranslation
             return result;
         }
 
+        private static void IsMatch(MethodTranslationOptions options)
+        {
+            var result = FindRegularExpression(options.Expression.Object);
+
+            if (result == null)
+            {
+                throw new MethodCallNotAllowedException(options.Expression, "Could not determine regular options.Expression.");
+            }
+
+            var clientRegexp = $"/{result.Value.Pattern}/{TranslateRegexOptions(result.Value.Options)}";
+            options.Writer.Write(clientRegexp);
+            options.Writer.Write(".test(");
+            WriteArguments(options.Translator, options.Expression.Arguments, options.Writer);
+            options.Writer.Write(")");
+        }
+
+        private static void Match(MethodTranslationOptions options)
+        {
+            var result = FindRegularExpression(options.Expression.Object);
+
+            if (result == null)
+            {
+                throw new MethodCallNotAllowedException(options.Expression, "Could not determine regular options.Expression.");
+            }
+
+            var clientRegexp = $"/{result.Value.Pattern}/{TranslateRegexOptions(result.Value.Options)}";
+            options.Writer.Write(clientRegexp);
+            options.Writer.Write(".test(");
+            WriteArguments(options.Translator, options.Expression.Arguments, options.Writer);
+            options.Writer.Write(")");
+            options.Result = nameof(System.Text.RegularExpressions.Match.Success);
+        }
+
         private static string TranslateRegexOptions(RegexOptions options)
         {
             var sb = new StringBuilder();
@@ -94,12 +91,12 @@ namespace Dryv.MethodCallTranslation
 
             if (options.HasFlag(RegexOptions.IgnorePatternWhitespace))
             {
-                throw new ExpressionNotTranslatableException($"JavaScript regular expressions don't support {RegexOptions.IgnorePatternWhitespace}.");
+                throw new ExpressionNotTranslatableException($"{RegexOptions.IgnorePatternWhitespace} not translatable to JavaScript.");
             }
 
             if (options.HasFlag(RegexOptions.RightToLeft))
             {
-                throw new ExpressionNotTranslatableException($"JavaScript regular expressions don't support {RegexOptions.RightToLeft}.");
+                throw new ExpressionNotTranslatableException($"{RegexOptions.RightToLeft} not translatable to JavaScript.");
             }
 
             var modifiers = sb.ToString();
