@@ -80,7 +80,8 @@ On the client, install the NPM package:
 ```
 npm install --save dryv-jquery-unobtrusive 
 ```
-... or download the JS file directly into your project and reference it from your page:
+... or download the browser-specific JS file directly [from here](https://raw.githubusercontent.com/mhusseini/dryv-jquery-unobtrusive/master/dist/dryv-jquery-unobtrusive.browser.min.js) 
+into your project and reference it from your page:
 ```
-<script src="js/dryv-jquery-unobtrusive.min.js"></script>
+<script src="js/dryv-jquery-unobtrusive.browser.min.js"></script>
 ```
