@@ -2,29 +2,33 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 
 namespace Dryv.MethodCallTranslation
 {
-    internal class StringMethodCallTranslator : MethodCallTranslatorBase
+    internal class StringMethodCallTranslator : MethodCallTranslator
     {
-        protected override Dictionary<string, Action<MethodTranslationOptions>> MethodTranslators { get; } = new Dictionary<string, Action<MethodTranslationOptions>>
+        private static readonly StringFormatDissector StringFormatDissector = new StringFormatDissector();
+        public override IList<Regex> TypeMatches { get; } = new[] { new Regex(typeof(String).FullName, RegexOptions.Compiled) };
+
+        protected override List<(string Method, Action<MethodTranslationParameters> Translator)> MethodTranslators { get; } = new List<(string Method, Action<MethodTranslationParameters> Translator)>
         {
-            [nameof(string.Equals)] = Equals,
-            [nameof(string.Contains)] = Contains,
-            [nameof(string.StartsWith)] = StartsWith,
-            [nameof(string.EndsWith)] = EndsWith,
-            [nameof(string.ToLower)] = ToLower,
-            [nameof(string.ToUpper)] = ToUpper,
-            [nameof(string.IsNullOrEmpty)] = IsNullOrEmpty,
-            [nameof(string.IsNullOrWhiteSpace)] = IsNullOrWhiteSpace,
-            [nameof(string.Trim)] = Trim,
-            [nameof(string.TrimEnd)] = TrimEnd,
-            [nameof(string.Normalize)] = Normalize,
-            [nameof(string.Compare)] = Compare,
-            [nameof(string.CompareTo)] = CompareTo,
-            [nameof(string.IndexOf)] = IndexOf,
-            [nameof(string.TrimStart)] = TrimStart,
-            [nameof(string.Format)] = Format,
+            (nameof(string.Equals), Equals),
+            (nameof(string.Contains), Contains),
+            (nameof(string.StartsWith), StartsWith),
+            (nameof(string.EndsWith), EndsWith),
+            (nameof(string.ToLower), ToLower),
+            (nameof(string.ToUpper), ToUpper),
+            (nameof(string.IsNullOrEmpty), IsNullOrEmpty),
+            (nameof(string.IsNullOrWhiteSpace), IsNullOrWhiteSpace),
+            (nameof(string.Trim), Trim),
+            (nameof(string.TrimEnd), TrimEnd),
+            (nameof(string.Normalize), Normalize),
+            (nameof(string.Compare), Compare),
+            (nameof(string.CompareTo), CompareTo),
+            (nameof(string.IndexOf), IndexOf),
+            (nameof(string.TrimStart), TrimStart),
+            (nameof(string.Format), Format)
         };
 
         protected static bool GetIsCaseInsensitive(MethodCallExpression expression)
@@ -56,7 +60,7 @@ namespace Dryv.MethodCallTranslation
             }
         }
 
-        private static void Compare(MethodTranslationOptions options)
+        private static void Compare(MethodTranslationParameters options)
         {
             /*
              Х public static int Compare(String strA, int indexA, String strB, int indexB, int length, bool ignoreCase);
@@ -75,7 +79,7 @@ namespace Dryv.MethodCallTranslation
                 throw new MethodCallNotAllowedException(options.Expression, "Only override without any indexes can be translated to JavaScript");
             }
             var arguments = options.Expression.Arguments;
-            options.Translator.VisitWithBrackets(arguments[0], options.Writer);
+            options.Translator.VisitWithBrackets(arguments.FirstOrDefault(), options.Writer);
             var isCaseInsensitive = ArgumentIs(options, 2, true) || GetIsCaseInsensitive(options.Expression);
             if (isCaseInsensitive)
             {
@@ -83,7 +87,7 @@ namespace Dryv.MethodCallTranslation
             }
 
             options.Writer.Write(".localeCompare(");
-            options.Translator.Visit((dynamic)arguments[1], options.Writer);
+            options.Translator.Visit(arguments[1], options.Writer);
             if (isCaseInsensitive)
             {
                 options.Writer.Write(".toLowerCase()");
@@ -92,7 +96,7 @@ namespace Dryv.MethodCallTranslation
             options.Writer.Write(")");
         }
 
-        private static void CompareTo(MethodTranslationOptions options)
+        private static void CompareTo(MethodTranslationParameters options)
         {
             /*
              √ public int CompareTo(String strB);
@@ -101,16 +105,16 @@ namespace Dryv.MethodCallTranslation
             var arguments = options.Expression.Arguments;
             options.Translator.VisitWithBrackets(options.Expression.Object, options.Writer);
             options.Writer.Write(".localeCompare(");
-            options.Translator.Visit((dynamic)arguments[0], options.Writer);
+            options.Translator.Visit(arguments[0], options.Writer);
             options.Writer.Write(")");
         }
 
-        private static void Contains(MethodTranslationOptions options)
+        private static void Contains(MethodTranslationParameters options)
         {
             /*
              √ public bool Contains(String value)
              */
-            options.Translator.Visit((dynamic)options.Expression.Object, options.Writer);
+            options.Translator.Visit(options.Expression.Object, options.Writer);
 
             var isCaseInsensitive = GetIsCaseInsensitive(options.Expression);
             if (isCaseInsensitive)
@@ -128,7 +132,7 @@ namespace Dryv.MethodCallTranslation
             options.Writer.Write(options.Negated ? ") < 0" : ") >= 0");
         }
 
-        private static void EndsWith(MethodTranslationOptions options)
+        private static void EndsWith(MethodTranslationParameters options)
         {
             /*
              √ public bool EndsWith(String value);
@@ -136,7 +140,7 @@ namespace Dryv.MethodCallTranslation
              √ public bool EndsWith(String value, StringComparison comparisonType);
              √ public bool EndsWith(char value);
              */
-            options.Translator.Visit((dynamic)options.Expression.Object, options.Writer);
+            options.Translator.Visit(options.Expression.Object, options.Writer);
 
             var isCaseInsensitive = ArgumentIs(options, 1, true) || GetIsCaseInsensitive(options.Expression);
             if (isCaseInsensitive)
@@ -145,26 +149,26 @@ namespace Dryv.MethodCallTranslation
             }
 
             options.Writer.Write(".indexOf(");
-            options.Translator.Visit((dynamic)options.Expression.Arguments[0], options.Writer);
+            options.Translator.Visit(options.Expression.Arguments[0], options.Writer);
             if (isCaseInsensitive)
             {
                 options.Writer.Write(".toLowerCase()");
             }
 
             options.Writer.Write(options.Negated ? ") !== (" : ") === (");
-            options.Translator.VisitWithBrackets((dynamic)options.Expression.Object, options.Writer);
+            options.Translator.VisitWithBrackets(options.Expression.Object, options.Writer);
             options.Writer.Write(".length - ");
-            options.Translator.VisitWithBrackets((dynamic)options.Expression.Arguments[0], options.Writer);
+            options.Translator.VisitWithBrackets(options.Expression.Arguments[0], options.Writer);
             options.Writer.Write(".length)");
         }
 
-        private static void Equals(MethodTranslationOptions options)
+        private static void Equals(MethodTranslationParameters options)
         {
             /*
              √ public static bool Equals(String a, String b, StringComparison comparisonType);
              √ public static bool Equals(String a, String b);
              */
-            options.Translator.Visit((dynamic)options.Expression.Object, options.Writer);
+            options.Translator.Visit(options.Expression.Object, options.Writer);
 
             var value = options.Expression.Arguments.First();
             var isCaseInsensitive = GetIsCaseInsensitive(options.Expression);
@@ -181,7 +185,7 @@ namespace Dryv.MethodCallTranslation
             }
         }
 
-        private static void Format(MethodTranslationOptions options)
+        private static void Format(MethodTranslationParameters options)
         {
             /*
              Х public static String Format(IFormatProvider provider, String format, object arg0);
@@ -238,7 +242,7 @@ namespace Dryv.MethodCallTranslation
             }
         }
 
-        private static void IndexOf(MethodTranslationOptions options)
+        private static void IndexOf(MethodTranslationParameters options)
         {
             /*
              √ public int IndexOf(char value);
@@ -265,7 +269,7 @@ namespace Dryv.MethodCallTranslation
             }
 
             options.Writer.Write(".indexOf(");
-            options.Translator.VisitWithBrackets((dynamic)arguments[1], options.Writer);
+            options.Translator.VisitWithBrackets(arguments[1], options.Writer);
             if (isCaseInsensitive)
             {
                 options.Writer.Write(".toLowerCase()");
@@ -274,7 +278,7 @@ namespace Dryv.MethodCallTranslation
             options.Writer.Write(")");
         }
 
-        private static void IsNullOrEmpty(MethodTranslationOptions options)
+        private static void IsNullOrEmpty(MethodTranslationParameters options)
         {
             /*
              √ public static bool IsNullOrEmpty(String value);
@@ -287,7 +291,7 @@ namespace Dryv.MethodCallTranslation
             options.Translator.VisitWithBrackets(options.Expression.Arguments.First(), options.Writer);
         }
 
-        private static void IsNullOrWhiteSpace(MethodTranslationOptions options)
+        private static void IsNullOrWhiteSpace(MethodTranslationParameters options)
         {
             /*
              √ public static bool IsNullOrWhiteSpace(String value);
@@ -302,7 +306,7 @@ namespace Dryv.MethodCallTranslation
             options.Writer.Write(@" || """")");
         }
 
-        private static void Normalize(MethodTranslationOptions options)
+        private static void Normalize(MethodTranslationParameters options)
         {
             /*
              √ public String Normalize();
@@ -312,7 +316,7 @@ namespace Dryv.MethodCallTranslation
             options.Writer.Write(".normalize()");
         }
 
-        private static void StartsWith(MethodTranslationOptions options)
+        private static void StartsWith(MethodTranslationParameters options)
         {
             /*
              √ public bool StartsWith(char value);
@@ -320,7 +324,7 @@ namespace Dryv.MethodCallTranslation
              √! public bool StartsWith(String value, bool ignoreCase, CultureInfo culture);
              √ public bool StartsWith(String value, StringComparison comparisonType);
              */
-            options.Translator.Visit((dynamic)options.Expression.Object, options.Writer);
+            options.Translator.Visit(options.Expression.Object, options.Writer);
             var isCaseInsensitive = ArgumentIs(options, 1, true) || GetIsCaseInsensitive(options.Expression);
             if (isCaseInsensitive)
             {
@@ -337,7 +341,7 @@ namespace Dryv.MethodCallTranslation
             options.Writer.Write(options.Negated ? ") !== 0" : ") === 0");
         }
 
-        private static void ToLower(MethodTranslationOptions options)
+        private static void ToLower(MethodTranslationParameters options)
         {
             /*
              √ public String ToLower();
@@ -352,7 +356,7 @@ namespace Dryv.MethodCallTranslation
             options.Writer.Write(".toLowerCase()");
         }
 
-        private static void ToUpper(MethodTranslationOptions options)
+        private static void ToUpper(MethodTranslationParameters options)
         {
             /*
              √ public String ToUpper();
@@ -367,7 +371,7 @@ namespace Dryv.MethodCallTranslation
             options.Writer.Write(".toUpperCase()");
         }
 
-        private static void Trim(MethodTranslationOptions options)
+        private static void Trim(MethodTranslationParameters options)
         {
             /*
              √ public String Trim(char trimChar);
@@ -383,7 +387,7 @@ namespace Dryv.MethodCallTranslation
             options.Writer.Write(".trim()");
         }
 
-        private static void TrimEnd(MethodTranslationOptions options)
+        private static void TrimEnd(MethodTranslationParameters options)
         {
             /*
              √ public String TrimEnd();
@@ -399,7 +403,7 @@ namespace Dryv.MethodCallTranslation
             options.Writer.Write(".trimRight()");
         }
 
-        private static void TrimStart(MethodTranslationOptions options)
+        private static void TrimStart(MethodTranslationParameters options)
         {
             /*
              √ public String TrimStart();

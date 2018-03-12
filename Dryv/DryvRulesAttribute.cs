@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Dryv.Translation;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Dryv
 {
@@ -15,16 +16,21 @@ namespace Dryv
         public void AddValidation(ClientModelValidationContext context)
         {
             context.Attributes.Add("data-val", "true");
-            context.Attributes.Add(ClientAttributeName, GetClientRules(context.ModelMetadata));
+            context.Attributes.Add(ClientAttributeName, GetClientRules(context));
         }
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext) =>
             GetValidationResult(GetFirstErrorMessage(validationContext));
 
-        private static string GetClientRules(ModelMetadata metadata) =>
-            RulesHelper.GetClientRulesForProperty(
+        private static string GetClientRules(ModelValidationContextBase context)
+        {
+            var translator = context.ActionContext.HttpContext.RequestServices.GetService<ITranslator>();
+            var metadata = context.ModelMetadata;
+            return RulesHelper.GetClientRulesForProperty(
                 metadata.ContainerType,
-                metadata.PropertyName);
+                metadata.PropertyName,
+                translator);
+        }
 
         private static IEnumerable<Func<object, DryvResult>> GetCompiledRules(ValidationContext validationContext) =>
             RulesHelper.GetCompiledRulesForProperty(

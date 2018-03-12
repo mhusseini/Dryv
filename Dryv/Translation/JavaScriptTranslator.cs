@@ -4,14 +4,14 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Dryv.DependencyInjection;
 using Dryv.MethodCallTranslation;
+using Microsoft.Extensions.Options;
 
 namespace Dryv.Translation
 {
     internal class JavaScriptTranslator : Translator
     {
-        private static readonly MethodCallTranslator MethodCallTranslator = new MethodCallTranslator();
-
         private static readonly MemberInfo SuccessMember = typeof(DryvResult).GetMember("Success").First();
 
         private static readonly Dictionary<ExpressionType, string> Terminals = new Dictionary<ExpressionType, string>
@@ -103,9 +103,19 @@ namespace Dryv.Translation
             [ExpressionType.IsFalse] = "!== false",
         };
 
+        private readonly IMethodCallTranslator methodCallTranslator;
+        private readonly DryvOptions options;
+
+        public JavaScriptTranslator(IMethodCallTranslator methodCallTranslator,
+            IOptions<DryvOptions> options)
+        {
+            this.methodCallTranslator = methodCallTranslator;
+            this.options = options.Value;
+        }
+
         public bool UseLowercaseMembers { get; set; }
 
-        public override object Visit(BinaryExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(BinaryExpression expression, IndentingStringWriter writer, bool negated = false)
         {
             this.VisitWithBrackets(expression.Left, writer);
 
@@ -117,10 +127,9 @@ namespace Dryv.Translation
             }
 
             this.VisitWithBrackets(expression.Right, writer);
-            return null;
         }
 
-        public override object Visit(BlockExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(BlockExpression expression, IndentingStringWriter writer, bool negated = false)
         {
             foreach (var variable in expression.Variables)
             {
@@ -128,10 +137,9 @@ namespace Dryv.Translation
             }
 
             base.Visit(expression, writer, negated);
-            return null;
         }
 
-        public override object Visit(ConditionalExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(ConditionalExpression expression, IndentingStringWriter writer, bool negated = false)
         {
             this.VisitWithBrackets(expression.Test, writer);
             writer.IncrementIndent();
@@ -140,84 +148,94 @@ namespace Dryv.Translation
             writer.Write(" : ");
             this.VisitWithBrackets(expression.IfFalse, writer);
             writer.DecrementIndent();
-            return null;
         }
 
-        public override object Visit(ConstantExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(ConstantExpression expression, IndentingStringWriter writer, bool negated = false)
         {
             var text = MethodCallTranslator.QuoteValue(expression.Value);
 
             writer.Write(text);
-            return null;
         }
 
-        public override object Visit(DefaultExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(DefaultExpression expression, IndentingStringWriter writer, bool negated = false)
         {
             var value = this.GetDefaultValue(expression.Type);
             var text = MethodCallTranslator.QuoteValue(value);
 
             writer.Write(text);
-            return null;
         }
 
-        public override object Visit(DynamicExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(DynamicExpression expression, IndentingStringWriter writer, bool negated = false)
         {
             throw new NotSupportedException();
         }
 
-        public override object Visit(GotoExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(GotoExpression expression, IndentingStringWriter writer, bool negated = false)
         {
             throw new NotSupportedException();
         }
 
-        public override object Visit(IDynamicExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(IDynamicExpression expression, IndentingStringWriter writer, bool negated = false)
         {
             throw new NotSupportedException();
         }
 
-        public override object Visit(IndexExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(IndexExpression expression, IndentingStringWriter writer, bool negated = false)
         {
             if (expression.Arguments.Count > 1)
             {
                 throw new NotSupportedException("JavaScript does not support indexers with more than one argument.");
             }
 
-            this.Visit((dynamic)expression.Object, writer);
+            this.Visit(expression.Object, writer);
             writer.Write("[");
-            this.Visit((dynamic)expression.Arguments.First(), writer);
+            this.Visit(expression.Arguments.First(), writer);
             writer.Write("]");
-            return null;
         }
 
-        public override object Visit(InvocationExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(Expression expression, IndentingStringWriter writer, bool negated = false)
+        {
+            var parameters = new TranslationParameters
+            {
+                Expression = expression,
+                Translator = this,
+                Writer = writer,
+                Negated = negated
+            };
+
+            if (!this.options.GenericTanslators.Any(t => t.Translate(parameters)))
+            {
+                this.Visit((dynamic)expression, writer, negated);
+            }
+        }
+
+        public override void Visit(InvocationExpression expression, IndentingStringWriter writer, bool negated = false)
         {
             this.VisitWithBrackets(expression.Expression, writer);
             writer.Write("(");
             MethodCallTranslator.WriteArguments(this, expression.Arguments, writer);
             writer.Write(")");
-            return null;
         }
 
-        public override object Visit(LabelExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(LabelExpression expression, IndentingStringWriter writer, bool negated = false)
         {
             throw new NotSupportedException();
         }
 
-        public override object Visit(LambdaExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(LambdaExpression expression, IndentingStringWriter writer, bool negated = false)
         {
             writer.Write("function(");
             writer.Write(string.Join(", ", expression.Parameters.Select(p => this.FormatIdentifier(p.Name))));
             writer.WriteLine(") {");
             writer.IncrementIndent();
             writer.Write("return ");
-            this.Visit((dynamic)expression.Body, writer);
+            this.Visit(expression.Body, writer);
             writer.WriteLine(";");
             writer.DecrementIndent();
             writer.Write("}");
-            return null;
         }
 
-        public override object Visit(ListInitExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(ListInitExpression expression, IndentingStringWriter writer, bool negated = false)
         {
             writer.Write("= [");
             var sep = string.Empty;
@@ -226,51 +244,42 @@ namespace Dryv.Translation
                 writer.Write(sep);
                 foreach (var argument in initializer.Arguments)
                 {
-                    this.Visit((dynamic)argument, writer);
+                    this.Visit(argument, writer);
                 }
                 sep = ", ";
             }
             writer.Write("]");
-            return null;
         }
 
-        public override object Visit(LoopExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(LoopExpression expression, IndentingStringWriter writer, bool negated = false)
         {
             throw new NotImplementedException();
         }
 
-        public override object Visit(MemberExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(MemberExpression expression, IndentingStringWriter writer, bool negated = false)
         {
             if (expression.Member == SuccessMember)
             {
                 writer.Write("null");
-                return null;
             }
 
             if (expression.Expression != null)
             {
-                var ignoredMember = this.Visit((dynamic)expression.Expression, writer);
-                if (ignoredMember == expression.Member.Name)
-                {
-                    return null;
-                }
-
+                this.Visit(expression.Expression, writer);
                 writer.Write(".");
             }
 
             writer.Write(this.FormatIdentifier(expression.Member.Name));
-            return null;
         }
 
-        public override object Visit(MemberInitExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(MemberInitExpression expression, IndentingStringWriter writer, bool negated = false)
         {
             this.Visit(expression.NewExpression, writer);
-            return null;
         }
 
-        public override object Visit(MethodCallExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(MethodCallExpression expression, IndentingStringWriter writer, bool negated = false)
         {
-            var options = new MethodTranslationOptions
+            var parameters = new MethodTranslationParameters
             {
                 Translator = this,
                 Expression = expression,
@@ -278,75 +287,69 @@ namespace Dryv.Translation
                 Negated = negated
             };
 
-            MethodCallTranslator.Translate(options);
-
-            return options.Result;
+            this.methodCallTranslator.Translate(parameters);
         }
 
-        public override object Visit(NewArrayExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(NewArrayExpression expression, IndentingStringWriter writer, bool negated = false)
         {
             writer.Write("[]");
-            return null;
         }
 
-        public override object Visit(NewExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(NewExpression expression, IndentingStringWriter writer, bool negated = false)
         {
             writer.Write("new ");
             writer.Write(expression.Constructor.MemberType);
             writer.Write("(");
             MethodCallTranslator.WriteArguments(this, expression.Arguments, writer);
             writer.Write(")");
-            return null;
         }
 
-        public override object Visit(ParameterExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(ParameterExpression expression, IndentingStringWriter writer, bool negated = false)
         {
             writer.Write(expression.Name);
-            return null;
         }
 
-        public override object Visit(RuntimeVariablesExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(RuntimeVariablesExpression expression, IndentingStringWriter writer, bool negated = false)
         {
             throw new NotImplementedException();
         }
 
-        public override object Visit(SwitchExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(SwitchExpression expression, IndentingStringWriter writer, bool negated = false)
         {
             writer.Write("switch(");
-            this.Visit((dynamic)expression.SwitchValue, writer);
+            this.Visit(expression.SwitchValue, writer);
             writer.WriteLine("){");
             foreach (var expressionCase in expression.Cases)
             {
                 foreach (var testCase in expressionCase.TestValues)
                 {
                     writer.Write("case ");
-                    this.Visit((dynamic)testCase, writer);
+                    this.Visit(testCase, writer);
                     writer.WriteLine(":");
                 }
 
                 writer.WriteLine("{");
                 writer.IncrementIndent();
-                this.Visit((dynamic)expressionCase.Body, writer);
+                this.Visit(expressionCase.Body, writer);
                 writer.WriteLine();
                 writer.WriteLine("break;");
                 writer.DecrementIndent();
                 writer.WriteLine("}");
             }
             writer.Write("}");
-            return null;
         }
 
-        public override object Visit(TryExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(TryExpression expression, IndentingStringWriter writer, bool negated = false)
         {
             throw new NotImplementedException();
         }
 
-        public override object Visit(TypeBinaryExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(TypeBinaryExpression expression, IndentingStringWriter writer, bool negated = false)
         {
             throw new NotSupportedException();
         }
 
-        public override object Visit(UnaryExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(UnaryExpression expression, IndentingStringWriter writer, bool negated = false)
         {
             var negatedExpression = expression.NodeType == ExpressionType.Not;
             if (!negatedExpression)
@@ -354,11 +357,10 @@ namespace Dryv.Translation
                 TryWriteTerminal(expression, writer);
             }
 
-            this.Visit((dynamic)expression.Operand, writer, negatedExpression);
-            return null;
+            this.Visit(expression.Operand, writer, negatedExpression);
         }
 
-        public object VisitWithBrackets(Expression expression, IndentingStringWriter writer)
+        public override void VisitWithBrackets(Expression expression, IndentingStringWriter writer)
         {
             var needsBrackets = GetNeedsBrackets(expression);
 
@@ -367,13 +369,12 @@ namespace Dryv.Translation
                 writer.Write("(");
             }
 
-            this.Visit((dynamic)expression, writer);
+            this.Visit(expression, writer);
 
             if (needsBrackets)
             {
                 writer.Write(") ");
             }
-            return null;
         }
 
         private static bool GetNeedsBrackets(Expression expression)

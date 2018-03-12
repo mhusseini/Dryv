@@ -2,7 +2,10 @@ using Escape;
 using Escape.Ast;
 using System;
 using System.Linq;
+using Dryv.DependencyInjection;
+using Dryv.MethodCallTranslation;
 using Dryv.Translation;
+using Microsoft.Extensions.Options;
 
 namespace Dryv.Tests
 {
@@ -23,7 +26,11 @@ namespace Dryv.Tests
 
         protected static FunctionExpression GetTranslatedAst(System.Linq.Expressions.Expression<Func<TestModel, DryvResult>> expression)
         {
-            var translator = new JavaScriptTranslator();
+            var options = Options.Create(new DryvOptions());
+            var translator = new JavaScriptTranslator(
+                new DefaultMethodCallTranslator(options),
+                options);
+
             var translation = translator.Translate(expression);
             var jsParser = new JavaScriptParser();
             return jsParser.ParseFunctionExpression(translation);

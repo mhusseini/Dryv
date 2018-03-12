@@ -3,9 +3,9 @@ using Dryv.Translation;
 
 namespace Dryv.MethodCallTranslation
 {
-    internal class MethodTranslationOptions
+    public class MethodTranslationParameters
     {
-        public JavaScriptTranslator Translator { get; set; }
+        public Translator Translator { get; set; }
         public MethodCallExpression Expression { get; set; }
         public IndentingStringWriter Writer { get; set; }
         public bool Negated { get; set; }

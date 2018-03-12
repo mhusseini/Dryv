@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Dryv.Translation
 {
-    internal class IndentingStringWriter : StringWriter
+    public class IndentingStringWriter : StringWriter
     {
         private int indent;
 

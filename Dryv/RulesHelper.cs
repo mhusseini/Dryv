@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using Dryv.Translation;
 
 namespace Dryv
@@ -13,12 +12,12 @@ namespace Dryv
     {
         private static readonly ConcurrentDictionary<Expression, string> ClientRules = new ConcurrentDictionary<Expression, string>();
         private static readonly ConcurrentDictionary<LambdaExpression, Func<object, DryvResult>> CompiledRules = new ConcurrentDictionary<LambdaExpression, Func<object, DryvResult>>();
-        private static readonly Regex RegexNewLine = new Regex(@"[\r\n]+", RegexOptions.Compiled);
-        private static readonly Regex RegexWhiteSpace = new Regex(@"\t+|\s{2,}", RegexOptions.Compiled);
         private static readonly ConcurrentDictionary<Type, IList<DryvRules>> TypeRules = new ConcurrentDictionary<Type, IList<DryvRules>>();
 
-        public static string GetClientRulesForProperty(Type objectType, string propertyName) =>
-            TranslateRules(GetRulesForProperty(GetRulesForType(objectType), propertyName));
+        public static string GetClientRulesForProperty(Type objectType, string propertyName, ITranslator translator) =>
+            TranslateRules(
+                translator,
+                GetRulesForProperty(GetRulesForType(objectType), propertyName));
 
         public static IEnumerable<Func<object, DryvResult>> GetCompiledRulesForProperty(Type objectType, string propertyName) =>
             CompileRules(GetRulesForProperty(GetRulesForType(objectType), propertyName));
@@ -50,13 +49,12 @@ namespace Dryv
                 select p.GetValue(null) as DryvRules)
             .ToList());
 
-        private static string TranslateRules(IEnumerable<Expression> rulesForProperty) =>
+        private static string TranslateRules(ITranslator translator, IEnumerable<Expression> rulesForProperty) =>
             $@"[{
                     string.Join(",",
                         from rule in rulesForProperty
                         select ClientRules.GetOrAdd(rule, r =>
                         {
-                            var translator = new JavaScriptTranslator();
                             var translated = translator.Translate(rule);
                             return Cleanup(translated);
                         }))

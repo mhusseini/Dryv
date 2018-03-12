@@ -6,13 +6,15 @@ using System.Text.RegularExpressions;
 
 namespace Dryv.MethodCallTranslation
 {
-    internal class RegexMethodCallTranslator : MethodCallTranslatorBase
+    internal class RegexMethodCallTranslator : MethodCallTranslator
     {
-        protected override Dictionary<string, Action<MethodTranslationOptions>> MethodTranslators { get; } = new Dictionary<string, Action<MethodTranslationOptions>>
+        protected override List<(string Method, Action<MethodTranslationParameters> Translator)> MethodTranslators { get; } = new List<(string Method, Action<MethodTranslationParameters> Translator)>
         {
-            [nameof(Regex.IsMatch)] = IsMatch,
-            [nameof(Regex.Match)] = Match
+            (nameof(Regex.IsMatch), IsMatch),
+            (nameof(Regex.Match), Match)
         };
+
+        public override IList<Regex> TypeMatches { get; } = new[] { new Regex(typeof(Regex).FullName, RegexOptions.Compiled) };
 
         private static (string Pattern, RegexOptions Options)? FindRegularExpression(Expression exp)
         {
@@ -43,7 +45,7 @@ namespace Dryv.MethodCallTranslation
             return result;
         }
 
-        private static void IsMatch(MethodTranslationOptions options)
+        private static void IsMatch(MethodTranslationParameters options)
         {
             var result = FindRegularExpression(options.Expression.Object);
 
@@ -59,7 +61,7 @@ namespace Dryv.MethodCallTranslation
             options.Writer.Write(")");
         }
 
-        private static void Match(MethodTranslationOptions options)
+        private static void Match(MethodTranslationParameters options)
         {
             var result = FindRegularExpression(options.Expression.Object);
 

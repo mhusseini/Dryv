@@ -27,6 +27,7 @@ namespace Dryv.Demo
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDryv();
             services.AddMvc();
         }
     }
