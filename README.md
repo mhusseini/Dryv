@@ -91,7 +91,7 @@ In the ASP.NET Core startup class, add Dryv in the ConfigureServices method usin
 ```csharp
 public class Startup
 {
-	// ...
+    // ...
 
     public void ConfigureServices(IServiceCollection services)
     {
@@ -108,11 +108,11 @@ public class Startup
     public void Configure(IApplicationBuilder app, IHostingEnvironment env)
     {
         
-		// ...
+        // ...
 
         app
-			// ...
-            .UseDryv();
+            .UseDryv()
+			.UseMvc();
     }
 
     // ...
