@@ -5,7 +5,10 @@ namespace Dryv.DependencyInjection
 {
     public class DryvOptions
     {
-        public List<IGenericTranslator> GenericTanslators { get; } = new List<IGenericTranslator>();
+        public List<IGenericTranslator> GenericTanslators { get; } = new List<IGenericTranslator>
+        {
+            new RegexMethodCallTranslator()
+        };
 
         public List<IMethodCallTranslator> MethodCallTanslators { get; } = new List<IMethodCallTranslator>
         {
