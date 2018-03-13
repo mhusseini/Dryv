@@ -95,8 +95,8 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddDryv();
-        services.AddMvc();
+        services.AddDryv()
+                .AddMvc();
     }
 }
 ```
@@ -110,9 +110,8 @@ public class Startup
         
         // ...
 
-        app
-            .UseDryv()
-			.UseMvc();
+        app.UseDryv()
+           .UseMvc();
     }
 
     // ...
