@@ -298,7 +298,7 @@ namespace Dryv.Translation
         public override void Visit(NewExpression expression, IndentingStringWriter writer, bool negated = false)
         {
             writer.Write("new ");
-            writer.Write(expression.Constructor.MemberType);
+            writer.Write(expression.Constructor.DeclaringType.Name);
             writer.Write("(");
             MethodCallTranslator.WriteArguments(this, expression.Arguments, writer);
             writer.Write(")");
