@@ -2,6 +2,6 @@
 {
     public interface IGenericTranslator
     {
-        bool Translate(TranslationParameters parameters);
+        bool TryTranslate(TranslationParameters parameters);
     }
 }

@@ -203,7 +203,7 @@ namespace Dryv.Translation
                 Negated = negated
             };
 
-            if (!this.options.GenericTanslators.Any(t => t.Translate(parameters)))
+            if (!this.options.GenericTanslators.Any(t => t.TryTranslate(parameters)))
             {
                 this.Visit((dynamic)expression, writer, negated);
             }

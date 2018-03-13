@@ -1,6 +1,6 @@
 ﻿namespace Dryv
 {
-    internal static class ResulExtensions
+    internal static class ResultExtensions
     {
         public static bool IsError(this DryvResult result) => !result.IsSuccess();
 

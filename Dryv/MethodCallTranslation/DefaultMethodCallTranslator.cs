@@ -19,7 +19,6 @@ namespace Dryv.MethodCallTranslation
         }
 
         public override IList<Regex> TypeMatches { get; } = new List<Regex>();
-        protected override List<(string Method, Action<MethodTranslationParameters> Translator)> MethodTranslators { get; } = null;
 
         public override bool Translate(MethodTranslationParameters parameters)
         {

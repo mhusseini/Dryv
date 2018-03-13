@@ -1,4 +1,5 @@
 ﻿using Dryv.Demo.Controllers;
+using Dryv.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;

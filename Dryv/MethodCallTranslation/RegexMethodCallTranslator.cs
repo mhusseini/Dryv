@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
@@ -11,14 +10,14 @@ namespace Dryv.MethodCallTranslation
     {
         private static readonly PropertyInfo SuccessProperty = typeof(Group).GetProperty(nameof(Group.Success));
 
+        public RegexMethodCallTranslator()
+        {
+            this.AddMethodTranslator(nameof(Regex.IsMatch), IsMatch);
+        }
+
         public override IList<Regex> TypeMatches { get; } = new[] { new Regex(typeof(Regex).FullName, RegexOptions.Compiled) };
 
-        protected override List<(string Method, Action<MethodTranslationParameters> Translator)> MethodTranslators { get; } = new List<(string Method, Action<MethodTranslationParameters> Translator)>
-        {
-            (nameof(Regex.IsMatch), IsMatch)
-        };
-
-        public bool Translate(TranslationParameters parameters)
+        public bool TryTranslate(TranslationParameters parameters)
         {
             if (!(parameters.Expression is MemberExpression memberExpression))
             {

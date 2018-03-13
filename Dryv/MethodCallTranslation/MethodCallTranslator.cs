@@ -1,17 +1,18 @@
-﻿using Dryv.Translation;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Dryv.Translation;
 
 namespace Dryv.MethodCallTranslation
 {
     public abstract class MethodCallTranslator : IMethodCallTranslator
     {
-        private List<(Regex Method, Action<MethodTranslationParameters> Translator)> methodTranslatorsByRegex;
-        protected abstract List<(string Method, Action<MethodTranslationParameters> Translator)> MethodTranslators { get; }
+        private readonly List<(Regex Method, Action<MethodTranslationParameters> Translator)> methodTranslatorsByRegex = new List<(Regex Method, Action<MethodTranslationParameters> Translator)>();
+
+        public abstract IList<Regex> TypeMatches { get; }
 
         public static string QuoteValue(object value)
         {
@@ -33,20 +34,8 @@ namespace Dryv.MethodCallTranslation
             }
         }
 
-        public abstract IList<Regex> TypeMatches { get; }
-
         public virtual bool Translate(MethodTranslationParameters options)
         {
-            if (this.methodTranslatorsByRegex == null)
-            {
-                this.methodTranslatorsByRegex = this.MethodTranslators
-                    .Select(i => (
-                        Method: new Regex($"^{i.Method}$", RegexOptions.Compiled),
-                        Translator: i.Translator
-                        ))
-                    .ToList();
-            }
-
             var translator = this.methodTranslatorsByRegex.Where(i => i.Method.IsMatch(options.Expression.Method.Name)).Select(i => i.Translator).FirstOrDefault();
 
             if (translator == null)
@@ -95,6 +84,16 @@ namespace Dryv.MethodCallTranslation
                        select field?.GetValue(obj) ?? property?.GetValue(obj))
                 .OfType<T>()
                 .FirstOrDefault();
+        }
+
+        protected void AddMethodTranslator(string methodName, Action<MethodTranslationParameters> translator)
+        {
+            this.AddMethodTranslator(new Regex($"^{methodName}$", RegexOptions.Compiled), translator);
+        }
+
+        protected void AddMethodTranslator(Regex regex, Action<MethodTranslationParameters> translator)
+        {
+            this.methodTranslatorsByRegex.Add((regex, translator));
         }
     }
 }

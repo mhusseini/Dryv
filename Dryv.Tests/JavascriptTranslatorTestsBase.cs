@@ -24,12 +24,12 @@ namespace Dryv.Tests
             return (Object: member?.Object, Name: (member?.Property as Identifier)?.Name);
         }
 
-        protected static FunctionExpression GetTranslatedAst(System.Linq.Expressions.Expression<Func<TestModel, DryvResult>> expression)
+        protected static FunctionExpression GetTranslatedAst(System.Linq.Expressions.Expression<Func<TestModel, DryvResult>> expression, DryvOptions options = null)
         {
-            var options = Options.Create(new DryvOptions());
+            var opt = Options.Create(options ?? new DryvOptions());
             var translator = new JavaScriptTranslator(
-                new DefaultMethodCallTranslator(options),
-                options);
+                new DefaultMethodCallTranslator(opt),
+                opt);
 
             var translation = translator.Translate(expression);
             var jsParser = new JavaScriptParser();
