@@ -1,11 +1,10 @@
-using Escape;
-using Escape.Ast;
 using System;
 using System.Linq;
 using Dryv.DependencyInjection;
 using Dryv.MethodCallTranslation;
 using Dryv.Translation;
-using Microsoft.Extensions.Options;
+using Escape;
+using Escape.Ast;
 
 namespace Dryv.Tests
 {
@@ -24,12 +23,23 @@ namespace Dryv.Tests
             return (Object: member?.Object, Name: (member?.Property as Identifier)?.Name);
         }
 
-        protected static FunctionExpression GetTranslatedAst(System.Linq.Expressions.Expression<Func<TestModel, DryvResult>> expression, DryvOptions options = null)
+        protected static FunctionExpression GetTranslatedAst(
+            System.Linq.Expressions.Expression<Func<TestModel, DryvResult>> expression,
+            params object[] translators)
         {
-            var opt = Options.Create(options ?? new DryvOptions());
+            var translatorProvider = new TranslatorProvider();
+            translatorProvider.MethodCallTranslators.Add(new RegexMethodCallTranslator());
+            translatorProvider.MethodCallTranslators.Add(new StringMethodCallTranslator());
+
+            if (translators != null)
+            {
+                translatorProvider.MethodCallTranslators.AddRange(translators.OfType<IMethodCallTranslator>());
+                translatorProvider.GenericTranslators.AddRange(translators.OfType<IGenericTranslator>());
+            }
+
             var translator = new JavaScriptTranslator(
-                new DefaultMethodCallTranslator(opt),
-                opt);
+                new DefaultMethodCallTranslator(translatorProvider),
+                translatorProvider);
 
             var translation = translator.Translate(expression);
             var jsParser = new JavaScriptParser();

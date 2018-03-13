@@ -6,7 +6,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Dryv.DependencyInjection;
 using Dryv.MethodCallTranslation;
-using Microsoft.Extensions.Options;
 
 namespace Dryv.Translation
 {
@@ -104,13 +103,13 @@ namespace Dryv.Translation
         };
 
         private readonly IMethodCallTranslator methodCallTranslator;
-        private readonly DryvOptions options;
+        private readonly ITranslatorProvider translatorProvider;
 
         public JavaScriptTranslator(IMethodCallTranslator methodCallTranslator,
-            IOptions<DryvOptions> options)
+            ITranslatorProvider translatorProvider)
         {
             this.methodCallTranslator = methodCallTranslator;
-            this.options = options.Value;
+            this.translatorProvider = translatorProvider;
         }
 
         public bool UseLowercaseMembers { get; set; }
@@ -203,7 +202,7 @@ namespace Dryv.Translation
                 Negated = negated
             };
 
-            if (!this.options.GenericTanslators.Any(t => t.TryTranslate(parameters)))
+            if (!this.translatorProvider.GenericTranslators.Any(t => t.TryTranslate(parameters)))
             {
                 this.Visit((dynamic)expression, writer, negated);
             }

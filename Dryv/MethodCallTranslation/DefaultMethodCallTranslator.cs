@@ -1,34 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using Dryv.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace Dryv.MethodCallTranslation
 {
     internal class DefaultMethodCallTranslator : MethodCallTranslator
     {
         private static readonly MemberInfo ErrorMember = typeof(DryvResult).GetMember("Error").First();
-        private readonly DryvOptions options;
+        private readonly ITranslatorProvider translatorProvider;
 
-        public DefaultMethodCallTranslator(IOptions<DryvOptions> options)
+        public DefaultMethodCallTranslator(ITranslatorProvider translatorProvider)
         {
-            this.options = options.Value;
+            this.translatorProvider = translatorProvider;
         }
-
-        public override IList<Regex> TypeMatches { get; } = new List<Regex>();
 
         public override bool Translate(MethodTranslationParameters parameters)
         {
-            var objectType = parameters.Expression.Method.DeclaringType.FullName;
-            var translator = this.options.MethodCallTanslators
-                .FirstOrDefault(t => t.TypeMatches.Any(r => r.IsMatch(objectType)));
+            var objectType = parameters.Expression.Method.DeclaringType;
 
-            if (translator != null)
+            if (this.translatorProvider
+                .MethodCallTranslators
+                .Where(t => t.SupportsType(objectType))
+                .Any(t => t.Translate(parameters)))
             {
-                return translator.Translate(parameters);
+                return true;
             }
 
             switch (parameters.Expression.Method.Name)

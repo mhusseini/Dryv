@@ -12,16 +12,14 @@ namespace Dryv.MethodCallTranslation
     {
         private readonly List<(Regex Method, Action<MethodTranslationParameters> Translator)> methodTranslatorsByRegex = new List<(Regex Method, Action<MethodTranslationParameters> Translator)>();
 
-        public abstract IList<Regex> TypeMatches { get; }
+        private readonly List<Type> supportedTypes = new List<Type>();
 
         public static string QuoteValue(object value)
-        {
-            return value == null
-                ? "null"
-                : (value.GetType().IsPrimitive
-                    ? value.ToString()
-                    : $@"""{value}""");
-        }
+            => value == null
+            ? "null"
+            : (value.GetType().IsPrimitive
+                ? value.ToString()
+                : $@"""{value}""");
 
         public static void WriteArguments(Translator translator, IEnumerable<Expression> arguments, IndentingStringWriter writer)
         {
@@ -34,13 +32,15 @@ namespace Dryv.MethodCallTranslation
             }
         }
 
+        public virtual bool SupportsType(Type type) => this.supportedTypes.Contains(type);
+
         public virtual bool Translate(MethodTranslationParameters options)
         {
             var translator = this.methodTranslatorsByRegex.Where(i => i.Method.IsMatch(options.Expression.Method.Name)).Select(i => i.Translator).FirstOrDefault();
 
             if (translator == null)
             {
-                throw new MethodCallNotAllowedException(options.Expression);
+                return false;
             }
 
             translator(options);
@@ -48,17 +48,15 @@ namespace Dryv.MethodCallTranslation
         }
 
         protected static bool ArgumentIs<T>(MethodTranslationParameters options, int index, T value)
-        {
-            return Equals(options.Expression.Arguments
-                .Skip(index)
-                .Take(1)
-                .OfType<ConstantExpression>()
-                .Select(i => i.Value)
-                .FirstOrDefault(), value);
-        }
+            => Equals(options.Expression.Arguments
+            .Skip(index)
+            .Take(1)
+            .OfType<ConstantExpression>()
+            .Select(i => i.Value)
+            .FirstOrDefault(), value);
 
-        protected static T FindValue<T>(params Expression[] expressions) =>
-                            FindValue<T>((IList<Expression>)expressions);
+        protected static T FindValue<T>(params Expression[] expressions)
+            => FindValue<T>((IList<Expression>)expressions);
 
         protected static T FindValue<T>(IList<Expression> expressions)
         {
@@ -87,13 +85,13 @@ namespace Dryv.MethodCallTranslation
         }
 
         protected void AddMethodTranslator(string methodName, Action<MethodTranslationParameters> translator)
-        {
-            this.AddMethodTranslator(new Regex($"^{methodName}$", RegexOptions.Compiled), translator);
-        }
+            => this.AddMethodTranslator(new Regex($"^{methodName}$", RegexOptions.Compiled), translator);
 
         protected void AddMethodTranslator(Regex regex, Action<MethodTranslationParameters> translator)
-        {
-            this.methodTranslatorsByRegex.Add((regex, translator));
-        }
+            => this.methodTranslatorsByRegex.Add((regex, translator));
+
+        protected void Supports(Type type) => this.supportedTypes.Add(type);
+
+        protected void Supports<T>() => this.Supports(typeof(T));
     }
 }

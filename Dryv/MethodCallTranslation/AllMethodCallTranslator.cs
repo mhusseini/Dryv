@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Text.RegularExpressions;
 
 namespace Dryv.MethodCallTranslation
@@ -10,7 +10,7 @@ namespace Dryv.MethodCallTranslation
             this.AddMethodTranslator(new Regex(".*", RegexOptions.Compiled), TranslateAnyMethod);
         }
 
-        public override IList<Regex> TypeMatches { get; } = new[] { new Regex(".*") };
+        public override bool SupportsType(Type type) => true;
 
         private static void TranslateAnyMethod(MethodTranslationParameters parameters)
         {

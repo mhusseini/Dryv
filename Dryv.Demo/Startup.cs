@@ -17,6 +17,7 @@ namespace Dryv.Demo
 
             app
                 .UseStaticFiles()
+                .UseDryv()
                 .UseMvc(routes =>
                 {
                     routes.MapRoute(

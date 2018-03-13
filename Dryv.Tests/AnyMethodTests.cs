@@ -1,5 +1,5 @@
 using System.Linq;
-using Dryv.DependencyInjection;
+using System.Text.RegularExpressions;
 using Dryv.MethodCallTranslation;
 using Escape.Ast;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -10,6 +10,26 @@ namespace Dryv.Tests
     public class AnyMethodTests : JavascriptTranslatorTestsBase
     {
         [TestMethod]
+        public void TranslateWithArguments()
+        {
+            var expression = Expression(m =>
+                new TestModelHelper().DoSomething("a", "b")
+                    ? "fail"
+                    : DryvResult.Success);
+
+            var jsProgram = GetTranslatedAst(expression, new AllMethodCallTranslator());
+            var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);
+
+            var callExpression = conditional?.Test as CallExpression;
+            Assert.IsNotNull(callExpression);
+
+            var method = GetMethod(callExpression);
+            Assert.AreEqual(method.Name, nameof(TestModelHelper.DoSomething).ToCamelCase());
+
+            Assert.AreEqual(2, callExpression.Arguments.Count());
+        }
+
+        [TestMethod]
         public void TranslateWithNoArguments()
         {
             var expression = Expression(m =>
@@ -17,11 +37,7 @@ namespace Dryv.Tests
                     ? "fail"
                     : DryvResult.Success);
 
-            var options = new DryvOptions();
-            options.MethodCallTanslators.Clear();
-            options.MethodCallTanslators.Add(new AllMethodCallTranslator());
-
-            var jsProgram = GetTranslatedAst(expression, options);
+            var jsProgram = GetTranslatedAst(expression, new AllMethodCallTranslator());
             var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);
 
             var callExpression = conditional?.Test as CallExpression;
@@ -34,34 +50,46 @@ namespace Dryv.Tests
         }
 
         [TestMethod]
-        public void TranslateWithArguments()
+        public void TranslateWithRegexMatch()
         {
             var expression = Expression(m =>
-                new TestModelHelper().DoSomething("a", "b")
+                new Regex(@"\d").Match(m.Text) == null
                     ? "fail"
                     : DryvResult.Success);
 
-            var options = new DryvOptions();
-            options.MethodCallTanslators.Clear();
-            options.MethodCallTanslators.Add(new AllMethodCallTranslator());
-
-            var jsProgram = GetTranslatedAst(expression, options);
+            var jsProgram = GetTranslatedAst(expression, new RegexMatchTranslator());
             var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);
 
-            var callExpression = conditional?.Test as CallExpression;
-            Assert.IsNotNull(callExpression);
+            var binaryExpression = conditional.Test as BinaryExpression;
 
-            var method = GetMethod(callExpression);
-            Assert.AreEqual(method.Name, nameof(TestModelHelper.DoSomething).ToCamelCase());
+            var leftMethod = GetMethod(binaryExpression?.Left);
+            Assert.AreEqual("match", leftMethod.Name);
+        }
 
-            Assert.AreEqual(2, callExpression.Arguments.Count());
+        private class RegexMatchTranslator : MethodCallTranslator
+        {
+            public RegexMatchTranslator()
+            {
+                this.Supports<Regex>();
+
+                this.AddMethodTranslator(nameof(Regex.Match), p =>
+                {
+                    p.Translator.VisitWithBrackets(p.Expression.Object, p.Writer);
+                    p.Writer.Write(".match(");
+                    WriteArguments(p.Translator, p.Expression.Arguments, p.Writer);
+                    p.Writer.Write(")");
+                });
+            }
         }
 
         private class TestModelHelper
         {
             public bool DoSomething() => true;
 
+            // ReSharper disable UnusedParameter.Local
             public bool DoSomething(string arg1, string arg2) => true;
+
+            // ReSharper restore UnusedParameter.Local
         }
     }
 }

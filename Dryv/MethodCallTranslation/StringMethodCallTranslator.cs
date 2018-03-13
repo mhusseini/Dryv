@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text.RegularExpressions;
 
 namespace Dryv.MethodCallTranslation
 {
@@ -12,6 +10,8 @@ namespace Dryv.MethodCallTranslation
 
         public StringMethodCallTranslator()
         {
+            this.Supports<string>();
+
             this.AddMethodTranslator(nameof(string.Equals), Equals);
             this.AddMethodTranslator(nameof(string.Contains), Contains);
             this.AddMethodTranslator(nameof(string.StartsWith), StartsWith);
@@ -29,8 +29,6 @@ namespace Dryv.MethodCallTranslation
             this.AddMethodTranslator(nameof(string.TrimStart), TrimStart);
             this.AddMethodTranslator(nameof(string.Format), Format);
         }
-
-        public override IList<Regex> TypeMatches { get; } = new[] { new Regex(typeof(String).FullName, RegexOptions.Compiled) };
 
         protected static bool GetIsCaseInsensitive(MethodCallExpression expression)
         {

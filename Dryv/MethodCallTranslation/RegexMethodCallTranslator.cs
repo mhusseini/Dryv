@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -12,10 +11,9 @@ namespace Dryv.MethodCallTranslation
 
         public RegexMethodCallTranslator()
         {
+            this.Supports<Regex>();
             this.AddMethodTranslator(nameof(Regex.IsMatch), IsMatch);
         }
-
-        public override IList<Regex> TypeMatches { get; } = new[] { new Regex(typeof(Regex).FullName, RegexOptions.Compiled) };
 
         public bool TryTranslate(TranslationParameters parameters)
         {

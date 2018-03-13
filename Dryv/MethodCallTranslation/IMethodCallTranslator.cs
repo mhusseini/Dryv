@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Text.RegularExpressions;
+﻿using System;
 
 namespace Dryv.MethodCallTranslation
 {
     public interface IMethodCallTranslator
     {
-        IList<Regex> TypeMatches { get; }
+        bool SupportsType(Type type);
+
         bool Translate(MethodTranslationParameters options);
     }
 }
