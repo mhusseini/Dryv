@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Dryv.DependencyInjection;
 using Dryv.Translation;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Dryv
 {
@@ -25,11 +27,13 @@ namespace Dryv
         private static string GetClientRules(ModelValidationContextBase context)
         {
             var translator = context.ActionContext.HttpContext.RequestServices.GetService<ITranslator>();
+            var options = context.ActionContext.HttpContext.RequestServices.GetService<IOptions<DryvOptions>>();
             var metadata = context.ModelMetadata;
             return RulesHelper.GetClientRulesForProperty(
                 metadata.ContainerType,
                 metadata.PropertyName,
-                translator);
+                translator,
+                options.Value);
         }
 
         private static IEnumerable<Func<object, DryvResult>> GetCompiledRules(ValidationContext validationContext) =>

@@ -85,3 +85,36 @@ into your project and reference it from your page:
 ```
 <script src="js/dryv-jquery-unobtrusive.browser.min.js"></script>
 ```
+## Usage
+In the ASP.NET Core startup class, add Dryv in the ConfigureServices method using the AddDryv extension method:
+
+```csharp
+public class Startup
+{
+	// ...
+
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddDryv();
+        services.AddMvc();
+    }
+}
+```
+Also in the startup class, use Dryv in the Configure method using the UseDryv extension method:
+
+```csharp
+public class Startup
+{
+    public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+    {
+        
+		// ...
+
+        app
+			// ...
+            .UseDryv();
+    }
+
+    // ...
+}
+```
