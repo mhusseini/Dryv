@@ -1,0 +1,6 @@
+﻿@model Dryv.Demo.Nav.NavStructure
+<li class="nav-item">
+    <a class="nav-link js-scroll-trigger @(this.Model.IsActive ? "active": "")"
+       asp-action="@this.Model.Action"
+       asp-controller="@this.Model.Controller">@this.Model.Caption</a>
+</li>

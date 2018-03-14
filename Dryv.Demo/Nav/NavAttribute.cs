@@ -1,24 +1,19 @@
 ﻿using System;
 
-namespace Dryv.Demo
+namespace Dryv.Demo.Nav
 {
     [AttributeUsage(AttributeTargets.Method)]
     public class NavAttribute : Attribute
     {
         public NavAttribute(string caption)
         {
-            Caption = caption;
-            Name = caption;
+            this.Caption = caption;
         }
 
-        public NavAttribute(string caption, string name) : this(caption)
-        {
-            Name = name;
-        }
+        public string After { get; set; }
 
         public string Caption { get; }
 
-        public string Name { get; set; }
         public string Parent { get; set; }
     }
 }

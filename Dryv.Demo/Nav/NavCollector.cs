@@ -1,51 +1,26 @@
-﻿using Dryv.Demo.Nav;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Dryv.Demo
+namespace Dryv.Demo.Nav
 {
     public class NavCollector
     {
-        private static List<NavStructure> allItems;
-        private static List<NavStructure> itemsHiaerarchy;
+        private static Dictionary<string, NavStructure> allItems;
 
-        public List<NavStructure> GetNavStructure(ViewContext viewContext)
+        public Dictionary<string, NavStructure> GetNavStructure(ViewContext viewContext)
         {
-            if (itemsHiaerarchy == null)
+            if (allItems == null)
             {
-                BuildUp();
+                allItems = FindStructureElements();
             }
 
-            ResetElements();
-            SetActiveHierarchy(viewContext);
+            SetElementSelection(viewContext);
 
-            return itemsHiaerarchy;
-        }
-
-        private static void BuildUp()
-        {
-            var structureElements = FindStructureElements();
-
-            BuildUpHierarchy(structureElements);
-            allItems = structureElements.Values.ToList();
-
-            itemsHiaerarchy = allItems
-                .Where(s => s.Parent == null)
-                .ToList();
-        }
-
-        private static void BuildUpHierarchy(Dictionary<string, NavStructure> structureElements)
-        {
-            foreach (var element in from element in structureElements.Values
-                                    where !string.IsNullOrWhiteSpace(element.ParentName)
-                                    select element)
-            {
-                structureElements[element.ParentName].Children.Add(element);
-            }
+            return allItems;
         }
 
         private static Dictionary<string, NavStructure> FindStructureElements()
@@ -57,53 +32,24 @@ namespace Dryv.Demo
                     where attr != null
                     select new NavStructure
                     {
-                        Name = attr.Name,
                         Caption = attr.Caption,
-                        Action = method,
-                        Controller = type,
-                        ParentName = attr.Parent
+                        Action = method.Name,
+                        Controller = type.Name.Replace(nameof(Controller), string.Empty)
                     })
-                                 .ToDictionary(s => s.Name);
+                .ToDictionary(s => s.Caption, StringComparer.OrdinalIgnoreCase);
         }
 
-        private static NavStructure GetCurrentNavElement(ViewContext viewContext)
+        private static void SetElementSelection(ActionContext viewContext)
         {
-            var currentController = viewContext.RouteData.Values["controller"].ToString() + "Controller";
+            var currentController = viewContext.RouteData.Values["controller"].ToString();
             var currentAction = viewContext.RouteData.Values["action"].ToString();
-            var currentElement = GetCurrentNavElement(currentController, currentAction, allItems);
-            return currentElement;
-        }
 
-        private static NavStructure GetCurrentNavElement(string currentController, string currentAction, IEnumerable<NavStructure> structureElements)
-        {
-            return structureElements
-                            .First(s => s.Controller.Name.Equals(currentController, StringComparison.OrdinalIgnoreCase)
-                        && s.Action.Name.Equals(currentAction, StringComparison.OrdinalIgnoreCase));
-        }
-
-        private static void ResetElements()
-        {
-            foreach (var element in allItems)
+            foreach (var element in allItems.Values)
             {
-                element.IsActive = false;
+                element.IsActive =
+                    element.Controller.Equals(currentController, StringComparison.OrdinalIgnoreCase) &&
+                    element.Action.Equals(currentAction, StringComparison.OrdinalIgnoreCase);
             }
-        }
-
-        private static void SetActiveHierarchy(ViewContext viewContext)
-        {
-            var currentElement = GetCurrentNavElement(viewContext);
-            currentElement = SetActiveHierarchy(currentElement);
-        }
-
-        private static NavStructure SetActiveHierarchy(NavStructure currentElement)
-        {
-            while (currentElement != null)
-            {
-                currentElement.IsActive = true;
-                currentElement = currentElement.Parent;
-            }
-
-            return currentElement;
         }
     }
 }

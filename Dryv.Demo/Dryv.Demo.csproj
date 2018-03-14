@@ -5,10 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\" />
+    <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Markdig" Version="0.14.9" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.0.1" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.2" />
@@ -22,7 +23,7 @@
   <Target Name="DownloadExternal" AfterTargets="PostBuildEvent">
     <Message Text="Downloading dryv-jquery-unobtrusive.min.js" />
     <MakeDir Directories="$(ProjectDir)wwwroot/js" />
-    <Exec Condition=" '$(OS)' == 'Windows_NT' " Command="powershell -Command &quot;Invoke-WebRequest -Uri https://raw.githubusercontent.com/mhusseini/dryv-jquery-unobtrusive/master/dist/dryv-jquery-unobtrusive.min.js -OutFile $(ProjectDir)wwwroot/js/dryv-jquery-unobtrusive.min.js&quot;" />
-    <Exec Condition=" '$(OS)' != 'Windows_NT' " Command="wget -o $(ProjectDir)wwwroot/js/dryv-jquery-unobtrusive.min.js https://raw.githubusercontent.com/mhusseini/dryv-jquery-unobtrusive/master/dist/dryv-jquery-unobtrusive.min.js" />
+    <!--<Exec Condition=" '$(OS)' == 'Windows_NT' " Command="powershell -Command &quot;Invoke-WebRequest -Uri https://raw.githubusercontent.com/mhusseini/dryv-jquery-unobtrusive/master/dist/dryv-jquery-unobtrusive.min.js -OutFile $(ProjectDir)wwwroot/js/dryv-jquery-unobtrusive.min.js&quot;" />
+    <Exec Condition=" '$(OS)' != 'Windows_NT' " Command="wget -o $(ProjectDir)wwwroot/js/dryv-jquery-unobtrusive.min.js https://raw.githubusercontent.com/mhusseini/dryv-jquery-unobtrusive/master/dist/dryv-jquery-unobtrusive.min.js" />-->
   </Target>
 </Project>

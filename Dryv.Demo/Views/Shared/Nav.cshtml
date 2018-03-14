@@ -1,13 +1,19 @@
-﻿@model Dryv.Demo.Nav.NavStructure
-<li class="nav-item">
-    <a class="nav-link js-scroll-trigger" href="#">@this.Model.Caption</a>
-    @if (this.Model.Children.Any())
+﻿@using Dryv.Demo.Nav
+@inject NavCollector NavCollector
+@{
+    var menu = new[]
     {
-        <ul class="navbar-nav">
-            @foreach (var nav in this.Model.Children)
-            {
-                @Html.Partial("Nav", nav);
-            }
-        </ul>
+        Menu.Introduction,
+        Menu.ExtendingDryv
+    };
+    var items = NavCollector.GetNavStructure(this.ViewContext);
+}
+
+<ul class="navbar-nav">
+    @{
+        foreach (var menuItem in menu)
+        {
+            @Html.Partial("NavItem", items[menuItem])
+        }
     }
-</li>
+</ul>
