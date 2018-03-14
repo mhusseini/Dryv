@@ -37,12 +37,43 @@
                 <img class="img-fluid mx-auto mb-2" src="images/logo.svg" alt="">
             </span>
         </a>
+        <ul class="list-inline list-social-icons mb-0">
+
+            <li class="list-inline-item">
+                <a href="https://github.com/mhusseini/Dryv">
+                    <span class="fa-stack fa-lg">
+                        <i class="fa fa-circle fa-stack-2x"></i>
+                        <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+            </li>
+
+            <li class="list-inline-item">
+                <a href="https://www.nuget.org/packages/Dryv/">
+                    <span class="fa-stack fa-lg">
+                        <i class="fa fa-circle fa-stack-2x"></i>
+                        <img src="images/nuget.svg" class="fa-stack-1x " />
+                    </span>
+                </a>
+            </li>
+
+
+            <li class="list-inline-item">
+                <a href="https://www.npmjs.com/package/dryv-jquery-unobtrusive">
+                    <span class="fa-stack fa-lg">
+                        <i class="fa fa-circle fa-stack-2x"></i>
+                        <img src="images/npm.svg" class="fa-stack-1x " />
+                    </span>
+                </a>
+            </li>
+        </ul>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             @Html.Partial("Nav")
         </div>
+
     </nav>
 
     <div class="container-fluid p-0" id="main">
@@ -65,9 +96,9 @@
 
     <script>
         $(document).ready(function () {
-            var ils = $("#main section").map(function (i, e) {
+            var ils = $("h2", $("#main")).map(function (i, e) {
                 var $e = $(e);
-                var caption = $e.find("h2").text().trim().replace(/\s{2,}/g, " ");
+                var caption = $e.text().trim().replace(/\s{2,}/g, " ");
                 if (caption) {
                     var id = $e.attr("id");
                     return '<li class="nav-item"><a class="nav-link js-scroll-trigger" href="#' + id + '">' + caption + '</a></li>';

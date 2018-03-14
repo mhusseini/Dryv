@@ -1,9 +1,10 @@
-﻿using System;
-using Markdig;
+﻿using Markdig;
 using Markdig.Renderers;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using System;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
@@ -17,18 +18,25 @@ namespace Dryv.Demo.TagHelpers
     [HtmlTargetElement("div", Attributes = "markdown")]
     [HtmlTargetElement("markdown")]
     [OutputElementHint("p")]
-    public class MarkdownTagHelper : TagHelper
+    public class MarkdownTagHelper : TagHelper, IHostingEnvironmentAwareViewComponent
     {
         private static readonly ConcurrentDictionary<string, string> Html = new ConcurrentDictionary<string, string>();
+
+        private static readonly Regex RegexLineSpace = new Regex(@"^\s+", RegexOptions.Compiled);
+
+        public MarkdownTagHelper(IHostingEnvironment hostingEnvironment)
+        {
+            this.HostingEnvironment = hostingEnvironment;
+        }
 
         public ModelExpression Content { get; set; }
         public string File { get; set; }
 
+        public IHostingEnvironment HostingEnvironment { get; }
+
         [ViewContext]
         [HtmlAttributeNotBound]
         public ViewContext ViewContext { get; set; }
-
-        private static readonly Regex RegexLineSpace = new Regex(@"^\s+", RegexOptions.Compiled);
 
         public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
         {
@@ -67,6 +75,7 @@ namespace Dryv.Demo.TagHelpers
 
         private async Task<string> GetContent(TagHelperOutput output) =>
             this.Content?.Model?.ToString()
+            ?? this.ReadFile(this.File)
             ?? (await output.GetChildContentAsync()).GetContent();
     }
 }

@@ -1,22 +1,13 @@
 ﻿@model Dryv.Demo.Models.HomeViewModel
 
-
-
 <section class="resume-section p-3 p-lg-5 d-flex d-column" id="about">
     <div class="my-auto">
         <h1 class="mb-0">
-            Using
-            <span class="text-primary">Dryv</span>
-            Again
+            Introducing <span class="text-primary">Dryv</span>
         </h1>
         <cache>
-            <div markdown>
-                ## Some test!
-                ```csharp
-                public class YuckFoo
-                {
-                }
-                ```
+            <div>
+                <markdown file="introduction.md"></markdown>
             </div>
         </cache>
     </div>
@@ -95,7 +86,7 @@
             <button type="submit" class="btn btn-primary"></button>
         </form>
 
-
+    </div>
 </section>
 
 <section class="resume-section p-3 p-lg-5 d-flex flex-column" id="education">
