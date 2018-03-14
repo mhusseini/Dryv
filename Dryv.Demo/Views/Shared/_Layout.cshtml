@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@inject Dryv.Demo.NavCollector NavCollector
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -41,7 +42,10 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav">
-                @RenderSection("nav", required: false)
+                @foreach(var nav in NavCollector.GetNavStructure(this.ViewContext))
+                {
+                    @Html.Partial("Nav", nav);
+                }
             </ul>
         </div>
     </nav>

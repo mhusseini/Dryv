@@ -5,6 +5,7 @@ namespace Dryv.Demo.Controllers
 {
     public class HomeController : Controller
     {
+        [Nav("Introduction")]
         public IActionResult Index()
         {
             return View(new HomeViewModel());

@@ -22,9 +22,7 @@
   <Target Name="DownloadExternal" AfterTargets="PostBuildEvent">
     <Message Text="Downloading dryv-jquery-unobtrusive.min.js" />
     <MakeDir Directories="$(ProjectDir)wwwroot/js" />
-    <Exec Condition=" '$(OS)' == 'Windows_NT' "
-          Command="powershell -Command &quot;Invoke-WebRequest -Uri https://raw.githubusercontent.com/mhusseini/dryv-jquery-unobtrusive/master/dist/dryv-jquery-unobtrusive.min.js -OutFile $(ProjectDir)wwwroot/js/dryv-jquery-unobtrusive.min.js&quot;"/>
-    <Exec Condition=" '$(OS)' != 'Windows_NT' "
-          Command="wget -o $(ProjectDir)wwwroot/js/dryv-jquery-unobtrusive.min.js https://raw.githubusercontent.com/mhusseini/dryv-jquery-unobtrusive/master/dist/dryv-jquery-unobtrusive.min.js"/>
+    <Exec Condition=" '$(OS)' == 'Windows_NT' " Command="powershell -Command &quot;Invoke-WebRequest -Uri https://raw.githubusercontent.com/mhusseini/dryv-jquery-unobtrusive/master/dist/dryv-jquery-unobtrusive.min.js -OutFile $(ProjectDir)wwwroot/js/dryv-jquery-unobtrusive.min.js&quot;" />
+    <Exec Condition=" '$(OS)' != 'Windows_NT' " Command="wget -o $(ProjectDir)wwwroot/js/dryv-jquery-unobtrusive.min.js https://raw.githubusercontent.com/mhusseini/dryv-jquery-unobtrusive/master/dist/dryv-jquery-unobtrusive.min.js" />
   </Target>
 </Project>

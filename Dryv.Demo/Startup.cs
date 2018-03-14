@@ -31,6 +31,7 @@ namespace Dryv.Demo
         {
             services.AddDryv();
             services.AddMvc();
+            services.AddSingleton<NavCollector>();
         }
     }
 }

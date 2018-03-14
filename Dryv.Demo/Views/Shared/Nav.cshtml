@@ -1,0 +1,13 @@
+﻿@model Dryv.Demo.Nav.NavStructure
+<li class="nav-item">
+    <a class="nav-link js-scroll-trigger" href="#">@this.Model.Caption</a>
+    @if (this.Model.Children.Any())
+    {
+        <ul class="navbar-nav">
+            @foreach (var nav in this.Model.Children)
+            {
+                @Html.Partial("Nav", nav);
+            }
+        </ul>
+    }
+</li>
