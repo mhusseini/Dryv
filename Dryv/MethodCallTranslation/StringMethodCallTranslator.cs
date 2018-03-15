@@ -191,7 +191,7 @@ namespace Dryv.MethodCallTranslation
              Х public static String Format(IFormatProvider provider, String format, object arg0, object arg1, object arg2);
              Х public static String Format(IFormatProvider provider, String format, params object[] args);
              √ public static String Format(String format, object arg0);
-             √! public static String Format(String format, params object[] args);
+             X public static String Format(String format, params object[] args);
              √ public static String Format(String format, object arg0, object arg1, object arg2);
              √ public static String Format(String format, object arg0, object arg1);
              Х public static String Format(IFormatProvider provider, String format, object arg0, object arg1);
@@ -373,9 +373,9 @@ namespace Dryv.MethodCallTranslation
         private static void Trim(MethodTranslationParameters parameters)
         {
             /*
-             √ public String Trim(char trimChar);
+             Х public String Trim(char trimChar);
              Х public String Trim(params char[] trimChars);
-             Х public String Trim();
+             √ public String Trim();
              */
             if (parameters.Expression.Arguments.Any())
             {

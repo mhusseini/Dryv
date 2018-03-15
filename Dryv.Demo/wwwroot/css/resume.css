@@ -151,3 +151,15 @@ a {
 a:hover, a:focus, a:active {
   color: #0379b3;
 }
+
+.blockquote {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  font-style: italic;
+  font-size: 100%;
+}
+
+.blockquote p {
+  margin: 0;
+}

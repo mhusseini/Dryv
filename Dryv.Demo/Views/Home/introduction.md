@@ -1,7 +1,14 @@
-According to [Rick Anderson](https://twitter.com/RickAndMSFT), "One of the design tenets of MVC is DRY ("Don't Repeat Yourself")" and 
-"The validation support provided by MVC and Entity Framework Core Code First is a good example of the DRY principle in action. 
-You can declaratively specify validation rules in one place (in the model class) and the rules are enforced everywhere in the app"  
-([from Microsoft Docs](https://docs.microsoft.com/en-us/aspnet/core/tutorials/first-mvc-app-xplat/validation)).
+# Getting Started
+
+## What is Drvy?
+According to [Rick Anderson](https://twitter.com/RickAndMSFT), 
+
+> "One of the design tenets of MVC is DRY ("Don't Repeat Yourself")"
+
+and
+
+> "The validation support provided by MVC and Entity Framework Core Code First is a good example of the DRY principle in action. 
+You can declaratively specify validation rules in one place (in the model class) and the rules are enforced everywhere in the app" ([from Microsoft Docs](https://docs.microsoft.com/en-us/aspnet/core/tutorials/first-mvc-app-xplat/validation)).
 
 While this is the case for simple validation rules, applying complex validations rules is a different story. For instance, see the foloowing model.
 
@@ -24,7 +31,8 @@ field becomes required. How would you implement such a validation? The recommend
 [ValidationAttribute](https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.dataannotations.validationattribute?view=netframework-4.7.1), 
 make it implement [IClientModelValidator](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.modelbinding.validation.iclientmodelvalidator.addvalidation?view=aspnetcore-2.0),
 implement server side validation and add client-side code to implement a jQuery validator. Real-world application can have lots and lots of different 
-validation rules and implementing them in C# as well as JavaScript can become a cumbersome task.
+validation rules and implementing them in C# as well as JavaScript can become a cumbersome task. If you can't re-use those custom-build attributes, 
+there's no _DRY_.
 
 That's where Dryv comes in. The name "Dryv" is derived from the term "DRY Validation".Using Dryv, you define the rules using C# expressions
 and some inner magic will translate them to JavaScript. Taking teh example above, using Dryv it would look like this:

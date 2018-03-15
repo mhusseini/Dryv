@@ -1,4 +1,6 @@
 ﻿using Markdig;
+using Markdig.Extensions.Bootstrap;
+using Markdig.Extensions.Emoji;
 using Markdig.Renderers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -59,7 +61,10 @@ namespace Dryv.Demo.TagHelpers
 
         private static string CompileMarkdown(string markdown)
         {
-            var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
+            var builder = new MarkdownPipelineBuilder().UseAdvancedExtensions();
+            builder.Extensions.Add(new BootstrapExtension());
+            builder.Extensions.Add(new EmojiExtension());
+            var pipeline = builder.Build();
             var document = Markdown.Parse(markdown, pipeline);
 
             var sb = new StringBuilder();

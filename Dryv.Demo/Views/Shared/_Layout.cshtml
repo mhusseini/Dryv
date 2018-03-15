@@ -8,7 +8,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Resume - Start Bootstrap Theme</title>
+    <title>Dryv - DRY Validation for ASP.NET</title>
 
     <!-- Bootstrap core CSS -->
     <link href="~/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -27,18 +27,24 @@
 
 </head>
 
-<body id="page-top" data-spy="scroll" data-target=".navbar-nav" data-offset="50">
+<body id="page-top" data-spy="scroll" data-target="#nav">
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" id="sideNav">
         <a class="navbar-brand js-scroll-trigger" href="#page-top">
             <span class="d-block d-lg-none">
                 <img class="img-fluid mx-auto mb-2" src="images/logo.svg" alt="" style="height: 3em">
             </span>
-            <span class="d-none d-lg-block">
-                <img class="img-fluid mx-auto mb-2" src="images/logo.svg" alt="">
+            <span class="d-none d-lg-block mb-5">
+                <img class="img-fluid mx-auto mb-2" src="images/logo_slogan.svg" alt="">
             </span>
         </a>
-        <ul class="list-inline list-social-icons mb-0">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            @Html.Partial("Nav")
+        </div>
 
+        <ul class="list-inline list-social-icons mb-0 d-none d-lg-block pb-3">
             <li class="list-inline-item">
                 <a href="https://github.com/mhusseini/Dryv">
                     <span class="fa-stack fa-lg">
@@ -57,7 +63,6 @@
                 </a>
             </li>
 
-
             <li class="list-inline-item">
                 <a href="https://www.npmjs.com/package/dryv-jquery-unobtrusive">
                     <span class="fa-stack fa-lg">
@@ -67,13 +72,6 @@
                 </a>
             </li>
         </ul>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            @Html.Partial("Nav")
-        </div>
-
     </nav>
 
     <div class="container-fluid p-0" id="main">
@@ -85,7 +83,7 @@
     <script src="~/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
     <!-- Plugin JavaScript -->
-    <script src="~/vendor/jquery-easing/jquery.easing.min.js"></script>
+    @*<script src="~/vendor/jquery-easing/jquery.easing.min.js"></script>*@
 
     <!-- Custom scripts for this template -->
     <script src="~/js/resume.min.js"></script>
@@ -96,12 +94,13 @@
 
     <script>
         $(document).ready(function () {
-            var ils = $("h2", $("#main")).map(function (i, e) {
+            var ils = $("h2,h3", $("#main")).map(function (i, e) {
                 var $e = $(e);
                 var caption = $e.text().trim().replace(/\s{2,}/g, " ");
                 if (caption) {
+                    var small = $e.prop("tagName") === "H3" ? " small" : "";
                     var id = $e.attr("id");
-                    return '<li class="nav-item"><a class="nav-link js-scroll-trigger" href="#' + id + '">' + caption + '</a></li>';
+                    return '<li class="nav-item"><a class="nav-link js-scroll-trigger' + small + '" href="#' + id + '">' + caption + '</a></li>';
                 }
             }).toArray();
 

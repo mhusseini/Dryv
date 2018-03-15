@@ -9,12 +9,12 @@ namespace Dryv.Demo.Controllers
         [Nav(Menu.ExtendingDryv)]
         public IActionResult Index()
         {
-            return this.View(new HomeViewModel());
+            return this.View(new Customer());
         }
 
 
         [HttpPost]
-        public IActionResult Index(HomeViewModel model)
+        public IActionResult Index(Customer model)
         {
             return this.View(model);
         }

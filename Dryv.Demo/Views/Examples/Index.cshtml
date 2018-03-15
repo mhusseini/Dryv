@@ -1,0 +1,32 @@
+﻿@model Dryv.Demo.Models.Customer
+
+<section class="resume-section p-3 p-lg-5 d-flex flex-column">
+    <div class="my-auto">
+        <h1>Examples</h1>
+        <h2>Simple example</h2>
+        <div class="resume-item d-flex flex-column flex-md-row mb-5">
+            <markdown file="example1.md"></markdown>
+        </div>
+        <div class="resume-item d-flex flex-column flex-md-row mb-5">
+            <form method="post">
+                <div class="form-group">
+                    <label asp-for="Name"></label>
+                    <input asp-for="Name" class="form-control">
+                    <span asp-validation-for="Name"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Company"></label>
+                    <input asp-for="Company" class="form-control">
+                    <span asp-validation-for="Company"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="TaxId"></label>
+                    <input asp-for="TaxId" class="form-control">
+                    <span asp-validation-for="TaxId"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Send</button>
+            </form>
+        </div>
+    </div>
+</section>

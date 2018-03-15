@@ -3,10 +3,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Dryv.Demo.Models
 {
-    public class HomeViewModel
+    public class Customer
     {
         public static readonly DryvRules Rules = DryvRules
-            .For<HomeViewModel>()
+            .For<Customer>()
             .Rule(m => m.TaxId,
                 m => string.IsNullOrWhiteSpace(m.Company) || !string.IsNullOrWhiteSpace(m.TaxId)
                     ? DryvResult.Success
@@ -19,6 +19,7 @@ namespace Dryv.Demo.Models
         [Required]
         public string Name { get; set; }
 
+        [DryvRules]
         public string Company { get; set; }
 
         [DryvRules]
