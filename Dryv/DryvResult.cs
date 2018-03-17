@@ -12,7 +12,7 @@
 
         public string Message { get; }
 
-        public static DryvResult Error(string message) => new DryvResult(message);
+        public static DryvResult Fail(string message) => new DryvResult(message);
 
         public static implicit operator DryvResult(string message) => new DryvResult(message);
     }

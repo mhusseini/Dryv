@@ -6,11 +6,11 @@ using System.Text.RegularExpressions;
 
 namespace Dryv.MethodCallTranslation
 {
-    internal class RegexMethodCallTranslator : MethodCallTranslator, IGenericTranslator
+    internal class RegexTranslator : MethodCallTranslator, IGenericTranslator
     {
         private static readonly PropertyInfo SuccessProperty = typeof(Group).GetProperty(nameof(Group.Success));
 
-        public RegexMethodCallTranslator()
+        public RegexTranslator()
         {
             this.Supports<Regex>();
             this.AddMethodTranslator(nameof(Regex.IsMatch), IsMatch);

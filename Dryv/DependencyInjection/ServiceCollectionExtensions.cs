@@ -1,8 +1,8 @@
-﻿using System;
-using Dryv.MethodCallTranslation;
+﻿using Dryv.MethodCallTranslation;
 using Dryv.Translation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using System;
 
 namespace Dryv.DependencyInjection
 {
@@ -16,10 +16,10 @@ namespace Dryv.DependencyInjection
             var options = new DryvOptions();
             setupAction?.Invoke(options);
 
-            services.AddSingleton<IMethodCallTranslator, DefaultMethodCallTranslator>();
+            services.AddSingleton<IMethodCallTranslator, DefaultTranslator>();
             services.AddSingleton<ITranslator, JavaScriptTranslator>();
-            services.AddSingleton<IMethodCallTranslator, StringMethodCallTranslator>();
-            services.AddSingleton<IMethodCallTranslator, RegexMethodCallTranslator>();
+            services.AddSingleton<IMethodCallTranslator, StringTranslator>();
+            services.AddSingleton<IMethodCallTranslator, RegexTranslator>();
             services.AddSingleton<ITranslatorProvider, TranslatorProvider>();
             services.AddSingleton(Options.Create(options));
 

@@ -28,18 +28,17 @@ namespace Dryv.Tests
             params object[] translators)
         {
             var translatorProvider = new TranslatorProvider();
-            translatorProvider.MethodCallTranslators.Add(new RegexMethodCallTranslator());
-            translatorProvider.MethodCallTranslators.Add(new StringMethodCallTranslator());
-            translatorProvider.GenericTranslators.Add(new RegexMethodCallTranslator());
 
-            if (translators != null)
-            {
-                translatorProvider.MethodCallTranslators.AddRange(translators.OfType<IMethodCallTranslator>());
-                translatorProvider.GenericTranslators.AddRange(translators.OfType<IGenericTranslator>());
-            }
+            translatorProvider.MethodCallTranslators.Add(new RegexTranslator());
+            translatorProvider.MethodCallTranslators.Add(new DryvResultTranslator());
+            translatorProvider.MethodCallTranslators.Add(new StringTranslator());
+            translatorProvider.GenericTranslators.Add(new RegexTranslator());
+            translatorProvider.GenericTranslators.Add(new DryvResultTranslator());
+            translatorProvider.MethodCallTranslators.AddRange(translators.OfType<IMethodCallTranslator>());
+            translatorProvider.GenericTranslators.AddRange(translators.OfType<IGenericTranslator>());
 
             var translator = new JavaScriptTranslator(
-                new DefaultMethodCallTranslator(translatorProvider),
+                new DefaultTranslator(translatorProvider),
                 translatorProvider);
 
             var translation = translator.Translate(expression);

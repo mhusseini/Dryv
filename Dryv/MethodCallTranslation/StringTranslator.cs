@@ -4,11 +4,11 @@ using System.Linq.Expressions;
 
 namespace Dryv.MethodCallTranslation
 {
-    internal class StringMethodCallTranslator : MethodCallTranslator
+    internal class StringTranslator : MethodCallTranslator
     {
         private static readonly StringFormatDissector StringFormatDissector = new StringFormatDissector();
 
-        public StringMethodCallTranslator()
+        public StringTranslator()
         {
             this.Supports<string>();
 

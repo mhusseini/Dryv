@@ -1,18 +1,15 @@
-﻿using System;
+﻿using Dryv.DependencyInjection;
+using Dryv.MethodCallTranslation;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
-using Dryv.DependencyInjection;
-using Dryv.MethodCallTranslation;
 
 namespace Dryv.Translation
 {
     internal class JavaScriptTranslator : Translator
     {
-        private static readonly MemberInfo SuccessMember = typeof(DryvResult).GetMember("Success").First();
-
         private static readonly Dictionary<ExpressionType, string> Terminals = new Dictionary<ExpressionType, string>
         {
             [ExpressionType.Add] = "+",
@@ -257,11 +254,6 @@ namespace Dryv.Translation
 
         public override void Visit(MemberExpression expression, IndentingStringWriter writer, bool negated = false)
         {
-            if (expression.Member == SuccessMember)
-            {
-                writer.Write("null");
-            }
-
             if (expression.Expression != null)
             {
                 this.Visit(expression.Expression, writer);
