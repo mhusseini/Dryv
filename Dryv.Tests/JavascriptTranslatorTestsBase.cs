@@ -30,6 +30,7 @@ namespace Dryv.Tests
             var translatorProvider = new TranslatorProvider();
             translatorProvider.MethodCallTranslators.Add(new RegexMethodCallTranslator());
             translatorProvider.MethodCallTranslators.Add(new StringMethodCallTranslator());
+            translatorProvider.GenericTranslators.Add(new RegexMethodCallTranslator());
 
             if (translators != null)
             {

@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -32,7 +33,7 @@ namespace Dryv.MethodCallTranslation
                 return false;
             }
 
-            var result = FindRegularExpression(methodCallExpression.Object);
+            var result = FindRegularExpression(methodCallExpression);
 
             if (result == null)
             {
@@ -42,21 +43,23 @@ namespace Dryv.MethodCallTranslation
             var clientRegexp = $"/{result.Value.Pattern}/{TranslateRegexOptions(result.Value.Options)}";
             parameters.Writer.Write(clientRegexp);
             parameters.Writer.Write(".test(");
-            WriteArguments(parameters.Translator, methodCallExpression.Arguments, parameters.Writer);
+            WriteArguments(parameters.Translator, new[] { result.Value.Test }, parameters.Writer);
             parameters.Writer.Write(")");
 
             return true;
         }
 
-        private static (string Pattern, RegexOptions Options)? FindRegularExpression(Expression exp)
+        private static (string Pattern, Expression Test, RegexOptions Options)? FindRegularExpression(MethodCallExpression methodCallExpression)
         {
-            (string Pattern, RegexOptions Options)? result = null;
+            (string Pattern, Expression Test, RegexOptions Options)? result = null;
+            var exp = methodCallExpression.Object;
 
             switch (exp)
             {
                 case NewExpression newExpression:
                     result = (
                         Pattern: FindValue<string>(newExpression.Arguments),
+                        Test: methodCallExpression.Arguments.First(),
                         Options: FindValue<RegexOptions>(newExpression.Arguments)
                     );
                     break;
@@ -67,10 +70,19 @@ namespace Dryv.MethodCallTranslation
                     {
                         result = (
                             Pattern: regex.ToString(),
+                            Test: methodCallExpression.Arguments.First(),
                             Options: regex.Options
                         );
                     }
 
+                    break;
+
+                case null:
+                    result = (
+                        Pattern: FindValue<string>(methodCallExpression.Arguments),
+                        Test: methodCallExpression.Arguments.Skip(1).First(),
+                        Options: FindValue<RegexOptions>(methodCallExpression.Arguments)
+                    );
                     break;
             }
 
@@ -79,7 +91,7 @@ namespace Dryv.MethodCallTranslation
 
         private static void IsMatch(MethodTranslationParameters parameters)
         {
-            var result = FindRegularExpression(parameters.Expression.Object);
+            var result = FindRegularExpression(parameters.Expression);
 
             if (result == null)
             {
@@ -89,7 +101,7 @@ namespace Dryv.MethodCallTranslation
             var clientRegexp = $"/{result.Value.Pattern}/{TranslateRegexOptions(result.Value.Options)}";
             parameters.Writer.Write(clientRegexp);
             parameters.Writer.Write(".test(");
-            WriteArguments(parameters.Translator, parameters.Expression.Arguments, parameters.Writer);
+            WriteArguments(parameters.Translator, new[] { result.Value.Test }, parameters.Writer);
             parameters.Writer.Write(")");
         }
 
@@ -116,8 +128,7 @@ namespace Dryv.MethodCallTranslation
                 throw new ExpressionNotTranslatableException($"{RegexOptions.RightToLeft} not translatable to JavaScript.");
             }
 
-            var modifiers = sb.ToString();
-            return modifiers;
+            return sb.ToString();
         }
     }
 }
