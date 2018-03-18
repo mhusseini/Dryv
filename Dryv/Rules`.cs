@@ -24,7 +24,8 @@ namespace Dryv
 
         private void Add<TProperty>(
             Expression<Func<TModel, TProperty>> property,
-            Expression rule)
+            LambdaExpression rule,
+            LambdaExpression enabled)
         {
             if (!(property.Body is MemberExpression memberExpression) ||
                 !(memberExpression.Member is PropertyInfo propertyInfo))
@@ -32,17 +33,22 @@ namespace Dryv
                 return;
             }
 
-            var expressions = this.PropertyRules.GetOrAdd(propertyInfo, _ => new List<Expression>());
-            expressions.Add(rule);
+            var expressions = this.PropertyRules.GetOrAdd(propertyInfo, _ => new List<DryvRule>());
+            expressions.Add(new DryvRule
+            {
+                ValidationExpression = rule,
+                EnablingExpression = enabled
+            });
         }
 
         private void Add<TProperty>(
-            Expression rule,
-            IEnumerable<Expression<Func<TModel, TProperty>>> properties)
+            LambdaExpression rule,
+            IEnumerable<Expression<Func<TModel, TProperty>>> properties,
+            LambdaExpression enabled = null)
         {
             foreach (var property in properties)
             {
-                this.Add(property, rule);
+                this.Add(property, rule, enabled);
             }
         }
     }

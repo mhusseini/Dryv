@@ -1,10 +1,10 @@
+using System;
+using System.Linq;
 using Dryv.DependencyInjection;
 using Dryv.MethodCallTranslation;
 using Dryv.Translation;
 using Escape;
 using Escape.Ast;
-using System;
-using System.Linq;
 
 namespace Dryv.Tests
 {
@@ -31,6 +31,15 @@ namespace Dryv.Tests
             object[] translators = null,
             object[] validationOptions = null)
         {
+            var translator = CreateTranslator(translators);
+            var translation = translator.Translate(expression).Factory(validationOptions);
+            var jsParser = new JavaScriptParser();
+
+            return jsParser.ParseFunctionExpression(translation);
+        }
+
+        private static JavaScriptTranslator CreateTranslator(object[] translators)
+        {
             var translatorProvider = new TranslatorProvider();
 
             translatorProvider.MethodCallTranslators.Add(new RegexTranslator());
@@ -45,13 +54,7 @@ namespace Dryv.Tests
                 translatorProvider.GenericTranslators.AddRange(translators.OfType<IGenericTranslator>());
             }
 
-            var translator = new JavaScriptTranslator(
-                new DefaultTranslator(translatorProvider),
-                translatorProvider);
-
-            var translation = translator.Translate(expression).Factory(validationOptions);
-            var jsParser = new JavaScriptParser();
-            return jsParser.ParseFunctionExpression(translation);
+            return new JavaScriptTranslator(translatorProvider);
         }
 
         protected abstract class TestModel

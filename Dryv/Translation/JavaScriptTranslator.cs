@@ -99,13 +99,10 @@ namespace Dryv.Translation
             [ExpressionType.IsFalse] = "!== false",
         };
 
-        private readonly IMethodCallTranslator methodCallTranslator;
         private readonly ITranslatorProvider translatorProvider;
 
-        public JavaScriptTranslator(IMethodCallTranslator methodCallTranslator,
-            ITranslatorProvider translatorProvider)
+        public JavaScriptTranslator(ITranslatorProvider translatorProvider)
         {
-            this.methodCallTranslator = methodCallTranslator;
             this.translatorProvider = translatorProvider;
         }
 
@@ -308,7 +305,17 @@ namespace Dryv.Translation
                 Negated = negated
             };
 
-            this.methodCallTranslator.Translate(context2);
+            var objectType = context2.Expression.Method.DeclaringType;
+
+            if (this.translatorProvider
+                .MethodCallTranslators
+                .Where(t => t.SupportsType(objectType))
+                .Any(t => t.Translate(context2)))
+            {
+                return;
+            }
+
+            throw new MethodCallNotAllowedException(expression);
         }
 
         public override void Visit(NewArrayExpression expression, TranslationContext context, bool negated = false)

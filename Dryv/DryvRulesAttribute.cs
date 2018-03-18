@@ -1,72 +1,41 @@
-﻿using Dryv.DependencyInjection;
-using Dryv.Translation;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace Dryv
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class DryvRulesAttribute : ValidationAttribute, IClientModelValidator
     {
-        private const string DataValDryAttribute = "data-val-dryv";
         private const string DataValAttribute = "data-val";
+        private const string DataValDryAttribute = "data-val-dryv";
 
         public void AddValidation(ClientModelValidationContext context)
         {
+            var services = context.ActionContext.HttpContext.RequestServices;
+            var property = context.GetProperty();
+            var rules = from rule in RulesFinder.GetRulesForProperty(property)
+                        where rule.IsEnabled(services.GetService)
+                        select rule;
+            var translatedRules = rules.Translate(services.GetService);
+
             context.Attributes.Add(DataValAttribute, "true");
-            context.Attributes.Add(DataValDryAttribute, this.GetClientRules(context));
+            context.Attributes.Add(DataValDryAttribute, translatedRules);
         }
 
-        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        protected override ValidationResult IsValid(object value, ValidationContext context)
         {
-            return GetValidationResult(GetFirstErrorMessage(validationContext));
-        }
+            var property = context.GetProperty();
+            var errorMessage = (from rule in RulesFinder.GetRulesForProperty(property)
+                                where rule.IsEnabled(context.GetService)
+                                let result = rule.Validate(context.ObjectInstance, context.GetService)
+                                where result.IsError()
+                                select result.Message).FirstOrDefault();
 
-        private static IEnumerable<Func<object, DryvResult>> GetCompiledRules(ValidationContext validationContext)
-        {
-            return RulesHelper.GetCompiledRulesForProperty(
-                validationContext.ObjectType,
-                validationContext.MemberName);
-        }
-
-        private static IEnumerable<string> GetErrorMessages(ValidationContext validationContext)
-        {
-            return from rule in GetCompiledRules(validationContext)
-                   let e = rule(validationContext.ObjectInstance)
-                   where e.IsError()
-                   select e.Message;
-        }
-
-        private static string GetFirstErrorMessage(ValidationContext validationContext)
-        {
-            return GetErrorMessages(validationContext).FirstOrDefault();
-        }
-
-        private static ValidationResult GetValidationResult(string errorMessage)
-        {
             return errorMessage == null
                 ? ValidationResult.Success
                 : new ValidationResult(errorMessage);
-        }
-
-        private string GetClientRules(ModelValidationContextBase context)
-        {
-            var services = context.ActionContext.HttpContext.RequestServices;
-            var translator = services.GetService<ITranslator>();
-            var options = services.GetService<IOptions<DryvOptions>>();
-            var metadata = context.ModelMetadata;
-
-            return RulesHelper.GetClientRulesForProperty(
-                metadata.ContainerType,
-                metadata.PropertyName,
-                translator,
-                options.Value,
-                services.GetService);
         }
     }
 }

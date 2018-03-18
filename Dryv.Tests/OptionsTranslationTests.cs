@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using Escape.Ast;
 using Microsoft.Extensions.Options;
@@ -10,40 +9,42 @@ namespace Dryv.Tests
     public class OptionsTranslationTests : JavascriptTranslatorTestsBase
     {
         [TestMethod]
-        public void ExplicitOptions()
+        public void InlineOptions()
         {
-            var expression = TestWithOptionsModel.Rules.PropertyRules.First().Value.First();
-            var jsProgram = GetTranslatedAst(expression, null, new object[]
+            var value = "hello";
+            var rule = TestWithOptionsModel.Rules.PropertyRules.First().Value.First();
+            var jsProgram = GetTranslatedAst(rule.ValidationExpression, null, new object[]
             {
                 Options.Create(new TestOptions
                 {
-                    IsUpperCase = true
+                    Text = value
                 })
             });
 
             var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);
-            var literal = (((conditional.Test as BinaryExpression)?.Left as ConditionalExpression)?.Test as Literal)?.Raw;
+            var binaryExpression = conditional.Test as BinaryExpression;
+            var literal = binaryExpression?.Right as Literal;
 
-            Assert.AreEqual("true", literal);
+            Assert.AreEqual(value, literal?.Value);
         }
 
-        private class TestWithOptionsModel
+        private class TestOptions
+        {
+            public string Text { get; set; }
+        }
+
+        private abstract class TestWithOptionsModel
         {
             public static readonly DryvRules Rules = DryvRules
                 .For<TestWithOptionsModel>()
                 .Rule<IOptions<TestOptions>>(
                     m => m.Text,
-                    (m, o) => (!o.Value.IsUpperCase ? m.Text.ToUpper() : m.Text) == "test"
+                    (m, o) => m.Text == o.Value.Text
                         ? DryvResult.Success
                         : "fail");
 
             [DryvRules]
-            public string Text { get; set; }
-        }
-
-        private class TestOptions
-        {
-            public bool IsUpperCase { get; set; }
+            public abstract string Text { get; set; }
         }
     }
 }

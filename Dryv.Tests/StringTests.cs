@@ -1,6 +1,6 @@
+using System;
 using Escape.Ast;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 
 namespace Dryv.Tests
 {
@@ -89,14 +89,17 @@ namespace Dryv.Tests
                     : DryvResult.Success);
 
             var jsProgram = GetTranslatedAst(expression);
-            var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);
-            var binaryExpression = conditional.Test as BinaryExpression;
+            var conditional = (dynamic)GetBodyExpression<ConditionalExpression>(jsProgram);
+            var callExpression = conditional.Test;
 
-            var leftMethod = GetMethod(binaryExpression?.Left);
-            Assert.AreEqual("toLowerCase", leftMethod.Name);
+            Assert.AreEqual("test", callExpression.Callee.Property.Name);
+            Assert.AreEqual(@"/^\s$/", callExpression.Callee.Object.Raw);
 
-            var rightMethod = GetMethod(binaryExpression?.Right);
-            Assert.AreEqual("toLowerCase", rightMethod.Name);
+            var logicalExpression = callExpression.Arguments[0];
+
+            Assert.AreEqual(LogicalOperator.LogicalOr, logicalExpression.Operator);
+            Assert.AreEqual(nameof(TestModel.Text), logicalExpression.Left.Property.Name);
+            Assert.AreEqual(string.Empty, logicalExpression.Right.Value);
         }
 
         [TestMethod]
