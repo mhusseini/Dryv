@@ -24,6 +24,17 @@ namespace Dryv.Tests
         }
 
         [TestMethod]
+        public void InterpolationStrings()
+        {
+            var expression = Expression(m => $"{m.Text}");
+
+            var jsProgram = GetTranslatedAst(expression);
+            var binaryExpression = (dynamic)GetBodyExpression<BinaryExpression>(jsProgram);
+            Assert.AreEqual(BinaryOperator.Plus, binaryExpression.Operator);
+            Assert.AreEqual(nameof(TestModel.Text), binaryExpression.Left.Right.Property.Name);
+        }
+
+        [TestMethod]
         public void TranslateEndsWithWithIgnoreCase()
         {
             var expression = Expression(m =>

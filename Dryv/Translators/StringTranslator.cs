@@ -234,7 +234,7 @@ namespace Dryv.MethodCallTranslation
 
                         break;
 
-                    case ConstantExpression exp:
+                    case Expression exp:
                         context.Translator.VisitWithBrackets(exp, context);
                         break;
                 }
