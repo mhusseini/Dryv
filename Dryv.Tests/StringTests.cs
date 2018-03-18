@@ -8,10 +8,83 @@ namespace Dryv.Tests
     public class StringTests : JavascriptTranslatorTestsBase
     {
         [TestMethod]
+        public void TranslateCompareTo()
+        {
+            var expression = Expression(m =>
+                m.Text.CompareTo("Oscorp") == 0
+                    ? "fail"
+                    : DryvResult.Success);
+
+            var jsProgram = GetTranslatedAst(expression);
+            var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);
+            var binaryExpression = conditional.Test as BinaryExpression;
+
+            var leftMethod = GetMethod(binaryExpression?.Left);
+            Assert.AreEqual("localeCompare", leftMethod.Name);
+        }
+
+        [TestMethod]
+        public void TranslateEndsWithWithIgnoreCase()
+        {
+            var expression = Expression(m =>
+                m.Text.EndsWith("Oscorp", StringComparison.OrdinalIgnoreCase)
+                    ? "fail"
+                    : DryvResult.Success);
+
+            var jsProgram = GetTranslatedAst(expression);
+            var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);
+            var binaryExpression = conditional.Test as BinaryExpression;
+
+            var leftMethod = GetMethod(binaryExpression?.Left);
+            var leftMethod2 = GetMethod(leftMethod.Object);
+
+            Assert.AreEqual("indexOf", leftMethod.Name);
+            Assert.AreEqual("toLowerCase", leftMethod2.Name);
+        }
+
+        [TestMethod]
         public void TranslateEqualsWithIgnoreCase()
         {
             var expression = Expression(m =>
                 m.Text.Equals("Oscorp", StringComparison.OrdinalIgnoreCase)
+                    ? "fail"
+                    : DryvResult.Success);
+
+            var jsProgram = GetTranslatedAst(expression);
+            var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);
+            var binaryExpression = conditional.Test as BinaryExpression;
+
+            var leftMethod = GetMethod(binaryExpression?.Left);
+            Assert.AreEqual("toLowerCase", leftMethod.Name);
+
+            var rightMethod = GetMethod(binaryExpression?.Right);
+            Assert.AreEqual("toLowerCase", rightMethod.Name);
+        }
+
+        [TestMethod]
+        public void TranslateIndexOfWithIgnoreCase()
+        {
+            var expression = Expression(m =>
+                m.Text.IndexOf("Oscorp", StringComparison.OrdinalIgnoreCase) == 0
+                    ? "fail"
+                    : DryvResult.Success);
+
+            var jsProgram = GetTranslatedAst(expression);
+            var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);
+            var binaryExpression = conditional.Test as BinaryExpression;
+
+            var leftMethod = GetMethod(binaryExpression?.Left);
+            var leftMethod2 = GetMethod(leftMethod.Object);
+
+            Assert.AreEqual("indexOf", leftMethod.Name);
+            Assert.AreEqual("toLowerCase", leftMethod2.Name);
+        }
+
+        [TestMethod]
+        public void TranslateIsNullOrWhiteSpace()
+        {
+            var expression = Expression(m =>
+                string.IsNullOrWhiteSpace(m.Text)
                     ? "fail"
                     : DryvResult.Success);
 
@@ -43,60 +116,6 @@ namespace Dryv.Tests
 
             Assert.AreEqual("indexOf", leftMethod.Name);
             Assert.AreEqual("toLowerCase", leftMethod2.Name);
-        }
-
-        [TestMethod]
-        public void TranslateEndsWithWithIgnoreCase()
-        {
-            var expression = Expression(m =>
-                m.Text.EndsWith("Oscorp", StringComparison.OrdinalIgnoreCase)
-                    ? "fail"
-                    : DryvResult.Success);
-
-            var jsProgram = GetTranslatedAst(expression);
-            var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);
-            var binaryExpression = conditional.Test as BinaryExpression;
-
-            var leftMethod = GetMethod(binaryExpression?.Left);
-            var leftMethod2 = GetMethod(leftMethod.Object);
-
-            Assert.AreEqual("indexOf", leftMethod.Name);
-            Assert.AreEqual("toLowerCase", leftMethod2.Name);
-        }
-
-        [TestMethod]
-        public void TranslateIndexOfWithIgnoreCase()
-        {
-            var expression = Expression(m =>
-                m.Text.IndexOf("Oscorp", StringComparison.OrdinalIgnoreCase) == 0
-                    ? "fail"
-                    : DryvResult.Success);
-
-            var jsProgram = GetTranslatedAst(expression);
-            var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);
-            var binaryExpression = conditional.Test as BinaryExpression;
-
-            var leftMethod = GetMethod(binaryExpression?.Left);
-            var leftMethod2 = GetMethod(leftMethod.Object);
-
-            Assert.AreEqual("indexOf", leftMethod.Name);
-            Assert.AreEqual("toLowerCase", leftMethod2.Name);
-        }
-
-        [TestMethod]
-        public void TranslateCompareTo()
-        {
-            var expression = Expression(m =>
-                m.Text.CompareTo("Oscorp") == 0
-                    ? "fail"
-                    : DryvResult.Success);
-
-            var jsProgram = GetTranslatedAst(expression);
-            var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);
-            var binaryExpression = conditional.Test as BinaryExpression;
-
-            var leftMethod = GetMethod(binaryExpression?.Left);
-            Assert.AreEqual("localeCompare", leftMethod.Name);
         }
 
         [TestMethod]

@@ -16,11 +16,12 @@ namespace Dryv.DependencyInjection
             var options = new DryvOptions();
             setupAction?.Invoke(options);
 
-            services.AddSingleton<IMethodCallTranslator, DefaultTranslator>();
             services.AddSingleton<ITranslator, JavaScriptTranslator>();
-            services.AddSingleton<IMethodCallTranslator, StringTranslator>();
-            services.AddSingleton<IMethodCallTranslator, RegexTranslator>();
+            services.AddTransient<IMethodCallTranslator, StringTranslator>();
+            services.AddTransient<IMethodCallTranslator, RegexTranslator>();
+            services.AddTransient<IGenericTranslator, RegexTranslator>();
             services.AddSingleton<ITranslatorProvider, TranslatorProvider>();
+            services.AddSingleton<IMethodCallTranslator, DefaultTranslator>();
             services.AddSingleton(Options.Create(options));
 
             return new DryvBuilder(services);

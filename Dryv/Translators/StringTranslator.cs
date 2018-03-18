@@ -295,12 +295,12 @@ namespace Dryv.MethodCallTranslation
             /*
              √ public static bool IsNullOrWhiteSpace(String value);
              */
-            if (!context.Negated)
+            if (context.Negated)
             {
                 context.Writer.Write("!");
             }
 
-            context.Writer.Write(@"/\S/.test(");
+            context.Writer.Write(@"/^\s$/.test(");
             context.Translator.VisitWithBrackets(context.Expression.Arguments.First(), context);
             context.Writer.Write(@" || """")");
         }
