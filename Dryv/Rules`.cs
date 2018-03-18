@@ -32,7 +32,7 @@ namespace Dryv
                 return;
             }
 
-            var expressions = this.PropertyRules.GetOrAdd(propertyInfo.Name, _ => new List<Expression>());
+            var expressions = this.PropertyRules.GetOrAdd(propertyInfo, _ => new List<Expression>());
             expressions.Add(rule);
         }
 

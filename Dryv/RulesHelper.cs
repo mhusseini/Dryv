@@ -20,39 +20,54 @@ namespace Dryv
             string propertyName,
             ITranslator translator,
             DryvOptions options,
-            IServiceProvider serviceProvider)
-            => TranslateRules(
+            Func<Type, object> objectProvider)
+        {
+            var typeRules = GetRulesForType(objectType);
+            var property = objectType.GetProperty(propertyName);
+            var propertyRules = GetRulesForProperty(typeRules, property);
+
+            return TranslateRules(
                 translator,
-                GetRulesForProperty(GetRulesForType(objectType), propertyName),
+                propertyRules,
                 options,
-                serviceProvider);
+                objectProvider);
+        }
 
         public static IEnumerable<Func<object, DryvResult>> GetCompiledRulesForProperty(
             Type objectType,
             string propertyName)
-            => CompileRules(GetRulesForProperty(GetRulesForType(objectType), propertyName));
+        {
+            var property = objectType.GetProperty(propertyName);
+            return CompileRules(GetRulesForProperty(GetRulesForType(objectType), property));
+        }
 
         private static IEnumerable<Func<object, DryvResult>> CompileRules(IEnumerable<Expression> rulesForProperty)
-            => from rule in rulesForProperty.OfType<LambdaExpression>()
-               select CompiledRules.GetOrAdd(rule, lambdaExpression =>
-                       {
-                           var inputParameter = Expression.Parameter(typeof(object), "input");
-                           var convertExpression = Expression.Convert(inputParameter, lambdaExpression.Parameters.First().Type);
-                           var invokeExpression = Expression.Invoke(lambdaExpression, convertExpression);
-                           var resultLambda = Expression.Lambda<Func<object, DryvResult>>(invokeExpression, inputParameter);
-                           return resultLambda.Compile();
-                       });
+        {
+            return from rule in rulesForProperty.OfType<LambdaExpression>()
+                   select CompiledRules.GetOrAdd(rule, lambdaExpression =>
+                   {
+                       var inputParameter = Expression.Parameter(typeof(object), "input");
+                       var convertExpression = Expression.Convert(inputParameter, lambdaExpression.Parameters.First().Type);
+                       var invokeExpression = Expression.Invoke(lambdaExpression, convertExpression);
+                       var resultLambda = Expression.Lambda<Func<object, DryvResult>>(invokeExpression, inputParameter);
+
+                       return resultLambda.Compile();
+                   });
+        }
 
         private static IEnumerable<Expression> GetRulesForProperty(
             IEnumerable<DryvRules> allRulesForType,
-            string propertyName)
-            => from rules in allRulesForType
-               where rules.PropertyRules.ContainsKey(propertyName)
-               from expression in rules.PropertyRules[propertyName]
-               select expression;
+            PropertyInfo property)
+        {
+            return from rules in allRulesForType
+                   where rules.PropertyRules.ContainsKey(property)
+                   from expression in rules.PropertyRules[property]
+                   select expression;
+        }
 
         private static IEnumerable<DryvRules> GetRulesForType(Type objectType)
-            => TypeRules.GetOrAdd(objectType, t
+        {
+            return TypeRules.GetOrAdd(objectType, t
                 => (from p in t.GetFields(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
                     where typeof(DryvRules).IsAssignableFrom(p.FieldType)
                     select p.GetValue(null) as DryvRules)
@@ -61,18 +76,21 @@ namespace Dryv
                         where typeof(DryvRules).IsAssignableFrom(p.PropertyType)
                         select p.GetValue(null) as DryvRules)
                     .ToList());
+        }
 
         private static string TranslateRules(
             ITranslator translator,
             IEnumerable<Expression> rulesForProperty,
             DryvOptions options,
-            IServiceProvider serviceProvider)
-            => $@"[{
+            Func<Type, object> objectProvider)
+        {
+            return $@"[{
                     string.Join(",",
                         from rule in rulesForProperty
                         let result = ClientRules.GetOrAdd(rule, r => translator.Translate(rule))
-                        let preevaluationOptions = result.OptionTypes.Select(serviceProvider.GetService).ToArray()
+                        let preevaluationOptions = result.OptionTypes.Select(objectProvider).ToArray()
                         select result.Factory(preevaluationOptions))
                 }]";
+        }
     }
 }
