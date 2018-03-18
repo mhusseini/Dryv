@@ -11,7 +11,7 @@ namespace Dryv.Translation
     {
         private static readonly MethodInfo TranslateValueMethod = typeof(Translator).GetMethod(nameof(TranslateValue));
 
-        public virtual Func<object[], string> Translate(Expression expression)
+        public virtual TranslationResult Translate(Expression expression)
         {
             var sb = new StringBuilder();
             var optionDelegates = new List<LambdaExpression>();
@@ -34,37 +34,44 @@ namespace Dryv.Translation
                 var lambda = Expression.Lambda<Func<object[], string>>(
                     Expression.Constant(sb.ToString()),
                     Expression.Parameter(typeof(object[])));
-                return lambda.Compile();
-            }
-            else
-            {
-                var code = sb.ToString()
-                    .Replace("{", "{{")
-                    .Replace("}", "}}");
-                var index = 0;
 
-                var parameter = Expression.Parameter(typeof(object[]));
-                var arrayItems = new List<Expression>();
-
-                foreach (var lambda in optionDelegates)
+                return new TranslationResult
                 {
-                    var idx = index++;
-                    code = code.Replace($"$${lambda.GetHashCode()}$$", $"{{{idx}}}");
-                    var optionType = optionTypes[idx];
-                    var p = Expression.Convert(Expression.ArrayAccess(parameter, Expression.Constant(idx)), optionType);
-                    var optionValue = Expression.Convert(Expression.Invoke(lambda, p), typeof(object));
-                    var translatedOptionsValue = Expression.Call(Expression.Constant(this), TranslateValueMethod, optionValue);
-                    arrayItems.Add(Expression.Convert(translatedOptionsValue, typeof(object)));
-                }
-
-                var formatMethod = typeof(string).GetMethod(nameof(string.Format), new[] { typeof(string), typeof(object[]) });
-                var pattern = Expression.Constant(code);
-                var array = Expression.NewArrayInit(typeof(object), arrayItems);
-                var format = Expression.Call(null, formatMethod, pattern, array);
-                var result = Expression.Lambda<Func<object[], string>>(format, parameter);
-
-                return result.Compile();
+                    Factory = lambda.Compile(),
+                    OptionTypes = optionTypes.ToArray()
+                };
             }
+
+            var code = sb.ToString()
+                .Replace("{", "{{")
+                .Replace("}", "}}");
+            var index = 0;
+
+            var parameter = Expression.Parameter(typeof(object[]));
+            var arrayItems = new List<Expression>();
+
+            foreach (var lambda in optionDelegates)
+            {
+                var idx = index++;
+                code = code.Replace($"$${lambda.GetHashCode()}$$", $"{{{idx}}}");
+                var optionType = optionTypes[idx];
+                var p = Expression.Convert(Expression.ArrayAccess(parameter, Expression.Constant(idx)), optionType);
+                var optionValue = Expression.Convert(Expression.Invoke(lambda, p), typeof(object));
+                var translatedOptionsValue = Expression.Call(Expression.Constant(this), TranslateValueMethod, optionValue);
+                arrayItems.Add(Expression.Convert(translatedOptionsValue, typeof(object)));
+            }
+
+            var formatMethod = typeof(string).GetMethod(nameof(string.Format), new[] { typeof(string), typeof(object[]) });
+            var pattern = Expression.Constant(code);
+            var array = Expression.NewArrayInit(typeof(object), arrayItems);
+            var format = Expression.Call(null, formatMethod, pattern, array);
+            var result = Expression.Lambda<Func<object[], string>>(format, parameter);
+
+            return new TranslationResult
+            {
+                Factory = result.Compile(),
+                OptionTypes = optionTypes.ToArray()
+            };
         }
 
         public virtual void Translate(Expression expression, TranslationContext context)

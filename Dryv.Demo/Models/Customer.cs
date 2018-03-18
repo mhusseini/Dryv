@@ -1,8 +1,14 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.Extensions.Options;
 
 namespace Dryv.Demo.Models
 {
+    public class TenantOptions
+    {
+        public bool IsEmptyCompanyAllowed { get; set; }
+    }
+
     public class Customer
     {
         public static readonly DryvRules Rules = DryvRules
@@ -14,6 +20,11 @@ namespace Dryv.Demo.Models
             .Rule(m => m.Company,
                 m => m.Company.Equals("Oscorp", StringComparison.OrdinalIgnoreCase)
                     ? "Sorry, no evil corporations"
+                    : DryvResult.Success)
+            .Rule<IOptions<TenantOptions>>(
+                m => m.Company,
+                (m, o) => !o.Value.IsEmptyCompanyAllowed && string.IsNullOrWhiteSpace(m.Company)
+                    ? "Company name is required"
                     : DryvResult.Success);
 
         [Required]

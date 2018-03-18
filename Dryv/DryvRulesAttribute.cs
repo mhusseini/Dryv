@@ -49,13 +49,12 @@ namespace Dryv
             var translator = services.GetService<ITranslator>();
             var options = services.GetService<IOptions<DryvOptions>>();
             var metadata = context.ModelMetadata;
-            throw new NotImplementedException("Get validation options!");
             return RulesHelper.GetClientRulesForProperty(
                 metadata.ContainerType,
                 metadata.PropertyName,
                 translator,
                 options.Value,
-                null);
+                services);
         }
     }
 }

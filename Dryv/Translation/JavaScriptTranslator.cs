@@ -273,7 +273,15 @@ namespace Dryv.Translation
             {
                 var func = Expression.Lambda(expression, parameter);
                 context.OptionDelegates.Add(func);
+                if (negated)
+                {
+                    context.Writer.Write("!(");
+                }
                 context.Writer.Write($"$${func.GetHashCode()}$$");
+                if (negated)
+                {
+                    context.Writer.Write(")");
+                }
                 return;
             }
 

@@ -49,7 +49,7 @@ namespace Dryv.Tests
                 new DefaultTranslator(translatorProvider),
                 translatorProvider);
 
-            var translation = translator.Translate(expression)(validationOptions);
+            var translation = translator.Translate(expression).Factory(validationOptions);
             var jsParser = new JavaScriptParser();
             return jsParser.ParseFunctionExpression(translation);
         }

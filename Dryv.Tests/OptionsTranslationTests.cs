@@ -33,7 +33,7 @@ namespace Dryv.Tests
                 .For<TestWithOptionsModel>()
                 .Rule<IOptions<TestOptions>>(
                     m => m.Text,
-                    (m, o) => (o.Value.IsUpperCase ? m.Text.ToUpper() : m.Text) == "test"
+                    (m, o) => (!o.Value.IsUpperCase ? m.Text.ToUpper() : m.Text) == "test"
                         ? DryvResult.Success
                         : "fail");
 

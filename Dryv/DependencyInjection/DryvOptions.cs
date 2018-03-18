@@ -2,6 +2,5 @@
 {
     public class DryvOptions
     {
-        public bool PrettyPrintJavaScript { get; set; }
     }
 }

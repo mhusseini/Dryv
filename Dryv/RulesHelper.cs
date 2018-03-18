@@ -6,16 +6,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text.RegularExpressions;
 
 namespace Dryv
 {
     internal class RulesHelper
     {
-        private static readonly ConcurrentDictionary<Expression, Func<object[], string>> ClientRules = new ConcurrentDictionary<Expression, Func<object[], string>>();
+        private static readonly ConcurrentDictionary<Expression, TranslationResult> ClientRules = new ConcurrentDictionary<Expression, TranslationResult>();
         private static readonly ConcurrentDictionary<LambdaExpression, Func<object, DryvResult>> CompiledRules = new ConcurrentDictionary<LambdaExpression, Func<object, DryvResult>>();
-        private static readonly Regex RegexNewLine = new Regex(@"[\r\n]+", RegexOptions.Compiled);
-        private static readonly Regex RegexWhiteSpace = new Regex(@"\t+|\s{2,}", RegexOptions.Compiled);
         private static readonly ConcurrentDictionary<Type, IList<DryvRules>> TypeRules = new ConcurrentDictionary<Type, IList<DryvRules>>();
 
         public static string GetClientRulesForProperty(
@@ -23,20 +20,17 @@ namespace Dryv
             string propertyName,
             ITranslator translator,
             DryvOptions options,
-            object[] validationOptions)
+            IServiceProvider serviceProvider)
             => TranslateRules(
                 translator,
                 GetRulesForProperty(GetRulesForType(objectType), propertyName),
                 options,
-                validationOptions);
+                serviceProvider);
 
         public static IEnumerable<Func<object, DryvResult>> GetCompiledRulesForProperty(
             Type objectType,
             string propertyName)
             => CompileRules(GetRulesForProperty(GetRulesForType(objectType), propertyName));
-
-        private static string Cleanup(string translated)
-            => RegexWhiteSpace.Replace(RegexNewLine.Replace(translated, " "), string.Empty);
 
         private static IEnumerable<Func<object, DryvResult>> CompileRules(IEnumerable<Expression> rulesForProperty)
             => from rule in rulesForProperty.OfType<LambdaExpression>()
@@ -72,12 +66,13 @@ namespace Dryv
             ITranslator translator,
             IEnumerable<Expression> rulesForProperty,
             DryvOptions options,
-            object[] validationOptions)
+            IServiceProvider serviceProvider)
             => $@"[{
                     string.Join(",",
                         from rule in rulesForProperty
-                        let func = ClientRules.GetOrAdd(rule, r => translator.Translate(rule))
-                        select func(validationOptions))
+                        let result = ClientRules.GetOrAdd(rule, r => translator.Translate(rule))
+                        let preevaluationOptions = result.OptionTypes.Select(serviceProvider.GetService).ToArray()
+                        select result.Factory(preevaluationOptions))
                 }]";
     }
 }
