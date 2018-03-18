@@ -101,10 +101,12 @@ namespace Dryv.Tests
 
             var jsProgram = GetTranslatedAst(expression);
             var conditional = (dynamic)GetBodyExpression<ConditionalExpression>(jsProgram);
-            var callExpression = conditional.Test;
+            var unaryExpression = conditional.Test;
+            var callExpression = unaryExpression.Argument;
 
+            Assert.AreEqual(UnaryOperator.LogicalNot, unaryExpression.Operator);
             Assert.AreEqual("test", callExpression.Callee.Property.Name);
-            Assert.AreEqual(@"/^\s$/", callExpression.Callee.Object.Raw);
+            Assert.AreEqual(@"/\S/", callExpression.Callee.Object.Raw);
 
             var logicalExpression = callExpression.Arguments[0];
 
