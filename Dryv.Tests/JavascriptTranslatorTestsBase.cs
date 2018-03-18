@@ -1,16 +1,19 @@
-using System;
-using System.Linq;
 using Dryv.DependencyInjection;
 using Dryv.MethodCallTranslation;
 using Dryv.Translation;
 using Escape;
 using Escape.Ast;
+using System;
+using System.Linq;
 
 namespace Dryv.Tests
 {
     public class JavascriptTranslatorTestsBase
     {
         protected static System.Linq.Expressions.Expression<Func<TestModel, DryvResult>> Expression(System.Linq.Expressions.Expression<Func<TestModel, DryvResult>> exp) =>
+            exp;
+
+        protected static System.Linq.Expressions.Expression<Func<TModel, DryvResult>> Expression<TModel>(System.Linq.Expressions.Expression<Func<TModel, DryvResult>> exp) =>
             exp;
 
         protected static T GetBodyExpression<T>(FunctionExpression jsProgram)
@@ -24,8 +27,9 @@ namespace Dryv.Tests
         }
 
         protected static FunctionExpression GetTranslatedAst(
-            System.Linq.Expressions.Expression<Func<TestModel, DryvResult>> expression,
-            params object[] translators)
+            System.Linq.Expressions.Expression expression,
+            object[] translators = null,
+            object[] validationOptions = null)
         {
             var translatorProvider = new TranslatorProvider();
 
@@ -34,14 +38,18 @@ namespace Dryv.Tests
             translatorProvider.MethodCallTranslators.Add(new StringTranslator());
             translatorProvider.GenericTranslators.Add(new RegexTranslator());
             translatorProvider.GenericTranslators.Add(new DryvResultTranslator());
-            translatorProvider.MethodCallTranslators.AddRange(translators.OfType<IMethodCallTranslator>());
-            translatorProvider.GenericTranslators.AddRange(translators.OfType<IGenericTranslator>());
+
+            if (translators != null)
+            {
+                translatorProvider.MethodCallTranslators.AddRange(translators.OfType<IMethodCallTranslator>());
+                translatorProvider.GenericTranslators.AddRange(translators.OfType<IGenericTranslator>());
+            }
 
             var translator = new JavaScriptTranslator(
                 new DefaultTranslator(translatorProvider),
                 translatorProvider);
 
-            var translation = translator.Translate(expression);
+            var translation = translator.Translate(expression)(validationOptions);
             var jsParser = new JavaScriptParser();
             return jsParser.ParseFunctionExpression(translation);
         }

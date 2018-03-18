@@ -17,7 +17,7 @@ namespace Dryv.Tests
                     ? "fail"
                     : DryvResult.Success);
 
-            var jsProgram = GetTranslatedAst(expression, new AllMethodCallTranslator());
+            var jsProgram = GetTranslatedAst(expression, new object[] { new AllMethodCallTranslator() });
             var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);
 
             var callExpression = conditional?.Test as CallExpression;
@@ -37,7 +37,7 @@ namespace Dryv.Tests
                     ? "fail"
                     : DryvResult.Success);
 
-            var jsProgram = GetTranslatedAst(expression, new AllMethodCallTranslator());
+            var jsProgram = GetTranslatedAst(expression, new object[] { new AllMethodCallTranslator() });
             var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);
 
             var callExpression = conditional?.Test as CallExpression;
@@ -57,7 +57,7 @@ namespace Dryv.Tests
                     ? "fail"
                     : DryvResult.Success);
 
-            var jsProgram = GetTranslatedAst(expression, new RegexMatchTranslator());
+            var jsProgram = GetTranslatedAst(expression, new object[] { new AllMethodCallTranslator() });
             var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);
 
             var binaryExpression = conditional.Test as BinaryExpression;
@@ -72,12 +72,12 @@ namespace Dryv.Tests
             {
                 this.Supports<Regex>();
 
-                this.AddMethodTranslator(nameof(Regex.Match), p =>
+                this.AddMethodTranslator(nameof(Regex.Match), context =>
                 {
-                    p.Translator.VisitWithBrackets(p.Expression.Object, p.Writer);
-                    p.Writer.Write(".match(");
-                    WriteArguments(p.Translator, p.Expression.Arguments, p.Writer);
-                    p.Writer.Write(")");
+                    context.Translator.VisitWithBrackets(context.Expression.Object, context);
+                    context.Writer.Write(".match(");
+                    WriteArguments(context.Translator, context.Expression.Arguments, context);
+                    context.Writer.Write(")");
                 });
             }
         }

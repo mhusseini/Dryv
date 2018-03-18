@@ -59,7 +59,7 @@ namespace Dryv.MethodCallTranslation
             }
         }
 
-        private static void Compare(MethodTranslationParameters parameters)
+        private static void Compare(MethodTranslationContext context)
         {
             /*
              Х public static int Compare(String strA, int indexA, String strB, int indexB, int length, bool ignoreCase);
@@ -69,69 +69,69 @@ namespace Dryv.MethodCallTranslation
              √! public static int Compare(String strA, String strB, bool ignoreCase, CultureInfo culture);
              √ public static int Compare(String strA, String strB, CultureInfo culture, CompareOptions options);
              Х public static int Compare(String strA, int indexA, String strB, int indexB, int length, bool ignoreCase, CultureInfo culture);
-             Х public static int Compare(String strA, int indexA, String strB, int indexB, int length, CultureInfo culture, CompareOptions parameters);
+             Х public static int Compare(String strA, int indexA, String strB, int indexB, int length, CultureInfo culture, CompareOptions context);
              √ public static int Compare(String strA, String strB, StringComparison comparisonType);
              Х public static int Compare(String strA, int indexA, String strB, int indexB, int length);
              */
-            if (parameters.Expression.Method.GetParameters().Any(p => p.ParameterType == typeof(int)))
+            if (context.Expression.Method.GetParameters().Any(p => p.ParameterType == typeof(int)))
             {
-                throw new MethodCallNotAllowedException(parameters.Expression, "Only override without any indexes can be translated to JavaScript");
+                throw new MethodCallNotAllowedException(context.Expression, "Only override without any indexes can be translated to JavaScript");
             }
-            var arguments = parameters.Expression.Arguments;
-            parameters.Translator.VisitWithBrackets(arguments.FirstOrDefault(), parameters.Writer);
-            var isCaseInsensitive = ArgumentIs(parameters, 2, true) || GetIsCaseInsensitive(parameters.Expression);
+            var arguments = context.Expression.Arguments;
+            context.Translator.VisitWithBrackets(arguments.FirstOrDefault(), context);
+            var isCaseInsensitive = ArgumentIs(context, 2, true) || GetIsCaseInsensitive(context.Expression);
             if (isCaseInsensitive)
             {
-                parameters.Writer.Write(".toLowerCase()");
+                context.Writer.Write(".toLowerCase()");
             }
 
-            parameters.Writer.Write(".localeCompare(");
-            parameters.Translator.Visit(arguments[1], parameters.Writer);
+            context.Writer.Write(".localeCompare(");
+            context.Translator.Visit(arguments[1], context);
             if (isCaseInsensitive)
             {
-                parameters.Writer.Write(".toLowerCase()");
+                context.Writer.Write(".toLowerCase()");
             }
 
-            parameters.Writer.Write(")");
+            context.Writer.Write(")");
         }
 
-        private static void CompareTo(MethodTranslationParameters parameters)
+        private static void CompareTo(MethodTranslationContext context)
         {
             /*
              √ public int CompareTo(String strB);
              √ public int CompareTo(object value);
              */
-            var arguments = parameters.Expression.Arguments;
-            parameters.Translator.VisitWithBrackets(parameters.Expression.Object, parameters.Writer);
-            parameters.Writer.Write(".localeCompare(");
-            parameters.Translator.Visit(arguments[0], parameters.Writer);
-            parameters.Writer.Write(")");
+            var arguments = context.Expression.Arguments;
+            context.Translator.VisitWithBrackets(context.Expression.Object, context);
+            context.Writer.Write(".localeCompare(");
+            context.Translator.Visit(arguments[0], context);
+            context.Writer.Write(")");
         }
 
-        private static void Contains(MethodTranslationParameters parameters)
+        private static void Contains(MethodTranslationContext context)
         {
             /*
              √ public bool Contains(String value)
              */
-            parameters.Translator.Visit(parameters.Expression.Object, parameters.Writer);
+            context.Translator.Visit(context.Expression.Object, context);
 
-            var isCaseInsensitive = GetIsCaseInsensitive(parameters.Expression);
+            var isCaseInsensitive = GetIsCaseInsensitive(context.Expression);
             if (isCaseInsensitive)
             {
-                parameters.Writer.Write(".toLowerCase()");
+                context.Writer.Write(".toLowerCase()");
             }
 
-            parameters.Writer.Write(".indexOf(");
-            WriteArguments(parameters.Translator, parameters.Expression.Arguments, parameters.Writer);
+            context.Writer.Write(".indexOf(");
+            WriteArguments(context.Translator, context.Expression.Arguments, context);
             if (isCaseInsensitive)
             {
-                parameters.Writer.Write(".toLowerCase()");
+                context.Writer.Write(".toLowerCase()");
             }
 
-            parameters.Writer.Write(parameters.Negated ? ") < 0" : ") >= 0");
+            context.Writer.Write(context.Negated ? ") < 0" : ") >= 0");
         }
 
-        private static void EndsWith(MethodTranslationParameters parameters)
+        private static void EndsWith(MethodTranslationContext context)
         {
             /*
              √ public bool EndsWith(String value);
@@ -139,52 +139,52 @@ namespace Dryv.MethodCallTranslation
              √ public bool EndsWith(String value, StringComparison comparisonType);
              √ public bool EndsWith(char value);
              */
-            parameters.Translator.Visit(parameters.Expression.Object, parameters.Writer);
+            context.Translator.Visit(context.Expression.Object, context);
 
-            var isCaseInsensitive = ArgumentIs(parameters, 1, true) || GetIsCaseInsensitive(parameters.Expression);
+            var isCaseInsensitive = ArgumentIs(context, 1, true) || GetIsCaseInsensitive(context.Expression);
             if (isCaseInsensitive)
             {
-                parameters.Writer.Write(".toLowerCase()");
+                context.Writer.Write(".toLowerCase()");
             }
 
-            parameters.Writer.Write(".indexOf(");
-            parameters.Translator.Visit(parameters.Expression.Arguments[0], parameters.Writer);
+            context.Writer.Write(".indexOf(");
+            context.Translator.Visit(context.Expression.Arguments[0], context);
             if (isCaseInsensitive)
             {
-                parameters.Writer.Write(".toLowerCase()");
+                context.Writer.Write(".toLowerCase()");
             }
 
-            parameters.Writer.Write(parameters.Negated ? ") !== (" : ") === (");
-            parameters.Translator.VisitWithBrackets(parameters.Expression.Object, parameters.Writer);
-            parameters.Writer.Write(".length - ");
-            parameters.Translator.VisitWithBrackets(parameters.Expression.Arguments[0], parameters.Writer);
-            parameters.Writer.Write(".length)");
+            context.Writer.Write(context.Negated ? ") !== (" : ") === (");
+            context.Translator.VisitWithBrackets(context.Expression.Object, context);
+            context.Writer.Write(".length - ");
+            context.Translator.VisitWithBrackets(context.Expression.Arguments[0], context);
+            context.Writer.Write(".length)");
         }
 
-        private static void Equals(MethodTranslationParameters parameters)
+        private static void Equals(MethodTranslationContext context)
         {
             /*
              √ public static bool Equals(String a, String b, StringComparison comparisonType);
              √ public static bool Equals(String a, String b);
              */
-            parameters.Translator.Visit(parameters.Expression.Object, parameters.Writer);
+            context.Translator.Visit(context.Expression.Object, context);
 
-            var value = parameters.Expression.Arguments.First();
-            var isCaseInsensitive = GetIsCaseInsensitive(parameters.Expression);
+            var value = context.Expression.Arguments.First();
+            var isCaseInsensitive = GetIsCaseInsensitive(context.Expression);
             if (isCaseInsensitive)
             {
-                parameters.Writer.Write(".toLowerCase()");
+                context.Writer.Write(".toLowerCase()");
             }
 
-            parameters.Writer.Write(parameters.Negated ? "!==" : " === ");
-            WriteArguments(parameters.Translator, new[] { value }, parameters.Writer);
+            context.Writer.Write(context.Negated ? "!==" : " === ");
+            WriteArguments(context.Translator, new[] { value }, context);
             if (isCaseInsensitive)
             {
-                parameters.Writer.Write(".toLowerCase()");
+                context.Writer.Write(".toLowerCase()");
             }
         }
 
-        private static void Format(MethodTranslationParameters parameters)
+        private static void Format(MethodTranslationContext context)
         {
             /*
              Х public static String Format(IFormatProvider provider, String format, object arg0);
@@ -196,22 +196,22 @@ namespace Dryv.MethodCallTranslation
              √ public static String Format(String format, object arg0, object arg1);
              Х public static String Format(IFormatProvider provider, String format, object arg0, object arg1);
              */
-            if (!(parameters.Expression.Arguments.First() is ConstantExpression pattern))
+            if (!(context.Expression.Arguments.First() is ConstantExpression pattern))
             {
                 throw new ExpressionNotSupportedException("Calls to string.Format with non-constant pattern strings are not supported.");
             }
 
-            if (parameters.Expression.Method.GetParameters().First().ParameterType == typeof(IFormatProvider))
+            if (context.Expression.Method.GetParameters().First().ParameterType == typeof(IFormatProvider))
             {
-                throw new MethodCallNotAllowedException(parameters.Expression, "Only override with first parameter being a string can be translated to JavaScript");
+                throw new MethodCallNotAllowedException(context.Expression, "Only override with first parameter being a string can be translated to JavaScript");
             }
 
-            if (parameters.Expression.Arguments.OfType<NewArrayExpression>().Any())
+            if (context.Expression.Arguments.OfType<NewArrayExpression>().Any())
             {
                 throw new ExpressionNotSupportedException("Calls to string.Format with arguments being an array are not supported.");
             }
 
-            var arguments = parameters.Expression.Arguments.Skip(1).Cast<object>().ToArray();
+            var arguments = context.Expression.Arguments.Skip(1).Cast<object>().ToArray();
             var parts = StringFormatDissector.Recombine(pattern.Value.ToString(), arguments);
 
             for (var index = 0; index < parts.Count; index++)
@@ -222,26 +222,26 @@ namespace Dryv.MethodCallTranslation
                     case string text:
                         if (index > 0)
                         {
-                            parameters.Writer.Write(" + ");
+                            context.Writer.Write(" + ");
                         }
 
-                        parameters.Writer.Write(QuoteValue(text));
+                        context.Writer.Write(QuoteValue(text));
 
                         if (index < parts.Count - 1)
                         {
-                            parameters.Writer.Write(" + ");
+                            context.Writer.Write(" + ");
                         }
 
                         break;
 
                     case ConstantExpression exp:
-                        parameters.Translator.VisitWithBrackets(exp, parameters.Writer);
+                        context.Translator.VisitWithBrackets(exp, context);
                         break;
                 }
             }
         }
 
-        private static void IndexOf(MethodTranslationParameters parameters)
+        private static void IndexOf(MethodTranslationContext context)
         {
             /*
              √ public int IndexOf(char value);
@@ -254,68 +254,68 @@ namespace Dryv.MethodCallTranslation
              √ public int IndexOf(String value, StringComparison comparisonType);
              Х public int IndexOf(String value, int startIndex);
              */
-            if (parameters.Expression.Method.GetParameters().Any(p => p.ParameterType == typeof(int)))
+            if (context.Expression.Method.GetParameters().Any(p => p.ParameterType == typeof(int)))
             {
-                throw new MethodCallNotAllowedException(parameters.Expression, "Only override without any indexes can be translated to JavaScript");
+                throw new MethodCallNotAllowedException(context.Expression, "Only override without any indexes can be translated to JavaScript");
             }
 
-            var arguments = parameters.Expression.Arguments;
-            parameters.Translator.VisitWithBrackets(parameters.Expression.Object, parameters.Writer);
-            var isCaseInsensitive = GetIsCaseInsensitive(parameters.Expression);
+            var arguments = context.Expression.Arguments;
+            context.Translator.VisitWithBrackets(context.Expression.Object, context);
+            var isCaseInsensitive = GetIsCaseInsensitive(context.Expression);
             if (isCaseInsensitive)
             {
-                parameters.Writer.Write(".toLowerCase()");
+                context.Writer.Write(".toLowerCase()");
             }
 
-            parameters.Writer.Write(".indexOf(");
-            parameters.Translator.VisitWithBrackets(arguments[1], parameters.Writer);
+            context.Writer.Write(".indexOf(");
+            context.Translator.VisitWithBrackets(arguments[1], context);
             if (isCaseInsensitive)
             {
-                parameters.Writer.Write(".toLowerCase()");
+                context.Writer.Write(".toLowerCase()");
             }
 
-            parameters.Writer.Write(")");
+            context.Writer.Write(")");
         }
 
-        private static void IsNullOrEmpty(MethodTranslationParameters parameters)
+        private static void IsNullOrEmpty(MethodTranslationContext context)
         {
             /*
              √ public static bool IsNullOrEmpty(String value);
              */
-            if (!parameters.Negated)
+            if (!context.Negated)
             {
-                parameters.Writer.Write("!");
+                context.Writer.Write("!");
             }
 
-            parameters.Translator.VisitWithBrackets(parameters.Expression.Arguments.First(), parameters.Writer);
+            context.Translator.VisitWithBrackets(context.Expression.Arguments.First(), context);
         }
 
-        private static void IsNullOrWhiteSpace(MethodTranslationParameters parameters)
+        private static void IsNullOrWhiteSpace(MethodTranslationContext context)
         {
             /*
              √ public static bool IsNullOrWhiteSpace(String value);
              */
-            if (!parameters.Negated)
+            if (!context.Negated)
             {
-                parameters.Writer.Write("!");
+                context.Writer.Write("!");
             }
 
-            parameters.Writer.Write(@"/\S/.test(");
-            parameters.Translator.VisitWithBrackets(parameters.Expression.Arguments.First(), parameters.Writer);
-            parameters.Writer.Write(@" || """")");
+            context.Writer.Write(@"/\S/.test(");
+            context.Translator.VisitWithBrackets(context.Expression.Arguments.First(), context);
+            context.Writer.Write(@" || """")");
         }
 
-        private static void Normalize(MethodTranslationParameters parameters)
+        private static void Normalize(MethodTranslationContext context)
         {
             /*
              √ public String Normalize();
              √! public String Normalize(NormalizationForm normalizationForm);
              */
-            parameters.Translator.VisitWithBrackets(parameters.Expression.Object, parameters.Writer);
-            parameters.Writer.Write(".normalize()");
+            context.Translator.VisitWithBrackets(context.Expression.Object, context);
+            context.Writer.Write(".normalize()");
         }
 
-        private static void StartsWith(MethodTranslationParameters parameters)
+        private static void StartsWith(MethodTranslationContext context)
         {
             /*
              √ public bool StartsWith(char value);
@@ -323,99 +323,89 @@ namespace Dryv.MethodCallTranslation
              √! public bool StartsWith(String value, bool ignoreCase, CultureInfo culture);
              √ public bool StartsWith(String value, StringComparison comparisonType);
              */
-            parameters.Translator.Visit(parameters.Expression.Object, parameters.Writer);
-            var isCaseInsensitive = ArgumentIs(parameters, 1, true) || GetIsCaseInsensitive(parameters.Expression);
+            context.Translator.Visit(context.Expression.Object, context);
+            var isCaseInsensitive = ArgumentIs(context, 1, true) || GetIsCaseInsensitive(context.Expression);
             if (isCaseInsensitive)
             {
-                parameters.Writer.Write(".toLowerCase()");
+                context.Writer.Write(".toLowerCase()");
             }
 
-            parameters.Writer.Write(".indexOf(");
-            WriteArguments(parameters.Translator, parameters.Expression.Arguments, parameters.Writer);
+            context.Writer.Write(".indexOf(");
+            WriteArguments(context.Translator, context.Expression.Arguments, context);
             if (isCaseInsensitive)
             {
-                parameters.Writer.Write(".toLowerCase()");
+                context.Writer.Write(".toLowerCase()");
             }
 
-            parameters.Writer.Write(parameters.Negated ? ") !== 0" : ") === 0");
+            context.Writer.Write(context.Negated ? ") !== 0" : ") === 0");
         }
 
-        private static void ToLower(MethodTranslationParameters parameters)
+        private static void ToLower(MethodTranslationContext context)
         {
             /*
              √ public String ToLower();
              √! public String ToLower(CultureInfo culture);
              */
-            if (!parameters.Negated)
-            {
-                parameters.Writer.Write("!");
-            }
-
-            parameters.Translator.VisitWithBrackets(parameters.Expression.Object, parameters.Writer);
-            parameters.Writer.Write(".toLowerCase()");
+            context.Translator.VisitWithBrackets(context.Expression.Object, context);
+            context.Writer.Write(".toLowerCase()");
         }
 
-        private static void ToUpper(MethodTranslationParameters parameters)
+        private static void ToUpper(MethodTranslationContext context)
         {
             /*
              √ public String ToUpper();
              √! public String ToUpper(CultureInfo culture);
              */
-            if (!parameters.Negated)
-            {
-                parameters.Writer.Write("!");
-            }
-
-            parameters.Translator.VisitWithBrackets(parameters.Expression.Object, parameters.Writer);
-            parameters.Writer.Write(".toUpperCase()");
+            context.Translator.VisitWithBrackets(context.Expression.Object, context);
+            context.Writer.Write(".toUpperCase()");
         }
 
-        private static void Trim(MethodTranslationParameters parameters)
+        private static void Trim(MethodTranslationContext context)
         {
             /*
              Х public String Trim(char trimChar);
              Х public String Trim(params char[] trimChars);
              √ public String Trim();
              */
-            if (parameters.Expression.Arguments.Any())
+            if (context.Expression.Arguments.Any())
             {
-                throw new MethodCallNotAllowedException(parameters.Expression, "Only override without any arguments can be translated to JavaScript");
+                throw new MethodCallNotAllowedException(context.Expression, "Only override without any arguments can be translated to JavaScript");
             }
 
-            parameters.Translator.VisitWithBrackets(parameters.Expression.Object, parameters.Writer);
-            parameters.Writer.Write(".trim()");
+            context.Translator.VisitWithBrackets(context.Expression.Object, context);
+            context.Writer.Write(".trim()");
         }
 
-        private static void TrimEnd(MethodTranslationParameters parameters)
+        private static void TrimEnd(MethodTranslationContext context)
         {
             /*
              √ public String TrimEnd();
              Х public String TrimEnd(char trimChar);
              Х public String TrimEnd(params char[] trimChars);
              */
-            if (parameters.Expression.Arguments.Any())
+            if (context.Expression.Arguments.Any())
             {
-                throw new MethodCallNotAllowedException(parameters.Expression, "Only override without any arguments can be translated to JavaScript");
+                throw new MethodCallNotAllowedException(context.Expression, "Only override without any arguments can be translated to JavaScript");
             }
 
-            parameters.Translator.VisitWithBrackets(parameters.Expression.Object, parameters.Writer);
-            parameters.Writer.Write(".trimRight()");
+            context.Translator.VisitWithBrackets(context.Expression.Object, context);
+            context.Writer.Write(".trimRight()");
         }
 
-        private static void TrimStart(MethodTranslationParameters parameters)
+        private static void TrimStart(MethodTranslationContext context)
         {
             /*
              √ public String TrimStart();
              Х public String TrimStart(char trimChar);
              Х public String TrimStart(params char[] trimChars);
              */
-            if (parameters.Expression.Arguments.Any())
+            if (context.Expression.Arguments.Any())
             {
-                throw new MethodCallNotAllowedException(parameters.Expression, "Only override without any arguments can be translated to JavaScript");
+                throw new MethodCallNotAllowedException(context.Expression, "Only override without any arguments can be translated to JavaScript");
             }
 
-            parameters.Translator.VisitWithBrackets(parameters.Expression.Object, parameters.Writer);
-            parameters.Writer.Write(".trimLeft()");
+            context.Translator.VisitWithBrackets(context.Expression.Object, context);
+            context.Writer.Write(".trimLeft()");
         }
     }
 }

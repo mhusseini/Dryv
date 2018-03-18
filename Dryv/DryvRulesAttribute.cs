@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using Dryv.DependencyInjection;
+﻿using Dryv.DependencyInjection;
 using Dryv.Translation;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace Dryv
 {
@@ -18,23 +18,11 @@ namespace Dryv
         public void AddValidation(ClientModelValidationContext context)
         {
             context.Attributes.Add("data-val", "true");
-            context.Attributes.Add(ClientAttributeName, GetClientRules(context));
+            context.Attributes.Add(ClientAttributeName, this.GetClientRules(context));
         }
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext) =>
             GetValidationResult(GetFirstErrorMessage(validationContext));
-
-        private static string GetClientRules(ModelValidationContextBase context)
-        {
-            var translator = context.ActionContext.HttpContext.RequestServices.GetService<ITranslator>();
-            var options = context.ActionContext.HttpContext.RequestServices.GetService<IOptions<DryvOptions>>();
-            var metadata = context.ModelMetadata;
-            return RulesHelper.GetClientRulesForProperty(
-                metadata.ContainerType,
-                metadata.PropertyName,
-                translator,
-                options.Value);
-        }
 
         private static IEnumerable<Func<object, DryvResult>> GetCompiledRules(ValidationContext validationContext) =>
             RulesHelper.GetCompiledRulesForProperty(
@@ -54,5 +42,20 @@ namespace Dryv
             errorMessage == null
                 ? ValidationResult.Success
                 : new ValidationResult(errorMessage);
+
+        private string GetClientRules(ModelValidationContextBase context)
+        {
+            var services = context.ActionContext.HttpContext.RequestServices;
+            var translator = services.GetService<ITranslator>();
+            var options = services.GetService<IOptions<DryvOptions>>();
+            var metadata = context.ModelMetadata;
+            throw new NotImplementedException("Get validation options!");
+            return RulesHelper.GetClientRulesForProperty(
+                metadata.ContainerType,
+                metadata.PropertyName,
+                translator,
+                options.Value,
+                null);
+        }
     }
 }

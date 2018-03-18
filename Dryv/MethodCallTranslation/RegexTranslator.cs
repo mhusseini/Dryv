@@ -16,9 +16,9 @@ namespace Dryv.MethodCallTranslation
             this.AddMethodTranslator(nameof(Regex.IsMatch), IsMatch);
         }
 
-        public bool TryTranslate(TranslationParameters parameters)
+        public bool TryTranslate(GenericTranslationContext context)
         {
-            if (!(parameters.Expression is MemberExpression memberExpression))
+            if (!(context.Expression is MemberExpression memberExpression))
             {
                 return false;
             }
@@ -37,14 +37,14 @@ namespace Dryv.MethodCallTranslation
 
             if (result == null)
             {
-                throw new MethodCallNotAllowedException(methodCallExpression, "Could not determine regular parameters.Expression.");
+                throw new MethodCallNotAllowedException(methodCallExpression, "Could not determine regular context.Expression.");
             }
 
             var clientRegexp = $"/{result.Value.Pattern}/{TranslateRegexOptions(result.Value.Options)}";
-            parameters.Writer.Write(clientRegexp);
-            parameters.Writer.Write(".test(");
-            WriteArguments(parameters.Translator, new[] { result.Value.Test }, parameters.Writer);
-            parameters.Writer.Write(")");
+            context.Writer.Write(clientRegexp);
+            context.Writer.Write(".test(");
+            WriteArguments(context.Translator, new[] { result.Value.Test }, context);
+            context.Writer.Write(")");
 
             return true;
         }
@@ -89,41 +89,41 @@ namespace Dryv.MethodCallTranslation
             return result;
         }
 
-        private static void IsMatch(MethodTranslationParameters parameters)
+        private static void IsMatch(MethodTranslationContext context)
         {
-            var result = FindRegularExpression(parameters.Expression);
+            var result = FindRegularExpression(context.Expression);
 
             if (result == null)
             {
-                throw new MethodCallNotAllowedException(parameters.Expression, "Could not determine regular parameters.Expression.");
+                throw new MethodCallNotAllowedException(context.Expression, "Could not determine regular context.Expression.");
             }
 
             var clientRegexp = $"/{result.Value.Pattern}/{TranslateRegexOptions(result.Value.Options)}";
-            parameters.Writer.Write(clientRegexp);
-            parameters.Writer.Write(".test(");
-            WriteArguments(parameters.Translator, new[] { result.Value.Test }, parameters.Writer);
-            parameters.Writer.Write(")");
+            context.Writer.Write(clientRegexp);
+            context.Writer.Write(".test(");
+            WriteArguments(context.Translator, new[] { result.Value.Test }, context);
+            context.Writer.Write(")");
         }
 
-        private static string TranslateRegexOptions(RegexOptions parameters)
+        private static string TranslateRegexOptions(RegexOptions context)
         {
             var sb = new StringBuilder();
-            if (parameters.HasFlag(RegexOptions.IgnoreCase))
+            if (context.HasFlag(RegexOptions.IgnoreCase))
             {
                 sb.Append("i");
             }
 
-            if (parameters.HasFlag(RegexOptions.Multiline))
+            if (context.HasFlag(RegexOptions.Multiline))
             {
                 sb.Append("m");
             }
 
-            if (parameters.HasFlag(RegexOptions.IgnorePatternWhitespace))
+            if (context.HasFlag(RegexOptions.IgnorePatternWhitespace))
             {
                 throw new ExpressionNotTranslatableException($"{RegexOptions.IgnorePatternWhitespace} not translatable to JavaScript.");
             }
 
-            if (parameters.HasFlag(RegexOptions.RightToLeft))
+            if (context.HasFlag(RegexOptions.RightToLeft))
             {
                 throw new ExpressionNotTranslatableException($"{RegexOptions.RightToLeft} not translatable to JavaScript.");
             }

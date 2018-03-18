@@ -14,20 +14,20 @@ namespace Dryv.MethodCallTranslation
             this.AddMethodTranslator(nameof(DryvResult.Fail), this.Error);
         }
 
-        private void Error(MethodTranslationParameters parameters)
+        private void Error(MethodTranslationContext context)
         {
-            parameters.Writer.Write(parameters.Expression.Arguments.First());
+            context.Writer.Write(context.Expression.Arguments.First());
         }
 
-        public bool TryTranslate(TranslationParameters parameters)
+        public bool TryTranslate(GenericTranslationContext context)
         {
-            if (!(parameters.Expression is MemberExpression memberExpression)
+            if (!(context.Expression is MemberExpression memberExpression)
                 || memberExpression.Member != SuccessMember)
             {
                 return false;
             }
 
-            parameters.Writer.Write("null");
+            context.Writer.Write("null");
             return true;
         }
     }

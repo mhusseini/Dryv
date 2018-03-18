@@ -12,14 +12,14 @@ namespace Dryv.MethodCallTranslation
 
         public override bool SupportsType(Type type) => true;
 
-        private static void TranslateAnyMethod(MethodTranslationParameters parameters)
+        private static void TranslateAnyMethod(MethodTranslationContext context)
         {
-            parameters.Translator.VisitWithBrackets(parameters.Expression.Object, parameters.Writer);
-            parameters.Writer.Write(".");
-            parameters.Writer.Write(parameters.Expression.Method.Name.ToCamelCase());
-            parameters.Writer.Write("(");
-            WriteArguments(parameters.Translator, parameters.Expression.Arguments, parameters.Writer);
-            parameters.Writer.Write(")");
+            context.Translator.VisitWithBrackets(context.Expression.Object, context);
+            context.Writer.Write(".");
+            context.Writer.Write(context.Expression.Method.Name.ToCamelCase());
+            context.Writer.Write("(");
+            WriteArguments(context.Translator, context.Expression.Arguments, context);
+            context.Writer.Write(")");
         }
     }
 }

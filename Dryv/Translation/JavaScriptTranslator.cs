@@ -111,260 +111,282 @@ namespace Dryv.Translation
 
         public bool UseLowercaseMembers { get; set; }
 
-        public override void Visit(BinaryExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override object TranslateValue(object value)
         {
-            this.VisitWithBrackets(expression.Left, writer);
+            switch (value)
+            {
+                case string txt:
+                    return $"\"{txt}\"";
 
-            if (!TryWriteTerminal(expression, writer))
+                case bool b:
+                    return b ? "true" : "false";
+
+                default:
+                    return value.ToString();
+            }
+        }
+
+        public override void Visit(BinaryExpression expression, TranslationContext context, bool negated = false)
+        {
+            this.VisitWithBrackets(expression.Left, context);
+
+            if (!TryWriteTerminal(expression, context.Writer))
             {
                 throw expression.Method != null
                     ? (Exception)new MethodCallNotAllowedException(expression)
                     : new ExpressionTypeNotSupportedException(expression);
             }
 
-            this.VisitWithBrackets(expression.Right, writer);
+            this.VisitWithBrackets(expression.Right, context);
         }
 
-        public override void Visit(BlockExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(BlockExpression expression, TranslationContext context, bool negated = false)
         {
             foreach (var variable in expression.Variables)
             {
-                writer.WriteLine($"var {this.FormatIdentifier(variable.Name)};");
+                context.Writer.WriteLine($"var {this.FormatIdentifier(variable.Name)};");
             }
 
-            base.Visit(expression, writer, negated);
+            base.Visit(expression, context, negated);
         }
 
-        public override void Visit(ConditionalExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(ConditionalExpression expression, TranslationContext context, bool negated = false)
         {
-            this.VisitWithBrackets(expression.Test, writer);
-            writer.IncrementIndent();
-            writer.Write(" ? ");
-            this.VisitWithBrackets(expression.IfTrue, writer);
-            writer.Write(" : ");
-            this.VisitWithBrackets(expression.IfFalse, writer);
-            writer.DecrementIndent();
+            this.VisitWithBrackets(expression.Test, context);
+            context.Writer.IncrementIndent();
+            context.Writer.Write(" ? ");
+            this.VisitWithBrackets(expression.IfTrue, context);
+            context.Writer.Write(" : ");
+            this.VisitWithBrackets(expression.IfFalse, context);
+            context.Writer.DecrementIndent();
         }
 
-        public override void Visit(ConstantExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(ConstantExpression expression, TranslationContext context, bool negated = false)
         {
             var text = MethodCallTranslator.QuoteValue(expression.Value);
 
-            writer.Write(text);
+            context.Writer.Write(text);
         }
 
-        public override void Visit(DefaultExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(DefaultExpression expression, TranslationContext context, bool negated = false)
         {
             var value = this.GetDefaultValue(expression.Type);
             var text = MethodCallTranslator.QuoteValue(value);
 
-            writer.Write(text);
+            context.Writer.Write(text);
         }
 
-        public override void Visit(DynamicExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(DynamicExpression expression, TranslationContext context, bool negated = false)
         {
             throw new NotSupportedException();
         }
 
-        public override void Visit(GotoExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(GotoExpression expression, TranslationContext context, bool negated = false)
         {
             throw new NotSupportedException();
         }
 
-        public override void Visit(IDynamicExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(IDynamicExpression expression, TranslationContext context, bool negated = false)
         {
             throw new NotSupportedException();
         }
 
-        public override void Visit(IndexExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(IndexExpression expression, TranslationContext context, bool negated = false)
         {
             if (expression.Arguments.Count > 1)
             {
                 throw new NotSupportedException("JavaScript does not support indexers with more than one argument.");
             }
 
-            this.Visit(expression.Object, writer);
-            writer.Write("[");
-            this.Visit(expression.Arguments.First(), writer);
-            writer.Write("]");
+            this.Visit(expression.Object, context);
+            context.Writer.Write("[");
+            this.Visit(expression.Arguments.First(), context);
+            context.Writer.Write("]");
         }
 
-        public override void Visit(Expression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(Expression expression, TranslationContext context, bool negated = false)
         {
-            var parameters = new TranslationParameters
+            var context2 = new GenericTranslationContext(context)
             {
                 Expression = expression,
                 Translator = this,
-                Writer = writer,
                 Negated = negated
             };
 
-            if (!this.translatorProvider.GenericTranslators.Any(t => t.TryTranslate(parameters)))
+            if (!this.translatorProvider.GenericTranslators.Any(t => t.TryTranslate(context2)))
             {
-                this.Visit((dynamic)expression, writer, negated);
+                this.Visit((dynamic)expression, context2, negated);
             }
         }
 
-        public override void Visit(InvocationExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(InvocationExpression expression, TranslationContext context, bool negated = false)
         {
-            this.VisitWithBrackets(expression.Expression, writer);
-            writer.Write("(");
-            MethodCallTranslator.WriteArguments(this, expression.Arguments, writer);
-            writer.Write(")");
+            this.VisitWithBrackets(expression.Expression, context);
+            context.Writer.Write("(");
+            MethodCallTranslator.WriteArguments(this, expression.Arguments, context);
+            context.Writer.Write(")");
         }
 
-        public override void Visit(LabelExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(LabelExpression expression, TranslationContext context, bool negated = false)
         {
             throw new NotSupportedException();
         }
 
-        public override void Visit(LambdaExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(LambdaExpression expression, TranslationContext context, bool negated = false)
         {
-            writer.Write("function(");
-            writer.Write(string.Join(", ", expression.Parameters.Select(p => this.FormatIdentifier(p.Name))));
-            writer.WriteLine(") {");
-            writer.IncrementIndent();
-            writer.Write("return ");
-            this.Visit(expression.Body, writer);
-            writer.WriteLine(";");
-            writer.DecrementIndent();
-            writer.Write("}");
+            context.Writer.Write("function(");
+            context.Writer.Write(string.Join(", ", expression.Parameters.Select(p => this.FormatIdentifier(p.Name))));
+            context.Writer.WriteLine(") {");
+            context.Writer.IncrementIndent();
+            context.Writer.Write("return ");
+            this.Visit(expression.Body, context);
+            context.Writer.WriteLine(";");
+            context.Writer.DecrementIndent();
+            context.Writer.Write("}");
         }
 
-        public override void Visit(ListInitExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(ListInitExpression expression, TranslationContext context, bool negated = false)
         {
-            writer.Write("= [");
+            context.Writer.Write("= [");
             var sep = string.Empty;
             foreach (var initializer in expression.Initializers)
             {
-                writer.Write(sep);
+                context.Writer.Write(sep);
                 foreach (var argument in initializer.Arguments)
                 {
-                    this.Visit(argument, writer);
+                    this.Visit(argument, context);
                 }
                 sep = ", ";
             }
-            writer.Write("]");
+            context.Writer.Write("]");
         }
 
-        public override void Visit(LoopExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(LoopExpression expression, TranslationContext context, bool negated = false)
         {
             throw new NotImplementedException();
         }
 
-        public override void Visit(MemberExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(MemberExpression expression, TranslationContext context, bool negated = false)
         {
-            if (expression.Expression != null)
+            var parameter = GetParameter(expression);
+            if (context.OptionsTypes.Contains(parameter?.Type))
             {
-                this.Visit(expression.Expression, writer);
-                writer.Write(".");
+                var func = Expression.Lambda(expression, parameter);
+                context.OptionDelegates.Add(func);
+                context.Writer.Write($"$${func.GetHashCode()}$$");
+                return;
             }
 
-            writer.Write(this.FormatIdentifier(expression.Member.Name));
+            if (expression.Expression != null)
+            {
+                this.Visit(expression.Expression, context);
+                context.Writer.Write(".");
+            }
+
+            context.Writer.Write(this.FormatIdentifier(expression.Member.Name));
         }
 
-        public override void Visit(MemberInitExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(MemberInitExpression expression, TranslationContext context, bool negated = false)
         {
-            this.Visit(expression.NewExpression, writer);
+            this.Visit(expression.NewExpression, context);
         }
 
-        public override void Visit(MethodCallExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(MethodCallExpression expression, TranslationContext context, bool negated = false)
         {
-            var parameters = new MethodTranslationParameters
+            var context2 = new MethodTranslationContext(context)
             {
                 Translator = this,
                 Expression = expression,
-                Writer = writer,
                 Negated = negated
             };
 
-            this.methodCallTranslator.Translate(parameters);
+            this.methodCallTranslator.Translate(context2);
         }
 
-        public override void Visit(NewArrayExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(NewArrayExpression expression, TranslationContext context, bool negated = false)
         {
-            writer.Write("[]");
+            context.Writer.Write("[]");
         }
 
-        public override void Visit(NewExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(NewExpression expression, TranslationContext context, bool negated = false)
         {
-            writer.Write("new ");
-            writer.Write(expression.Constructor.DeclaringType.Name);
-            writer.Write("(");
-            MethodCallTranslator.WriteArguments(this, expression.Arguments, writer);
-            writer.Write(")");
+            context.Writer.Write("new ");
+            context.Writer.Write(expression.Constructor.DeclaringType.Name);
+            context.Writer.Write("(");
+            MethodCallTranslator.WriteArguments(this, expression.Arguments, context);
+            context.Writer.Write(")");
         }
 
-        public override void Visit(ParameterExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(ParameterExpression expression, TranslationContext context, bool negated = false)
         {
-            writer.Write(expression.Name);
+            context.Writer.Write(expression.Name);
         }
 
-        public override void Visit(RuntimeVariablesExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(RuntimeVariablesExpression expression, TranslationContext context, bool negated = false)
         {
             throw new NotImplementedException();
         }
 
-        public override void Visit(SwitchExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(SwitchExpression expression, TranslationContext context, bool negated = false)
         {
-            writer.Write("switch(");
-            this.Visit(expression.SwitchValue, writer);
-            writer.WriteLine("){");
+            context.Writer.Write("switch(");
+            this.Visit(expression.SwitchValue, context);
+            context.Writer.WriteLine("){");
             foreach (var expressionCase in expression.Cases)
             {
                 foreach (var testCase in expressionCase.TestValues)
                 {
-                    writer.Write("case ");
-                    this.Visit(testCase, writer);
-                    writer.WriteLine(":");
+                    context.Writer.Write("case ");
+                    this.Visit(testCase, context);
+                    context.Writer.WriteLine(":");
                 }
 
-                writer.WriteLine("{");
-                writer.IncrementIndent();
-                this.Visit(expressionCase.Body, writer);
-                writer.WriteLine();
-                writer.WriteLine("break;");
-                writer.DecrementIndent();
-                writer.WriteLine("}");
+                context.Writer.WriteLine("{");
+                context.Writer.IncrementIndent();
+                this.Visit(expressionCase.Body, context);
+                context.Writer.WriteLine();
+                context.Writer.WriteLine("break;");
+                context.Writer.DecrementIndent();
+                context.Writer.WriteLine("}");
             }
-            writer.Write("}");
+            context.Writer.Write("}");
         }
 
-        public override void Visit(TryExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(TryExpression expression, TranslationContext context, bool negated = false)
         {
             throw new NotImplementedException();
         }
 
-        public override void Visit(TypeBinaryExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(TypeBinaryExpression expression, TranslationContext context, bool negated = false)
         {
             throw new NotSupportedException();
         }
 
-        public override void Visit(UnaryExpression expression, IndentingStringWriter writer, bool negated = false)
+        public override void Visit(UnaryExpression expression, TranslationContext context, bool negated = false)
         {
             var negatedExpression = expression.NodeType == ExpressionType.Not;
             if (!negatedExpression)
             {
-                TryWriteTerminal(expression, writer);
+                TryWriteTerminal(expression, context.Writer);
             }
 
-            this.Visit(expression.Operand, writer, negatedExpression);
+            this.Visit(expression.Operand, context, negatedExpression);
         }
 
-        public override void VisitWithBrackets(Expression expression, IndentingStringWriter writer)
+        public override void VisitWithBrackets(Expression expression, TranslationContext context)
         {
             var needsBrackets = GetNeedsBrackets(expression);
 
             if (needsBrackets)
             {
-                writer.Write("(");
+                context.Writer.Write("(");
             }
 
-            this.Visit(expression, writer);
+            this.Visit(expression, context);
 
             if (needsBrackets)
             {
-                writer.Write(") ");
+                context.Writer.Write(") ");
             }
         }
 
@@ -380,6 +402,16 @@ namespace Dryv.Translation
             }
 
             return true;
+        }
+
+        private static ParameterExpression GetParameter(Expression expression)
+        {
+            while (expression is MemberExpression memberExpression)
+            {
+                expression = memberExpression.Expression;
+            }
+
+            return expression as ParameterExpression;
         }
 
         private static bool TryWriteTerminal(Expression expression, TextWriter writer)

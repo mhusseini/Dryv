@@ -6,6 +6,6 @@ namespace Dryv.MethodCallTranslation
     {
         bool SupportsType(Type type);
 
-        bool Translate(MethodTranslationParameters options);
+        bool Translate(MethodTranslationContext options);
     }
 }
