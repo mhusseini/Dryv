@@ -172,13 +172,13 @@ public class Customer
 Pre-evaluated options are objects that get evaluated prior to the actual validation phase. 
 The pre-evaluated option values are then later used during model validation. For instance, 
 the pre-evaluated option values are inserted into the generated client code, as opposed to a translated
-expression as it would normally be the case. In the example below, the string `Awesome` will be
+expression as it would normally be the case. In the example below, the string `Conglom-O` will be
 hard-coded into the generated JavaScript code.
  
 ```csharp
 public class Options
 {
-    public string CompanyPrefix { get; set; } = "Awesome";
+    public string CompanyPrefix { get; set; }
 }
 
 public class Model
