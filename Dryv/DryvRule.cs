@@ -9,8 +9,9 @@ namespace Dryv
         public Func<object, object[], DryvResult> CompiledValidationExpression { get; set; }
         public LambdaExpression EnablingExpression { get; set; }
         public Type[] PreevaluationOptionTypes { get; set; }
+        public RuleLocation RuleLocation { get; set; }
         public Func<object[], string> TranslatedValidationExpression { get; set; }
-        public LambdaExpression ValidationExpression { get; set; }
         public Exception TranslationError { get; set; }
+        public LambdaExpression ValidationExpression { get; set; }
     }
 }

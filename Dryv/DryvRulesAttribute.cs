@@ -21,7 +21,8 @@ namespace Dryv
             var options = services.GetService<IOptions<DryvOptions>>();
             var property = context.GetProperty();
             var rules = from rule in RulesFinder.GetRulesForProperty(property)
-                        where rule.IsEnabled(services.GetService)
+                        where rule.IsEnabled(services.GetService) &&
+                              rule.RuleLocation.HasFlag(RuleLocation.Client)
                         select rule;
             var translatedRules = rules.Translate(services.GetService, options.Value);
 
@@ -33,7 +34,8 @@ namespace Dryv
         {
             var property = context.GetProperty();
             var errorMessage = (from rule in RulesFinder.GetRulesForProperty(property)
-                                where rule.IsEnabled(context.GetService)
+                                where rule.IsEnabled(context.GetService) &&
+                                      rule.RuleLocation.HasFlag(RuleLocation.Server)
                                 let result = rule.Validate(context.ObjectInstance, context.GetService)
                                 where result.IsError()
                                 select result.Message).FirstOrDefault();

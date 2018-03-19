@@ -25,7 +25,8 @@ namespace Dryv
         private void Add<TProperty>(
             Expression<Func<TModel, TProperty>> property,
             LambdaExpression rule,
-            LambdaExpression enabled)
+            LambdaExpression enabled,
+            RuleLocation ruleLocation)
         {
             if (!(property.Body is MemberExpression memberExpression) ||
                 !(memberExpression.Member is PropertyInfo propertyInfo))
@@ -37,18 +38,41 @@ namespace Dryv
             expressions.Add(new DryvRule
             {
                 ValidationExpression = rule,
-                EnablingExpression = enabled
+                EnablingExpression = enabled,
+                RuleLocation = ruleLocation
             });
         }
 
         private void Add<TProperty>(
             LambdaExpression rule,
             IEnumerable<Expression<Func<TModel, TProperty>>> properties,
-            LambdaExpression enabled = null)
+            LambdaExpression ruleSwitch)
         {
             foreach (var property in properties)
             {
-                this.Add(property, rule, enabled);
+                this.Add(property, rule, ruleSwitch, RuleLocation.Server | RuleLocation.Client);
+            }
+        }
+
+        private void AddServer<TProperty>(
+            LambdaExpression rule,
+            IEnumerable<Expression<Func<TModel, TProperty>>> properties,
+            LambdaExpression ruleSwitch)
+        {
+            foreach (var property in properties)
+            {
+                this.Add(property, rule, ruleSwitch, RuleLocation.Server);
+            }
+        }
+
+        private void AddClient<TProperty>(
+            LambdaExpression rule,
+            IEnumerable<Expression<Func<TModel, TProperty>>> properties,
+            LambdaExpression ruleSwitch)
+        {
+            foreach (var property in properties)
+            {
+                this.Add(property, rule, ruleSwitch, RuleLocation.Client);
             }
         }
     }

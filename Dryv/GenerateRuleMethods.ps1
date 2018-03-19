@@ -1,6 +1,6 @@
 ﻿$fn = "Rules``.g.cs"
 
-function WriteMethod($propCount, $optionCount)
+function WriteMethod($propCount, $optionCount, $methodPrefix)
 {
 	$gen = "";
 	if($optionCount -gt 0){
@@ -24,12 +24,21 @@ function WriteMethod($propCount, $optionCount)
 		$properties += "property$j, ";
 	}
 
+	if($optionCount -gt 0){
+		$ruleSwitch = ",`r`n         			Expression<Func<$($gen2)bool>> ruleSwitch = null";
+		$ruleSwitchArgument = "ruleSwitch";
+	}
+	else {
+		$ruleSwitchArgument = "null";
+	}
+
 	@"
-		public Rules<TModel> Rule$gen(
-$parameters			Expression<Func<TModel, $($gen2)DryvResult>> rule)
+		public Rules<TModel> $($methodPrefix)Rule$gen(
+$parameters			Expression<Func<TModel, $($gen2)DryvResult>> rule$ruleSwitch)
         {
-			this.Add(rule, 
-				new[] { $properties});
+			this.Add$($methodPrefix)(rule,
+				new[] { $properties},
+				$ruleSwitchArgument);
 			return this;
         }
 "@ | Add-Content $fn;
@@ -44,13 +53,16 @@ namespace Dryv
     {
 ' | Out-File $fn
 
-for($i = 1; $i -lt 10; $i++)
-{
-	for($o = 0; $o -lt 9; $o++)
-	{
-		WriteMethod -propCount $i -optionCoun $o;
+$prefixes = @("","Server","Client")
+
+for($i = 1; $i -lt 10; $i++) {
+	for($o = 0; $o -lt 9; $o++)	{
+		foreach ($prefix in $prefixes) {
+			WriteMethod -propCount $i -optionCount $o -methodPrefix $prefix;
+		}
 	}
 }
+
 '
 	}
 }' | Add-Content $fn
