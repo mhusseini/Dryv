@@ -8,6 +8,11 @@ namespace Dryv
 {
     internal class RulesFinder
     {
+        private const BindingFlags BindingFlags = System.Reflection.BindingFlags.Static |
+                                          System.Reflection.BindingFlags.Public |
+                                          System.Reflection.BindingFlags.NonPublic |
+                                          System.Reflection.BindingFlags.FlattenHierarchy;
+
         private static readonly ConcurrentDictionary<PropertyInfo, IList<DryvRule>> PropertyRules = new ConcurrentDictionary<PropertyInfo, IList<DryvRule>>();
         private static readonly ConcurrentDictionary<Type, IList<DryvRules>> TypeRules = new ConcurrentDictionary<Type, IList<DryvRules>>();
 
@@ -45,11 +50,11 @@ namespace Dryv
 
         private static IEnumerable<DryvRules> GetRulesOnType(Type objectType) => TypeRules.GetOrAdd(objectType, t =>
         {
-            var fromFields = from p in t.GetFields(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+            var fromFields = from p in t.GetFields(BindingFlags)
                              where typeof(DryvRules).IsAssignableFrom(p.FieldType)
                              select p.GetValue(null) as DryvRules;
 
-            var fromProperties = from p in objectType.GetProperties(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+            var fromProperties = from p in objectType.GetProperties(BindingFlags)
                                  where typeof(DryvRules).IsAssignableFrom(p.PropertyType)
                                  select p.GetValue(null) as DryvRules;
 
