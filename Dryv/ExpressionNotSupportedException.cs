@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace Dryv
+﻿namespace Dryv
 {
-    public class ExpressionNotSupportedException : Exception
+    public class ExpressionNotSupportedException : DryvException
     {
         public ExpressionNotSupportedException(string message)
             : base(message)

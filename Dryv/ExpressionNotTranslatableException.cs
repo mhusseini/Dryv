@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace Dryv
+﻿namespace Dryv
 {
-    public class ExpressionNotTranslatableException : Exception
+    public class ExpressionNotTranslatableException : DryvException
     {
         public ExpressionNotTranslatableException(string message) : base(message)
         {

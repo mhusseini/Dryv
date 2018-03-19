@@ -1,7 +1,11 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Dryv.Configuration;
+using Dryv.Translation;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Dryv
 {
@@ -14,11 +18,12 @@ namespace Dryv
         public void AddValidation(ClientModelValidationContext context)
         {
             var services = context.ActionContext.HttpContext.RequestServices;
+            var options = services.GetService<IOptions<DryvOptions>>();
             var property = context.GetProperty();
             var rules = from rule in RulesFinder.GetRulesForProperty(property)
                         where rule.IsEnabled(services.GetService)
                         select rule;
-            var translatedRules = rules.Translate(services.GetService);
+            var translatedRules = rules.Translate(services.GetService, options.Value);
 
             context.Attributes.Add(DataValAttribute, "true");
             context.Attributes.Add(DataValDryAttribute, translatedRules);

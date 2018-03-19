@@ -11,5 +11,6 @@ namespace Dryv
         public Type[] PreevaluationOptionTypes { get; set; }
         public Func<object[], string> TranslatedValidationExpression { get; set; }
         public LambdaExpression ValidationExpression { get; set; }
+        public Exception TranslationError { get; set; }
     }
 }
