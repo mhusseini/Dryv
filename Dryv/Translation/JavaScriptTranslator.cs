@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Dryv.Translation
 {
@@ -286,6 +287,21 @@ namespace Dryv.Translation
             {
                 this.Visit(expression.Expression, context);
                 context.Writer.Write(".");
+            }
+            else switch (expression.Member)
+            {
+                case PropertyInfo property:
+                {
+                    var value = property.GetValue(null);
+                    context.Writer.Write(this.TranslateValue(value));
+                    return;
+                }
+                case FieldInfo field:
+                {
+                    var value = field.GetValue(null);
+                    context.Writer.Write(this.TranslateValue(value));
+                    return;
+                }
             }
 
             context.Writer.Write(this.FormatIdentifier(expression.Member.Name));
