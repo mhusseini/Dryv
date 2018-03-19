@@ -1,0 +1,21 @@
+﻿@using Dryv.Demo.Nav
+@inject NavCollector NavCollector
+@{
+    var menu = new[]
+    {
+        Menu.Introduction,
+        Menu.Documentation,
+        Menu.ExtendingDryv,
+        Menu.Examples,
+};
+    var items = NavCollector.GetNavStructure(this.ViewContext);
+}
+
+<ul class="navbar-nav" id="nav">
+    @{
+        foreach (var menuItem in menu)
+        {
+            @Html.Partial("NavItem", items[menuItem])
+        }
+    }
+</ul>

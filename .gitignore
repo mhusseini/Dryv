@@ -1,10 +1,6 @@
 _build/
 _site/
 
-# Use git add -f to force override .sln when required. Not needed in most cases.
-# git add -f myProj.sln
-*.sln
-
 Project_Readme.html
 
 ## Ignore Visual Studio temporary files, build results, and
@@ -30,7 +26,6 @@ build/
 bld/
 [Bb]in/
 [Oo]bj/
-wwwroot/
 
 # Visual Studo 2015 cache/options directory
 .vs/

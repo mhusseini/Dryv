@@ -1,29 +1,8 @@
-﻿@model Dryv.Demo.Models.HomeViewModel
-
-<form method="post">
-    <p>
-        <label asp-for="Name"></label>
-        <input asp-for="Name" />
-        <span asp-validation-for="Name"></span>
-    </p>
-
-    <p>
-        <label asp-for="Age"></label>
-        <input asp-for="Age" />
-        <span asp-validation-for="Age"></span>
-    </p>
-
-    <p>
-        <label asp-for="Email"></label>
-        <input asp-for="Email" />
-        <span asp-validation-for="Email"></span>
-    </p>
-
-    <p>
-        <label asp-for="ParentsEmail"></label>
-        <input asp-for="ParentsEmail" />
-        <span asp-validation-for="ParentsEmail"></span>
-    </p>
-
-    <input type="submit" />
-</form>
+﻿<cache>
+    <section class="resume-section p-3 p-lg-5 d-flex d-column">
+        <div class="my-auto">
+            <h1 class="mb-0 text-primary">Getting Started</h1>
+            <markdown file="introduction.md"></markdown>
+        </div>
+    </section>
+</cache>

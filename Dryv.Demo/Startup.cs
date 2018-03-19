@@ -1,4 +1,5 @@
 ﻿using Dryv.Demo.Controllers;
+using Dryv.Demo.Nav;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +17,7 @@ namespace Dryv.Demo
 
             app
                 .UseStaticFiles()
+                .UseDryv()
                 .UseMvc(routes =>
                 {
                     routes.MapRoute(
@@ -28,6 +30,9 @@ namespace Dryv.Demo
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            services.AddSingleton<NavCollector>();
+
+            services.AddDryv();
         }
     }
 }
