@@ -8,19 +8,42 @@ namespace Dryv
 {
     internal class RulesFinder
     {
+        private static readonly ConcurrentDictionary<PropertyInfo, IList<DryvRule>> PropertyRules = new ConcurrentDictionary<PropertyInfo, IList<DryvRule>>();
         private static readonly ConcurrentDictionary<Type, IList<DryvRules>> TypeRules = new ConcurrentDictionary<Type, IList<DryvRules>>();
 
         public static IEnumerable<DryvRule> GetRulesForProperty(PropertyInfo property)
         {
-            var typeRules = GetRulesForType(property.DeclaringType);
+            return PropertyRules.GetOrAdd(
+                    property,
+                    prop => GetInheritedRules(prop).ToList());
+        }
 
-            return from rules in typeRules
-                   where rules.PropertyRules.ContainsKey(property)
-                   from expression in rules.PropertyRules[property]
+        private static IEnumerable<PropertyInfo> GetInheritedProperties(PropertyInfo property)
+        {
+            foreach (var prop in from iface in property.DeclaringType.GetInterfaces()
+                                 from p in iface.GetProperties()
+                                 where p.Name == property.Name
+                                 select p)
+            {
+                yield return prop;
+            }
+
+            yield return property;
+        }
+
+        private static IEnumerable<DryvRule> GetInheritedRules(PropertyInfo prop)
+        {
+            var typeRules = GetRulesOnType(prop.DeclaringType);
+            var properties = GetInheritedProperties(prop);
+
+            return from p in properties
+                   from rule in typeRules
+                   where rule.PropertyRules.ContainsKey(p)
+                   from expression in rule.PropertyRules[p]
                    select expression;
         }
 
-        private static IEnumerable<DryvRules> GetRulesForType(Type objectType) => TypeRules.GetOrAdd(objectType, t =>
+        private static IEnumerable<DryvRules> GetRulesOnType(Type objectType) => TypeRules.GetOrAdd(objectType, t =>
         {
             var fromFields = from p in t.GetFields(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
                              where typeof(DryvRules).IsAssignableFrom(p.FieldType)
