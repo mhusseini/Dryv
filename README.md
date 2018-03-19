@@ -13,12 +13,12 @@ While this is the case for simple validation rules, applying complex validations
 ```csharp
 public class Customer
 {
-	[Required]
-	public string Name { get; set; }
+    [Required]
+    public string Name { get; set; }
 
-	public string Company { get; set; }
+    public string Company { get; set; }
 
-	public string TaxId { get; set; }
+    public string TaxId { get; set; }
 }
 ```
 
@@ -168,7 +168,8 @@ public class Customer
 Pre-evaluated options are objects that get evaluated prior to the actual validation phase. 
 The pre-evaluated option values are then later used during model validation. For instance, 
 the pre-evaluated option values are inserted into the generated client code, as opposed to a translated
-expression as it would normally be the case.
+expression as it would normally be the case. In the example below, the string `Awesome` will be
+hard-coded into the generated JavaScript code.
  
 ```csharp
 public class Options
@@ -191,7 +192,7 @@ public class Model
 ```
 
 Objects used for pre-evaluation must be registered in the web applications service collection. That is,
-they must have been registered as a servivce in the startup class. For example:
+they must be registered as a service in the startup class. For example:
 ```csharp
 public class Startup
 {
@@ -200,16 +201,17 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services.RegisterSingleton(Options.Create(new Options
-		{
-			CompanyPrefix = "Conglom-O"
-		}));
+        {
+            CompanyPrefix = "Conglom-O"
+        }));
     }
 }
 ```
 
 ## Rule Switches
 Using application options (registered as an application service like above), validation rules
-can dynamically be activated or deactivated.
+can dynamically be activated or deactivated. In the example below, the validation rule will only
+be applied if the value of `Options.CompanyNameRequired` is set to 'true'.
 ```csharp
 public class Options
 {
