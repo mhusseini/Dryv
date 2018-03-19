@@ -1,11 +1,8 @@
 ﻿using Dryv.Demo.Controllers;
-using Dryv.Demo.Models;
 using Dryv.Demo.Nav;
-using Dryv.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace Dryv.Demo
 {
@@ -36,10 +33,6 @@ namespace Dryv.Demo
             services.AddSingleton<NavCollector>();
 
             services.AddDryv();
-            services.AddSingleton(Options.Create(new TenantOptions
-            {
-                IsEmptyCompanyAllowed = true
-            }));
         }
     }
 }

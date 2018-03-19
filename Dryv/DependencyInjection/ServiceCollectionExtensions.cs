@@ -1,10 +1,11 @@
 ﻿using System;
+using Dryv.DependencyInjection;
 using Dryv.MethodCallTranslation;
 using Dryv.Translation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Dryv.DependencyInjection
+namespace Dryv
 {
     public static class ServiceCollectionExtensions
     {

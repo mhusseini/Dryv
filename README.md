@@ -86,9 +86,12 @@ into your project and reference it from your page:
 <script src="js/dryv-jquery-unobtrusive.browser.min.js"></script>
 ```
 ## Usage
+
 In the ASP.NET Core startup class, add Dryv in the ConfigureServices method using the AddDryv extension method:
 
 ```csharp
+using Dryv;
+
 public class Startup
 {
     // ...
@@ -103,6 +106,8 @@ public class Startup
 Also in the startup class, use Dryv in the Configure method using the UseDryv extension method:
 
 ```csharp
+using Dryv;
+
 public class Startup
 {
     public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -112,5 +117,116 @@ public class Startup
     }
 
     // ...
+}
+```
+
+# Examples
+## Simple Example
+```csharp
+public class Customer
+{
+    public static readonly DryvRules Rules = DryvRules
+        .For<Customer>()
+        .Rule(m => m.TaxId,
+            m => string.IsNullOrWhiteSpace(m.Company) || !string.IsNullOrWhiteSpace(m.TaxId)
+                ? DryvResult.Success
+                : $"The tax ID for {m.Company} must be specified.");
+
+    public string Company { get; set; }
+
+    [Required]
+    public string Name { get; set; }
+
+    [DryvRules]
+    public string TaxId { get; set; }
+}
+```
+
+```html
+<form method="post">
+    <div class="form-group">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" class="form-control">
+        <span asp-validation-for="Name"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Company"></label>
+        <input asp-for="Company" class="form-control">
+        <span asp-validation-for="Company"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="TaxId"></label>
+        <input asp-for="TaxId" class="form-control">
+        <span asp-validation-for="TaxId"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Send</button>
+</form>
+```
+
+## Pre-evaluated Options
+Pre-evaluated options are objects that get evaluated prior to the actual validation phase. 
+The pre-evaluated option values are then later used during model validation. For instance, 
+the pre-evaluated option values are inserted into the generated client code, as opposed to a translated
+expression as it would normally be the case.
+ 
+```csharp
+public class Options
+{
+    public string CompanyPrefix { get; set; } = "Awesome";
+}
+
+public class Model
+{
+    public static readonly DryvRules Rules = DryvRules
+        .For<Model>()
+        .Rule<IOptions<Options>>(m => m.Company,
+            (m, o) => m.Company.StartsWith(o.Value.CompanyPrefix)
+                ? DryvResult.Success
+                : $"The company name must begin with '{o.Value.CompanyPrefix}'.");
+
+    [DryvRules]
+    public string Company { get; set; }
+}
+```
+
+Objects used for pre-evaluation must be registered in the web applications service collection. That is,
+they must have been registered as a servivce in the startup class. For example:
+```csharp
+public class Startup
+{
+    // ...
+
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.RegisterSingleton(Options.Create(new Options
+		{
+			CompanyPrefix = "Conglom-O"
+		}));
+    }
+}
+```
+
+## Rule Switches
+Using application options (registered as an application service like above), validation rules
+can dynamically be activated or deactivated.
+```csharp
+public class Options
+{
+    public bool CompanyNameRequired { get; set; }
+}
+
+public class Model
+{
+    public static readonly DryvRules Rules = DryvRules
+        .For<Model>()
+        .Rule<IOptions<Options>>(m => m.Company,
+            (m, o) => string.IsNullOrWhiteSpace(m.Company)
+                ? "The company name must be specified."
+                : DryvResult.Success,
+            o => o.Value.CompanyNameRequired);
+
+    [DryvRules]
+    public string Company { get; set; }
 }
 ```

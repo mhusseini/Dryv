@@ -1,9 +1,10 @@
 ﻿using System;
+using Dryv.DependencyInjection;
 using Dryv.MethodCallTranslation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Dryv.DependencyInjection
+namespace Dryv
 {
     public static class ApplicationBuilderExtensions
     {

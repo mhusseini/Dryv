@@ -1,26 +1,21 @@
-
+## Simple Example
 ```csharp
 public class Customer
 {
-	public static readonly DryvRules Rules = DryvRules
-		.For<Customer>()
-		.Rule(m => m.TaxId,
-			  m => string.IsNullOrWhiteSpace(m.Company) || !string.IsNullOrWhiteSpace(m.TaxId)
-					? DryvResult.Success
-					: $"The tax ID for {m.Company} must be specified.")
-		.Rule(m => m.Company,
-			  m => m.Company.Equals("Oscorp", StringComparison.OrdinalIgnoreCase)
-					? "Sorry, no evil corporations"
-					: DryvResult.Success);
+    public static readonly DryvRules Rules = DryvRules
+        .For<Customer>()
+        .Rule(m => m.TaxId,
+            m => string.IsNullOrWhiteSpace(m.Company) || !string.IsNullOrWhiteSpace(m.TaxId)
+                ? DryvResult.Success
+                : $"The tax ID for {m.Company} must be specified.");
 
-	[Required]
-	public string Name { get; set; }
+    public string Company { get; set; }
 
-	[DryvRules]
-	public string Company { get; set; }
+    [Required]
+    public string Name { get; set; }
 
-	[DryvRules]
-	public string TaxId { get; set; }
+    [DryvRules]
+    public string TaxId { get; set; }
 }
 ```
 
@@ -44,4 +39,4 @@ public class Customer
 
     <button type="submit" class="btn btn-primary">Send</button>
 </form>
-``
+```

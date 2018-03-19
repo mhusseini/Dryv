@@ -1,5 +1,3 @@
-# Getting Started
-
 ## What is Drvy?
 According to [Rick Anderson](https://twitter.com/RickAndMSFT), 
 
@@ -78,20 +76,11 @@ Install-Package Dryv
 paket add Dryv 
 ```
 
-### Client
-On the client, install the NPM package:
-```
-npm install --save dryv-jquery-unobtrusive 
-```
-... or download the browser-specific JS file directly [from here](https://raw.githubusercontent.com/mhusseini/dryv-jquery-unobtrusive/master/dist/dryv-jquery-unobtrusive.browser.min.js) 
-into your project and reference it from your page:
-```
-<script src="js/dryv-jquery-unobtrusive.browser.min.js"></script>
-```
-## Basic Usage
 In the ASP.NET Core startup class, add Dryv in the ConfigureServices method using the AddDryv extension method:
 
 ```csharp
+using Dryv;
+
 public class Startup
 {
     // ...
@@ -106,6 +95,8 @@ public class Startup
 Also in the startup class, use Dryv in the Configure method using the UseDryv extension method:
 
 ```csharp
+using Dryv;
+
 public class Startup
 {
     public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -116,4 +107,14 @@ public class Startup
 
     // ...
 }
+```
+### Client
+On the client, install the NPM package:
+```
+npm install --save dryv-jquery-unobtrusive 
+```
+... or download the browser-specific JS file directly [from here](https://raw.githubusercontent.com/mhusseini/dryv-jquery-unobtrusive/master/dist/dryv-jquery-unobtrusive.browser.min.js) 
+into your project and reference it from your page:
+```
+<script src="js/dryv-jquery-unobtrusive.browser.min.js"></script>
 ```

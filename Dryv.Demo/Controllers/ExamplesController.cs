@@ -11,5 +11,10 @@ namespace Dryv.Demo.Controllers
         {
             return this.View();
         }
+
+        public IActionResult Index(SimpleCustomer model)
+        {
+            return this.View(model);
+        }
     }
 }
