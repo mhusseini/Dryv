@@ -2,18 +2,20 @@
 {
     public class DryvResult
     {
-        public static readonly DryvResult Success = new DryvResult();
+        public static readonly DryvResult Success = new DryvResult(DryResulType.Success);
 
-        public DryvResult()
-        {
-        }
+        private DryvResult(DryResulType type) => this.Type = type;
 
-        public DryvResult(string message) => this.Message = message;
+        private DryvResult(string message, DryResulType type) : this(type) => this.Message = message;
 
         public string Message { get; }
 
-        public static DryvResult Fail(string message) => new DryvResult(message);
+        public DryResulType Type { get; }
 
-        public static implicit operator DryvResult(string message) => new DryvResult(message);
+        public static DryvResult Error(string message) => new DryvResult(message, DryResulType.Error);
+
+        public static implicit operator DryvResult(string message) => Error(message);
+
+        public static DryvResult Warning(string message) => new DryvResult(message, DryResulType.Warning);
     }
 }

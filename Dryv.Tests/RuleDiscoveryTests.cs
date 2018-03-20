@@ -51,7 +51,7 @@ namespace Dryv.Tests
                 .Rule(m => m.Text,
                     m => m.Text != null
                         ? DryvResult.Success
-                        : DryvResult.Fail("error"));
+                        : DryvResult.Error("error"));
         }
 
         private class Model : IModel
@@ -61,7 +61,7 @@ namespace Dryv.Tests
                 .Rule(m => m.Text,
                     m => m.Text != null
                         ? DryvResult.Success
-                        : DryvResult.Fail("error"));
+                        : DryvResult.Error("error"));
 
             public string Text { get; set; }
         }

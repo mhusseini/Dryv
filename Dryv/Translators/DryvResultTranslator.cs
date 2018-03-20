@@ -11,12 +11,24 @@ namespace Dryv.MethodCallTranslation
         public DryvResultTranslator()
         {
             this.Supports<DryvResult>();
-            this.AddMethodTranslator(nameof(DryvResult.Fail), this.Error);
+            this.AddMethodTranslator(nameof(DryvResult.Error), Error);
+            this.AddMethodTranslator(nameof(DryvResult.Warning), Warning);
+            this.AddMethodTranslator(nameof(DryvResult.Success), Success);
         }
 
-        private void Error(MethodTranslationContext context)
+        private static void Error(MethodTranslationContext context)
         {
-            context.Writer.Write(context.Expression.Arguments.First());
+            context.Writer.Write($"{{ type:'error', message:'{context.Expression.Arguments.First()}' }}");
+        }
+
+        private static void Warning(MethodTranslationContext context)
+        {
+            context.Writer.Write($"{{ type:'warning', message:'{context.Expression.Arguments.First()}' }}");
+        }
+
+        private static void Success(MethodTranslationContext context)
+        {
+            context.Writer.Write("null");
         }
 
         public bool TryTranslate(GenericTranslationContext context)
