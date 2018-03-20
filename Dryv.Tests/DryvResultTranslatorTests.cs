@@ -1,3 +1,4 @@
+using System.Linq;
 using Escape.Ast;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -16,9 +17,14 @@ namespace Dryv.Tests
 
             var jsProgram = GetTranslatedAst(expression);
             var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);
-            var literal = (conditional.Consequent as Literal)?.Raw;
+            var properties = (conditional.Consequent as ObjectExpression)?.Properties;
+            Assert.IsNotNull(properties);
 
-            Assert.AreEqual("\"fail\"", literal);
+            var first = (dynamic) properties.First().Value;
+            Assert.AreEqual("error", first.Value);
+
+            var second = (dynamic)properties.Last().Value;
+            Assert.AreEqual("\"fail\"", second.Value);
         }
 
         [TestMethod]
