@@ -5,6 +5,14 @@ public class Options
     public string CompanyPrefix { get; set; } = "Awesome";
 }
 
+public class Startup
+{
+    public void ConfigureServices(IServiceCollection services)
+	{
+		services.AddSingleton(Options.Create(new Options2()));
+	}
+}
+
 public class Model
 {
     public static readonly DryvRules Rules = DryvRules

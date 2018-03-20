@@ -1,0 +1,40 @@
+﻿@using System.Globalization
+@using Dryv.Demo.Models
+@using Microsoft.Extensions.Options
+@model Model4
+@{
+    Layout = null;
+}
+
+<form asp-controller="Options" asp-action="Example4" onsubmit="return updateOptions(this, '#form4')">
+    <div class="alert alert-info" role="alert">
+        <div class="d-flex justify-content-between">
+            <div class="form-group row">
+                <label for="Locale" class="col-sm-5 col-form-label col-form-label-sm">Locale</label>
+                <div class="col-sm-7">
+                    <select class="form-control form-control-sm" name="Locale" id="Locale">
+                        <option value="en-US">English</option>
+                        <option value="de-DE">Deutsch</option>
+                        <option value="fr-FR">Français</option>
+                        <option value="es-ES">Español</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn btn-secondary btn-sm">Update options</button>
+        </div>
+    </div>
+</form>
+
+<form id="form4" asp-controller="Examples" asp-action="Example4" onsubmit="return sendForm(this)">
+    <input type="hidden" id="Locale" value="@CultureInfo.CurrentUICulture.Name">
+    <div class="form-group row">
+        <label asp-for="Company" class="col-sm-2 col-form-label"></label>
+        <div class="col-sm-10">
+            <input asp-for="Company" class="form-control">
+            <span asp-validation-for="Company"></span>
+        </div>
+    </div>
+
+    <button class="btn btn-primary">Send</button>
+    <button type="button" class="btn btn-primary" onclick="return sendForm(this)">Send w/o client validation</button>
+</form>

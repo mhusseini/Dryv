@@ -94,7 +94,7 @@ namespace Dryv
         {
             if (rule.PreevaluationOptionTypes?.Any() != true)
             {
-                rule.PreevaluationOptionTypes = (from p in rule.ValidationExpression.Parameters
+                rule.PreevaluationOptionTypes = (from p in rule.ValidationExpression.Parameters.Skip(1)
                                                  select p.Type).ToArray();
             }
         }

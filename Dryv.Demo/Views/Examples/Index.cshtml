@@ -1,41 +1,93 @@
-﻿@model Dryv.Demo.Models.SimpleCustomer
+﻿@using Dryv.Demo.Models
+@model Dryv.Demo.Models.Model1
 
 <section class="resume-section p-3 p-lg-5 d-flex flex-column">
     <div class="my-auto">
         <h1 class="mb-0 text-primary">Examples</h1>
-        <div class="resume-item d-flex flex-column flex-md-row mb-5">
+        <div class="mb-4">
             <markdown file="example1.md"></markdown>
         </div>
-        <div class="resume-item d-flex flex-column flex-md-row mb-5">
-            <form method="post">
-                <div class="form-group">
-                    <label asp-for="Name"></label>
-                    <input asp-for="Name" class="form-control">
-                    <span asp-validation-for="Name"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Company"></label>
-                    <input asp-for="Company" class="form-control">
-                    <span asp-validation-for="Company"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="TaxId"></label>
-                    <input asp-for="TaxId" class="form-control">
-                    <span asp-validation-for="TaxId"></span>
-                </div>
-
-                <button type="submit" class="btn btn-primary">Send</button>
-            </form>
+        <div class="resume-item d-flex flex-column mb-5">
+            @Html.Partial("example1.partial", new Model1())
         </div>
     </div>
     <div class="my-auto">
-        <div class="resume-item d-flex flex-column flex-md-row mb-5">
+        <div class="mb-4">
             <markdown file="example2.md"></markdown>
         </div>
+        <div class="resume-item d-flex flex-column mb-5">
+            @Html.Partial("example2.partial", new Model2())
+        </div>
     </div>
     <div class="my-auto">
-        <div class="resume-item d-flex flex-column flex-md-row mb-5">
+        <div class="mb-4">
             <markdown file="example3.md"></markdown>
+        </div>
+        <div class="resume-item d-flex flex-column mb-5">
+            @Html.Partial("example3.partial", new Model3())
+        </div>
+    </div>
+    <div class="my-auto">
+        <div class="mb-4">
+            <markdown file="example4.md"></markdown>
+        </div>
+        <div class="resume-item d-flex flex-column mb-5">
+            @Html.Partial("example4.partial", new Model4())
         </div>
     </div>
 </section>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $("form").validate({
+                submitHandler: function (form) {
+                    debugger;
+                }
+            });
+        });
+
+        function send(form, $parent) {
+            var $form = $(form);
+            var language = $("#Locale", $form).val();
+            var headers = undefined;
+            if (language) {
+                headers = {
+                    "Accept-Language": language
+                };
+            }
+            $.ajax({
+                url: form.action,
+                type: form.method,
+                data: $form.serialize(),
+                headers: headers, 
+                success: function (response) {
+                    $parent.html(response);
+                    $("form", $parent).validate();
+                }
+            });
+        }
+
+        function sendForm(form) {
+            if (form.tagName !== "FORM") {
+                form = $(form).parent("form")[0];
+            } else {
+                var isValid = $(form).validate().checkForm();
+                if (!isValid) {
+                    return false;
+                }
+            }
+            var $parent = $(form.parentElement);
+            send(form, $parent);
+
+            return false;
+        }
+
+        function updateOptions(form, selector) {
+            var $parent = $(selector).parent();
+            send(form, $parent);
+
+            return false;
+        }
+    </script>
+}

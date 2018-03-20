@@ -45,16 +45,14 @@ namespace Dryv.Translation
             var code = sb.ToString()
                 .Replace("{", "{{")
                 .Replace("}", "}}");
-            var index = 0;
-
             var parameter = Expression.Parameter(typeof(object[]));
             var arrayItems = new List<Expression>();
 
             foreach (var lambda in optionDelegates)
             {
-                var idx = index++;
+                var optionType = this.GetTypeChain(lambda.Body).Last();
+                var idx = optionTypes.IndexOf(optionType);
                 code = code.Replace($"$${lambda.GetHashCode()}$$", $"{{{idx}}}");
-                var optionType = optionTypes[idx];
                 var p = Expression.Convert(Expression.ArrayAccess(parameter, Expression.Constant(idx)), optionType);
                 var optionValue = Expression.Convert(Expression.Invoke(lambda, p), typeof(object));
                 var translatedOptionsValue = Expression.Call(Expression.Constant(this), TranslateValueMethod, optionValue);
@@ -72,6 +70,29 @@ namespace Dryv.Translation
                 Factory = result.Compile(),
                 OptionTypes = optionTypes.ToArray()
             };
+        }
+
+        private IEnumerable<Type> GetTypeChain(Expression expression)
+        {
+            if (!(expression is MemberExpression memberExpression))
+            {
+                yield break;
+            }
+
+            while (memberExpression != null)
+            {
+                switch (memberExpression.Expression)
+                {
+                    case MemberExpression mex:
+                        memberExpression = mex;
+                        yield return mex.Type;
+                        break;
+                    case ParameterExpression pex:
+                        memberExpression = null;
+                        yield return pex.Type;
+                        break;
+                }
+            }
         }
 
         public virtual void Translate(Expression expression, TranslationContext context)
