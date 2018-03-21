@@ -1,6 +1,4 @@
-﻿using Dryv.Demo.Resources;
-
-namespace Dryv.Demo.Models
+﻿namespace Dryv.Demo.Models
 {
     public class Model4
     {
@@ -8,8 +6,10 @@ namespace Dryv.Demo.Models
             .For<Model4>()
             .Rule(m => m.Company,
                 m => string.IsNullOrWhiteSpace(m.Company)
-                    ? LocalizedStrings.CompanyError
-                    : DryvResult.Success);
+                    ? Options4.CompanyError
+                    : m.Company.Length < Options4.CompanyNameLength
+                        ? string.Format(Options4.CompanyLengthError, Options4.CompanyNameLength)
+                        : DryvResult.Success);
 
         [DryvRules]
         public string Company { get; set; }

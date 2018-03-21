@@ -37,6 +37,7 @@ namespace Dryv.Demo
             services.AddSingleton(Options.Create(new Options3()));
             services.AddSingleton(Options.Create(new Options2()));
 
+            services.AddMvc();
             services.AddDryv();
         }
     }

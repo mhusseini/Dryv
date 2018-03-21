@@ -30,11 +30,5 @@ namespace Dryv.Demo.Controllers
             this.options3.Value.CompanyNameRequired = options.CompanyNameRequired;
             return this.View("~/Views/Examples/example3.partial.cshtml", new Model3());
         }
-
-        [HttpPost]
-        public IActionResult Example4()
-        {
-            return this.View("~/Views/Examples/example4.partial.cshtml", new Model4());
-        }
     }
 }
