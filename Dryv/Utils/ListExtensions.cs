@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
-namespace Dryv
+namespace Dryv.Utils
 {
     internal static class ListExtensions
     {
@@ -10,6 +11,16 @@ namespace Dryv
             {
                 list.Add(item);
             }
+        }
+
+        public static IEnumerable<T> Iterrate<T>(this T item, Func<T, T> next)
+        where T : class
+        {
+            do
+            {
+                yield return item;
+                item = next(item);
+            } while (item != null);
         }
     }
 }

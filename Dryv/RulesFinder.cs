@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Dryv.Utils;
 
 namespace Dryv
 {
@@ -25,6 +26,14 @@ namespace Dryv
 
         private static IEnumerable<PropertyInfo> GetInheritedProperties(PropertyInfo property)
         {
+            foreach (var prop in from iface in property.DeclaringType.Iterrate(t => t.BaseType)
+                                 from p in iface.GetProperties()
+                                 where p.Name == property.Name
+                                 select p)
+            {
+                yield return prop;
+            }
+
             foreach (var prop in from iface in property.DeclaringType.GetInterfaces()
                                  from p in iface.GetProperties()
                                  where p.Name == property.Name

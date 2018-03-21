@@ -3,6 +3,7 @@ using System.Linq;
 using Dryv.DependencyInjection;
 using Dryv.MethodCallTranslation;
 using Dryv.Translation;
+using Dryv.Utils;
 using Escape;
 using Escape.Ast;
 

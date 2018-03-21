@@ -12,6 +12,17 @@ namespace Dryv.Tests
         }
 
         [TestMethod]
+        public void FindeRulesForBaseClass()
+        {
+            var model = new Model4();
+            var property = model.GetType().GetProperty(nameof(model.Text));
+            var rules = RulesFinder.GetRulesForProperty(property);
+
+            Assert.IsNotNull(rules);
+            Assert.IsTrue(rules.Any());
+        }
+
+        [TestMethod]
         public void FindeRulesForInterface()
         {
             var model = new Model();
@@ -23,9 +34,9 @@ namespace Dryv.Tests
         }
 
         [TestMethod]
-        public void FindeRulesOnOtherType()
+        public void FindeRulesInProperty()
         {
-            var model = new Model2();
+            var model = new Model3();
             var property = model.GetType().GetProperty(nameof(model.Text));
             var rules = RulesFinder.GetRulesForProperty(property);
 
@@ -34,9 +45,9 @@ namespace Dryv.Tests
         }
 
         [TestMethod]
-        public void FindeRulesInProperty()
+        public void FindeRulesOnOtherType()
         {
-            var model = new Model3();
+            var model = new Model2();
             var property = model.GetType().GetProperty(nameof(model.Text));
             var rules = RulesFinder.GetRulesForProperty(property);
 
@@ -78,6 +89,23 @@ namespace Dryv.Tests
             public static DryvRules Rules => CommonRules.Text;
 
             public string Text { get; set; }
+        }
+
+        private class Model4 : ModelBase
+        {
+            public static DryvRules Rules = DryvRules
+                .For<ModelBase>()
+                .Rule(m => m.Text,
+                    m => m.Text != null
+                        ? DryvResult.Success
+                        : DryvResult.Error("error"));
+
+            public override string Text { get; set; }
+        }
+
+        private abstract class ModelBase
+        {
+            public virtual string Text { get; set; }
         }
     }
 }
