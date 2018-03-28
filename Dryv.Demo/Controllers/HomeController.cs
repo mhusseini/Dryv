@@ -10,5 +10,10 @@ namespace Dryv.Demo.Controllers
         {
             return this.View();
         }
+
+        public IActionResult GettingStarted()
+        {
+            return this.View();
+        }
     }
 }

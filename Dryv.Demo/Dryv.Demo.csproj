@@ -29,6 +29,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Update="wwwroot\plugins\prism\prism.js">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Update="Resources\LocalizedStrings.de.resx">
       <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>

@@ -1,0 +1,11 @@
+img.logo {
+    height: 15rem;
+}
+
+img.logo_small {
+    height: 5rem;
+}
+
+.header .dev-links a {
+    color: #000000;
+}

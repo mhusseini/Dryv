@@ -1,15 +1,18 @@
-﻿<section class="resume-section p-3 p-lg-5 d-flex flex-column">
-    <div class="my-auto">
-        <h1 class="mb-0 text-primary" id="documentation">
+﻿@{
+    this.ViewData["Title"] = "Documentation";
+}
+<section class="doc-section">
+    <div class="section-block">
+        <h1 class="doc-title" id="documentation">
             Documentation
         </h1>
     </div>
-
-    <div class="my-auto">
+    
+    <div class="section-block">
         <markdown file="translation.md"></markdown>
     </div>
-
-    <div class="my-auto">
+    
+    <div class="section-block">
         <markdown file="compatibility.md"></markdown>
         <markdown file="compat-string.md"></markdown>
         <markdown file="compat-regex.md"></markdown>

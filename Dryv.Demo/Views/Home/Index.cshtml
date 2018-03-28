@@ -1,8 +1,41 @@
-﻿<cache>
-    <section class="resume-section p-3 p-lg-5 d-flex d-column">
-        <div class="my-auto">
-            <h1 class="mb-0 text-primary">Getting Started</h1>
-            <markdown file="introduction.md"></markdown>
-        </div>
-    </section>
-</cache>
+﻿@{
+    Layout = "_LayoutLanding";
+    this.ViewData["Title"] = "Home";
+ }
+<section class="cards-section text-center">
+    <div class="container">
+        <h2 class="title">Getting started is easy!</h2>
+        <div class="intro">
+            <p>Welcome to prettyDocs. This landing page is an example of how you can use a card view to present segments of your documentation. You can customise the icon fonts based on your needs.</p>
+            <div class="cta-container">
+                <a class="btn btn-primary btn-cta" href="https://www.nuget.org/packages/Dryv/" target="_blank"><i class="fa fa-cloud-download"></i> Download Now</a>
+            </div><!--//cta-container-->
+        </div><!--//intro-->
+        @{
+            var items = new[]
+            {
+                (Title: "Quick Start", Text:"Demo example, consectetuer adipiscing elit", Controller: "Home", Action:"GettingStarted", Color:"green", Icon:"paper-plane"),
+                (Title: "Examples", Text:"Demo example, consectetuer adipiscing elit", Controller: "Examples", Action:"Index", Color:"orange", Icon:"eye"),
+                (Title: "Documentation", Text:"Demo example, consectetuer adipiscing elit", Controller: "Documentation", Action:"Index", Color:"blue", Icon:"book"),
+                (Title: "Extending Dryv", Text:"Demo example, consectetuer adipiscing elit", Controller: "Extension", Action:"Index", Color:"pink", Icon:"puzzle-piece")
+            };
+        }
+        <div id="cards-wrapper" class="cards-wrapper row">
+            @foreach (var item in items)
+            {
+                <div class="item item-@item.Color col-md-4 col-sm-6 col-xs-6">
+                    <div class="item-inner">
+                        <div class="icon-holder">
+                            <i class="icon fa fa-@item.Icon"></i>
+                        </div><!--//icon-holder-->
+                        <h3 class="title">@item.Title</h3>
+                        <p class="intro">@item.Text</p>
+                        <a class="link" asp-controller="@item.Controller" asp-action="@item.Action"><span></span></a>
+                    </div><!--//item-inner-->
+                </div>
+                <!--//item-->
+            }
+        </div><!--//cards-->
+
+    </div><!--//container-->
+</section><!--//cards-section-->

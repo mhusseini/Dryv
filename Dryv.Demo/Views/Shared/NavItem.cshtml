@@ -1,14 +1,14 @@
 ﻿@model Dryv.Demo.Nav.NavStructure
-<li class="nav-item">
+<div class="bd-toc-item">
     @if (this.Model.IsActive)
     {
-        <a class="nav-link js-scroll-trigger active"
+        <a class="bd-toc-link active js-scroll-trigger"
            href="#@this.Model.Caption.ToLower().Replace(" ", "-")">@this.Model.Caption</a>
     }
     else
     {
-        <a class="nav-link js-scroll-trigger"
+        <a class="bd-toc-link js-scroll-trigger"
            asp-action="@this.Model.Action"
            asp-controller="@this.Model.Controller">@this.Model.Caption</a>
     }
-</li>
+</div>
