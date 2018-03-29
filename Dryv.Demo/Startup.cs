@@ -1,10 +1,7 @@
-﻿using System.Globalization;
-using Dryv.Demo.Controllers;
+﻿using Dryv.Demo.Controllers;
 using Dryv.Demo.Models;
-using Dryv.Demo.Nav;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
@@ -33,7 +30,6 @@ namespace Dryv.Demo
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<NavCollector>();
             services.AddSingleton(Options.Create(new Options3()));
             services.AddSingleton(Options.Create(new Options2()));
 
