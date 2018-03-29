@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <Version>1.0.0-preview.3</Version>
+    <Version>1.0.0-preview.4</Version>
     <Copyright>2018 Munir Husseini</Copyright>
     <PackageProjectUrl>https://dryv-lib.net</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/mhusseini/Dryv/blob/master/LICENSE</PackageLicenseUrl>
@@ -12,6 +12,7 @@
     <Description>Server- and client-based model validation for ASP.NET Core 2.0 with rules written once in C#.</Description>
     <Authors>Munir husseini</Authors>
     <Company>Munir husseini</Company>
+    <PackageIconUrl>https://github.com/mhusseini/Dryv/raw/master/logo.png</PackageIconUrl>
   </PropertyGroup>
 
   <ItemGroup>
