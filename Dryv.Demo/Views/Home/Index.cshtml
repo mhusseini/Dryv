@@ -1,23 +1,28 @@
 ﻿@{
     Layout = "_LayoutLanding";
     this.ViewData["Title"] = "Home";
- }
+}
 <section class="cards-section text-center">
     <div class="container">
-        <h2 class="title">Getting started is easy!</h2>
+        <h2 class="title">Complex model validation for server and client made easy.</h2>
         <div class="intro">
-            <p>Welcome to prettyDocs. This landing page is an example of how you can use a card view to present segments of your documentation. You can customise the icon fonts based on your needs.</p>
+            <p>Write model validation rules once in your favorite .NET language. <i>Dryv</i> will magically generate JavaScript for client-side validation.</p>
             <div class="cta-container">
-                <a class="btn btn-primary btn-cta" href="https://www.nuget.org/packages/Dryv/" target="_blank"><i class="fa fa-cloud-download"></i> Download Now</a>
+                <a title="Download NuGet package" href="https://www.nuget.org/packages/Dryv/">
+                    <img alt="Download NuGet package" src="https://badge.fury.io/nu/dryv.svg" />
+                </a>
+                <a title="Download NPM package" href="https://www.npmjs.com/package/dryv-jquery-unobtrusive">
+                    <img alt="Download NPM package" src="https://badge.fury.io/js/dryv-jquery-unobtrusive.svg" />
+                </a>
             </div><!--//cta-container-->
         </div><!--//intro-->
         @{
             var items = new[]
             {
-                (Title: "Quick Start", Text:"Demo example, consectetuer adipiscing elit", Controller: "Home", Action:"GettingStarted", Color:"green", Icon:"paper-plane"),
-                (Title: "Examples", Text:"Demo example, consectetuer adipiscing elit", Controller: "Examples", Action:"Index", Color:"orange", Icon:"eye"),
-                (Title: "Documentation", Text:"Demo example, consectetuer adipiscing elit", Controller: "Documentation", Action:"Index", Color:"blue", Icon:"book"),
-                (Title: "Extending Dryv", Text:"Demo example, consectetuer adipiscing elit", Controller: "Extension", Action:"Index", Color:"pink", Icon:"puzzle-piece")
+                (Title: "Quick Start", Text:"Leran the basic usage of Dryv.", Controller: "Home", Action:"GettingStarted", Color:"green", Icon:"paper-plane"),
+                (Title: "Examples", Text:"See examples of common secanrios with Dryv.", Controller: "Examples", Action:"Index", Color:"orange", Icon:"eye"),
+                (Title: "Documentation", Text:"Read the documentation for advances usage.", Controller: "Documentation", Action:"Index", Color:"blue", Icon:"book"),
+                (Title: "Extending Dryv", Text:"Learn how to extend Dryv to support custom JavaScript frameworks.", Controller: "Extension", Action:"Index", Color:"pink", Icon:"puzzle-piece")
             };
         }
         <div id="cards-wrapper" class="cards-wrapper row">

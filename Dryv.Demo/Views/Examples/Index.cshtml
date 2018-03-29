@@ -8,36 +8,22 @@
         <h1 class="doc-title" id="Examples">
             Examples
         </h1>
-        <div class="mb-4">
-            <markdown file="example1.md"></markdown>
-        </div>
-        <div class="resume-item d-flex flex-column mb-5">
-            @Html.Partial("example1.partial", new Model1())
-        </div>
-    </div>
-        <div class="mb-4">
-    <div class="section-block">
-            <markdown file="example2.md"></markdown>
-        </div>
-        <div class="resume-item d-flex flex-column mb-5">
-            @Html.Partial("example2.partial", new Model2())
-        </div>
     </div>
     <div class="section-block">
-        <div class="mb-4">
-            <markdown file="example3.md"></markdown>
-        </div>
-        <div class="resume-item d-flex flex-column mb-5">
-            @Html.Partial("example3.partial", new Model3())
-        </div>
+        <markdown file="example1.md"></markdown>
+        @Html.Partial("example1.partial", new Model1())
     </div>
     <div class="section-block">
-        <div class="mb-4">
-            <markdown file="example4.md"></markdown>
-        </div>
-        <div class="resume-item d-flex flex-column mb-5">
-            @Html.Partial("example4.partial", new Model4())
-        </div>
+        <markdown file="example2.md"></markdown>
+        @Html.Partial("example2.partial", new Model2())
+    </div>
+    <div class="section-block">
+        <markdown file="example3.md"></markdown>
+        @Html.Partial("example3.partial", new Model3())
+    </div>
+    <div class="section-block">
+        <markdown file="example4.md"></markdown>
+        @Html.Partial("example4.partial", new Model4())
     </div>
 </section>
 
