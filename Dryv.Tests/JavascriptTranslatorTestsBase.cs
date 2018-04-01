@@ -32,11 +32,17 @@ namespace Dryv.Tests
             object[] translators = null,
             object[] validationOptions = null)
         {
-            var translator = CreateTranslator(translators);
-            var translation = translator.Translate(expression).Factory(validationOptions);
+            var translation = Translate(expression, translators, validationOptions);
             var jsParser = new JavaScriptParser();
 
             return jsParser.ParseFunctionExpression(translation);
+        }
+
+        protected static string Translate(System.Linq.Expressions.Expression expression, object[] translators = null, object[] validationOptions = null)
+        {
+            var translator = CreateTranslator(translators);
+            var translation = translator.Translate(expression).Factory(validationOptions);
+            return translation;
         }
 
         private static JavaScriptTranslator CreateTranslator(object[] translators)
@@ -61,6 +67,7 @@ namespace Dryv.Tests
         protected abstract class TestModel
         {
             public abstract string Text { get; set; }
+            public bool BooleanValue { get; set; }
         }
     }
 }

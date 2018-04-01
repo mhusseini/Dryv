@@ -219,6 +219,11 @@ namespace Dryv.Translation
 
         public override void Visit(InvocationExpression expression, TranslationContext context, bool negated = false)
         {
+            if (expression.Expression is MemberExpression)
+            {
+                throw new ExpressionNotSupportedException(expression);
+            }
+
             this.VisitWithBrackets(expression.Expression, context);
             context.Writer.Write("(");
             MethodCallTranslator.WriteArguments(this, expression.Arguments, context);
@@ -283,25 +288,30 @@ namespace Dryv.Translation
                 return;
             }
 
-            if (expression.Expression != null)
+            if (expression.Expression is ConstantExpression ||
+                expression.Expression == null)
+            {
+                var instance = (expression.Expression as ConstantExpression)?.Value;
+                switch (expression.Member)
+                {
+                    case PropertyInfo property:
+                        {
+                            var value = property.GetValue(instance);
+                            context.Writer.Write(this.TranslateValue(value));
+                            return;
+                        }
+                    case FieldInfo field:
+                        {
+                            var value = field.GetValue(instance);
+                            context.Writer.Write(this.TranslateValue(value));
+                            return;
+                        }
+                }
+            }
+            else
             {
                 this.Visit(expression.Expression, context);
                 context.Writer.Write(".");
-            }
-            else switch (expression.Member)
-            {
-                case PropertyInfo property:
-                {
-                    var value = property.GetValue(null);
-                    context.Writer.Write(this.TranslateValue(value));
-                    return;
-                }
-                case FieldInfo field:
-                {
-                    var value = field.GetValue(null);
-                    context.Writer.Write(this.TranslateValue(value));
-                    return;
-                }
             }
 
             context.Writer.Write(this.FormatIdentifier(expression.Member.Name));
@@ -314,6 +324,13 @@ namespace Dryv.Translation
 
         public override void Visit(MethodCallExpression expression, TranslationContext context, bool negated = false)
         {
+            if (expression.Method.IsStatic && expression.Arguments?.Any() != true)
+            {
+                var value = expression.Method.Invoke(null, null);
+                context.Writer.Write(this.TranslateValue(value));
+                return;
+            }
+
             var context2 = new MethodTranslationContext(context)
             {
                 Translator = this,
@@ -390,7 +407,7 @@ namespace Dryv.Translation
 
         public override void Visit(TypeBinaryExpression expression, TranslationContext context, bool negated = false)
         {
-            throw new NotSupportedException();
+            throw new ExpressionNotSupportedException(expression);
         }
 
         public override void Visit(UnaryExpression expression, TranslationContext context, bool negated = false)

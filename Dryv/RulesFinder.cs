@@ -67,6 +67,8 @@ namespace Dryv
                                  where typeof(DryvRules).IsAssignableFrom(p.PropertyType)
                                  select p.GetValue(null) as DryvRules;
 
+            // TODO: add static methods.                                 
+
             return fromFields.Union(fromProperties).ToList();
         });
     }
