@@ -13,7 +13,9 @@ namespace Dryv
         {
             var services = context.ActionContext.HttpContext.RequestServices;
             var property = context.GetProperty();
-            var rules = from rule in RulesFinder.GetRulesForProperty(property)
+            // TODO: get real model?
+            var model = property.DeclaringType;
+            var rules = from rule in RulesFinder.GetRulesForProperty(model, property)
                         where rule.IsEnabled(services.GetService) &&
                               rule.EvaluationLocation.HasFlag(RuleEvaluationLocation.Client)
                         select rule;
@@ -25,7 +27,8 @@ namespace Dryv
         protected override ValidationResult IsValid(object value, ValidationContext context)
         {
             var property = context.GetProperty();
-            var errorMessage = (from rule in RulesFinder.GetRulesForProperty(property)
+            var model = context.ObjectInstance;
+            var errorMessage = (from rule in RulesFinder.GetRulesForProperty(model, property)
                                 where rule.IsEnabled(context.GetService) &&
                                       rule.EvaluationLocation.HasFlag(RuleEvaluationLocation.Server)
                                 let result = rule.Validate(context.ObjectInstance, context.GetService)

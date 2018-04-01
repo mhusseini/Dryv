@@ -17,11 +17,11 @@ namespace Dryv
         private static readonly ConcurrentDictionary<PropertyInfo, IList<DryvRule>> PropertyRules = new ConcurrentDictionary<PropertyInfo, IList<DryvRule>>();
         private static readonly ConcurrentDictionary<Type, IList<DryvRules>> TypeRules = new ConcurrentDictionary<Type, IList<DryvRules>>();
 
-        public static IEnumerable<DryvRule> GetRulesForProperty(PropertyInfo property)
+        public static IEnumerable<DryvRule> GetRulesForProperty(object model, PropertyInfo property)
         {
             return PropertyRules.GetOrAdd(
                     property,
-                    prop => GetInheritedRules(prop).ToList());
+                    prop => GetInheritedRules(model, prop).ToList());
         }
 
         private static IEnumerable<PropertyInfo> GetInheritedProperties(PropertyInfo property)
@@ -45,9 +45,9 @@ namespace Dryv
             yield return property;
         }
 
-        private static IEnumerable<DryvRule> GetInheritedRules(PropertyInfo prop)
+        private static IEnumerable<DryvRule> GetInheritedRules(object model, PropertyInfo prop)
         {
-            var typeRules = GetRulesOnType(prop.DeclaringType);
+            var typeRules = GetRulesOnType(model.GetType());
             var properties = GetInheritedProperties(prop);
 
             return from p in properties
@@ -67,9 +67,13 @@ namespace Dryv
                                  where typeof(DryvRules).IsAssignableFrom(p.PropertyType)
                                  select p.GetValue(null) as DryvRules;
 
-            // TODO: add static methods.                                 
+            var fromMethods = from m in objectType.GetMethods(BindingFlags)
+                              where m.IsStatic
+                                    && !m.GetParameters().Any()
+                                    && typeof(DryvRules).IsAssignableFrom(m.ReturnType)
+                              select m.Invoke(null, null) as DryvRules;
 
-            return fromFields.Union(fromProperties).ToList();
+            return fromFields.Union(fromProperties).Union(fromMethods).ToList();
         });
     }
 }

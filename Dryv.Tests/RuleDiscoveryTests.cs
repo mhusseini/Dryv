@@ -12,44 +12,55 @@ namespace Dryv.Tests
         }
 
         [TestMethod]
-        public void FindeRulesForBaseClass()
+        public void FinderulesInStaticMethods()
+        {
+            var model = new Model5();
+            var property = model.GetType().GetProperty(nameof(model.Text));
+            var rules = RulesFinder.GetRulesForProperty(model, property);
+
+            Assert.IsNotNull(rules);
+            Assert.IsTrue(rules.Any());
+        }
+
+        [TestMethod]
+        public void FinderulesForBaseClass()
         {
             var model = new Model4();
             var property = model.GetType().GetProperty(nameof(model.Text));
-            var rules = RulesFinder.GetRulesForProperty(property);
+            var rules = RulesFinder.GetRulesForProperty(model, property);
 
             Assert.IsNotNull(rules);
             Assert.IsTrue(rules.Any());
         }
 
         [TestMethod]
-        public void FindeRulesForInterface()
+        public void FinderulesForInterface()
         {
             var model = new Model();
             var property = model.GetType().GetProperty(nameof(model.Text));
-            var rules = RulesFinder.GetRulesForProperty(property);
+            var rules = RulesFinder.GetRulesForProperty(model, property);
 
             Assert.IsNotNull(rules);
             Assert.IsTrue(rules.Any());
         }
 
         [TestMethod]
-        public void FindeRulesInProperty()
+        public void FinderulesInProperty()
         {
             var model = new Model3();
             var property = model.GetType().GetProperty(nameof(model.Text));
-            var rules = RulesFinder.GetRulesForProperty(property);
+            var rules = RulesFinder.GetRulesForProperty(model, property);
 
             Assert.IsNotNull(rules);
             Assert.IsTrue(rules.Any());
         }
 
         [TestMethod]
-        public void FindeRulesOnOtherType()
+        public void FinderulesOnOtherType()
         {
             var model = new Model2();
             var property = model.GetType().GetProperty(nameof(model.Text));
-            var rules = RulesFinder.GetRulesForProperty(property);
+            var rules = RulesFinder.GetRulesForProperty(model, property);
 
             Assert.IsNotNull(rules);
             Assert.IsTrue(rules.Any());
@@ -101,6 +112,16 @@ namespace Dryv.Tests
                         : DryvResult.Error("error"));
 
             public override string Text { get; set; }
+        }
+
+        private class Model5 : ModelBase
+        {
+            public static DryvRules Rules() => DryvRules
+                .For<Model5>()
+                .Rule(m => m.Text,
+                    m => m.Text != null
+                        ? DryvResult.Success
+                        : DryvResult.Error("error"));
         }
 
         private abstract class ModelBase
