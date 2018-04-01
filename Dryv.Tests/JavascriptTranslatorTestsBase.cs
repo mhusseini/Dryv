@@ -1,8 +1,8 @@
 using System;
 using System.Linq;
 using Dryv.DependencyInjection;
-using Dryv.MethodCallTranslation;
 using Dryv.Translation;
+using Dryv.Translators;
 using Dryv.Utils;
 using Escape;
 using Escape.Ast;
@@ -58,7 +58,7 @@ namespace Dryv.Tests
             if (translators != null)
             {
                 translatorProvider.MethodCallTranslators.AddRange(translators.OfType<IMethodCallTranslator>());
-                translatorProvider.GenericTranslators.AddRange(translators.OfType<IGenericTranslator>());
+                translatorProvider.GenericTranslators.AddRange(translators.OfType<ICustomTranslator>());
             }
 
             return new JavaScriptTranslator(translatorProvider);

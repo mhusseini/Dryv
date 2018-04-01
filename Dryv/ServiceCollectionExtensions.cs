@@ -1,8 +1,8 @@
 ﻿using System;
 using Dryv.Configuration;
 using Dryv.DependencyInjection;
-using Dryv.MethodCallTranslation;
 using Dryv.Translation;
+using Dryv.Translators;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 

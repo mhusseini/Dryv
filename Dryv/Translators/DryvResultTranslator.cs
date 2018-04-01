@@ -1,10 +1,11 @@
 ﻿using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Dryv.Translation;
 
-namespace Dryv.MethodCallTranslation
+namespace Dryv.Translators
 {
-    internal class DryvResultTranslator : MethodCallTranslator, IGenericTranslator
+    internal class DryvResultTranslator : MethodCallTranslator, ICustomTranslator
     {
         private static readonly MemberInfo SuccessMember = typeof(DryvResult).GetMember("Success").First();
 
@@ -31,7 +32,7 @@ namespace Dryv.MethodCallTranslation
             context.Writer.Write("null");
         }
 
-        public bool TryTranslate(GenericTranslationContext context)
+        public bool TryTranslate(CustomTranslationContext context)
         {
             if (!(context.Expression is MemberExpression memberExpression)
                 || memberExpression.Member != SuccessMember)

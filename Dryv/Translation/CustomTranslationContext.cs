@@ -1,15 +1,14 @@
-﻿using Dryv.Translation;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 
-namespace Dryv.MethodCallTranslation
+namespace Dryv.Translation
 {
-    public class GenericTranslationContext : TranslationContext
+    public class CustomTranslationContext : TranslationContext
     {
-        public GenericTranslationContext()
+        public CustomTranslationContext()
         {
         }
 
-        public GenericTranslationContext(TranslationContext context)
+        public CustomTranslationContext(TranslationContext context)
         {
             this.OptionsTypes = context.OptionsTypes;
             this.Writer = context.Writer;

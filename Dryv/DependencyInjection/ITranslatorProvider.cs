@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
-using Dryv.MethodCallTranslation;
+using Dryv.Translation;
 
 namespace Dryv.DependencyInjection
 {
     internal interface ITranslatorProvider
     {
         IList<IMethodCallTranslator> MethodCallTranslators { get; }
-        IList<IGenericTranslator> GenericTranslators { get; }
+        IList<ICustomTranslator> GenericTranslators { get; }
     }
 }

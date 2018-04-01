@@ -3,10 +3,11 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using Dryv.Translation;
 
-namespace Dryv.MethodCallTranslation
+namespace Dryv.Translators
 {
-    internal class RegexTranslator : MethodCallTranslator, IGenericTranslator
+    internal class RegexTranslator : MethodCallTranslator, ICustomTranslator
     {
         private static readonly PropertyInfo SuccessProperty = typeof(Group).GetProperty(nameof(Group.Success));
 
@@ -16,7 +17,7 @@ namespace Dryv.MethodCallTranslation
             this.AddMethodTranslator(nameof(Regex.IsMatch), IsMatch);
         }
 
-        public bool TryTranslate(GenericTranslationContext context)
+        public bool TryTranslate(CustomTranslationContext context)
         {
             if (!(context.Expression is MemberExpression memberExpression))
             {

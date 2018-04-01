@@ -1,5 +1,4 @@
 ﻿using Dryv.DependencyInjection;
-using Dryv.MethodCallTranslation;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -204,7 +203,7 @@ namespace Dryv.Translation
 
         public override void Visit(Expression expression, TranslationContext context, bool negated = false)
         {
-            var context2 = new GenericTranslationContext(context)
+            var context2 = new CustomTranslationContext(context)
             {
                 Expression = expression,
                 Translator = this,

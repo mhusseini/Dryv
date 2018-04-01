@@ -1,6 +1,8 @@
 using System.Linq;
 using System.Text.RegularExpressions;
-using Dryv.MethodCallTranslation;
+using Dryv.Translation;
+using Dryv.Translators;
+using Dryv.Utils;
 using Escape.Ast;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
