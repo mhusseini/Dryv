@@ -17,11 +17,11 @@ namespace Dryv
         private static readonly ConcurrentDictionary<PropertyInfo, IList<DryvRule>> PropertyRules = new ConcurrentDictionary<PropertyInfo, IList<DryvRule>>();
         private static readonly ConcurrentDictionary<Type, IList<DryvRules>> TypeRules = new ConcurrentDictionary<Type, IList<DryvRules>>();
 
-        public static IEnumerable<DryvRule> GetRulesForProperty(object model, PropertyInfo property)
+        public static IEnumerable<DryvRule> GetRulesForProperty(Type modelType, PropertyInfo property)
         {
             return PropertyRules.GetOrAdd(
                     property,
-                    prop => GetInheritedRules(model, prop).ToList());
+                    prop => GetInheritedRules(modelType, prop).ToList());
         }
 
         private static IEnumerable<PropertyInfo> GetInheritedProperties(PropertyInfo property)
@@ -45,9 +45,9 @@ namespace Dryv
             yield return property;
         }
 
-        private static IEnumerable<DryvRule> GetInheritedRules(object model, PropertyInfo prop)
+        private static IEnumerable<DryvRule> GetInheritedRules(Type modelType, PropertyInfo prop)
         {
-            var typeRules = GetRulesOnType(model.GetType());
+            var typeRules = GetRulesOnType(modelType);
             var properties = GetInheritedProperties(prop);
 
             return from p in properties

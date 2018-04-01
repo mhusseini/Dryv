@@ -12,22 +12,11 @@ namespace Dryv.Tests
         }
 
         [TestMethod]
-        public void FinderulesInStaticMethods()
-        {
-            var model = new Model5();
-            var property = model.GetType().GetProperty(nameof(model.Text));
-            var rules = RulesFinder.GetRulesForProperty(model, property);
-
-            Assert.IsNotNull(rules);
-            Assert.IsTrue(rules.Any());
-        }
-
-        [TestMethod]
         public void FinderulesForBaseClass()
         {
             var model = new Model4();
             var property = model.GetType().GetProperty(nameof(model.Text));
-            var rules = RulesFinder.GetRulesForProperty(model, property);
+            var rules = RulesFinder.GetRulesForProperty(model.GetType(), property);
 
             Assert.IsNotNull(rules);
             Assert.IsTrue(rules.Any());
@@ -38,7 +27,7 @@ namespace Dryv.Tests
         {
             var model = new Model();
             var property = model.GetType().GetProperty(nameof(model.Text));
-            var rules = RulesFinder.GetRulesForProperty(model, property);
+            var rules = RulesFinder.GetRulesForProperty(model.GetType(), property);
 
             Assert.IsNotNull(rules);
             Assert.IsTrue(rules.Any());
@@ -49,7 +38,18 @@ namespace Dryv.Tests
         {
             var model = new Model3();
             var property = model.GetType().GetProperty(nameof(model.Text));
-            var rules = RulesFinder.GetRulesForProperty(model, property);
+            var rules = RulesFinder.GetRulesForProperty(model.GetType(), property);
+
+            Assert.IsNotNull(rules);
+            Assert.IsTrue(rules.Any());
+        }
+
+        [TestMethod]
+        public void FinderulesInStaticMethods()
+        {
+            var model = new Model5();
+            var property = model.GetType().GetProperty(nameof(model.Text));
+            var rules = RulesFinder.GetRulesForProperty(model.GetType(), property);
 
             Assert.IsNotNull(rules);
             Assert.IsTrue(rules.Any());
@@ -60,7 +60,7 @@ namespace Dryv.Tests
         {
             var model = new Model2();
             var property = model.GetType().GetProperty(nameof(model.Text));
-            var rules = RulesFinder.GetRulesForProperty(model, property);
+            var rules = RulesFinder.GetRulesForProperty(model.GetType(), property);
 
             Assert.IsNotNull(rules);
             Assert.IsTrue(rules.Any());
