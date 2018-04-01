@@ -17,12 +17,17 @@ namespace Dryv
 
         public static IDryvBuilder AddDryv(this IServiceCollection services, Action<DryvOptions> setupAction)
         {
-            var options = new DryvOptions();
+            var options = new DryvOptions
+            {
+                ClientModelValidatorType = typeof(DryvClientModelValidator)
+            };
+
             setupAction?.Invoke(options);
 
             services.AddSingleton<ITranslator, JavaScriptTranslator>();
             services.AddSingleton<ITranslatorProvider, TranslatorProvider>();
             services.AddSingleton(Options.Create(options));
+            services.AddSingleton(typeof(IDryvClientModelValidator), options.ClientModelValidatorType);
 
             return new DryvBuilder(services)
                 .AddTranslator<DryvResultTranslator>()

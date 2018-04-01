@@ -3,7 +3,7 @@
 namespace Dryv
 {
     [Flags]
-    public enum RuleLocation
+    public enum RuleEvaluationLocation
     {
         Server,
         Client

@@ -26,7 +26,7 @@ namespace Dryv
             Expression<Func<TModel, TProperty>> property,
             LambdaExpression rule,
             LambdaExpression enabled,
-            RuleLocation ruleLocation)
+            RuleEvaluationLocation ruleLocation)
         {
             if (!(property.Body is MemberExpression memberExpression) ||
                 !(memberExpression.Member is PropertyInfo propertyInfo))
@@ -39,7 +39,7 @@ namespace Dryv
             {
                 ValidationExpression = rule,
                 EnablingExpression = enabled,
-                RuleLocation = ruleLocation
+                EvaluationLocation = ruleLocation
             });
         }
 
@@ -50,7 +50,7 @@ namespace Dryv
         {
             foreach (var property in properties)
             {
-                this.Add(property, rule, ruleSwitch, RuleLocation.Server | RuleLocation.Client);
+                this.Add(property, rule, ruleSwitch, RuleEvaluationLocation.Server | RuleEvaluationLocation.Client);
             }
         }
 
@@ -61,7 +61,7 @@ namespace Dryv
         {
             foreach (var property in properties)
             {
-                this.Add(property, rule, ruleSwitch, RuleLocation.Server);
+                this.Add(property, rule, ruleSwitch, RuleEvaluationLocation.Server);
             }
         }
 
@@ -72,7 +72,7 @@ namespace Dryv
         {
             foreach (var property in properties)
             {
-                this.Add(property, rule, ruleSwitch, RuleLocation.Client);
+                this.Add(property, rule, ruleSwitch, RuleEvaluationLocation.Client);
             }
         }
     }
