@@ -1,8 +1,8 @@
 using System;
 using System.Linq;
 using Dryv.DependencyInjection;
-using Dryv.MethodCallTranslation;
 using Dryv.Translation;
+using Dryv.Translators;
 using Dryv.Utils;
 using Escape;
 using Escape.Ast;
@@ -32,11 +32,17 @@ namespace Dryv.Tests
             object[] translators = null,
             object[] validationOptions = null)
         {
-            var translator = CreateTranslator(translators);
-            var translation = translator.Translate(expression).Factory(validationOptions);
+            var translation = Translate(expression, translators, validationOptions);
             var jsParser = new JavaScriptParser();
 
             return jsParser.ParseFunctionExpression(translation);
+        }
+
+        protected static string Translate(System.Linq.Expressions.Expression expression, object[] translators = null, object[] validationOptions = null)
+        {
+            var translator = CreateTranslator(translators);
+            var translation = translator.Translate(expression).Factory(validationOptions);
+            return translation;
         }
 
         private static JavaScriptTranslator CreateTranslator(object[] translators)
@@ -52,7 +58,7 @@ namespace Dryv.Tests
             if (translators != null)
             {
                 translatorProvider.MethodCallTranslators.AddRange(translators.OfType<IMethodCallTranslator>());
-                translatorProvider.GenericTranslators.AddRange(translators.OfType<IGenericTranslator>());
+                translatorProvider.GenericTranslators.AddRange(translators.OfType<ICustomTranslator>());
             }
 
             return new JavaScriptTranslator(translatorProvider);
@@ -61,6 +67,7 @@ namespace Dryv.Tests
         protected abstract class TestModel
         {
             public abstract string Text { get; set; }
+            public bool BooleanValue { get; set; }
         }
     }
 }

@@ -1,7 +1,8 @@
+using System;
+using System.Text.RegularExpressions;
 using Escape;
 using Escape.Ast;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Text.RegularExpressions;
 
 namespace Dryv.Tests
 {
@@ -15,6 +16,32 @@ namespace Dryv.Tests
         private string PatternProperty => this.patternField;
         private Regex RegexProperty => this.regexField;
         private string Var2Property => this.var2Field;
+
+
+        [TestMethod]
+        public void InlineLambdaExpreession()
+        {
+            var expression = Expression(m => ((Func<TestModel, string>)(m2 => m2.Text))(m));
+            var translation = Translate(expression);
+
+            Assert.IsNotNull(translation);
+        }
+
+
+        [TestMethod]
+        public void NonInlineLambdaExpreession()
+        {
+            var x = (Func<TestModel, string>)(m2 => m2.Text);
+            var expression = Expression(m => x(m));
+            try
+            {
+                var translation = Translate(expression);
+                Assert.Fail();
+            }
+            catch (ExpressionNotSupportedException)
+            {
+            }
+        }
 
         [TestMethod]
         public void GetArgumentFromField()
@@ -215,5 +242,19 @@ namespace Dryv.Tests
 
             Assert.AreEqual(pattern, regexp?.Pattern);
         }
+
+        [TestMethod]
+        public void PreevaluateStaticMethod()
+        {
+            var expression = Expression(model => GetText());
+            var script = Translate(expression);
+
+            var engine = new Jurassic.ScriptEngine();
+            var result = engine.Evaluate($"({script})()");
+
+            Assert.AreEqual("Text", result);
+        }
+
+        private static string GetText() => "Text";
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 using Dryv.DependencyInjection;
-using Dryv.MethodCallTranslation;
+using Dryv.Translation;
 using Dryv.Utils;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,11 +10,11 @@ namespace Dryv
     public static class ApplicationBuilderExtensions
     {
         public static IServiceCollection AddGenericTranslator<T>(this IDryvBuilder dryvBuilder)
-            where T : class, IGenericTranslator
-            => dryvBuilder.Services.AddSingleton<IGenericTranslator, T>();
+            where T : class, ICustomTranslator
+            => dryvBuilder.Services.AddSingleton<ICustomTranslator, T>();
 
         public static IServiceCollection AddGenericTranslator(this IDryvBuilder dryvBuilder, Type type)
-            => AddSingleton(dryvBuilder.Services, typeof(IGenericTranslator), type);
+            => AddSingleton(dryvBuilder.Services, typeof(ICustomTranslator), type);
 
         public static IServiceCollection AddMethodCallTranslator<T>(this IDryvBuilder dryvBuilder)
             where T : class, IMethodCallTranslator
@@ -28,7 +28,7 @@ namespace Dryv
             var translatorProvider = app.ApplicationServices.GetService<ITranslatorProvider>();
 
             translatorProvider.MethodCallTranslators.AddRange(app.ApplicationServices.GetServices<IMethodCallTranslator>());
-            translatorProvider.GenericTranslators.AddRange(app.ApplicationServices.GetServices<IGenericTranslator>());
+            translatorProvider.GenericTranslators.AddRange(app.ApplicationServices.GetServices<ICustomTranslator>());
 
             return app;
         }

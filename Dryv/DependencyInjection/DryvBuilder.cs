@@ -1,4 +1,4 @@
-﻿using Dryv.MethodCallTranslation;
+﻿using Dryv.Translation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Dryv.DependencyInjection
@@ -21,9 +21,9 @@ namespace Dryv.DependencyInjection
                 this.Services.AddSingleton(typeof(IMethodCallTranslator), type);
             }
 
-            if (typeof(IGenericTranslator).IsAssignableFrom(type))
+            if (typeof(ICustomTranslator).IsAssignableFrom(type))
             {
-                this.Services.AddSingleton(typeof(IGenericTranslator), type);
+                this.Services.AddSingleton(typeof(ICustomTranslator), type);
             }
 
             return this;
@@ -36,7 +36,7 @@ namespace Dryv.DependencyInjection
                 this.Services.AddSingleton(methodCallTranslator);
             }
 
-            if (translator is IGenericTranslator genericTranslator)
+            if (translator is ICustomTranslator genericTranslator)
             {
                 this.Services.AddSingleton(genericTranslator);
             }

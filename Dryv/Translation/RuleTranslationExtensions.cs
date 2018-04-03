@@ -40,18 +40,15 @@ namespace Dryv.Translation
             return rule;
         }
 
-        public static string Translate(this IEnumerable<DryvRule> rules, Func<Type, object> objectProvider, DryvOptions options)
+        public static IEnumerable<string> Translate(this IEnumerable<DryvRule> rules, Func<Type, object> objectProvider, DryvOptions options)
         {
             var translator = objectProvider(typeof(ITranslator)) as ITranslator;
 
-            return $@"[{
-                    string.Join(",",
-                        from r in rules
-                        let rule = r.Translate(translator, options)
-                        where rule.TranslationError == null
-                        let preevaluationOptions = rule.PreevaluationOptionTypes.Select(objectProvider).ToArray()
-                        select rule.TranslatedValidationExpression(preevaluationOptions))
-                }]";
+            return (from r in rules
+                    let rule = r.Translate(translator, options)
+                    where rule.TranslationError == null
+                    let preevaluationOptions = rule.PreevaluationOptionTypes.Select(objectProvider).ToArray()
+                    select rule.TranslatedValidationExpression(preevaluationOptions)).ToList();
         }
     }
 }

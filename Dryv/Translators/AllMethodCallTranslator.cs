@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Text.RegularExpressions;
+using Dryv.Translation;
+using Dryv.Utils;
 
-namespace Dryv.MethodCallTranslation
+namespace Dryv.Translators
 {
     public class AllMethodCallTranslator : MethodCallTranslator
     {

@@ -2,7 +2,7 @@
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
-namespace Dryv
+namespace Dryv.Utils
 {
     internal static class ValidationContextExtensions
     {

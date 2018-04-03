@@ -1,4 +1,4 @@
-﻿namespace Dryv
+﻿namespace Dryv.Utils
 {
     public static class StringExtensions
     {

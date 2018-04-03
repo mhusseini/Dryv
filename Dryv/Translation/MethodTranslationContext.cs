@@ -1,7 +1,6 @@
-﻿using Dryv.Translation;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 
-namespace Dryv.MethodCallTranslation
+namespace Dryv.Translation
 {
     public class MethodTranslationContext : TranslationContext
     {

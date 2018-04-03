@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Linq.Expressions;
+using Dryv.Translation;
 
-namespace Dryv.MethodCallTranslation
+namespace Dryv.Translators
 {
     internal class StringTranslator : MethodCallTranslator
     {
