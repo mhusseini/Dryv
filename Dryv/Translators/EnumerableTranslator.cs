@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using System.Linq.Expressions;
 using Dryv.Translation;
 
 namespace Dryv.Translators
@@ -15,6 +14,7 @@ namespace Dryv.Translators
             this.AddMethodTranslator(nameof(Enumerable.Sum), Sum);
             this.AddMethodTranslator(nameof(Enumerable.Min), Min);
             this.AddMethodTranslator(nameof(Enumerable.Max), Max);
+            this.AddMethodTranslator(nameof(Enumerable.Average), Average);
             this.AddMethodTranslator(nameof(Enumerable.Select), Select);
             this.AddMethodTranslator(nameof(Enumerable.Where), Where);
             this.AddMethodTranslator(nameof(Enumerable.First), First);
@@ -136,6 +136,13 @@ namespace Dryv.Translators
         protected static void LastOrDefault(MethodTranslationContext context)
         {
             TranslateSelect(context, "return arr.length ? arr[arr.length - 1] : null;");
+        }
+
+        protected static void Average(MethodTranslationContext context)
+        {
+            context.Writer.Write("(function(){var _c = 0; return ");
+            Reduce(context, "++_c; return a + b");
+            context.Writer.Write(" / (_c > 0 ? _c + 1 : 0);})()");
         }
 
         protected static void Max(MethodTranslationContext context)

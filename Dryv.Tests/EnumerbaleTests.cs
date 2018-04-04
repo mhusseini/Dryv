@@ -167,6 +167,19 @@ namespace Dryv.Tests
         }
 
         [TestMethod]
+        public void TranslateAverage()
+        {
+            var expression = (Expression<Func<TestModel, double>>)(m => m.Items.Average(i => i.Length));
+            var translation = Translate(expression);
+            var model = @"{items:['x', 'xx', 'xxx']}";
+            var engine = new Jurassic.ScriptEngine();
+            var script = $"({translation})({model})";
+            var result = engine.Evaluate(script);
+
+            Assert.AreEqual(2, result);
+        }
+
+        [TestMethod]
         public void TranslateMax()
         {
             var expression = Expression(m => m.Items.Max(i => i.Length).ToString());
