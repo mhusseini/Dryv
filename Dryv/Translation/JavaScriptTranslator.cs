@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Dryv.Utils;
 
 namespace Dryv.Translation
 {
@@ -117,6 +118,9 @@ namespace Dryv.Translation
 
                 case bool b:
                     return b ? "true" : "false";
+
+                case null:
+                    return "null";
 
                 default:
                     return value.ToString();
@@ -313,7 +317,7 @@ namespace Dryv.Translation
                 context.Writer.Write(".");
             }
 
-            context.Writer.Write(this.FormatIdentifier(expression.Member.Name));
+            context.Writer.Write(this.FormatIdentifier(expression.Member.Name.ToCamelCase()));
         }
 
         public override void Visit(MemberInitExpression expression, TranslationContext context, bool negated = false)

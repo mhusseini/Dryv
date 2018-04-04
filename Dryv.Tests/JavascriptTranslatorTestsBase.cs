@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Dryv.DependencyInjection;
 using Dryv.Translation;
@@ -52,8 +53,10 @@ namespace Dryv.Tests
             translatorProvider.MethodCallTranslators.Add(new RegexTranslator());
             translatorProvider.MethodCallTranslators.Add(new DryvResultTranslator());
             translatorProvider.MethodCallTranslators.Add(new StringTranslator());
+            translatorProvider.MethodCallTranslators.Add(new EnumerableTranslator());
             translatorProvider.GenericTranslators.Add(new RegexTranslator());
             translatorProvider.GenericTranslators.Add(new DryvResultTranslator());
+            translatorProvider.GenericTranslators.Add(new BaseMethodsTranslator());
 
             if (translators != null)
             {
@@ -68,6 +71,10 @@ namespace Dryv.Tests
         {
             public abstract string Text { get; set; }
             public bool BooleanValue { get; set; }
+
+            public IEnumerable<string> Items { get; set; }
+
+            public IEnumerable<int> IntItems { get; set; }
         }
     }
 }

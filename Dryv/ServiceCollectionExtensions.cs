@@ -30,8 +30,10 @@ namespace Dryv
             services.AddSingleton(typeof(IDryvClientModelValidator), options.ClientModelValidatorType);
 
             return new DryvBuilder(services)
+                .AddTranslator<BaseMethodsTranslator>()
                 .AddTranslator<DryvResultTranslator>()
                 .AddTranslator<StringTranslator>()
+                .AddTranslator<EnumerableTranslator>()
                 .AddTranslator<RegexTranslator>();
         }
     }
