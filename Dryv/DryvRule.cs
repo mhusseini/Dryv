@@ -13,5 +13,6 @@ namespace Dryv
         internal Func<object[], string> TranslatedValidationExpression { get; set; }
         internal Exception TranslationError { get; set; }
         public LambdaExpression ValidationExpression { get; set; }
+        internal string ModelName { get; set; }
     }
 }

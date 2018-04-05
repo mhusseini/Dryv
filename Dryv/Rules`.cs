@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Dryv.Utils;
 
 namespace Dryv
 {
@@ -34,9 +36,16 @@ namespace Dryv
                 return;
             }
 
+            var modelName = string.Join(".", memberExpression
+                .Iterrate(e => e.Expression as MemberExpression)
+                .Skip(1)
+                .Select(e => e.Member.Name.ToCamelCase())
+                .Reverse());
+
             var expressions = this.PropertyRules.GetOrAdd(propertyInfo, _ => new List<DryvRule>());
             expressions.Add(new DryvRule
             {
+                ModelName = modelName,
                 ValidationExpression = rule,
                 EnablingExpression = enabled,
                 EvaluationLocation = ruleLocation

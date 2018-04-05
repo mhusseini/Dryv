@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Dryv.Configuration;
 
 namespace Dryv.Translation
@@ -17,6 +18,8 @@ namespace Dryv.Translation
 
             try
             {
+                var regex = new Regex($"^{Regex.Escape(rule.ModelName)}");
+                modelName = regex.Replace(modelName, string.Empty);
                 var translatedRule = translator.Translate(rule.ValidationExpression, modelName);
 
                 rule.TranslatedValidationExpression = translatedRule.Factory;

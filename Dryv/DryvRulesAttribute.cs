@@ -3,9 +3,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Dryv.Compilation;
 using Dryv.Utils;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Dryv
@@ -15,9 +15,10 @@ namespace Dryv
     {
         public void AddValidation(ClientModelValidationContext context)
         {
+            var modelType = (context.ActionContext as ViewContext)?.ViewData.ModelMetadata.ModelType
+                            ?? context.ModelMetadata.ContainerType;
             var services = context.ActionContext.HttpContext.RequestServices;
             var property = context.GetProperty();
-            var modelType = context.ModelMetadata.ContainerType;
             var rules = from rule in RulesFinder.GetRulesForProperty(modelType, property)
                         where rule.IsEnabled(services.GetService) &&
                               rule.EvaluationLocation.HasFlag(RuleEvaluationLocation.Client)
@@ -29,6 +30,10 @@ namespace Dryv
 
         protected override ValidationResult IsValid(object value, ValidationContext context)
         {
+            var httpConextAccessor = context.GetService<IHttpContextAccessor>();
+            var httpContext = httpConextAccessor.HttpContext;
+            //var modelType = (context. as ViewContext)?.ViewData.Model?.GetType()
+            //                ?? context.ObjectType;
             var property = context.GetProperty();
             var modelType = context.ObjectType;
             var errorMessage = (from rule in RulesFinder.GetRulesForProperty(modelType, property)

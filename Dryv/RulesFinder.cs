@@ -14,14 +14,15 @@ namespace Dryv
                                           System.Reflection.BindingFlags.NonPublic |
                                           System.Reflection.BindingFlags.FlattenHierarchy;
 
-        private static readonly ConcurrentDictionary<PropertyInfo, IList<DryvRule>> PropertyRules = new ConcurrentDictionary<PropertyInfo, IList<DryvRule>>();
+        private static readonly ConcurrentDictionary<string, IList<DryvRule>> PropertyRules = new ConcurrentDictionary<string, IList<DryvRule>>();
         private static readonly ConcurrentDictionary<Type, IList<DryvRules>> TypeRules = new ConcurrentDictionary<Type, IList<DryvRules>>();
 
         public static IEnumerable<DryvRule> GetRulesForProperty(Type modelType, PropertyInfo property)
         {
+            var key = $"{modelType.FullName}|{property.DeclaringType.FullName}|{property.Name}";
             return PropertyRules.GetOrAdd(
-                    property,
-                    prop => GetInheritedRules(modelType, prop).ToList());
+                    key,
+                    _ => GetInheritedRules(modelType, property).ToList());
         }
 
         private static IEnumerable<PropertyInfo> GetInheritedProperties(PropertyInfo property)
@@ -41,8 +42,6 @@ namespace Dryv
             {
                 yield return prop;
             }
-
-            yield return property;
         }
 
         private static IEnumerable<DryvRule> GetInheritedRules(Type modelType, PropertyInfo prop)
@@ -57,17 +56,22 @@ namespace Dryv
                    select expression;
         }
 
-        private static IEnumerable<DryvRules> GetRulesOnType(Type objectType) => TypeRules.GetOrAdd(objectType, t =>
+        private static IEnumerable<DryvRules> GetRulesOnType(Type objectType) => TypeRules.GetOrAdd(objectType, type =>
         {
-            var fromFields = from p in t.GetFields(BindingFlags)
+            var typeHierarchy = type.GetObjecTypeHierarchy().ToList();
+
+            var fromFields = from t in typeHierarchy
+                             from p in t.GetFields(BindingFlags)
                              where typeof(DryvRules).IsAssignableFrom(p.FieldType)
                              select p.GetValue(null) as DryvRules;
 
-            var fromProperties = from p in objectType.GetProperties(BindingFlags)
+            var fromProperties = from t in typeHierarchy
+                                 from p in objectType.GetProperties(BindingFlags)
                                  where typeof(DryvRules).IsAssignableFrom(p.PropertyType)
                                  select p.GetValue(null) as DryvRules;
 
-            var fromMethods = from m in objectType.GetMethods(BindingFlags)
+            var fromMethods = from t in typeHierarchy
+                              from m in objectType.GetMethods(BindingFlags)
                               where m.IsStatic
                                     && !m.GetParameters().Any()
                                     && typeof(DryvRules).IsAssignableFrom(m.ReturnType)

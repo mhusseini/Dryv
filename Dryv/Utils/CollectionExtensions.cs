@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace Dryv.Utils
 {
-    internal static class ListExtensions
+    internal static class CollectionExtensions
     {
-        public static void AddRange<T>(this IList<T> list, IEnumerable<T> items)
+        public static void AddRange<T>(this ICollection<T> list, IEnumerable<T> items)
         {
             foreach (var item in items)
             {
