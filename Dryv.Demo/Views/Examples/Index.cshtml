@@ -9,7 +9,7 @@
             Examples
         </h1>
     </div>
-    <div class="section-block">
+    @*<div class="section-block">
         <markdown file="example1.md"></markdown>
         @Html.Partial("example1.partial", new Model1())
     </div>
@@ -24,6 +24,17 @@
     <div class="section-block">
         <markdown file="example4.md"></markdown>
         @Html.Partial("example4.partial", new Model4())
+    </div>*@
+    <div class="section-block">
+        @*<markdown file="example5.md"></markdown>*@
+        @Html.Partial("example5.partial", new Model5
+        {
+            Name = "Hallo",
+            Child = new Model6
+            {
+                Name = "Welt"
+            }
+        })
     </div>
 </section>
 

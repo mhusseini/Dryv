@@ -10,6 +10,6 @@ namespace Dryv.Translation
         /// <summary>
         /// Translates the specified expreeion.
         /// </summary>
-        TranslationResult Translate(Expression expression);
+        TranslationResult Translate(Expression expression, string modelName);
     }
 }

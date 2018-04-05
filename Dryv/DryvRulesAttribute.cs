@@ -4,6 +4,8 @@ using System.Linq;
 using Dryv.Compilation;
 using Dryv.Utils;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Dryv
@@ -15,7 +17,7 @@ namespace Dryv
         {
             var services = context.ActionContext.HttpContext.RequestServices;
             var property = context.GetProperty();
-            var modelType = context.ModelMetadata.ModelType;
+            var modelType = context.ModelMetadata.ContainerType;
             var rules = from rule in RulesFinder.GetRulesForProperty(modelType, property)
                         where rule.IsEnabled(services.GetService) &&
                               rule.EvaluationLocation.HasFlag(RuleEvaluationLocation.Client)

@@ -11,5 +11,6 @@ namespace Dryv.Translation
         public IList<Type> OptionsTypes { get; set; }
 
         public IList<LambdaExpression> OptionDelegates { get; set; }
+        public string ModelName { get; set; }
     }
 }

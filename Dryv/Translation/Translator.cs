@@ -11,7 +11,7 @@ namespace Dryv.Translation
     {
         private static readonly MethodInfo TranslateValueMethod = typeof(Translator).GetMethod(nameof(TranslateValue));
 
-        public virtual TranslationResult Translate(Expression expression)
+        public virtual TranslationResult Translate(Expression expression, string modelName)
         {
             var sb = new StringBuilder();
             var optionDelegates = new List<LambdaExpression>();
@@ -23,7 +23,8 @@ namespace Dryv.Translation
                 {
                     OptionsTypes = optionTypes,
                     Writer = writer,
-                    OptionDelegates = optionDelegates
+                    OptionDelegates = optionDelegates,
+                    ModelName = modelName
                 };
 
                 this.Translate(expression, context);

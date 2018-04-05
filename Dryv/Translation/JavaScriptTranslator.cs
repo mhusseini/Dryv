@@ -371,6 +371,13 @@ namespace Dryv.Translation
         public override void Visit(ParameterExpression expression, TranslationContext context, bool negated = false)
         {
             context.Writer.Write(expression.Name);
+
+            if (!string.IsNullOrWhiteSpace(context.ModelName))
+            {
+                context.Writer.Write(".");
+                context.Writer.Write(context.ModelName);
+            }
+
         }
 
         public override void Visit(RuntimeVariablesExpression expression, TranslationContext context, bool negated = false)
