@@ -27,6 +27,7 @@ namespace Dryv.Translators
             this.AddMethodTranslator(nameof(Enumerable.ElementAt), ElementAt);
             this.AddMethodTranslator(nameof(Enumerable.ElementAtOrDefault), ElementAtOrDefault);
             this.AddMethodTranslator(nameof(Enumerable.Count), Count);
+            this.AddMethodTranslator(nameof(Enumerable.LongCount), Count);
             this.AddMethodTranslator(nameof(Enumerable.DefaultIfEmpty), DefaultIfEmpty);
         }
 
