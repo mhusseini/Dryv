@@ -11,7 +11,7 @@ namespace Dryv.Translation
     {
         private static readonly MethodInfo TranslateValueMethod = typeof(Translator).GetMethod(nameof(TranslateValue));
 
-        public virtual TranslationResult Translate(Expression expression, string modelName)
+        public virtual TranslationResult Translate(Expression expression, MemberExpression propertyExpression)
         {
             var sb = new StringBuilder();
             var optionDelegates = new List<LambdaExpression>();
@@ -24,29 +24,31 @@ namespace Dryv.Translation
                     OptionsTypes = optionTypes,
                     Writer = writer,
                     OptionDelegates = optionDelegates,
-                    ModelName = modelName
+                    ModelType = propertyExpression.Expression.GetExpressionType(),
+                    PropertyExpression = propertyExpression.Expression
                 };
 
                 this.Translate(expression, context);
             }
 
-            if (!optionDelegates.Any())
-            {
-                var lambda = Expression.Lambda<Func<object[], string>>(
-                    Expression.Constant(sb.ToString()),
-                    Expression.Parameter(typeof(object[])));
+            //if (!optionDelegates.Any())
+            //{
+            //    var lambda = Expression.Lambda<Func<object[], string>>(
+            //        Expression.Constant(sb.ToString()),
+            //        Expression.Parameter(typeof(object[])));
 
-                return new TranslationResult
-                {
-                    Factory = lambda.Compile(),
-                    OptionTypes = optionTypes.ToArray()
-                };
-            }
+            //    return new TranslationResult
+            //    {
+            //        Factory = lambda.Compile(),
+            //        OptionTypes = optionTypes.ToArray()
+            //    };
+            //}
 
             var code = sb.ToString()
                 .Replace("{", "{{")
                 .Replace("}", "}}");
             var parameter = Expression.Parameter(typeof(object[]));
+            // Create an array that will be used as parameters for string.Format 
             var arrayItems = new List<Expression>();
 
             foreach (var lambda in optionDelegates)
@@ -54,12 +56,27 @@ namespace Dryv.Translation
                 var optionType = this.GetTypeChain(lambda.Body).Last();
                 var idx = optionTypes.IndexOf(optionType);
                 code = code.Replace($"$${lambda.GetHashCode()}$$", $"{{{idx}}}");
+                // get item from input array (properly casted)
                 var p = Expression.Convert(Expression.ArrayAccess(parameter, Expression.Constant(idx)), optionType);
+                // invoke lambda with item as argument
                 var optionValue = Expression.Convert(Expression.Invoke(lambda, p), typeof(object));
+                // translate result of lambda to JavaScript
                 var translatedOptionsValue = Expression.Call(Expression.Constant(this), TranslateValueMethod, optionValue);
+                // Add the whole expression to the formatting array
                 arrayItems.Add(Expression.Convert(translatedOptionsValue, typeof(object)));
             }
 
+            {
+                // Last item in input array is the path of the current model.
+                var idx = optionTypes.Count;
+                var modelPathParameter = Expression.ArrayAccess(parameter, Expression.Constant(idx));
+                // Put that item into the formatting array 
+                arrayItems.Add(modelPathParameter);
+                // Replace all occurences of $$MODELPATH$$ with the appropriate formatting placeholder 
+                code = code.Replace("$$MODELPATH$$", $"{{{idx}}}");
+            }
+
+            // create the following code: string.Format("...", new[]{ ... })
             var formatMethod = typeof(string).GetMethod(nameof(string.Format), new[] { typeof(string), typeof(object[]) });
             var pattern = Expression.Constant(code);
             var array = Expression.NewArrayInit(typeof(object), arrayItems);

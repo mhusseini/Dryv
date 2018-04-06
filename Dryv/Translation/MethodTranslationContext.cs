@@ -13,7 +13,8 @@ namespace Dryv.Translation
             this.OptionsTypes = context.OptionsTypes;
             this.Writer = context.Writer;
             this.OptionDelegates = context.OptionDelegates;
-            this.ModelName = context.ModelName;
+            this.ModelType = context.ModelType;
+            this.PropertyExpression = context.PropertyExpression;
         }
 
         public MethodCallExpression Expression { get; set; }

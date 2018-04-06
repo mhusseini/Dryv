@@ -10,5 +10,7 @@
 
         [DryvRules]
         public string Name { get; set; }
+
+        public Model6 Child { get; set; }
     }
 }

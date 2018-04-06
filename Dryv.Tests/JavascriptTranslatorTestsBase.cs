@@ -42,7 +42,7 @@ namespace Dryv.Tests
         protected static string Translate(System.Linq.Expressions.Expression expression, object[] translators = null, object[] validationOptions = null)
         {
             var translator = CreateTranslator(translators);
-            var translation = translator.Translate(expression).Factory(validationOptions);
+            var translation = translator.Translate(expression, (string)null).Factory(validationOptions);
             return translation;
         }
 

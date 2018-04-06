@@ -313,7 +313,30 @@ namespace Dryv.Translation
             }
             else
             {
-                this.Visit(expression.Expression, context);
+                if (expression.Expression.ToString().Contains(context.PropertyExpression.ToString()))
+                {
+                    var e = expression;
+                    while (e.Expression is MemberExpression mex)
+                    {
+                        e = mex;
+                    }
+
+                    if (e.Expression is ParameterExpression parameterExpression)
+                    {
+
+                        this.Visit(parameterExpression, context);
+                        context.Writer.Write("$$MODELPATH$$");
+                    }
+                    else
+                    {
+                        this.Visit(expression.Expression, context);
+                    }
+                }
+                else
+                {
+                    this.Visit(expression.Expression, context);
+                }
+
                 context.Writer.Write(".");
             }
 
@@ -371,13 +394,6 @@ namespace Dryv.Translation
         public override void Visit(ParameterExpression expression, TranslationContext context, bool negated = false)
         {
             context.Writer.Write(expression.Name);
-
-            if (!string.IsNullOrWhiteSpace(context.ModelName))
-            {
-                context.Writer.Write(".");
-                context.Writer.Write(context.ModelName);
-            }
-
         }
 
         public override void Visit(RuntimeVariablesExpression expression, TranslationContext context, bool negated = false)

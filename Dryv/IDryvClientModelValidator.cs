@@ -13,6 +13,6 @@ namespace Dryv
         /// </summary>
         /// <param name="context">The context for client-side model validation.</param>
         /// <param name="rules">The validation rules to be written to the client.</param>
-        void AddValidation(ClientModelValidationContext context, IEnumerable<DryvRule> rules);
+        void AddValidation(ClientModelValidationContext context, IEnumerable<(string Path, DryvRule Rule)> rules);
     }
 }

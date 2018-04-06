@@ -36,8 +36,11 @@ namespace Dryv
                 return;
             }
 
-            var modelName = string.Join(".", memberExpression
+            var members = memberExpression
                 .Iterrate(e => e.Expression as MemberExpression)
+                .ToList();
+
+            var modelName = string.Join(".", members
                 .Skip(1)
                 .Select(e => e.Member.Name.ToCamelCase())
                 .Reverse());
@@ -45,6 +48,8 @@ namespace Dryv
             var expressions = this.PropertyRules.GetOrAdd(propertyInfo, _ => new List<DryvRule>());
             expressions.Add(new DryvRule
             {
+                PropertyExpression = memberExpression,
+                PropertyName = members.First().Member.Name,
                 ModelName = modelName,
                 ValidationExpression = rule,
                 EnablingExpression = enabled,

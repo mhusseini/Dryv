@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Dryv.Configuration;
 
 namespace Dryv.Translation
 {
     internal static class RuleTranslationExtensions
     {
-        public static DryvRule Translate(this DryvRule rule, ITranslator translator, DryvOptions options, string modelName)
+        public static DryvRule Translate(this DryvRule rule, ITranslator translator, DryvOptions options, Type modelType)
         {
             if (rule.TranslatedValidationExpression != null ||
                 rule.TranslationError != null)
@@ -18,9 +17,7 @@ namespace Dryv.Translation
 
             try
             {
-                var regex = new Regex($"^{Regex.Escape(rule.ModelName)}");
-                modelName = regex.Replace(modelName, string.Empty);
-                var translatedRule = translator.Translate(rule.ValidationExpression, modelName);
+                var translatedRule = translator.Translate(rule.ValidationExpression, rule.PropertyExpression);
 
                 rule.TranslatedValidationExpression = translatedRule.Factory;
                 rule.PreevaluationOptionTypes = translatedRule.OptionTypes;
@@ -43,14 +40,15 @@ namespace Dryv.Translation
             return rule;
         }
 
-        public static IEnumerable<string> Translate(this IEnumerable<DryvRule> rules, Func<Type, object> objectProvider, DryvOptions options, string modelName)
+        public static IEnumerable<string> Translate(this IEnumerable<(string Path, DryvRule Rule)> rules, Func<Type, object> objectProvider, DryvOptions options, string modelPath, Type modelType)
         {
             var translator = objectProvider(typeof(ITranslator)) as ITranslator;
 
             return (from r in rules
-                    let rule = r.Translate(translator, options, modelName)
+                    let rule = r.Rule.Translate(translator, options, modelType)
                     where rule.TranslationError == null
-                    let preevaluationOptions = rule.PreevaluationOptionTypes.Select(objectProvider).ToArray()
+                    let path = string.IsNullOrWhiteSpace(r.Path) ? r.Path : $".{r.Path}"
+                    let preevaluationOptions = rule.PreevaluationOptionTypes.Select(objectProvider).Union(new[] { path }).ToArray()
                     select rule.TranslatedValidationExpression(preevaluationOptions)).ToList();
         }
     }

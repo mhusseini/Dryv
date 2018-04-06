@@ -19,13 +19,13 @@ namespace Dryv
                             ?? context.ModelMetadata.ContainerType;
             var services = context.ActionContext.HttpContext.RequestServices;
             var property = context.GetProperty();
-            var rules = from rule in RulesFinder.GetRulesForProperty(modelType, property)
-                        where rule.IsEnabled(services.GetService) &&
-                              rule.EvaluationLocation.HasFlag(RuleEvaluationLocation.Client)
+            var modelPath = context.GetModelPath();
+            var rules = from rule in modelType.GetRulesForProperty(property, modelPath)
+                        where rule.Rule.IsEnabled(services.GetService) &&
+                              rule.Rule.EvaluationLocation.HasFlag(RuleEvaluationLocation.Client)
                         select rule;
 
-            var clientValidator = services.GetService<IDryvClientModelValidator>();
-            clientValidator.AddValidation(context, rules);
+            services.GetService<IDryvClientModelValidator>().AddValidation(context, rules);
         }
 
         protected override ValidationResult IsValid(object value, ValidationContext context)
@@ -36,10 +36,10 @@ namespace Dryv
             //                ?? context.ObjectType;
             var property = context.GetProperty();
             var modelType = context.ObjectType;
-            var errorMessage = (from rule in RulesFinder.GetRulesForProperty(modelType, property)
-                                where rule.IsEnabled(context.GetService) &&
-                                      rule.EvaluationLocation.HasFlag(RuleEvaluationLocation.Server)
-                                let result = rule.Validate(context.ObjectInstance, context.GetService)
+            var errorMessage = (from rule in modelType.GetRulesForProperty(property, null)
+                                where rule.Rule.IsEnabled(context.GetService) &&
+                                      rule.Rule.EvaluationLocation.HasFlag(RuleEvaluationLocation.Server)
+                                let result = rule.Rule.Validate(context.ObjectInstance, context.GetService)
                                 where result.IsError()
                                 select result.Message).FirstOrDefault();
 

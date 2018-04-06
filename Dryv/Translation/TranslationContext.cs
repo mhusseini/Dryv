@@ -6,11 +6,11 @@ namespace Dryv.Translation
 {
     public class TranslationContext
     {
-        public IndentingStringWriter Writer { get; set; }
-
-        public IList<Type> OptionsTypes { get; set; }
-
+        public Type ModelType { get; set; }
         public IList<LambdaExpression> OptionDelegates { get; set; }
-        public string ModelName { get; set; }
+        public IList<Type> OptionsTypes { get; set; }
+        public Expression PropertyExpression { get; set; }
+
+        public IndentingStringWriter Writer { get; set; }
     }
 }
