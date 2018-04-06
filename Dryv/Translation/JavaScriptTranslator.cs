@@ -313,7 +313,8 @@ namespace Dryv.Translation
             }
             else
             {
-                if (expression.Expression.ToString().Contains(context.PropertyExpression.ToString()))
+                if (context.PropertyExpression != null && 
+                    expression.Expression.ToString().Contains(context.PropertyExpression.ToString()))
                 {
                     var e = expression;
                     while (e.Expression is MemberExpression mex)
@@ -350,7 +351,7 @@ namespace Dryv.Translation
 
         public override void Visit(MethodCallExpression expression, TranslationContext context, bool negated = false)
         {
-            if (expression.Method.IsStatic && expression.Arguments?.Any() != true)
+            if (expression.Method.IsStatic && expression.Arguments.Any() != true)
             {
                 var value = expression.Method.Invoke(null, null);
                 context.Writer.Write(this.TranslateValue(value));

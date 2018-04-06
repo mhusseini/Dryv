@@ -1,4 +1,5 @@
 using System;
+using Dryv.Utils;
 using Escape.Ast;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -7,6 +8,17 @@ namespace Dryv.Tests
     [TestClass]
     public class StringTests : JavascriptTranslatorTestsBase
     {
+        [TestMethod]
+        public void InterpolationStrings()
+        {
+            var expression = Expression(m => $"{m.Text}");
+
+            var jsProgram = GetTranslatedAst(expression);
+            var binaryExpression = (dynamic)GetBodyExpression<BinaryExpression>(jsProgram);
+            Assert.AreEqual(BinaryOperator.Plus, binaryExpression.Operator);
+            Assert.AreEqual(nameof(TestModel.Text).ToCamelCase(), binaryExpression.Left.Right.Property.Name);
+        }
+
         [TestMethod]
         public void TranslateCompareTo()
         {
@@ -21,17 +33,6 @@ namespace Dryv.Tests
 
             var leftMethod = GetMethod(binaryExpression?.Left);
             Assert.AreEqual("localeCompare", leftMethod.Name);
-        }
-
-        [TestMethod]
-        public void InterpolationStrings()
-        {
-            var expression = Expression(m => $"{m.Text}");
-
-            var jsProgram = GetTranslatedAst(expression);
-            var binaryExpression = (dynamic)GetBodyExpression<BinaryExpression>(jsProgram);
-            Assert.AreEqual(BinaryOperator.Plus, binaryExpression.Operator);
-            Assert.AreEqual(nameof(TestModel.Text), binaryExpression.Left.Right.Property.Name);
         }
 
         [TestMethod]
@@ -111,7 +112,7 @@ namespace Dryv.Tests
             var logicalExpression = callExpression.Arguments[0];
 
             Assert.AreEqual(LogicalOperator.LogicalOr, logicalExpression.Operator);
-            Assert.AreEqual(nameof(TestModel.Text), logicalExpression.Left.Property.Name);
+            Assert.AreEqual(nameof(TestModel.Text).ToCamelCase(), logicalExpression.Left.Property.Name);
             Assert.AreEqual(string.Empty, logicalExpression.Right.Value);
         }
 

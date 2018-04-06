@@ -5,9 +5,9 @@ namespace Dryv
 {
     public class DryvRule
     {
-        public RuleEvaluationLocation EvaluationLocation { get; set; }
+        public RuleEvaluationLocation EvaluationLocation { get; internal set; }
         public string PropertyName { get; internal set; }
-        public LambdaExpression ValidationExpression { get; set; }
+        public LambdaExpression ValidationExpression { get; internal set; }
         internal Func<object[], bool> CompiledEnablingExpression { get; set; }
         internal Func<object, object[], DryvResult> CompiledValidationExpression { get; set; }
         internal LambdaExpression EnablingExpression { get; set; }

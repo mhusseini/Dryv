@@ -7,6 +7,8 @@ using Dryv.Translators;
 using Dryv.Utils;
 using Escape;
 using Escape.Ast;
+using Expression = Escape.Ast.Expression;
+using MemberExpression = Escape.Ast.MemberExpression;
 
 namespace Dryv.Tests
 {
@@ -41,8 +43,14 @@ namespace Dryv.Tests
 
         protected static string Translate(System.Linq.Expressions.Expression expression, object[] translators = null, object[] validationOptions = null)
         {
+            if (validationOptions == null)
+            {
+                validationOptions = new object[0];
+            }
+
+            var args = validationOptions.Union(new object[] { "" }).ToArray();
             var translator = CreateTranslator(translators);
-            var translation = translator.Translate(expression, (string)null).Factory(validationOptions);
+            var translation = translator.Translate(expression, (System.Linq.Expressions.MemberExpression)null).Factory(args);
             return translation;
         }
 
@@ -69,12 +77,10 @@ namespace Dryv.Tests
 
         protected abstract class TestModel
         {
-            public abstract string Text { get; set; }
             public bool BooleanValue { get; set; }
-
-            public IEnumerable<string> Items { get; set; }
-
             public IEnumerable<int> IntItems { get; set; }
+            public IEnumerable<string> Items { get; set; }
+            public abstract string Text { get; set; }
         }
     }
 }

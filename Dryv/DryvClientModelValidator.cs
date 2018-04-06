@@ -9,8 +9,8 @@ namespace Dryv
 {
     public class DryvClientModelValidator : IDryvClientModelValidator
     {
-        private const string DataValAttribute = "data-val";
-        private const string DataValDryAttribute = "data-val-dryv";
+        protected const string DataValAttribute = "data-val";
+        protected const string DataValDryAttribute = "data-val-dryv";
         private readonly IOptions<DryvOptions> options;
 
         public DryvClientModelValidator(IOptions<DryvOptions> options)
@@ -18,7 +18,9 @@ namespace Dryv
             this.options = options;
         }
 
-        public virtual void AddValidation(ClientModelValidationContext context, IEnumerable<(string Path, DryvRule Rule)> rules)
+        protected DryvOptions Options => this.options.Value;
+
+        public virtual void AddValidation(ClientModelValidationContext context, IEnumerable<DryvRuleNode> rules)
         {
             var modelType = context.ModelMetadata.ContainerType;
             var modelPath = context.GetModelPath();
@@ -29,11 +31,11 @@ namespace Dryv
             context.Attributes.Add(DataValDryAttribute, script);
         }
 
-        protected IEnumerable<string> TranslateRules(ClientModelValidationContext context, IEnumerable<(string Path, DryvRule Rule)> rules, string modelPath, Type modelType)
+        protected IEnumerable<string> TranslateRules(ClientModelValidationContext context, IEnumerable<DryvRuleNode> rules, string modelPath, Type modelType)
         {
             return rules.Translate(
                 context.ActionContext.HttpContext.RequestServices.GetService,
-                this.options.Value,
+                this.Options,
                 modelPath,
                 modelType);
         }

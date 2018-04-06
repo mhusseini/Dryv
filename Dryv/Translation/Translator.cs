@@ -24,8 +24,8 @@ namespace Dryv.Translation
                     OptionsTypes = optionTypes,
                     Writer = writer,
                     OptionDelegates = optionDelegates,
-                    ModelType = propertyExpression.Expression.GetExpressionType(),
-                    PropertyExpression = propertyExpression.Expression
+                    ModelType = propertyExpression?.Expression.GetExpressionType(),
+                    PropertyExpression = propertyExpression?.Expression
                 };
 
                 this.Translate(expression, context);

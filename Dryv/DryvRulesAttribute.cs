@@ -2,8 +2,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Dryv.Compilation;
+using Dryv.Mvc;
 using Dryv.Utils;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,13 +30,11 @@ namespace Dryv
 
         protected override ValidationResult IsValid(object value, ValidationContext context)
         {
-            var httpConextAccessor = context.GetService<IHttpContextAccessor>();
-            var httpContext = httpConextAccessor.HttpContext;
-            //var modelType = (context. as ViewContext)?.ViewData.Model?.GetType()
-            //                ?? context.ObjectType;
+            var rootModel = context.GetService<IModelProvider>().GetModel();
             var property = context.GetProperty();
             var modelType = context.ObjectType;
-            var errorMessage = (from rule in modelType.GetRulesForProperty(property, null)
+            var modelPath = context.Items.GetOrAdd(context.ObjectInstance, o => o.FindPathOn(rootModel));
+            var errorMessage = (from rule in modelType.GetRulesForProperty(property, modelPath)
                                 where rule.Rule.IsEnabled(context.GetService) &&
                                       rule.Rule.EvaluationLocation.HasFlag(RuleEvaluationLocation.Server)
                                 let result = rule.Rule.Validate(context.ObjectInstance, context.GetService)

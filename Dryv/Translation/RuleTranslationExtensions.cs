@@ -40,7 +40,7 @@ namespace Dryv.Translation
             return rule;
         }
 
-        public static IEnumerable<string> Translate(this IEnumerable<(string Path, DryvRule Rule)> rules, Func<Type, object> objectProvider, DryvOptions options, string modelPath, Type modelType)
+        public static IEnumerable<string> Translate(this IEnumerable<DryvRuleNode> rules, Func<Type, object> objectProvider, DryvOptions options, string modelPath, Type modelType)
         {
             var translator = objectProvider(typeof(ITranslator)) as ITranslator;
 
