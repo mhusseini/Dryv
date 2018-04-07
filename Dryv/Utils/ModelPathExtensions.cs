@@ -1,16 +1,12 @@
-﻿using System.Linq;
-using Dryv.Utils;
+﻿using System.Collections.Immutable;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
-namespace Dryv
+namespace Dryv.Utils
 {
     internal static class ModelPathExtensions
     {
-        public static string FindPathOn(this object model, object root)
-        {
-            return FindPathOn(model, root, null);
-        }
-
         public static string GetModelPath(this ClientModelValidationContext context)
         {
             context.Attributes.TryGetValue("name", out var modelName);
@@ -32,28 +28,57 @@ namespace Dryv
             return modelName;
         }
 
-        private static string FindPathOn(object model, object root, string path)
+        public static ModelTreeInfo GetTreeInfo(this object model, object root, ValidationContext context)
         {
-            if (path == null)
+            return context.Items.GetOrAdd(model, m => GetTreeInfo(m, root));
+        }
+
+        public static ModelTreeInfo GetTreeInfo(this object model, object root)
+        {
+            var x = GetTreeInfo(model, root, ImmutableList<object>.Empty.Add(root), ImmutableList<string>.Empty.Add(string.Empty));
+            if (x == null)
             {
-                path = string.Empty;
+                return null;
             }
 
+            var models = x.Value.Item1;
+            var paths = x.Value.Item2.Reverse();
+
+            return new ModelTreeInfo
+            {
+                ModelsByPath = paths
+                    .Select((p, i) => new { Key = p, Value = models[i] })
+                    .ToDictionary(i => i.Key, i => i.Value),
+                PathsByModel = models
+                    .Select((m, i) => new { Key = m, Value = paths[i] })
+                    .ToDictionary(i => i.Key, i => i.Value)
+            };
+        }
+
+        private static (ImmutableList<object>, ImmutableList<string>)? GetTreeInfo(object model, object root, ImmutableList<object> models, ImmutableList<string> paths)
+        {
             if (root == model)
             {
-                return path;
+                return (models, paths);
             }
 
+            var path = paths.Last();
             var pathPrefix = string.IsNullOrWhiteSpace(path) ? string.Empty : ".";
             var rootType = root.GetType();
 
             foreach (var property in rootType.GetProperties())
             {
-                var path2 = $"{path}{pathPrefix}{property.Name.ToCamelCase()}";
                 var child = property.GetValue(root);
+                if (child == null)
+                {
+                    continue;
+                }
+
+                var paths2 = paths.Add($"{path}{pathPrefix}{property.Name.ToCamelCase()}");
+                var models2 = models.Add(child);
                 if (child == model)
                 {
-                    return path2;
+                    return (models2, paths2);
                 }
 
                 if (!property.PropertyType.IsClass || property.PropertyType.Namespace == "System")
@@ -61,7 +86,7 @@ namespace Dryv
                     continue;
                 }
 
-                var childResult = FindPathOn(model, child, path2);
+                var childResult = GetTreeInfo(model, child, models2, paths2);
                 if (childResult != null)
                 {
                     return childResult;
@@ -70,11 +95,17 @@ namespace Dryv
 
             foreach (var property in rootType.GetFields())
             {
-                var path2 = $"{path}{pathPrefix}{property.Name.ToCamelCase()}";
                 var child = property.GetValue(root);
+                if (child == null)
+                {
+                    continue;
+                }
+
+                var paths2 = paths.Add($"{path}{pathPrefix}{property.Name.ToCamelCase()}");
+                var models2 = models.Add(child);
                 if (child == model)
                 {
-                    return path2;
+                    return (models2, paths2);
                 }
 
                 if (!property.FieldType.IsClass || property.FieldType.Namespace == "System")
@@ -82,7 +113,7 @@ namespace Dryv
                     continue;
                 }
 
-                var childResult = FindPathOn(model, child, path2);
+                var childResult = GetTreeInfo(model, child, models2, paths2);
                 if (childResult != null)
                 {
                     return childResult;

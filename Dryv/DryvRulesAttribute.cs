@@ -31,13 +31,15 @@ namespace Dryv
         protected override ValidationResult IsValid(object value, ValidationContext context)
         {
             var rootModel = context.GetService<IModelProvider>().GetModel();
+            var rootModelType = rootModel.GetType();
             var property = context.GetProperty();
-            var modelType = context.ObjectType;
-            var modelPath = context.Items.GetOrAdd(context.ObjectInstance, o => o.FindPathOn(rootModel));
-            var errorMessage = (from rule in modelType.GetRulesForProperty(property, modelPath)
-                                where rule.Rule.IsEnabled(context.GetService) &&
-                                      rule.Rule.EvaluationLocation.HasFlag(RuleEvaluationLocation.Server)
-                                let result = rule.Rule.Validate(context.ObjectInstance, context.GetService)
+            var treeInfo = context.ObjectInstance.GetTreeInfo(rootModel, context);
+            var modelPath = treeInfo.ModelsByPath.Keys.OrderBy(k => k.Length).Last();
+            var errorMessage = (from node in rootModelType.GetRulesForProperty(property, modelPath)
+                                where node.Rule.IsEnabled(context.GetService) &&
+                                      node.Rule.EvaluationLocation.HasFlag(RuleEvaluationLocation.Server)
+                                let model = treeInfo.FindModel(node.Rule.ModelName, context)
+                                let result = node.Rule.Validate(model, context.GetService)
                                 where result.IsError()
                                 select result.Message).FirstOrDefault();
 

@@ -1,4 +1,4 @@
-﻿namespace Dryv
+﻿namespace Dryv.Utils
 {
     internal static class ResultExtensions
     {

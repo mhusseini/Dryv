@@ -33,9 +33,13 @@
             Child = new Model6
             {
                 Name = "Welt",
-                Child = new Model6
+                //Child = new Model6
+                //{
+                //    Name = "Welt"
+                //},
+                Child2 = new Model7
                 {
-                    Name = "Welt"
+                    Name = "XYZ"
                 }
             }
         })
@@ -54,6 +58,7 @@
 
         function send(form, $parent) {
             var $form = $(form);
+            var id = form.id;
             var language = $("#Locale", $form).val();
             var headers = undefined;
             if (language) {
@@ -67,7 +72,9 @@
                 data: $form.serialize(),
                 headers: headers,
                 success: function (response) {
-                    $parent.html(response);
+                    var dom = $(response);
+                    var newForm = $("#" + id, dom);
+                    $parent.html(newForm[0].outerHTML);
                     $("form", $parent).validate();
                 }
             });

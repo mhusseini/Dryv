@@ -6,6 +6,7 @@ namespace Dryv
     public class DryvRule
     {
         public RuleEvaluationLocation EvaluationLocation { get; internal set; }
+        public Type ModelType { get; internal set; }
         public string PropertyName { get; internal set; }
         public LambdaExpression ValidationExpression { get; internal set; }
         internal Func<object[], bool> CompiledEnablingExpression { get; set; }

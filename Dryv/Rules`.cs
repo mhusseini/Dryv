@@ -40,6 +40,8 @@ namespace Dryv
                 .Iterrate(e => e.Expression as MemberExpression)
                 .ToList();
 
+            var parameter = (ParameterExpression)members.Last().Expression;
+
             var modelName = string.Join(".", members
                 .Skip(1)
                 .Select(e => e.Member.Name.ToCamelCase())
@@ -51,6 +53,7 @@ namespace Dryv
                 PropertyExpression = memberExpression,
                 PropertyName = members.First().Member.Name,
                 ModelName = modelName,
+                ModelType = parameter.Type,
                 ValidationExpression = rule,
                 EnablingExpression = enabled,
                 EvaluationLocation = ruleLocation
