@@ -38,7 +38,7 @@ namespace Dryv
             var errorMessage = (from node in rootModelType.GetRulesForProperty(property, modelPath)
                                 where node.Rule.IsEnabled(context.GetService) &&
                                       node.Rule.EvaluationLocation.HasFlag(RuleEvaluationLocation.Server)
-                                let model = treeInfo.FindModel(node.Rule.ModelName, context)
+                                let model = treeInfo.FindModel(node.Rule.ModelPath, context)
                                 let result = node.Rule.Validate(model, context.GetService)
                                 where result.IsError()
                                 select result.Message).FirstOrDefault();

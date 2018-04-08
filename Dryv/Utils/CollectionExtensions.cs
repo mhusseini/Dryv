@@ -13,6 +13,17 @@ namespace Dryv.Utils
             }
         }
 
+        public static bool TryRemove<T>(this ICollection<T> list, T item)
+        {
+            if (!list.Contains(item))
+            {
+                return false;
+            }
+
+            list.Remove(item);
+            return true;
+        }
+
         public static IEnumerable<T> Iterrate<T>(this T item, Func<T, T> next)
         where T : class
         {

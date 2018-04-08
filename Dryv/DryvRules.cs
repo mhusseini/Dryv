@@ -11,9 +11,7 @@ namespace Dryv
         {
         }
 
-        internal List<Expression> ModelRules { get; } = new List<Expression>();
-
-        internal ConcurrentDictionary<PropertyInfo, List<DryvRule>> PropertyRules { get; } = new ConcurrentDictionary<PropertyInfo, List<DryvRule>>();
+        internal List<DryvRule> PropertyRules { get; } = new List<DryvRule>();
 
         public static Rules<TModel> For<TModel>() => new Rules<TModel>();
     }

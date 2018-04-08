@@ -13,17 +13,6 @@ namespace Dryv
         {
         }
 
-        internal Rules(Expression<Func<TModel, DryvResult>> rule)
-        {
-            this.ModelRules.Add(rule);
-        }
-
-        public Rules<TModel> Rule(Expression<Func<TModel, DryvResult>> rule)
-        {
-            this.ModelRules.Add(rule);
-            return this;
-        }
-
         private void Add<TProperty>(
             Expression<Func<TModel, TProperty>> property,
             LambdaExpression rule,
@@ -42,17 +31,16 @@ namespace Dryv
 
             var parameter = (ParameterExpression)members.Last().Expression;
 
-            var modelName = string.Join(".", members
+            var modelPath = string.Join(".", members
                 .Skip(1)
                 .Select(e => e.Member.Name.ToCamelCase())
                 .Reverse());
 
-            var expressions = this.PropertyRules.GetOrAdd(propertyInfo, _ => new List<DryvRule>());
-            expressions.Add(new DryvRule
+            this.PropertyRules.Add(new DryvRule
             {
                 PropertyExpression = memberExpression,
-                PropertyName = members.First().Member.Name,
-                ModelName = modelName,
+                Property = propertyInfo,
+                ModelPath = modelPath,
                 ModelType = parameter.Type,
                 ValidationExpression = rule,
                 EnablingExpression = enabled,

@@ -17,7 +17,7 @@ namespace Dryv
 
         private static readonly ConcurrentDictionary<string, IList<DryvRuleNode>> PropertyRules = new ConcurrentDictionary<string, IList<DryvRuleNode>>();
 
-        private static readonly ConcurrentDictionary<Type, IList<DryvRules>> TypeRules = new ConcurrentDictionary<Type, IList<DryvRules>>();
+        private static readonly ConcurrentDictionary<Type, IList<DryvRule>> TypeRules = new ConcurrentDictionary<Type, IList<DryvRule>>();
 
         public static IEnumerable<DryvRuleNode> GetRulesForProperty(this Type modelType, PropertyInfo property, string modelPath = "")
         {
@@ -27,7 +27,7 @@ namespace Dryv
                     _ => GetInheritedRules(modelType, property, modelPath).ToList());
         }
 
-        public static IEnumerable<DryvRules> GetRulesOnType(this Type objectType) => TypeRules.GetOrAdd(objectType, type =>
+        public static IEnumerable<DryvRule> GetRulesOnType(this Type objectType) => TypeRules.GetOrAdd(objectType, type =>
         {
             var fromFields = from p in type.GetFields(MemberBindingFlags)
                              where typeof(DryvRules).IsAssignableFrom(p.FieldType)
@@ -44,45 +44,58 @@ namespace Dryv
                                     && !m.ContainsGenericParameters
                               select m.Invoke(null, null) as DryvRules;
 
-            return fromFields.Union(fromProperties).Union(fromMethods).ToList();
+            return (from rules in fromFields.Union(fromProperties).Union(fromMethods)
+                    from rule in rules.PropertyRules
+                    select rule).ToList();
         });
 
         internal static IEnumerable<DryvRuleNode> FindRulesForProperty(this Type type, PropertyInfo property, string modelPath)
         {
-            var result = (from tuple in type.FindRulesForProperty(property, new Dictionary<DryvRule, IList<string>>(), new HashSet<Type>(), null, modelPath)
-                          select new DryvRuleNode
-                          {
-                              Path = string.Join(".", tuple.Path.Split(".").Reverse().Skip(1).Reverse()),
-                              Rule = tuple.Rule
-                          }
-                )
-                .ToList();
-
-            return result;
+            var tuples = type.FindRulesForProperty(
+                property,
+                new Dictionary<DryvRule, IList<string>>(),
+                new HashSet<Type>(),
+                null,
+                modelPath,
+                new ConcurrentDictionary<Type, List<DryvRule>>());
+            return (from tuple in tuples
+                    select new DryvRuleNode
+                    {
+                        Path = string.Join(".", tuple.Path.Split(".").Reverse().Skip(1).Reverse()),
+                        Rule = tuple.Rule
+                    }).ToList();
         }
 
-        private static IEnumerable<DryvRuleNode> FindRulesForProperty(this Type type, PropertyInfo property, Dictionary<DryvRule, IList<string>> propertiesToFind, ISet<Type> processed, string path, string modelPath)
+        private static IEnumerable<DryvRuleNode> FindRulesForProperty(this Type type, PropertyInfo property, IDictionary<DryvRule, IList<string>> propertiesToFind, ISet<Type> processed, string path, string modelPath, ConcurrentDictionary<Type, List<DryvRule>> deferredRules)
         {
             var pathPrefix = path == null ? string.Empty : $"{path}.";
             const BindingFlags bindingFlags = BindingFlags.FlattenHierarchy | BindingFlags.Instance |
                                               BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
             processed.Add(type);
 
-            foreach (var rule in from ruleSet in type.GetRulesOnType()
-                                 from kvp in ruleSet.PropertyRules
-                                 where kvp.Key == property
-                                 from rule in kvp.Value
+            var deferredRulesForType = deferredRules.GetOrAdd(type, _ => new List<DryvRule>());
+
+            foreach (var rule in from rule in deferredRulesForType.Union(type.GetRulesOnType())
+                                 where rule.Property == property
                                  select rule)
             {
-                var l = rule.ModelName.Split(".")
+                var l = rule.ModelPath.Split(".")
                     .Where(s => !string.IsNullOrWhiteSpace(s))
                     .ToList();
-                l.Add(rule.PropertyName.ToCamelCase());
-                propertiesToFind[rule] = l;
+
+                var targetType = rule.ValidationExpression.Parameters.First().Type;
+                if (!l.Any() && targetType != type)
+                {
+                    deferredRules.GetOrAdd(targetType, _ => new List<DryvRule>()).Add(rule);
+                }
+                else
+                {
+                    l.Add(rule.Property.Name.ToCamelCase());
+                    propertiesToFind[rule] = l;
+                }
             }
 
             foreach (var childProperty in from prop in type.GetProperties(bindingFlags)
-                                          where prop.PropertyType.IsClass
                                           select prop)
             {
                 var childPropertyName = childProperty.Name.ToCamelCase();
@@ -113,8 +126,9 @@ namespace Dryv
                         i => i.Key,
                         i => i.Value);
 
-                if (propertyPath.StartsWith(modelPath) && propertyPath != modelPath &&
-                    processed.Contains(childProperty.PropertyType) && !propertiesToFind2.Any())
+                if (!childProperty.PropertyType.IsClass || childProperty.PropertyType.Namespace == "System" ||
+                    (propertyPath.StartsWith(modelPath) && propertyPath != modelPath &&
+                    processed.Contains(childProperty.PropertyType) && !propertiesToFind2.Any()))
                 {
                     continue;
                 }
@@ -124,7 +138,13 @@ namespace Dryv
                     ? childProperty.PropertyType.GetGenericArguments().First()
                     : childProperty.PropertyType;
 
-                foreach (var p2 in childType.FindRulesForProperty(property, propertiesToFind2, processed, propertyPath, modelPath))
+                foreach (var p2 in childType.FindRulesForProperty(
+                    property,
+                    propertiesToFind2,
+                    processed,
+                    propertyPath,
+                    modelPath,
+                    deferredRules))
                 {
                     yield return p2;
                 }

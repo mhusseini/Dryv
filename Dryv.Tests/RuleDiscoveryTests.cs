@@ -76,6 +76,16 @@ namespace Dryv.Tests
             Assert.IsTrue(rules.Any());
         }
 
+        [TestMethod]
+        public void FindeRuleOnParentNode()
+        {
+            var property = typeof(Model9).GetProperty(nameof(Model9.Text));
+            var rules = typeof(Model8).GetRulesForProperty(property);
+
+            Assert.IsNotNull(rules);
+            Assert.IsTrue(rules.Any());
+        }
+
         private abstract class CommonRules
         {
             public static readonly DryvRules Text = DryvRules
@@ -165,6 +175,23 @@ namespace Dryv.Tests
         private abstract class ModelBase
         {
             public virtual string Text { get; set; }
+        }
+
+        private class Model8
+        {
+            public static DryvRules Rules = DryvRules
+                .For<Model9>()
+                .Rule(m => m.Text,
+                    m => string.IsNullOrWhiteSpace(m.Text)
+                        ? "error"
+                        : null);
+
+            public Model9 Child { get; set; }
+        }
+
+        private class Model9
+        {
+            public string Text { get; set; }
         }
     }
 }

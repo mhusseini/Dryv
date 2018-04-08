@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Dryv
 {
@@ -7,12 +8,12 @@ namespace Dryv
     {
         public RuleEvaluationLocation EvaluationLocation { get; internal set; }
         public Type ModelType { get; internal set; }
-        public string PropertyName { get; internal set; }
+        public PropertyInfo Property { get; internal set; }
         public LambdaExpression ValidationExpression { get; internal set; }
         internal Func<object[], bool> CompiledEnablingExpression { get; set; }
         internal Func<object, object[], DryvResult> CompiledValidationExpression { get; set; }
         internal LambdaExpression EnablingExpression { get; set; }
-        internal string ModelName { get; set; }
+        internal string ModelPath { get; set; }
         internal Type[] PreevaluationOptionTypes { get; set; }
         internal MemberExpression PropertyExpression { get; set; }
         internal Func<object[], string> TranslatedValidationExpression { get; set; }
