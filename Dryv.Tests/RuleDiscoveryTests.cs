@@ -12,7 +12,7 @@ namespace Dryv.Tests
         }
 
         [TestMethod]
-        public void FinderulesForBaseClass()
+        public void FindRulesForBaseClass()
         {
             var model = new Model4();
             var property = model.GetType().GetProperty(nameof(model.Text));

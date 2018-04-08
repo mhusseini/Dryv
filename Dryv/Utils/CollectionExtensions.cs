@@ -13,6 +13,16 @@ namespace Dryv.Utils
             }
         }
 
+        public static IEnumerable<T> Iterrate<T>(this T item, Func<T, T> next)
+        where T : class
+        {
+            do
+            {
+                yield return item;
+                item = next(item);
+            } while (item != null);
+        }
+
         public static bool TryRemove<T>(this ICollection<T> list, T item)
         {
             if (!list.Contains(item))
@@ -22,16 +32,6 @@ namespace Dryv.Utils
 
             list.Remove(item);
             return true;
-        }
-
-        public static IEnumerable<T> Iterrate<T>(this T item, Func<T, T> next)
-        where T : class
-        {
-            do
-            {
-                yield return item;
-                item = next(item);
-            } while (item != null);
         }
     }
 }
