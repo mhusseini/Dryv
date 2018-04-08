@@ -21,7 +21,13 @@ namespace Dryv.Demo
                 .UseDryv()
                 .UseMvc(routes =>
                 {
-                    routes.MapRoute(
+                    routes
+                        .MapRoute(
+                            name: "Examples",
+                            template: "Examples/{controller}/{action?}",
+                            defaults: new { area = "Examples", action = nameof(HomeController.Index) }
+                        )
+                        .MapRoute(
                         name: string.Empty,
                         template: "{controller}/{action?}",
                         defaults: new { controller = "Home", action = nameof(HomeController.Index) });
