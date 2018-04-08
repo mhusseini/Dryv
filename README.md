@@ -1,4 +1,4 @@
-# <img src="logo_slogan.svg" title="Dryv - DRY Validation for ASP.NET Core" width="300">
+<img src="logo_slogan.svg" title="Dryv - DRY Validation for ASP.NET Core" width="300">
 
 [![NuGet version](https://badge.fury.io/nu/dryv.svg)](https://badge.fury.io/nu/dryv)
 
