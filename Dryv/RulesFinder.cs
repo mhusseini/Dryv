@@ -41,6 +41,7 @@ namespace Dryv
                               where m.IsStatic
                                     && !m.GetParameters().Any()
                                     && typeof(DryvRules).IsAssignableFrom(m.ReturnType)
+                                    && !m.ContainsGenericParameters
                               select m.Invoke(null, null) as DryvRules;
 
             return fromFields.Union(fromProperties).Union(fromMethods).ToList();
