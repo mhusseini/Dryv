@@ -9,40 +9,33 @@
             Examples
         </h1>
     </div>
-    @*<div class="section-block">
-            <markdown file="example1.md"></markdown>
-            @Html.Partial("example1.partial", new Model1())
-        </div>
-        <div class="section-block">
-            <markdown file="example2.md"></markdown>
-            @Html.Partial("example2.partial", new Model2())
-        </div>
-        <div class="section-block">
-            <markdown file="example3.md"></markdown>
-            @Html.Partial("example3.partial", new Model3())
-        </div>
-        <div class="section-block">
-            <markdown file="example4.md"></markdown>
-            @Html.Partial("example4.partial", new Model4())
-        </div>*@
     <div class="section-block">
-        @*<markdown file="example5.md"></markdown>*@
+        <markdown file="example1.md"></markdown>
+        @Html.Partial("example1.partial", new Model1())
+    </div>
+    <div class="section-block">
+        <markdown file="example2.md"></markdown>
+        @Html.Partial("example2.partial", new Model2())
+    </div>
+    <div class="section-block">
+        <markdown file="example3.md"></markdown>
+        @Html.Partial("example3.partial", new Model3())
+    </div>
+    <div class="section-block">
+        <markdown file="example4.md"></markdown>
+        @Html.Partial("example4.partial", new Model4())
+    </div>
+    <div class="section-block">
+        <markdown file="example5.md"></markdown>
         @Html.Partial("example5.partial", new Model5
-        {
-            Name = "Hallo",
-            Child = new Model6
-            {
-                Name = "Welt",
-                //Child = new Model6
-                //{
-                //    Name = "Welt"
-                //},
-                Child2 = new Model7
-                {
-                    Name = "XYZ"
-                }
-            }
-        })
+   {
+       Name = "Hello",
+       Child = new Model6
+       {
+           Name = "World",
+           Child = new Model7()
+       }
+   })
     </div>
 </section>
 

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 
 namespace Dryv.Demo.Models
 {
@@ -10,7 +11,7 @@ namespace Dryv.Demo.Models
                 m => !string.IsNullOrWhiteSpace(m.Name) &&
                      !string.IsNullOrWhiteSpace(m.Child.Name) &&
                      m.Name != m.Child.Name
-                    ? $"Name must be {m.Name}"
+                    ? $"{nameof(Model6.Name)} of {nameof(Model6)} must be {m.Name}"
                     : null);
 
         [DryvRules]
