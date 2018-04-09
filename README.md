@@ -1,6 +1,6 @@
-<img src="logo_slogan.svg" title="Dryv - DRY Validation for ASP.NET Core" width="300">
+<a href="https://dryv-lib.net" target="_new" title="Got to project website"><img src="logo_slogan.svg" title="Dryv - DRY Validation for ASP.NET Core" width="300"></a>
 
-[![NuGet version](https://badge.fury.io/nu/dryv.svg)](https://badge.fury.io/nu/dryv)
+[![NuGet version](https://badge.fury.io/nu/dryv.svg)](https://badge.fury.io/nu/dryv) [![npm version](https://badge.fury.io/js/dryv-jquery-unobtrusive.svg)](https://badge.fury.io/js/dryv-jquery-unobtrusive)
 
 **Complex model validation for server and client made easy.**
 
