@@ -19,12 +19,16 @@ namespace Dryv.Translators
 
         private static void Error(MethodTranslationContext context)
         {
-            context.Writer.Write($"{{ type:'error', message:'{context.Expression.Arguments.First()}' }}");
+            context.Writer.Write("{ type:'error', message:");
+            context.Translator.Visit(context.Expression.Arguments.First(), context);
+            context.Writer.Write(" }");
         }
 
         private static void Warning(MethodTranslationContext context)
         {
-            context.Writer.Write($"{{ type:'warning', message:'{context.Expression.Arguments.First()}' }}");
+            context.Writer.Write("{ type:'error', warning:");
+            context.Translator.Visit(context.Expression.Arguments.First(), context);
+            context.Writer.Write(" }");
         }
 
         private static void Success(MethodTranslationContext context)

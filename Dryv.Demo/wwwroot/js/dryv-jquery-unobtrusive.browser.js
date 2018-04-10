@@ -1,18 +1,24 @@
 (function () {
-    var regex = /(\w+)(\[(\d)\])?/;
     var createFormHandler = function (form) {
         var handler = function () { return form.data("dryv-object", null); };
         form.data("dryv-handler", handler)
             .on("invalid-form", handler);
     };
+    var convert = function (value, type) {
+        switch (type) {
+            case "number": return Number(value);
+            case "boolean": value.toLowerCase() === "true" || !!value;
+            default: return value;
+        }
+    };
     var updateField = function (element, obj) {
         var el = $(element);
-        var names = el.attr("name").split(".");
+        var names = el.attr("name").replace(/^\w|\.\w/g, function (m) { return m.toLowerCase(); }).split(".");
+        var type = el.attr("data-type-dryv");
         var max = names.length - 1;
         for (var i = 0; i < names.length; i++) {
             var name_1 = names[i];
-            var g = name_1.charAt(0).toLowerCase() + name_1.substr(1);
-            var m = regex.exec(g);
+            var m = /(\w+)(\[(\d)\])?/.exec(name_1);
             var field = m[1];
             var index = m[3];
             var parent_1 = obj;
@@ -36,10 +42,10 @@
                 if (!obj) {
                     obj = parent_1[field] = [];
                 }
-                obj[Number(index)] = el.val();
+                obj[Number(index)] = convert(el.val(), type);
             }
             else {
-                parent_1[field] = el.val();
+                parent_1[field] = convert(el.val(), type);
             }
         }
     };
@@ -53,8 +59,8 @@
     };
     var getObject = function (context) {
         var existing;
-        var obj = (existing = $(context.currentForm).data("dryv-object")) ||
-            createObject(context);
+        var obj = (existing = $(context.currentForm).data("dryv-object"))
+            || createObject(context);
         obj.isNew = !existing;
         return obj;
     };

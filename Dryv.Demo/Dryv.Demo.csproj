@@ -9,7 +9,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Areas\" />
     <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
@@ -38,6 +37,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Update="Areas\Examples\Views\Examples\example6.partial.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Update="wwwroot\plugins\prism\prism.js">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
@@ -57,6 +59,12 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>LocalizedStrings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Areas\Examples\Views\Examples\example6.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <Target Name="DownloadExternal" AfterTargets="PostBuildEvent">

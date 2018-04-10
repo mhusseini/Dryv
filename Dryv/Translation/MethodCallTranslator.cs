@@ -18,7 +18,7 @@ namespace Dryv.Translation
             ? "null"
             : (value.GetType().IsPrimitive
                 ? value.ToString()
-                : $@"""{value}""");
+                : $@"""{value.ToString().Trim('\"')}""");
 
         public static void WriteArguments(Translator translator, IEnumerable<Expression> arguments, TranslationContext context)
         {
