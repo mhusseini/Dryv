@@ -25,7 +25,7 @@ namespace Dryv
                               rule.Rule.EvaluationLocation.HasFlag(RuleEvaluationLocation.Client)
                         select rule;
 
-            services.GetService<IDryvClientModelValidator>().AddValidation(context, rules);
+            services.GetService<IDryvClientModelValidator>().AddValidation(context, property, rules);
         }
 
         protected override ValidationResult IsValid(object value, ValidationContext context)

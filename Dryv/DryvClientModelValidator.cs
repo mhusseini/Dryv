@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Reflection;
 using Dryv.Configuration;
 using Dryv.Translation;
 using Dryv.Utils;
@@ -10,6 +10,7 @@ namespace Dryv
 {
     public class DryvClientModelValidator : IDryvClientModelValidator
     {
+        protected const string DataTypeDryAttribute = "data-type-dryv";
         protected const string DataValAttribute = "data-val";
         protected const string DataValDryAttribute = "data-val-dryv";
         private readonly IOptions<DryvOptions> options;
@@ -21,24 +22,23 @@ namespace Dryv
 
         protected DryvOptions Options => this.options.Value;
 
-        public virtual void AddValidation(ClientModelValidationContext context, IEnumerable<DryvRuleNode> rules)
+        public virtual void AddValidation(ClientModelValidationContext context, PropertyInfo property, IEnumerable<DryvRuleNode> rules)
         {
-            var modelType = context.ModelMetadata.ContainerType;
-            var modelPath = context.GetModelPath();
-            var translatedRules = this.TranslateRules(context, rules, modelPath, modelType);
+            var translatedRules = this.TranslateRules(context, rules);
             var script = $@"[{string.Join(",", translatedRules)}]";
 
             context.Attributes.Add(DataValAttribute, "true");
             context.Attributes.Add(DataValDryAttribute, script);
+            context.Attributes.Add(DataTypeDryAttribute, property.PropertyType.GetJavaScriptType());
         }
 
-        protected IEnumerable<string> TranslateRules(ClientModelValidationContext context, IEnumerable<DryvRuleNode> rules, string modelPath, Type modelType)
+        protected IEnumerable<string> TranslateRules(ClientModelValidationContext context, IEnumerable<DryvRuleNode> rules)
         {
             return rules.Translate(
                 context.ActionContext.HttpContext.RequestServices.GetService,
                 this.Options,
-                modelPath,
-                modelType);
+                context.GetModelPath(),
+                context.ModelMetadata.ContainerType);
         }
     }
 }
