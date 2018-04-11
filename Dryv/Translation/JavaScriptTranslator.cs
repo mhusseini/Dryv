@@ -274,20 +274,27 @@ namespace Dryv.Translation
 
         public override void Visit(MemberExpression expression, TranslationContext context, bool negated = false)
         {
+            if (negated)
+            {
+                context.Writer.Write("!(");
+            }
+
+            this.WriteMember(expression, context);
+
+            if (negated)
+            {
+                context.Writer.Write(")");
+            }
+        }
+
+        private void WriteMember(MemberExpression expression, TranslationContext context)
+        {
             var parameter = GetParameter(expression);
             if (context.OptionsTypes.Contains(parameter?.Type))
             {
                 var func = Expression.Lambda(expression, parameter);
                 context.OptionDelegates.Add(func);
-                if (negated)
-                {
-                    context.Writer.Write("!(");
-                }
                 context.Writer.Write($"$${func.GetHashCode()}$$");
-                if (negated)
-                {
-                    context.Writer.Write(")");
-                }
                 return;
             }
 
@@ -301,19 +308,19 @@ namespace Dryv.Translation
                         {
                             var value = property.GetValue(instance);
                             context.Writer.Write(this.TranslateValue(value));
-                            return;
+                            break;
                         }
                     case FieldInfo field:
                         {
                             var value = field.GetValue(instance);
                             context.Writer.Write(this.TranslateValue(value));
-                            return;
+                            break;
                         }
                 }
             }
             else
             {
-                if (context.PropertyExpression != null && 
+                if (context.PropertyExpression != null &&
                     expression.Expression.ToString().Contains(context.PropertyExpression.ToString()))
                 {
                     var e = expression;
@@ -324,7 +331,6 @@ namespace Dryv.Translation
 
                     if (e.Expression is ParameterExpression parameterExpression)
                     {
-
                         this.Visit(parameterExpression, context);
                         context.Writer.Write("$$MODELPATH$$");
                     }
