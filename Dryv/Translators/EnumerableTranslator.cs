@@ -9,26 +9,26 @@ namespace Dryv.Translators
         {
             this.Supports(typeof(Enumerable));
 
-            this.AddMethodTranslator(nameof(Enumerable.Any), Any);
             this.AddMethodTranslator(nameof(Enumerable.All), All);
-            this.AddMethodTranslator(nameof(Enumerable.Sum), Sum);
-            this.AddMethodTranslator(nameof(Enumerable.Min), Min);
-            this.AddMethodTranslator(nameof(Enumerable.Max), Max);
+            this.AddMethodTranslator(nameof(Enumerable.Any), Any);
             this.AddMethodTranslator(nameof(Enumerable.Average), Average);
-            this.AddMethodTranslator(nameof(Enumerable.Select), Select);
-            this.AddMethodTranslator(nameof(Enumerable.Where), Where);
-            this.AddMethodTranslator(nameof(Enumerable.First), First);
-            this.AddMethodTranslator(nameof(Enumerable.Last), Last);
-            this.AddMethodTranslator(nameof(Enumerable.Single), Single);
-            this.AddMethodTranslator(nameof(Enumerable.SingleOrDefault), SingleOrDefault);
-            this.AddMethodTranslator(nameof(Enumerable.FirstOrDefault), FirstOrDefault);
-            this.AddMethodTranslator(nameof(Enumerable.LastOrDefault), LastOrDefault);
             this.AddMethodTranslator(nameof(Enumerable.Contains), Contains);
+            this.AddMethodTranslator(nameof(Enumerable.Count), Count);
+            this.AddMethodTranslator(nameof(Enumerable.DefaultIfEmpty), DefaultIfEmpty);
             this.AddMethodTranslator(nameof(Enumerable.ElementAt), ElementAt);
             this.AddMethodTranslator(nameof(Enumerable.ElementAtOrDefault), ElementAtOrDefault);
-            this.AddMethodTranslator(nameof(Enumerable.Count), Count);
+            this.AddMethodTranslator(nameof(Enumerable.First), First);
+            this.AddMethodTranslator(nameof(Enumerable.FirstOrDefault), FirstOrDefault);
+            this.AddMethodTranslator(nameof(Enumerable.Last), Last);
+            this.AddMethodTranslator(nameof(Enumerable.LastOrDefault), LastOrDefault);
             this.AddMethodTranslator(nameof(Enumerable.LongCount), Count);
-            this.AddMethodTranslator(nameof(Enumerable.DefaultIfEmpty), DefaultIfEmpty);
+            this.AddMethodTranslator(nameof(Enumerable.Max), Max);
+            this.AddMethodTranslator(nameof(Enumerable.Min), Min);
+            this.AddMethodTranslator(nameof(Enumerable.Select), Select);
+            this.AddMethodTranslator(nameof(Enumerable.Single), Single);
+            this.AddMethodTranslator(nameof(Enumerable.SingleOrDefault), SingleOrDefault);
+            this.AddMethodTranslator(nameof(Enumerable.Sum), Sum);
+            this.AddMethodTranslator(nameof(Enumerable.Where), Where);
         }
 
         protected static void All(MethodTranslationContext context)

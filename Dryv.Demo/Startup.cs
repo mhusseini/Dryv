@@ -1,9 +1,7 @@
 ﻿using Dryv.Demo.Controllers;
-using Dryv.Demo.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace Dryv.Demo
 {
@@ -36,11 +34,9 @@ namespace Dryv.Demo
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton(Options.Create(new Options3()));
-            services.AddSingleton(Options.Create(new Options2()));
-
             services.AddMvc();
             services.AddDryv();
+            services.AddExamples();
         }
     }
 }
