@@ -140,7 +140,24 @@ namespace Dryv.Translators
              √ public bool EndsWith(String value, StringComparison comparisonType);
              √ public bool EndsWith(char value);
              */
-            context.Translator.Visit(context.Expression.Object, context);
+            context.Writer.Write("(");
+            WriteIndexOf(context);
+
+            context.Writer.Write(context.Negated ? "< 0 || " : ">= 0 && ");
+
+            WriteIndexOf(context);
+
+            context.Writer.Write(context.Negated ? " !== (" : " === (");
+            context.Translator.VisitWithBrackets(context.Expression.Object, context);
+            context.Writer.Write(".length - ");
+            context.Translator.VisitWithBrackets(context.Expression.Arguments[0], context);
+            context.Writer.Write(".length)");
+            context.Writer.Write(")");
+        }
+
+        private static void WriteIndexOf(MethodTranslationContext context)
+        {
+            context.Translator.VisitWithBrackets(context.Expression.Object, context);
 
             var isCaseInsensitive = ArgumentIs(context, 1, true) || GetIsCaseInsensitive(context.Expression);
             if (isCaseInsensitive)
@@ -155,11 +172,7 @@ namespace Dryv.Translators
                 context.Writer.Write(".toLowerCase()");
             }
 
-            context.Writer.Write(context.Negated ? ") !== (" : ") === (");
-            context.Translator.VisitWithBrackets(context.Expression.Object, context);
-            context.Writer.Write(".length - ");
-            context.Translator.VisitWithBrackets(context.Expression.Arguments[0], context);
-            context.Writer.Write(".length)");
+            context.Writer.Write(")");
         }
 
         private static void Equals(MethodTranslationContext context)
