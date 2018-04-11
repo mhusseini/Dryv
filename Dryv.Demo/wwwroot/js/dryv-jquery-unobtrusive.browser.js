@@ -1,9 +1,9 @@
 (function () {
-    var createFormHandler = function (form) {
-        var handler = function () { return form.data("dryv-object", null); };
-        form.data("dryv-handler", handler)
-            .on("invalid-form", handler);
-    };
+    // const createFormHandler = (form: any) => {
+    //     const handler = () => form.data("dryv-object", null);
+    //     form.data("dryv-handler", handler)
+    //         .on("invalid-form", handler);
+    // };
     var convert = function (value, type) {
         switch (type) {
             case "number": return Number(value);
@@ -11,10 +11,19 @@
             default: return value;
         }
     };
+    var getValue = function ($el) {
+        var type = $el.attr("type").toLowerCase();
+        switch (type) {
+            case "checkbox":
+            case "radio":
+                return $el[0]["checked"];
+            default:
+                return convert($el.val(), $el.attr("data-type-dryv"));
+        }
+    };
     var updateField = function (element, obj) {
         var el = $(element);
         var names = el.attr("name").replace(/^\w|\.\w/g, function (m) { return m.toLowerCase(); }).split(".");
-        var type = el.attr("data-type-dryv");
         var max = names.length - 1;
         for (var i = 0; i < names.length; i++) {
             var name_1 = names[i];
@@ -42,30 +51,28 @@
                 if (!obj) {
                     obj = parent_1[field] = [];
                 }
-                obj[Number(index)] = convert(el.val(), type);
+                obj[Number(index)] = getValue(el);
             }
             else {
-                parent_1[field] = convert(el.val(), type);
+                parent_1[field] = getValue(el);
             }
         }
     };
-    var createObject = function (context) {
-        var form = $(context.currentForm);
-        form.data("dryv-handler") || createFormHandler(form);
+    var createObject = function ($form) {
         var obj = {};
-        $("input, select, textarea", form).each(function (_, element) { return updateField(element, obj); });
-        form.data("dryv-object", obj);
+        $("input, select, textarea", $form).each(function (_, element) { return updateField(element, obj); });
+        $form.data("dryv-object", obj);
         return obj;
     };
-    var getObject = function (context) {
+    var getObject = function ($form) {
         var existing;
-        var obj = (existing = $(context.currentForm).data("dryv-object"))
-            || createObject(context);
+        var obj = (existing = $form.data("dryv-object"))
+            || createObject($form);
         obj.isNew = !existing;
         return obj;
     };
     $.validator.addMethod("dryv", function (_, element, functions) {
-        var obj = getObject(this);
+        var obj = getObject($(this.currentForm));
         if (!obj.isNew) {
             updateField(element, obj);
         }
@@ -82,6 +89,19 @@
         return true;
     });
     $.validator.unobtrusive.adapters.add("dryv", function (options) {
+        var form = options.form;
+        var $form = $(form);
+        if (!$form.data("dryv-init")) {
+            $form.data("dryv-init", true);
+            $form.bind("submit", function () { $(this).data("dryv-object", null); });
+            $("input:not([data-val-dryv]), textarea:not([data-val-dryv])")
+                .each(function (i, el) {
+                    $(el).change(function () {
+                        var obj = getObject($form);
+                        updateField(this, obj);
+                    });
+                });
+        }
         try {
             options.rules["dryv"] = eval(options.message);
         }
