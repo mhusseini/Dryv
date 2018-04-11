@@ -38,7 +38,7 @@
 
   <ItemGroup>
     <Content Update="Areas\Examples\Views\Examples\example6.partial.cshtml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Content>
     <Content Update="wwwroot\plugins\prism\prism.js">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
