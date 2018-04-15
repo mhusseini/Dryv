@@ -19,5 +19,12 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Runtime" Version="2.0.1" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Content Include="tools\**\*">
+      <Pack>true</Pack>
+      <PackagePath>tools\</PackagePath>
+    </Content>
+  </ItemGroup>
 
 </Project>
