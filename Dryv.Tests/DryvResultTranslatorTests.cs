@@ -24,7 +24,7 @@ namespace Dryv.Tests
             Assert.AreEqual("error", first.Value);
 
             var second = (dynamic)properties.Last().Value;
-            Assert.AreEqual("\"fail\"", second.Value);
+            Assert.AreEqual("fail", second.Value);
         }
 
         [TestMethod]

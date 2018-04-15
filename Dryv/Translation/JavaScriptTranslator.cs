@@ -345,9 +345,9 @@ namespace Dryv.Translation
                 }
 
                 context.Writer.Write(".");
-            }
 
-            context.Writer.Write(this.FormatIdentifier(expression.Member.Name.ToCamelCase()));
+                context.Writer.Write(this.FormatIdentifier(expression.Member.Name.ToCamelCase()));
+            }
         }
 
         public override void Visit(MemberInitExpression expression, TranslationContext context, bool negated = false)
