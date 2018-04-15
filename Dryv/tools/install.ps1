@@ -1,0 +1,1 @@
+﻿$DTE.ItemOperations.Navigate("https://dryv-lib.net/Home/ThankYou")
