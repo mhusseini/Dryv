@@ -2,14 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <Version>1.0.0-preview.6</Version>
+    <Version>1.0.0</Version>
     <Copyright>2018 Munir Husseini</Copyright>
     <PackageProjectUrl>https://dryv-lib.net</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/mhusseini/Dryv/blob/master/LICENSE</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/mhusseini/Dryv.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>asp-net-core, asp-net-core-mvc, model-validation</PackageTags>
-    <Description>Server- and client-based model validation for ASP.NET Core 2.0 with rules written once in C#.</Description>
+    <Description>Complex model validation for server and client made easy. Write complex model validation rules in C# once. Dryv will generate JavaScript for client-side validation.</Description>
     <Authors>Munir husseini</Authors>
     <Company>Munir husseini</Company>
     <PackageIconUrl>https://github.com/mhusseini/Dryv/raw/master/logo.png</PackageIconUrl>
