@@ -1,6 +1,8 @@
 using System;
 using Dryv.Utils;
 using Escape.Ast;
+using Jurassic;
+using Jurassic.Library;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Dryv.Tests
@@ -39,19 +41,34 @@ namespace Dryv.Tests
         public void TranslateEndsWithWithIgnoreCase()
         {
             var expression = Expression(m =>
-                m.Text.EndsWith("Oscorp", StringComparison.OrdinalIgnoreCase)
+                m.Text.EndsWith("xy", StringComparison.OrdinalIgnoreCase)
                     ? "fail"
                     : DryvResult.Success);
 
-            var jsProgram = GetTranslatedAst(expression);
-            var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);
-            var binaryExpression = conditional.Test as BinaryExpression;
+            var translation = Translate(expression);
+            var model = @"{text:'zzzzzzzXY'}";
+            var engine = new Jurassic.ScriptEngine();
+            var script = $"({translation})({model})";
+            var result = engine.Evaluate(script) as string;
 
-            var leftMethod = GetMethod(binaryExpression?.Left);
-            var leftMethod2 = GetMethod(leftMethod.Object);
+            Assert.AreEqual("fail", result);
+        }
 
-            Assert.AreEqual("indexOf", leftMethod.Name);
-            Assert.AreEqual("toLowerCase", leftMethod2.Name);
+        [TestMethod]
+        public void TranslateNotEndsWith()
+        {
+            var expression = Expression(m =>
+                m.Text.EndsWith("xy")
+                    ? "fail"
+                    : DryvResult.Success);
+
+            var translation = Translate(expression);
+            var model = @"{text:'ab'}";
+            var engine = new Jurassic.ScriptEngine();
+            var script = $"({translation})({model})";
+            var result = engine.Evaluate(script);
+
+            Assert.AreEqual(Null.Value, result);
         }
 
         [TestMethod]
