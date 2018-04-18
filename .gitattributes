@@ -1,3 +1,5 @@
+* text=auto
+*.cs     diff=csharp
 Dryv.Demo/wwwroot/* linguist-vendored
 Dryv.Demo/Resources/* linguist-vendored
 Dryv/tools/* linguist-vendored
