@@ -20,13 +20,13 @@ namespace Dryv.Translation
                 ? value.ToString()
                 : $@"""{value.ToString().Trim('\"')}""");
 
-        public static void WriteArguments(Translator translator, IEnumerable<Expression> arguments, TranslationContext context)
+        public static void WriteArguments(ITranslator translator, IEnumerable<Expression> arguments, TranslationContext context)
         {
             var sep = string.Empty;
             foreach (var argument in arguments)
             {
                 context.Writer.Write(sep);
-                translator.Visit(argument, context);
+                translator.Translate(argument, context);
                 sep = ", ";
             }
         }

@@ -21,17 +21,12 @@ namespace Dryv.Translation
             return this.translationCompiler.GenerateTranslationDelegate(code, optionDelegates, optionTypes);
         }
 
-        public virtual void Translate(Expression expression, TranslationContext context)
+        public virtual string TranslateValue(object value)
         {
-            this.Visit(expression, context);
+            return value?.ToString();
         }
 
-        public virtual object TranslateValue(object value)
-        {
-            return value;
-        }
-
-        public virtual void Visit(Expression expression, TranslationContext context, bool negated = false)
+        public virtual void Translate(Expression expression, TranslationContext context, bool negated = false)
         {
         }
 
@@ -43,7 +38,7 @@ namespace Dryv.Translation
         {
             foreach (dynamic child in expression.Expressions)
             {
-                this.Visit(child, context);
+                this.Translate(child, context);
             }
         }
 
@@ -140,10 +135,6 @@ namespace Dryv.Translation
         }
 
         public virtual void Visit(UnaryExpression expression, TranslationContext context, bool negated = false)
-        {
-        }
-
-        public virtual void VisitWithBrackets(Expression expression, TranslationContext context)
         {
         }
 

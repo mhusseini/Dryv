@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace Dryv
 {
-    public class DryvRule
+    public sealed class DryvRuleDefinition
     {
         public RuleEvaluationLocation EvaluationLocation { get; internal set; }
         public Type ModelType { get; internal set; }

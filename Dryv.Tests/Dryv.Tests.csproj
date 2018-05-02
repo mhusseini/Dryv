@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Dryv.AspNetCore\Dryv.AspNetCore.csproj" />
     <ProjectReference Include="..\Dryv\Dryv.csproj" />
   </ItemGroup>
 

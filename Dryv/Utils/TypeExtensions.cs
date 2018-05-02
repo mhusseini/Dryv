@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace Dryv.Utils
 {
-    public static class TypeExtensions
+    internal static class TypeExtensions
     {
         public static string GetJavaScriptType(this Type type)
         {

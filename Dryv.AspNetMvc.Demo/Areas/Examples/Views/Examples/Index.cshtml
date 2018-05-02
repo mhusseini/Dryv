@@ -1,0 +1,102 @@
+﻿@using System.Web.Mvc.Html
+@using DryvDemo.Areas.Examples.Models
+@{
+    Layout = "~/views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Examples";
+}
+<section class="doc-section">
+    <div class="section-block">
+        <h1 class="doc-title" id="Examples">
+            Examples
+        </h1>
+    </div>
+    <div class="section-block">
+        <cache>
+            <markdown file="example1.md"></markdown>
+        </cache>
+        @Html.Partial("example1.partial", new Model1())
+    </div>
+    <div class="section-block">
+        <cache>
+            <markdown file="example2.md"></markdown>
+        </cache>
+        @Html.Partial("example2.partial", new Model2())
+    </div>
+    <div class="section-block">
+        <cache>
+            <markdown file="example3.md"></markdown>
+        </cache>
+        @Html.Partial("example3.partial", new Model3())
+    </div>
+    <div class="section-block">
+        <cache>
+            <markdown file="example4.md"></markdown>
+        </cache>
+        @Html.Partial("example4.partial", new Model4())
+    </div>
+    <div class="section-block">
+        <cache>
+            <markdown file="example5.md"></markdown>
+        </cache>
+        @Html.Partial("example5.partial", new Model5
+        {
+            Name = "Hello",
+            Child = new Model6
+            {
+                Name = "World",
+                Child = new Model7()
+            }
+        })
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        function send(form, $parent) {
+            var $form = $(form);
+            var id = form.id;
+            var language = $("#Locale", $form).val();
+            var headers = undefined;
+            if (language) {
+                headers = {
+                    "Accept-Language": language
+                };
+            }
+            $.ajax({
+                url: form.action,
+                type: form.method,
+                data: $form.serialize(),
+                headers: headers,
+                success: function (response) {
+                    $form.removeData("validator").removeData("unobtrusiveValidation");
+                    var dom = $(response);
+                    var newForm = $("#" + id, dom);
+                    $parent.html(newForm[0].outerHTML);
+                    $.validator.unobtrusive.parse("form");
+                }
+            });
+        }
+
+        function sendForm(form) {
+            if (form.tagName !== "FORM") {
+                form = $(form).parent("form")[0];
+            } else {
+                var isValid = $(form).validate().checkForm();
+                if (!isValid) {
+                    return false;
+                }
+            }
+            var $parent = $(form.parentElement);
+            send(form, $parent);
+
+            return false;
+        }
+
+        function updateOptions(form, selector) {
+            var $parent = $(selector).parent();
+            send(form, $parent);
+
+            return false;
+        }
+    </script>
+}

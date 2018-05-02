@@ -1,5 +1,4 @@
-﻿using Dryv.DependencyInjection;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,7 +8,7 @@ using Dryv.Utils;
 
 namespace Dryv.Translation
 {
-    internal class JavaScriptTranslator : Translator
+    public class JavaScriptTranslator : Translator
     {
         private static readonly Dictionary<ExpressionType, string> Terminals = new Dictionary<ExpressionType, string>
         {
@@ -109,7 +108,7 @@ namespace Dryv.Translation
 
         public bool UseLowercaseMembers { get; set; }
 
-        public override object TranslateValue(object value)
+        public override string TranslateValue(object value)
         {
             switch (value)
             {
@@ -129,16 +128,16 @@ namespace Dryv.Translation
 
         public override void Visit(BinaryExpression expression, TranslationContext context, bool negated = false)
         {
-            this.VisitWithBrackets(expression.Left, context);
+            this.Translate(expression.Left, context);
 
             if (!TryWriteTerminal(expression, context.Writer))
             {
                 throw expression.Method != null
-                    ? (Exception)new MethodCallNotAllowedException(expression)
-                    : new ExpressionTypeNotSupportedException(expression);
+                    ? (Exception)new MethodNotSupportedException(expression)
+                    : new ExpressionNotSupportedException(expression);
             }
 
-            this.VisitWithBrackets(expression.Right, context);
+            this.Translate(expression.Right, context);
         }
 
         public override void Visit(BlockExpression expression, TranslationContext context, bool negated = false)
@@ -153,12 +152,12 @@ namespace Dryv.Translation
 
         public override void Visit(ConditionalExpression expression, TranslationContext context, bool negated = false)
         {
-            this.VisitWithBrackets(expression.Test, context);
+            this.Translate(expression.Test, context);
             context.Writer.IncrementIndent();
             context.Writer.Write(" ? ");
-            this.VisitWithBrackets(expression.IfTrue, context);
+            this.Translate(expression.IfTrue, context);
             context.Writer.Write(" : ");
-            this.VisitWithBrackets(expression.IfFalse, context);
+            this.Translate(expression.IfFalse, context);
             context.Writer.DecrementIndent();
         }
 
@@ -199,14 +198,21 @@ namespace Dryv.Translation
                 throw new NotSupportedException("JavaScript does not support indexers with more than one argument.");
             }
 
-            this.Visit(expression.Object, context);
+            this.Translate(expression.Object, context);
             context.Writer.Write("[");
-            this.Visit(expression.Arguments.First(), context);
+            this.Translate(expression.Arguments.First(), context);
             context.Writer.Write("]");
         }
 
-        public override void Visit(Expression expression, TranslationContext context, bool negated = false)
+        public override void Translate(Expression expression, TranslationContext context, bool negated = false)
         {
+            var needsBrackets = GetNeedsBrackets(expression);
+
+            if (needsBrackets)
+            {
+                context.Writer.Write("(");
+            }
+
             var context2 = new CustomTranslationContext(context)
             {
                 Expression = expression,
@@ -218,6 +224,11 @@ namespace Dryv.Translation
             {
                 this.Visit((dynamic)expression, context2, negated);
             }
+
+            if (needsBrackets)
+            {
+                context.Writer.Write(") ");
+            }
         }
 
         public override void Visit(InvocationExpression expression, TranslationContext context, bool negated = false)
@@ -227,7 +238,7 @@ namespace Dryv.Translation
                 throw new ExpressionNotSupportedException(expression);
             }
 
-            this.VisitWithBrackets(expression.Expression, context);
+            this.Translate(expression.Expression, context);
             context.Writer.Write("(");
             MethodCallTranslator.WriteArguments(this, expression.Arguments, context);
             context.Writer.Write(")");
@@ -245,7 +256,7 @@ namespace Dryv.Translation
             context.Writer.WriteLine(") {");
             context.Writer.IncrementIndent();
             context.Writer.Write("return ");
-            this.Visit(expression.Body, context);
+            this.Translate(expression.Body, context);
             context.Writer.WriteLine(";");
             context.Writer.DecrementIndent();
             context.Writer.Write("}");
@@ -260,7 +271,7 @@ namespace Dryv.Translation
                 context.Writer.Write(sep);
                 foreach (var argument in initializer.Arguments)
                 {
-                    this.Visit(argument, context);
+                    this.Translate(argument, context);
                 }
                 sep = ", ";
             }
@@ -336,12 +347,12 @@ namespace Dryv.Translation
                     }
                     else
                     {
-                        this.Visit(expression.Expression, context);
+                        this.Translate(expression.Expression, context);
                     }
                 }
                 else
                 {
-                    this.Visit(expression.Expression, context);
+                    this.Translate(expression.Expression, context);
                 }
 
                 context.Writer.Write(".");
@@ -381,7 +392,7 @@ namespace Dryv.Translation
                 return;
             }
 
-            throw new MethodCallNotAllowedException(expression);
+            throw new MethodNotSupportedException(expression);
         }
 
         public override void Visit(NewArrayExpression expression, TranslationContext context, bool negated = false)
@@ -411,20 +422,20 @@ namespace Dryv.Translation
         public override void Visit(SwitchExpression expression, TranslationContext context, bool negated = false)
         {
             context.Writer.Write("switch(");
-            this.Visit(expression.SwitchValue, context);
+            this.Translate(expression.SwitchValue, context);
             context.Writer.WriteLine("){");
             foreach (var expressionCase in expression.Cases)
             {
                 foreach (var testCase in expressionCase.TestValues)
                 {
                     context.Writer.Write("case ");
-                    this.Visit(testCase, context);
+                    this.Translate(testCase, context);
                     context.Writer.WriteLine(":");
                 }
 
                 context.Writer.WriteLine("{");
                 context.Writer.IncrementIndent();
-                this.Visit(expressionCase.Body, context);
+                this.Translate(expressionCase.Body, context);
                 context.Writer.WriteLine();
                 context.Writer.WriteLine("break;");
                 context.Writer.DecrementIndent();
@@ -451,24 +462,7 @@ namespace Dryv.Translation
                 TryWriteTerminal(expression, context.Writer);
             }
 
-            this.Visit(expression.Operand, context, negatedExpression);
-        }
-
-        public override void VisitWithBrackets(Expression expression, TranslationContext context)
-        {
-            var needsBrackets = GetNeedsBrackets(expression);
-
-            if (needsBrackets)
-            {
-                context.Writer.Write("(");
-            }
-
-            this.Visit(expression, context);
-
-            if (needsBrackets)
-            {
-                context.Writer.Write(") ");
-            }
+            this.Translate(expression.Operand, context, negatedExpression);
         }
 
         private static bool GetNeedsBrackets(Expression expression)

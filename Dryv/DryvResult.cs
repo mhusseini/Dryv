@@ -1,21 +1,21 @@
 ﻿namespace Dryv
 {
-    public class DryvResult
+    public sealed class DryvResult
     {
-        public static readonly DryvResult Success = new DryvResult(DryResulType.Success);
+        public static readonly DryvResult Success = new DryvResult(DryvResultType.Success);
 
-        private DryvResult(DryResulType type) => this.Type = type;
+        private DryvResult(DryvResultType type) => this.Type = type;
 
-        private DryvResult(string message, DryResulType type) : this(type) => this.Message = message;
+        private DryvResult(string message, DryvResultType type) : this(type) => this.Message = message;
 
         public string Message { get; }
 
-        public DryResulType Type { get; }
+        public DryvResultType Type { get; }
 
-        public static DryvResult Error(string message) => new DryvResult(message, DryResulType.Error);
+        public static DryvResult Error(string message) => new DryvResult(message, DryvResultType.Error);
 
         public static implicit operator DryvResult(string message) => Error(message);
 
-        public static DryvResult Warning(string message) => new DryvResult(message, DryResulType.Warning);
+        public static DryvResult Warning(string message) => new DryvResult(message, DryvResultType.Warning);
     }
 }

@@ -3,8 +3,13 @@ using System.Collections.Generic;
 
 namespace Dryv.Utils
 {
-    internal static class CollectionExtensions
+    public static class CollectionExtensions
     {
+        internal static HashSet<T> ToHashSet<T>(this IEnumerable<T> items)
+        {
+            return new HashSet<T>(items);
+        }
+
         public static void AddRange<T>(this ICollection<T> list, IEnumerable<T> items)
         {
             foreach (var item in items)
@@ -13,7 +18,7 @@ namespace Dryv.Utils
             }
         }
 
-        public static IEnumerable<T> Iterrate<T>(this T item, Func<T, T> next)
+        internal static IEnumerable<T> Iterrate<T>(this T item, Func<T, T> next)
         where T : class
         {
             do
@@ -23,7 +28,7 @@ namespace Dryv.Utils
             } while (item != null);
         }
 
-        public static bool TryRemove<T>(this ICollection<T> list, T item)
+        internal static bool TryRemove<T>(this ICollection<T> list, T item)
         {
             if (!list.Contains(item))
             {

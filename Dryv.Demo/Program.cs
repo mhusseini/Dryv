@@ -1,25 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using System.ComponentModel.DataAnnotations;
+using Dryv.Demo.Models;
 
 namespace Dryv.Demo
 {
-    public class Program
+    internal class Program
     {
-        public static void Main(string[] args)
+        private static void Main()
         {
-            BuildWebHost(args).Run();
-        }
+            var model = new Model5
+            {
+                Name = "Hello",
+                Child = new Model6
+                {
+                    Name = "World",
+                    Child = new Model7()
+                },
+                Children = new[]
+                {
+                    new Model8(),
+                    new Model8(),
+                    new Model8()
+                }
+            };
 
-        public static IWebHost BuildWebHost(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>()
-                .Build();
+            var vc = new ValidationContext(model, null, null);
+            var results = new List<ValidationResult>();
+            var x = Validator.TryValidateObject(model, vc, results, true);
+
+            var validator = new DryvValidator();
+            var errors = validator.Validate(model);
+
+            foreach (var error in errors)
+            {
+                Console.WriteLine(error);
+            }
+        }
     }
 }

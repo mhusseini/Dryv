@@ -1,44 +1,57 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using Dryv.Compilation;
 using Dryv.Configuration;
 using Dryv.Translation;
 using Dryv.Utils;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
-using Microsoft.Extensions.Options;
 
 namespace Dryv
 {
     public class DryvClientModelValidator : IDryvClientModelValidator
     {
-        protected const string DataTypeDryAttribute = "data-type-dryv";
-        protected const string DataValAttribute = "data-val";
-        protected const string DataValDryAttribute = "data-val-dryv";
-        private readonly IOptions<DryvOptions> options;
+        public const string DataTypeDryAttribute = "data-val-dryv-type";
+        public const string DataValAttribute = "data-val";
+        public const string DataValDryAttribute = "data-val-dryv";
 
-        public DryvClientModelValidator(IOptions<DryvOptions> options)
+        public IDictionary<string, string> GetValidationAttributes(
+            Type modelType,
+            string modelPath,
+            PropertyInfo property,
+            Func<Type, object> services,
+            DryvOptions options)
         {
-            this.options = options;
+            if (modelPath == null)
+            {
+                modelPath = string.Empty;
+            }
+
+            var rules = from rule in modelType.GetRulesForProperty(property, modelPath)
+                        where rule.Rule.IsEnabled(services) &&
+                              rule.Rule.EvaluationLocation.HasFlag(RuleEvaluationLocation.Client)
+                        select rule;
+
+            var translatedRules = rules.Translate(
+                services,
+                options,
+                modelPath,
+                modelType);
+
+            return this.CreateValidationAttributes(modelType, property, translatedRules);
         }
 
-        protected DryvOptions Options => this.options.Value;
-
-        public virtual void AddValidation(ClientModelValidationContext context, PropertyInfo property, IEnumerable<DryvRuleNode> rules)
+        protected virtual IDictionary<string, string> CreateValidationAttributes(
+            Type modelType,
+            PropertyInfo property,
+            IEnumerable<string> translatedRules)
         {
-            var translatedRules = this.TranslateRules(context, rules);
-            var script = $@"[{string.Join(",", translatedRules)}]";
-
-            context.Attributes.Add(DataValAttribute, "true");
-            context.Attributes.Add(DataValDryAttribute, script);
-            context.Attributes.Add(DataTypeDryAttribute, property.PropertyType.GetJavaScriptType());
-        }
-
-        protected IEnumerable<string> TranslateRules(ClientModelValidationContext context, IEnumerable<DryvRuleNode> rules)
-        {
-            return rules.Translate(
-                context.ActionContext.HttpContext.RequestServices.GetService,
-                this.Options,
-                context.GetModelPath(),
-                context.ModelMetadata.ContainerType);
+            return new Dictionary<string, string>
+            {
+                {DataValAttribute, "true"},
+                {DataValDryAttribute, $@"[{string.Join(",", translatedRules)}]"},
+                {DataTypeDryAttribute, property.PropertyType.GetJavaScriptType()}
+            };
         }
     }
 }

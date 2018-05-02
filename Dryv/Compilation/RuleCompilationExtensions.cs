@@ -7,7 +7,7 @@ namespace Dryv.Compilation
 {
     internal static class RuleCompilationExtensions
     {
-        public static DryvRule Compile(this DryvRule rule)
+        public static DryvRuleDefinition Compile(this DryvRuleDefinition rule)
         {
             if (rule.CompiledValidationExpression != null)
             {
@@ -20,7 +20,7 @@ namespace Dryv.Compilation
             return rule;
         }
 
-        public static bool IsEnabled(this DryvRule rule, Func<Type, object> objectFactory)
+        public static bool IsEnabled(this DryvRuleDefinition rule, Func<Type, object> objectFactory)
         {
             rule.Compile();
             var options = rule.GetPreevaluationOptions(objectFactory);
@@ -28,7 +28,7 @@ namespace Dryv.Compilation
             return rule.CompiledEnablingExpression(options);
         }
 
-        public static DryvResult Validate(this DryvRule rule, object model, Func<Type, object> objectFactory)
+        public static DryvResult Validate(this DryvRuleDefinition rule, object model, Func<Type, object> objectFactory)
         {
             rule.Compile();
             var options = rule.GetPreevaluationOptions(objectFactory);
@@ -36,8 +36,8 @@ namespace Dryv.Compilation
             return rule.CompiledValidationExpression(model, options);
         }
 
-        private static void AddOptionParameters(this List<Expression> invokeArguments, 
-            LambdaExpression lambdaExpression, 
+        private static void AddOptionParameters(this List<Expression> invokeArguments,
+            LambdaExpression lambdaExpression,
             Expression optionsParameters,
             int skip = 0)
         {
@@ -49,7 +49,7 @@ namespace Dryv.Compilation
                                      select Expression.Convert(arrayAccess, options.Type));
         }
 
-        private static Func<object[], bool> CompileEnablingExpression(this DryvRule rule)
+        private static Func<object[], bool> CompileEnablingExpression(this DryvRuleDefinition rule)
         {
             var lambdaExpression = rule.EnablingExpression;
             rule.EnsurePreevaluationOptionTypes();
@@ -71,7 +71,7 @@ namespace Dryv.Compilation
             return resultLambda.Compile();
         }
 
-        private static Func<object, object[], DryvResult> CompileValidationExpression(this DryvRule rule)
+        private static Func<object, object[], DryvResult> CompileValidationExpression(this DryvRuleDefinition rule)
         {
             var lambdaExpression = rule.ValidationExpression;
             rule.EnsurePreevaluationOptionTypes();
@@ -90,7 +90,7 @@ namespace Dryv.Compilation
             return resultLambda.Compile();
         }
 
-        private static void EnsurePreevaluationOptionTypes(this DryvRule rule)
+        private static void EnsurePreevaluationOptionTypes(this DryvRuleDefinition rule)
         {
             if (rule.PreevaluationOptionTypes?.Any() != true)
             {
@@ -99,7 +99,7 @@ namespace Dryv.Compilation
             }
         }
 
-        private static object[] GetPreevaluationOptions(this DryvRule rule, Func<Type, object> objectFactory)
+        private static object[] GetPreevaluationOptions(this DryvRuleDefinition rule, Func<Type, object> objectFactory)
         {
             return (from t in rule.PreevaluationOptionTypes
                     select objectFactory(t)).ToArray();

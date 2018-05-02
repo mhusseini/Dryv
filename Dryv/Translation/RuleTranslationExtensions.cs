@@ -7,7 +7,19 @@ namespace Dryv.Translation
 {
     internal static class RuleTranslationExtensions
     {
-        public static DryvRule Translate(this DryvRule rule, ITranslator translator, DryvOptions options, Type modelType)
+        public static IEnumerable<string> Translate(this IEnumerable<DryvRuleNode> rules, Func<Type, object> objectProvider, DryvOptions options, string modelPath, Type modelType)
+        {
+            var translator = objectProvider(typeof(ITranslator)) as ITranslator;
+
+            return (from r in rules
+                    let rule = r.Rule.Translate(translator, options)
+                    where rule.TranslationError == null
+                    let path = string.IsNullOrWhiteSpace(r.Path) ? r.Path : $".{r.Path}"
+                    let preevaluationOptions = rule.PreevaluationOptionTypes.Select(objectProvider).Union(new[] { path }).ToArray()
+                    select rule.TranslatedValidationExpression(preevaluationOptions)).ToList();
+        }
+
+        private static DryvRuleDefinition Translate(this DryvRuleDefinition rule, ITranslator translator, DryvOptions options)
         {
             if (rule.TranslatedValidationExpression != null ||
                 rule.TranslationError != null)
@@ -38,18 +50,6 @@ namespace Dryv.Translation
             }
 
             return rule;
-        }
-
-        public static IEnumerable<string> Translate(this IEnumerable<DryvRuleNode> rules, Func<Type, object> objectProvider, DryvOptions options, string modelPath, Type modelType)
-        {
-            var translator = objectProvider(typeof(ITranslator)) as ITranslator;
-
-            return (from r in rules
-                    let rule = r.Rule.Translate(translator, options, modelType)
-                    where rule.TranslationError == null
-                    let path = string.IsNullOrWhiteSpace(r.Path) ? r.Path : $".{r.Path}"
-                    let preevaluationOptions = rule.PreevaluationOptionTypes.Select(objectProvider).Union(new[] { path }).ToArray()
-                    select rule.TranslatedValidationExpression(preevaluationOptions)).ToList();
         }
     }
 }

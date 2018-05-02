@@ -1,7 +1,7 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using Dryv.Translation;
-using Dryv.Translators;
+using Dryv.Translation.Translators;
 using Dryv.Utils;
 using Escape.Ast;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -76,7 +76,7 @@ namespace Dryv.Tests
 
                 this.AddMethodTranslator(nameof(Regex.Match), context =>
                 {
-                    context.Translator.VisitWithBrackets(context.Expression.Object, context);
+                    context.Translator.Translate(context.Expression.Object, context);
                     context.Writer.Write(".match(");
                     WriteArguments(context.Translator, context.Expression.Arguments, context);
                     context.Writer.Write(")");
