@@ -1,16 +1,15 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Dryv.AspNetMvc")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Dryv integration with ASP.NET MVC. Dryv provides complex model validation for server and client made easy. Write complex model validation rules in C# once. Dryv will generate JavaScript for client-side validation.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Dryv.AspNetMvc")]
-[assembly: AssemblyCopyright("Copyright ©  2018")]
+[assembly: AssemblyCompany("Munir husseini")]
+[assembly: AssemblyProduct("Dryv")]
+[assembly: AssemblyCopyright("2018 Munir Husseini")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

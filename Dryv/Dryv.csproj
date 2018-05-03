@@ -9,10 +9,11 @@
     <RepositoryUrl>https://github.com/mhusseini/Dryv.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>model-validation, JavaScript, C#</PackageTags>
-    <Description>Complex model validation for server and client made easy. Write complex model validation rules in C# once. Dryv will generate JavaScript for client-side validation.</Description>
+    <Description>Base classes for Dryv. Dryv provides complex model validation for server and client made easy. Write complex model validation rules in C# once. Dryv will generate JavaScript for client-side validation.</Description>
     <Authors>Munir husseini</Authors>
     <Company>Munir husseini</Company>
     <PackageIconUrl>https://github.com/mhusseini/Dryv/raw/master/logo.png</PackageIconUrl>
+    <ApplicationIcon>dryv.ico</ApplicationIcon>
   </PropertyGroup>
   
   <ItemGroup>
