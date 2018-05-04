@@ -17,6 +17,7 @@ and
 > "The validation support provided by MVC and Entity Framework Core Code First is a good example of the DRY principle in action. 
 You can declaratively specify validation rules in one place (in the model class) and the rules are enforced everywhere in the app" ([from Microsoft Docs](https://docs.microsoft.com/en-us/aspnet/core/tutorials/first-mvc-app-xplat/validation)).
 
+
 While this is the case for simple validation rules, applying complex validations rules is a different story. For instance, see the following model.
 
 ```csharp
