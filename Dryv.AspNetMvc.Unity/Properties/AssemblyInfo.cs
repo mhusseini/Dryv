@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("Dryv.AspNetMvc.Unity")]
@@ -16,3 +17,5 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyVersionAttribute("1.0.0.0")]
 [assembly: AssemblyFileVersionAttribute("1.0.0.0")]
+
+[assembly: InternalsVisibleTo("Dryv.AspNetMvc.Unity.Tests")]

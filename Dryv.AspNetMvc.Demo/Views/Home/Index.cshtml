@@ -1,8 +1,7 @@
-﻿@using System.Reflection
-@using DryvDemo.Models
+﻿@using DryvDemo.Models
 @{
     Layout = "~/views/Shared/_LayoutLanding.cshtml";
-    this.ViewData["Title"] = "Home";
+    ViewData["Title"] = "Home";
 }
 <section class="cards-section text-center">
     <div class="container">
@@ -19,11 +18,11 @@
             </div><!--//cta-container-->
         </div><!--//intro-->
         @{
-            var items = new MainMenuModel[]
+            var items = new[]
             {
-                new MainMenuModel{Title= "Quick Start", Text="Learn the basic usage of Dryv.", Area= (string)null, Link= "https://dryv-lib.net/Home/GettingStarted", Controller=null, Action=null, Color="green", Icon="paper-plane"},
-                new MainMenuModel{Title= "Examples", Text="See examples of common scenarios with Dryv.", Area= "Examples", Link= (string)null, Controller= "Examples", Action="Index", Color="orange", Icon="eye" },
-                new MainMenuModel{Title= "Documentation", Text="Read how Dryv works and how to use it.", Area= (string)null, Link= "https=//dryv-lib.net/Documentation", Controller= null, Action= null, Color="blue", Icon="book"},
+                new MainMenuModel{Title= "Quick Start", Text="Learn the basic usage of Dryv.", Area=null, Link= "https://dryv-lib.net/Home/GettingStarted", Controller=null, Action=null, Color="green", Icon="paper-plane"},
+                new MainMenuModel{Title= "Examples", Text="See examples of common scenarios with Dryv.", Area= "Examples", Link= null, Controller= "Examples", Action="Index", Color="orange", Icon="eye" },
+                new MainMenuModel{Title= "Documentation", Text="Read how Dryv works and how to use it.", Area= null, Link= "https://dryv-lib.net/Documentation", Controller= null, Action= null, Color="blue", Icon="book"},
                 // new MainMenuModel{Title= "Extending Dryv", Text="Learn how to extend Dryv to support custom JavaScript frameworks.", Link= "https=//dryv-lib.net/Extension", Controller= null, Action= null, Color="pink", Icon="puzzle-piece"}
             };
         }
@@ -39,7 +38,7 @@
                         <p class="intro">@item.Text</p>
                         @if (item.Link == null)
                         {
-                            <a class="link" asp-area="@item.Area" asp-controller="@item.Controller" asp-action="@item.Action"><span></span></a>
+                            <a class="link" href="@Url.Action(item.Action, item.Controller, new{item.Area})"><span></span></a>
                         }
                         else
                         {

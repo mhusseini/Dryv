@@ -1,4 +1,4 @@
-﻿#define autofac
+﻿#define ninject
 
 using System.Web;
 using System.Web.Mvc;
@@ -15,6 +15,10 @@ namespace DryvDemo
             UnityMvcActivator.Start();
 #elif autofac
             AutofacMvcActivator.Start();
+#elif ninject
+            NinjectMvcActivator.Start();
+#elif simpleinjector
+            SimpleInjectorMvcActivator.Start();
 #endif
 
             AreaRegistration.RegisterAllAreas();

@@ -48,7 +48,7 @@
   <ItemGroup>
     <Compile Include="DependencyContainer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UnityContainerExtensions.cs" />
+    <Compile Include="AutofacContainerExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Dryv.AspNetMvc.Autofac.nuspec" />

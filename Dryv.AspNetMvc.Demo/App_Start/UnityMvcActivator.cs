@@ -19,8 +19,8 @@ namespace DryvDemo
 
             container.RegisterDryv();
 
-            container.RegisterType<Options2>(new InjectionFactory(_ => ExamplesConfiguration.CreateOptionsFromCookie<Options2>()));
-            container.RegisterType<Options3>(new InjectionFactory(_ => ExamplesConfiguration.CreateOptionsFromCookie<Options3>()));
+            container.RegisterType<IOptions<Options2>>(new InjectionFactory(_ => ExamplesConfiguration.CreateOptionsFromCookie<Options2>()));
+            container.RegisterType<IOptions<Options3>>(new InjectionFactory(_ => ExamplesConfiguration.CreateOptionsFromCookie<Options3>()));
 
             DependencyResolver.SetResolver(new UnityDependencyResolver(container));
         }
