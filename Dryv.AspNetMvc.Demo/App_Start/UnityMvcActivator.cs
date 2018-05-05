@@ -1,38 +1,28 @@
 using System.Linq;
 using System.Web.Mvc;
-
+using Unity;
 using Unity.AspNet.Mvc;
+using Unity.Injection;
+using Dryv.AspNetMvc;
+using DryvDemo.Areas.Examples;
+using DryvDemo.Areas.Examples.Models;
 
-[assembly: WebActivatorEx.PreApplicationStartMethod(typeof(Dryv.AspNetMvc.Demo.UnityMvcActivator), nameof(Dryv.AspNetMvc.Demo.UnityMvcActivator.Start))]
-[assembly: WebActivatorEx.ApplicationShutdownMethod(typeof(Dryv.AspNetMvc.Demo.UnityMvcActivator), nameof(Dryv.AspNetMvc.Demo.UnityMvcActivator.Shutdown))]
-
-namespace Dryv.AspNetMvc.Demo
+namespace DryvDemo
 {
-    /// <summary>
-    /// Provides the bootstrapping for integrating Unity with ASP.NET MVC.
-    /// </summary>
     public static class UnityMvcActivator
     {
-        /// <summary>
-        /// Integrates Unity when the application starts.
-        /// </summary>
-        public static void Start() 
+        public static void Start()
         {
+            var container = new UnityContainer();
             FilterProviders.Providers.Remove(FilterProviders.Providers.OfType<FilterAttributeFilterProvider>().First());
-            FilterProviders.Providers.Add(new UnityFilterAttributeFilterProvider(UnityConfig.Container));
+            FilterProviders.Providers.Add(new UnityFilterAttributeFilterProvider(container));
 
-            DependencyResolver.SetResolver(new UnityDependencyResolver(UnityConfig.Container));
+            container.RegisterDryv();
 
-            // TODO: Uncomment if you want to use PerRequestLifetimeManager
-            // Microsoft.Web.Infrastructure.DynamicModuleHelper.DynamicModuleUtility.RegisterModule(typeof(UnityPerRequestHttpModule));
-        }
+            container.RegisterType<Options2>(new InjectionFactory(_ => ExamplesConfiguration.CreateOptionsFromCookie<Options2>()));
+            container.RegisterType<Options3>(new InjectionFactory(_ => ExamplesConfiguration.CreateOptionsFromCookie<Options3>()));
 
-        /// <summary>
-        /// Disposes the Unity container when the application is shut down.
-        /// </summary>
-        public static void Shutdown()
-        {
-            UnityConfig.Container.Dispose();
+            DependencyResolver.SetResolver(new UnityDependencyResolver(container));
         }
     }
 }

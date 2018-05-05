@@ -1,8 +1,9 @@
-﻿using System.Web;
+﻿#define autofac
+
+using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Dryv.AspNetMvc;
-using Dryv.AspNetMvc.Demo;
 
 namespace DryvDemo
 {
@@ -10,7 +11,11 @@ namespace DryvDemo
     {
         protected void Application_Start()
         {
+#if unity
             UnityMvcActivator.Start();
+#elif autofac
+            AutofacMvcActivator.Start();
+#endif
 
             AreaRegistration.RegisterAllAreas();
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);

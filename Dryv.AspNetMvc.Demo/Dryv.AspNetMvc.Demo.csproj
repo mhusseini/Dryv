@@ -54,6 +54,9 @@
     <Reference Include="Autofac, Version=4.8.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
       <HintPath>..\packages\Autofac.4.8.0\lib\net45\Autofac.dll</HintPath>
     </Reference>
+    <Reference Include="Autofac.Integration.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.Mvc5.4.0.2\lib\net45\Autofac.Integration.Mvc.dll</HintPath>
+    </Reference>
     <Reference Include="CommonServiceLocator, Version=2.0.3.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
       <HintPath>..\packages\Unity.5.8.6\lib\net46\CommonServiceLocator.dll</HintPath>
     </Reference>
@@ -181,7 +184,6 @@
   <ItemGroup>
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
-    <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="App_Start\UnityMvcActivator.cs" />
     <Compile Include="Areas\Examples\Controllers\ExamplesController.cs" />
     <Compile Include="Areas\Examples\Controllers\OptionsController.cs" />
@@ -196,7 +198,9 @@
     <Compile Include="Areas\Examples\Models\Options2.cs" />
     <Compile Include="Areas\Examples\Models\Options3.cs" />
     <Compile Include="Areas\Examples\Models\Options4.cs" />
+    <Compile Include="Areas\Examples\ExamplesConfiguration.cs" />
     <Compile Include="Areas\Examples\ServiceCollectionExtensions.cs" />
+    <Compile Include="App_Start\AutofacMvcActivator.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -1090,6 +1094,10 @@
     <Content Include="plugins\lightbox\README.md" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Dryv.AspNetMvc.Autofac\Dryv.AspNetMvc.Autofac.csproj">
+      <Project>{54037AB6-C905-41D2-8872-A8A44DB06C61}</Project>
+      <Name>Dryv.AspNetMvc.Autofac</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Dryv.AspNetMvc.Unity\Dryv.AspNetMvc.Unity.csproj">
       <Project>{31571851-1bd8-4212-a803-b6ad570f670c}</Project>
       <Name>Dryv.AspNetMvc.Unity</Name>
