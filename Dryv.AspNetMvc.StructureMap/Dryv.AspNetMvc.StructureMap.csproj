@@ -51,7 +51,7 @@
     <Compile Include="StructureMapContainerExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Dryv.AspNetMvc.StructureMap.nuspec" />
+    <None Include="Dryv.AspNetMvc.StructureMap.nuspec.disabled" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
