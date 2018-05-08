@@ -157,11 +157,11 @@ public class MvcApplication : HttpApplication
 {
     protected void Application_Start()
     {
-	    var kernel = new StandardKernel(new NinjectSettings());
-		// The following line is special for Ninject and reactivates the default ASP.NET MVC model validation.
+        var kernel = new StandardKernel(new NinjectSettings());
+        // The following line is special for Ninject and reactivates the default ASP.NET MVC model validation.
         kernel.Unbind<ModelValidatorProvider>();
 		
-		// Register Dry with the IoC framework.
+        // Register Dry with the IoC framework.
         kernel.RegisterDryv();
 		
         DependencyResolver.SetResolver(new NinjectDependencyResolver(kernel));
@@ -189,19 +189,19 @@ namespace Dryv.AspNetMvc
         private readonly IKernel kernel;
 
         public DependencyContainer(IKernel kernel) 
-			=> this.kernel = kernel;
+            => this.kernel = kernel;
 
         public void AddInstance(Type iface, object implementation) 
-			=> this.kernel.Bind(iface).ToConstant(implementation).InSingletonScope().Named(Guid.NewGuid().ToString());
+            => this.kernel.Bind(iface).ToConstant(implementation).InSingletonScope().Named(Guid.NewGuid().ToString());
 
         public void AddSingleton(Type iface, Type implementation) 
-			=> this.kernel.Bind(iface).To(implementation).InSingletonScope().Named(Guid.NewGuid().ToString());
+            => this.kernel.Bind(iface).To(implementation).InSingletonScope().Named(Guid.NewGuid().ToString());
 
         public void RegisterInstance(Type iface, object implementation) 
-			=> this.kernel.Bind(iface).ToConstant(implementation).InSingletonScope();
+            => this.kernel.Bind(iface).ToConstant(implementation).InSingletonScope();
 
         public void RegisterSingleton(Type iface, Type implementation) 
-			=> this.kernel.Bind(iface).To(implementation).InSingletonScope();
+            => this.kernel.Bind(iface).To(implementation).InSingletonScope();
     }
 
     public static class NinjectContainerExtensions
