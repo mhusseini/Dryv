@@ -68,25 +68,25 @@ On the server, install the NuGet package:
 ```
 Install-Package Dryv.AspNetCore 
 ```
-### ASP.NET MVC 4.6.1 with Unity
+### ASP.NET MVC 4.5.1 with Unity
 On the server, install the NuGet package:
 ```
 Install-Package Dryv.AspNetMvc.Unity 
 ```
 
-### ASP.NET MVC 4.6.1 with Autofac
+### ASP.NET MVC 4.5.1 with Autofac
 On the server, install the NuGet package:
 ```
 Install-Package Dryv.AspNetMvc.Autofac 
 ```
 
-### ASP.NET MVC 4.6.1 with Ninject
+### ASP.NET MVC 4.5.1 with Ninject
 On the server, install the NuGet package:
 ```
 Install-Packag Dryv.AspNetMvc.Ninject 
 ```
 
-### ASP.NET MVC 4.6.1 with SimpleInjector
+### ASP.NET MVC 4.5.1 with SimpleInjector
 On the server, install the NuGet package:
 ```
 Install-Package Dryv.AspNetMvc.SimpleInjector 
@@ -142,7 +142,7 @@ Since version 2.0, Dryv uses TagHelper to add the client-side validation attribu
 @addTagHelper *, Dryv.AspNetCore
 ```
 
-### ASP.NET MVC 4.6.1
+### ASP.NET MVC 4.5.1
 
 In the ASP.NET MVC startup class (startup.cs or global.asax.cs), add Dryv in the startup method. The following sample demonstrates registering Dryv for usage with Ninject in global.asax.cs:
 
