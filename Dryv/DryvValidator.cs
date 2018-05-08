@@ -6,18 +6,19 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Dryv.Compilation;
+using Dryv.Reflection;
 using Dryv.Utils;
 
 namespace Dryv
 {
     public class DryvValidator
     {
-        private static readonly ConstructorInfo ValidationResultCtor = typeof(DryvValidationError).GetConstructors().First();
-        private static readonly MethodInfo AddResultMethod = typeof(ICollection<DryvValidationError>).GetMethod(nameof(ICollection<DryvValidationError>.Add));
-        private static readonly MethodInfo StringConcatMethod = typeof(string).GetMethod(nameof(string.Concat), new[] { typeof(string), typeof(string) });
-        private static readonly MethodInfo ValidateMethod = typeof(DryvValidator).GetMethod(nameof(Validate), BindingFlags.NonPublic | BindingFlags.Static);
+        private static readonly ConstructorInfo ValidationResultCtor = typeof(DryvValidationError).GetTypeInfo().DeclaredConstructors.First();
+        private static readonly MethodInfo AddResultMethod = typeof(ICollection<DryvValidationError>).GetTypeInfo().GetDeclaredMethod(nameof(ICollection<DryvValidationError>.Add));
+        private static readonly MethodInfo StringConcatMethod = typeof(string).GetTypeInfo().DeclaredMethods.First(m => m.Name == nameof(string.Concat) && m.GetParameters().Select(p => p.ParameterType).ToList().ElementsEqual(typeof(string), typeof(string)));
+        private static readonly MethodInfo ValidateMethod = typeof(DryvValidator).GetTypeInfo().DeclaredMethods.First(m => m.Name == nameof(Validate) && !m.IsPublic && m.IsStatic);
         private static readonly ConcurrentDictionary<Type, ValidateAction> ValidateMethods = new ConcurrentDictionary<Type, ValidateAction>();
-        private static readonly MethodInfo ValidatePropertyMethod = typeof(DryvValidator).GetMethod(nameof(ValidateProperty), BindingFlags.NonPublic | BindingFlags.Static);
+        private static readonly MethodInfo ValidatePropertyMethod = typeof(DryvValidator).GetTypeInfo().DeclaredMethods.First(m => m.Name == nameof(ValidateProperty) && !m.IsPublic && m.IsStatic);
 
         private delegate void ValidateAction(object currentModel,
             object rootModel,
@@ -92,7 +93,7 @@ namespace Dryv
 
             var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy);
             var navigationProperties = (from p in properties
-                                        where (p.PropertyType.IsClass || p.PropertyType.IsInterface)
+                                        where (p.PropertyType.IsClass() || p.PropertyType.IsInterface())
                                               && p.PropertyType != typeof(string)
                                         select p).ToList();
             var propertyValidationExpressions = from property in properties

@@ -4,19 +4,20 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Dryv.Reflection;
 
 namespace Dryv.Translation
 {
     public abstract class MethodCallTranslator : IMethodCallTranslator
     {
-        private readonly List<(Regex Method, Action<MethodTranslationContext> Translator)> methodTranslatorsByRegex = new List<(Regex Method, Action<MethodTranslationContext> Translator)>();
+        private readonly List<RegexAndTranslator> methodTranslatorsByRegex = new List<RegexAndTranslator>();
 
         private readonly List<Type> supportedTypes = new List<Type>();
 
         public static string QuoteValue(object value)
             => value == null
             ? "null"
-            : (value.GetType().IsPrimitive
+            : (value.GetType().GetTypeInfo().IsPrimitive
                 ? value.ToString()
                 : $@"""{value.ToString().Trim('\"')}""");
 
@@ -84,13 +85,25 @@ namespace Dryv.Translation
         }
 
         protected void AddMethodTranslator(string methodName, Action<MethodTranslationContext> translator)
-            => this.AddMethodTranslator(new Regex($"^{methodName}$", RegexOptions.Compiled), translator);
+            => this.AddMethodTranslator(new Regex($"^{methodName}$"), translator);
 
         protected void AddMethodTranslator(Regex regex, Action<MethodTranslationContext> translator)
-            => this.methodTranslatorsByRegex.Add((regex, translator));
+            => this.methodTranslatorsByRegex.Add(new RegexAndTranslator(regex, translator));
 
         protected void Supports(Type type) => this.supportedTypes.Add(type);
 
         protected void Supports<T>() => this.Supports(typeof(T));
+
+        private struct RegexAndTranslator
+        {
+            public RegexAndTranslator(Regex method, Action<MethodTranslationContext> translator)
+            {
+                this.Method = method;
+                this.Translator = translator;
+            }
+
+            public Regex Method { get; }
+            public Action<MethodTranslationContext> Translator { get; }
+        }
     }
 }

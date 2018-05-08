@@ -1,12 +1,13 @@
 ﻿using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Dryv.Reflection;
 
 namespace Dryv.Translation.Translators
 {
     public class DryvResultTranslator : MethodCallTranslator, ICustomTranslator
     {
-        private static readonly MemberInfo SuccessMember = typeof(DryvResult).GetMember("Success").First();
+        private static readonly MemberInfo SuccessMember = typeof(DryvResult).GetMember("Success");
 
         public DryvResultTranslator()
         {

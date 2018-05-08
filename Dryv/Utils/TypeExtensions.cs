@@ -3,11 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Dryv.Reflection;
 
 namespace Dryv.Utils
 {
     internal static class TypeExtensions
     {
+        private static readonly TypeInfo EnumerableTypeInfo = typeof(IEnumerable).GetTypeInfo();
+
         public static string GetJavaScriptType(this Type type)
         {
             switch (type.Name)
@@ -39,9 +42,11 @@ namespace Dryv.Utils
         internal static Type GetElementType(this PropertyInfo property)
         {
             var type = property.PropertyType;
-            while (type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type) && type.IsGenericType)
+            var typeInfo = type.GetTypeInfo();
+            while (type != typeof(string) && EnumerableTypeInfo.IsAssignableFrom(typeInfo) && typeInfo.IsGenericType)
             {
-                type = type.GetGenericArguments().First();
+                type = typeInfo.GenericTypeArguments.First();
+                typeInfo = type.GetTypeInfo();
             }
 
             return type;
@@ -57,7 +62,7 @@ namespace Dryv.Utils
 
         internal static IEnumerable<Type> GetTypeHierarchyAndInterfaces(this Type type)
         {
-            var typeHierarchy = type.Iterrate(t => t.BaseType).ToList();
+            var typeHierarchy = type.Iterrate(t => t.GetBaseType()).ToList();
 
             return (from t in typeHierarchy
                     from i in t.GetInterfaces()
@@ -67,7 +72,7 @@ namespace Dryv.Utils
         internal static bool IsNavigationProperty(this PropertyInfo property)
         {
             var type = property.GetElementType();
-            return type.IsClass && type.Namespace != "System";
+            return type.IsClass() && type.Namespace != "System";
         }
     }
 }

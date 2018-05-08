@@ -6,8 +6,8 @@ namespace Dryv.Translation.Translators
 {
     internal class StringFormatDissector
     {
-        private static readonly Regex RegexEscaped = new Regex(@"\{{2,}\d+(:.+?)?\}{2,}", RegexOptions.Compiled);
-        private static readonly Regex RegexUnescaped = new Regex(@"\{{1,1}(\d+)(:.+?)?\}{1,1}", RegexOptions.Compiled);
+        private static readonly Regex RegexEscaped = new Regex(@"\{{2,}\d+(:.+?)?\}{2,}");
+        private static readonly Regex RegexUnescaped = new Regex(@"\{{1,1}(\d+)(:.+?)?\}{1,1}");
 
         public IList<object> Parse(string pattern)
         {

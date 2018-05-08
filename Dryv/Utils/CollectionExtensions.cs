@@ -1,10 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Dryv.Utils
 {
     public static class CollectionExtensions
     {
+        internal static bool ElementsEqual<T>(this IList<T> enumerable, params T[] items)
+        {
+            return enumerable.Count == items.Length && !items.Where((t, i) => !Equals(enumerable[i], t)).Any();
+        }
+
         internal static HashSet<T> ToHashSet<T>(this IEnumerable<T> items)
         {
             return new HashSet<T>(items);

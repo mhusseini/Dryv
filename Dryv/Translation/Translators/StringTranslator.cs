@@ -22,7 +22,8 @@ namespace Dryv.Translation.Translators
             this.AddMethodTranslator(nameof(string.IsNullOrWhiteSpace), IsNullOrWhiteSpace);
             this.AddMethodTranslator(nameof(string.Trim), Trim);
             this.AddMethodTranslator(nameof(string.TrimEnd), TrimEnd);
-            this.AddMethodTranslator(nameof(string.Normalize), Normalize);
+            //this.AddMethodTranslator(nameof(string.Normalize), Normalize);
+            this.AddMethodTranslator("Normalize", Normalize);
             this.AddMethodTranslator(nameof(string.Compare), Compare);
             this.AddMethodTranslator(nameof(string.CompareTo), CompareTo);
             this.AddMethodTranslator(nameof(string.IndexOf), IndexOf);
@@ -42,11 +43,11 @@ namespace Dryv.Translation.Translators
                 return false;
             }
 
-            switch (stringComparison.Value)
+            switch ((int)stringComparison.Value)
             {
-                case StringComparison.CurrentCultureIgnoreCase:
-                case StringComparison.InvariantCultureIgnoreCase:
-                case StringComparison.OrdinalIgnoreCase:
+                case (int)StringComparison.CurrentCultureIgnoreCase:
+                case (int)StringComparison.OrdinalIgnoreCase:
+                case 3: // StringComparison.InvariantCultureIgnoreCase:
                     // As stated above, locale hadling isn't very easy on the client side, so we'll just
                     // strick to simple case-insensitive sring comparison here.
                     return true;
@@ -151,26 +152,6 @@ namespace Dryv.Translation.Translators
             context.Writer.Write(".length - ");
             context.Translator.Translate(context.Expression.Arguments[0], context);
             context.Writer.Write(".length)");
-            context.Writer.Write(")");
-        }
-
-        private static void WriteIndexOf(MethodTranslationContext context)
-        {
-            context.Translator.Translate(context.Expression.Object, context);
-
-            var isCaseInsensitive = ArgumentIs(context, 1, true) || GetIsCaseInsensitive(context.Expression);
-            if (isCaseInsensitive)
-            {
-                context.Writer.Write(".toLowerCase()");
-            }
-
-            context.Writer.Write(".indexOf(");
-            context.Translator.Translate(context.Expression.Arguments[0], context);
-            if (isCaseInsensitive)
-            {
-                context.Writer.Write(".toLowerCase()");
-            }
-
             context.Writer.Write(")");
         }
 
@@ -419,6 +400,26 @@ namespace Dryv.Translation.Translators
 
             context.Translator.Translate(context.Expression.Object, context);
             context.Writer.Write(".trimLeft()");
+        }
+
+        private static void WriteIndexOf(MethodTranslationContext context)
+        {
+            context.Translator.Translate(context.Expression.Object, context);
+
+            var isCaseInsensitive = ArgumentIs(context, 1, true) || GetIsCaseInsensitive(context.Expression);
+            if (isCaseInsensitive)
+            {
+                context.Writer.Write(".toLowerCase()");
+            }
+
+            context.Writer.Write(".indexOf(");
+            context.Translator.Translate(context.Expression.Arguments[0], context);
+            if (isCaseInsensitive)
+            {
+                context.Writer.Write(".toLowerCase()");
+            }
+
+            context.Writer.Write(")");
         }
     }
 }

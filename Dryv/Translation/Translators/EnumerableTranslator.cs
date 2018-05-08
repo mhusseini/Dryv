@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Dryv.Reflection;
 
 namespace Dryv.Translation.Translators
 {
@@ -40,6 +41,13 @@ namespace Dryv.Translation.Translators
             Translate(context, "some");
         }
 
+        protected static void Average(MethodTranslationContext context)
+        {
+            context.Writer.Write("(function(){var _c = 0; return ");
+            Reduce(context, "++_c; return a + b");
+            context.Writer.Write(" / (_c > 0 ? _c + 1 : 0);})()");
+        }
+
         protected static void Contains(MethodTranslationContext context)
         {
             var array = context.Expression.Arguments.First();
@@ -61,7 +69,6 @@ namespace Dryv.Translation.Translators
             var array = context.Expression.Arguments.First();
             var defaultValueExpression = context.Expression.Arguments.Skip(1).FirstOrDefault();
 
-
             context.Writer.Write("(function(arr){ return arr.length ? arr : [");
             if (defaultValueExpression != null)
             {
@@ -77,7 +84,6 @@ namespace Dryv.Translation.Translators
             context.Writer.Write("(");
             context.Translator.Translate(array, context);
             context.Writer.Write(")) ");
-
         }
 
         protected static void ElementAt(MethodTranslationContext context)
@@ -136,13 +142,6 @@ namespace Dryv.Translation.Translators
         protected static void LastOrDefault(MethodTranslationContext context)
         {
             TranslateSelect(context, "return arr.length ? arr[arr.length - 1] : null;");
-        }
-
-        protected static void Average(MethodTranslationContext context)
-        {
-            context.Writer.Write("(function(){var _c = 0; return ");
-            Reduce(context, "++_c; return a + b");
-            context.Writer.Write(" / (_c > 0 ? _c + 1 : 0);})()");
         }
 
         protected static void Max(MethodTranslationContext context)

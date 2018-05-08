@@ -8,7 +8,7 @@ namespace Dryv.Translation.Translators
 {
     public class RegexTranslator : MethodCallTranslator, ICustomTranslator
     {
-        private static readonly PropertyInfo SuccessProperty = typeof(Group).GetProperty(nameof(Group.Success));
+        private static readonly PropertyInfo SuccessProperty = typeof(Group).GetTypeInfo().GetDeclaredProperty(nameof(Group.Success));
 
         public RegexTranslator()
         {
@@ -23,7 +23,7 @@ namespace Dryv.Translation.Translators
                 return false;
             }
 
-            if (memberExpression.Member != SuccessProperty)
+            if (!Equals(memberExpression.Member, SuccessProperty))
             {
                 return false;
             }
@@ -40,27 +40,27 @@ namespace Dryv.Translation.Translators
                 throw new MethodNotSupportedException(methodCallExpression, "Could not determine regular context.Expression.");
             }
 
-            var clientRegexp = $"/{result.Value.Pattern}/{TranslateRegexOptions(result.Value.Options)}";
+            var clientRegexp = $"/{result.Pattern}/{TranslateRegexOptions(result.Options)}";
             context.Writer.Write(clientRegexp);
             context.Writer.Write(".test(");
-            WriteArguments(context.Translator, new[] { result.Value.Test }, context);
+            WriteArguments(context.Translator, new[] { result.Test }, context);
             context.Writer.Write(")");
 
             return true;
         }
 
-        private static (string Pattern, Expression Test, RegexOptions Options)? FindRegularExpression(MethodCallExpression methodCallExpression)
+        private static FindRegularExpressionResult FindRegularExpression(MethodCallExpression methodCallExpression)
         {
-            (string Pattern, Expression Test, RegexOptions Options)? result = null;
+            FindRegularExpressionResult result = null;
             var exp = methodCallExpression.Object;
 
             switch (exp)
             {
                 case NewExpression newExpression:
-                    result = (
-                        Pattern: FindValue<string>(newExpression.Arguments),
-                        Test: methodCallExpression.Arguments.First(),
-                        Options: FindValue<RegexOptions>(newExpression.Arguments)
+                    result = new FindRegularExpressionResult(
+                        FindValue<string>(newExpression.Arguments),
+                        methodCallExpression.Arguments.First(),
+                        FindValue<RegexOptions>(newExpression.Arguments)
                     );
                     break;
 
@@ -68,20 +68,20 @@ namespace Dryv.Translation.Translators
                     var regex = FindValue<Regex>(memberExpression.Expression);
                     if (regex != null)
                     {
-                        result = (
-                            Pattern: regex.ToString(),
-                            Test: methodCallExpression.Arguments.First(),
-                            Options: regex.Options
+                        result = new FindRegularExpressionResult(
+                            regex.ToString(),
+                            methodCallExpression.Arguments.First(),
+                            regex.Options
                         );
                     }
 
                     break;
 
                 case null:
-                    result = (
-                        Pattern: FindValue<string>(methodCallExpression.Arguments),
-                        Test: methodCallExpression.Arguments.Skip(1).First(),
-                        Options: FindValue<RegexOptions>(methodCallExpression.Arguments)
+                    result = new FindRegularExpressionResult(
+                        FindValue<string>(methodCallExpression.Arguments),
+                        methodCallExpression.Arguments.Skip(1).First(),
+                        FindValue<RegexOptions>(methodCallExpression.Arguments)
                     );
                     break;
             }
@@ -98,10 +98,10 @@ namespace Dryv.Translation.Translators
                 throw new MethodNotSupportedException(context.Expression, "Could not determine regular context.Expression.");
             }
 
-            var clientRegexp = $"/{result.Value.Pattern}/{TranslateRegexOptions(result.Value.Options)}";
+            var clientRegexp = $"/{result.Pattern}/{TranslateRegexOptions(result.Options)}";
             context.Writer.Write(clientRegexp);
             context.Writer.Write(".test(");
-            WriteArguments(context.Translator, new[] { result.Value.Test }, context);
+            WriteArguments(context.Translator, new[] { result.Test }, context);
             context.Writer.Write(")");
         }
 
@@ -129,6 +129,20 @@ namespace Dryv.Translation.Translators
             }
 
             return sb.ToString();
+        }
+
+        private class FindRegularExpressionResult
+        {
+            public FindRegularExpressionResult(string pattern, Expression test, RegexOptions options)
+            {
+                this.Pattern = pattern;
+                this.Test = test;
+                this.Options = options;
+            }
+
+            public RegexOptions Options { get; }
+            public string Pattern { get; }
+            public Expression Test { get; }
         }
     }
 }

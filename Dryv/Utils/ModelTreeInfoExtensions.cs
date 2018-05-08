@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using Dryv.Reflection;
 
 namespace Dryv.Utils
 {
@@ -48,8 +49,8 @@ namespace Dryv.Utils
                 return null;
             }
 
-            var models = x.Value.Item1;
-            var paths = x.Value.Item2.Reverse();
+            var models = x.Models;
+            var paths = x.Paths.Reverse();
 
             return new ModelTreeInfo
             {
@@ -62,11 +63,11 @@ namespace Dryv.Utils
             };
         }
 
-        private static (ImmutableList<object>, ImmutableList<string>)? GetTreeInfo(object model, object root, ImmutableList<object> models, ImmutableList<string> paths)
+        private static TreeInfo GetTreeInfo(object model, object root, ImmutableList<object> models, ImmutableList<string> paths)
         {
             if (root == model)
             {
-                return (models, paths);
+                return new TreeInfo(models, paths);
             }
 
             var path = paths.Last();
@@ -85,15 +86,15 @@ namespace Dryv.Utils
                 var models2 = models.Add(child);
                 if (child == model)
                 {
-                    return (models2, paths2);
+                    return new TreeInfo(models2, paths2);
                 }
 
                 if (!(child is string) && child is IEnumerable enumerable && enumerable.Cast<object>().Contains(model))
                 {
-                    return (models2, paths2);
+                    return new TreeInfo(models2, paths2);
                 }
 
-                if (!property.PropertyType.IsClass || property.PropertyType.Namespace == "System")
+                if (!property.PropertyType.IsClass() || property.PropertyType.Namespace == "System")
                 {
                     continue;
                 }
@@ -117,10 +118,10 @@ namespace Dryv.Utils
                 var models2 = models.Add(child);
                 if (child == model)
                 {
-                    return (models2, paths2);
+                    return new TreeInfo(models2, paths2);
                 }
 
-                if (!property.FieldType.IsClass || property.FieldType.Namespace == "System")
+                if (!property.FieldType.IsClass() || property.FieldType.Namespace == "System")
                 {
                     continue;
                 }
@@ -133,6 +134,19 @@ namespace Dryv.Utils
             }
 
             return null;
+        }
+
+        private class TreeInfo
+        {
+            public TreeInfo(ImmutableList<object> models, ImmutableList<string> paths)
+            {
+                this.Models = models;
+                this.Paths = paths;
+            }
+
+            public ImmutableList<object> Models { get; }
+
+            public ImmutableList<string> Paths { get; }
         }
     }
 }

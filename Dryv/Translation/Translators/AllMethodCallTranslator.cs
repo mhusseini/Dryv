@@ -8,7 +8,7 @@ namespace Dryv.Translation.Translators
     {
         public AllMethodCallTranslator()
         {
-            this.AddMethodTranslator(new Regex(".*", RegexOptions.Compiled), TranslateAnyMethod);
+            this.AddMethodTranslator(new Regex(".*"), TranslateAnyMethod);
         }
 
         public override bool SupportsType(Type type) => true;

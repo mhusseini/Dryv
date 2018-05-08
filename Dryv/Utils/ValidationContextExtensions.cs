@@ -7,7 +7,13 @@ namespace Dryv.Utils
     {
         public static PropertyInfo GetProperty(this ValidationContext context)
         {
-            return context.ObjectType.GetProperty(context.MemberName);
+            return context.ObjectType.GetTypeInfo().GetDeclaredProperty(context.MemberName);
+        }
+
+        public static T GetService<T>(this ValidationContext context)
+        where T : class
+        {
+            return context.GetService(typeof(T)) as T;
         }
     }
 }

@@ -186,10 +186,10 @@ namespace Dryv.Translation
             throw new NotSupportedException();
         }
 
-        public override void Visit(IDynamicExpression expression, TranslationContext context, bool negated = false)
-        {
-            throw new NotSupportedException();
-        }
+        //public override void Visit(IDynamicExpression expression, TranslationContext context, bool negated = false)
+        //{
+        //    throw new NotSupportedException();
+        //}
 
         public override void Visit(IndexExpression expression, TranslationContext context, bool negated = false)
         {
@@ -473,6 +473,7 @@ namespace Dryv.Translation
                 case MethodCallExpression _:
                 case MemberExpression _:
                 case UnaryExpression _:
+                case LambdaExpression _:
                     return false;
             }
 
