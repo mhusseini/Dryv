@@ -68,25 +68,25 @@ On the server, install the NuGet package:
 ```
 Install-Package Dryv.AspNetCore 
 ```
-### ASP.NET with Unity
+### ASP.NET MVC 4.6.1 with Unity
 On the server, install the NuGet package:
 ```
 Install-Package Dryv.AspNetMvc.Unity 
 ```
 
-### ASP.NET with Autofac
+### ASP.NET MVC 4.6.1 with Autofac
 On the server, install the NuGet package:
 ```
 Install-Package Dryv.AspNetMvc.Autofac 
 ```
 
-### ASP.NET with Ninject
+### ASP.NET MVC 4.6.1 with Ninject
 On the server, install the NuGet package:
 ```
 Install-Packag Dryv.AspNetMvc.Ninject 
 ```
 
-### ASP.NET with SimpleInjector
+### ASP.NET MVC 4.6.1 with SimpleInjector
 On the server, install the NuGet package:
 ```
 Install-Package Dryv.AspNetMvc.SimpleInjector 
@@ -136,41 +136,81 @@ public class Startup
     // ...
 }
 ```
-### ASP.NET MVC (>=4.6.1)
 
-In the ASP.NET Core startup class, add Dryv in the ConfigureServices method using the AddDryv extension method:
+Since version 2.0, Dryv uses TagHelper to add the client-side validation attributes. To activate the Dryv clienbt validation, register the Dryv TagHelpers, for example in *_ViewImports.cshtml*:
+```
+@addTagHelper *, Dryv.AspNetCore
+```
+
+### ASP.NET MVC 4.6.1
+
+In the ASP.NET MVC startup class (startup.cs or global.asax.cs), add Dryv in the startup method. The following sample demonstrates registering Dryv for usage with Ninject in global.asax.cs:
 
 ```csharp
-using Dryv;
+using System.Web.Mvc;
+using Dryv.AspNetMvc;
+using Ninject;
+using Ninject.Web.Common;
+using Ninject.Web.Mvc;
 
-public class Startup
+public class MvcApplication : HttpApplication
 {
-    // ...
-
-    public void ConfigureServices(IServiceCollection services)
+    protected void Application_Start()
     {
-        services.AddDryv()
-                .AddMvc();
+	    var kernel = new StandardKernel(new NinjectSettings());
+		// The following line is special for Ninject and reactivates the default ASP.NET MVC model validation.
+        kernel.Unbind<ModelValidatorProvider>();
+		
+		// Register Dry with the IoC framework.
+        kernel.RegisterDryv();
+		
+        DependencyResolver.SetResolver(new NinjectDependencyResolver(kernel));
+
+        AreaRegistration.RegisterAllAreas();
+        FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
+        RouteConfig.RegisterRoutes(RouteTable.Routes);
+
+		// Startup Dryv
+        DependencyResolver.Current.StartDryv();
     }
 }
 ```
-Also in the startup class, use Dryv in the Configure method using the UseDryv extension method:
+### Other IoC Frameworks
+Dryv currently supports Unity, Ninject, Autofac and SimpleInjector out of the box. More supported IoC frameworks will subsequently be added. If you need integration with a framework that is not yet supporte, implement the *IDependencyContainer* interface. Here is how the integration for Ninject was implemnented:
 
 ```csharp
-using Dryv;
+using System;
+using Ninject;
 
-public class Startup
+namespace Dryv.AspNetMvc
 {
-    public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+    internal class DependencyContainer : IDependencyContainer
     {
-        app.UseDryv()
-           .UseMvc();
+        private readonly IKernel kernel;
+
+        public DependencyContainer(IKernel kernel) 
+			=> this.kernel = kernel;
+
+        public void AddInstance(Type iface, object implementation) 
+			=> this.kernel.Bind(iface).ToConstant(implementation).InSingletonScope().Named(Guid.NewGuid().ToString());
+
+        public void AddSingleton(Type iface, Type implementation) 
+			=> this.kernel.Bind(iface).To(implementation).InSingletonScope().Named(Guid.NewGuid().ToString());
+
+        public void RegisterInstance(Type iface, object implementation) 
+			=> this.kernel.Bind(iface).ToConstant(implementation).InSingletonScope();
+
+        public void RegisterSingleton(Type iface, Type implementation) 
+			=> this.kernel.Bind(iface).To(implementation).InSingletonScope();
     }
 
-    // ...
+    public static class NinjectContainerExtensions
+    {
+        public static IDryvBuilder RegisterDryv(this IKernel kernel)
+            => DryvMvc.Configure(new DependencyContainer(kernel));
+    }
 }
 ```
-
 ## Examples and Documentation
 For detailed information and usage examples, please visit the project website at [https://dryv-lib.net](https://dryv-lib.net).
 
