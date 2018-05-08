@@ -170,7 +170,7 @@ public class MvcApplication : HttpApplication
         FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
         RouteConfig.RegisterRoutes(RouteTable.Routes);
 
-		// Startup Dryv
+        // Startup Dryv
         DependencyResolver.Current.StartDryv();
     }
 }
