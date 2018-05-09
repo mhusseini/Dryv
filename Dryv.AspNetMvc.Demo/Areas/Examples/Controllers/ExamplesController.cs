@@ -20,6 +20,9 @@ namespace DryvDemo.Areas.Examples.Controllers
         [HttpPost]
         public ActionResult Example5(Model5 model) => this.View("example5.partial", model);
 
+        //[HttpPost]
+        //public ActionResult Example6(Model8 model) => this.View("example6.partial", model);
+
         [HttpGet]
         public ActionResult Index() => this.View();
     }

@@ -161,7 +161,7 @@ public class MvcApplication : HttpApplication
         // The following line is special for Ninject and reactivates the default ASP.NET MVC model validation.
         kernel.Unbind<ModelValidatorProvider>();
 		
-        // Register Dry with the IoC framework.
+        // Register Dryv with the IoC framework.
         kernel.RegisterDryv();
 		
         DependencyResolver.SetResolver(new NinjectDependencyResolver(kernel));
@@ -213,6 +213,3 @@ namespace Dryv.AspNetMvc
 ```
 ## Examples and Documentation
 For detailed information and usage examples, please visit the project website at [https://dryv-lib.net](https://dryv-lib.net).
-
-# Cloning This Repository
-This repository **uses submodules** (this repository and the repository for the project website share the examples code). When cloning this repository, make sure to use `git clone ... --recursive`.

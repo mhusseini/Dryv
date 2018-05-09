@@ -1,9 +1,10 @@
-﻿@model Model8
+﻿@using DryvDemo.Areas.Examples.Controllers
+@model Model8
 @{
     Layout = null;
 }
 <div class="alert alert-info" role="alert">
-    <form id="form4" asp-controller="Examples" asp-action="Example6" onsubmit="return sendForm(this)">
+    <form id="form4" action="@Url.Action(nameof(ExamplesController.Example6), "Examples")" onsubmit="return sendForm(this)" method="post">
         <div class="form-group row">
             <label asp-for="IsManly" class="col-sm-2 col-form-label"></label>
             <div class="col-sm-10">

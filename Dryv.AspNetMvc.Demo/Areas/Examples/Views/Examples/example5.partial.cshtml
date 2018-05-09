@@ -1,30 +1,31 @@
-﻿@model DryvDemo.Areas.Examples.Models.Model5
+﻿@using DryvDemo.Areas.Examples.Controllers
+@model DryvDemo.Areas.Examples.Models.Model5
 @{
     Layout = null;
 }
 <div class="alert alert-info" role="alert">
-    <form id="form4" asp-controller="Examples" asp-action="Example5" onsubmit="return sendForm(this)">
+    <form id="form4" action="@Url.Action(nameof(ExamplesController.Example5), "Examples")" onsubmit="return sendForm(this)" method="post">
         <div class="form-group row">
-            <label asp-for="Name" class="col-sm-2 col-form-label"></label>
+            @Html.LabelFor(m => m.Name, new { @class = "col-sm-2 col-form-label" })
             <div class="col-sm-10">
-                <input asp-for="Name" class="form-control">
-                <span asp-validation-for="Name"></span>
+                @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Name)
             </div>
         </div>
 
         <div class="form-group row">
-            <label asp-for="Child.Name" class="col-sm-2 col-form-label"></label>
+            @Html.LabelFor(m => m.Child.Name, new { @class = "col-sm-2 col-form-label" })
             <div class="col-sm-10">
-                <input asp-for="Child.Name" class="form-control">
-                <span asp-validation-for="Child.Name"></span>
+                @Html.TextBoxFor(m => m.Child.Name, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Child.Name)
             </div>
         </div>
 
         <div class="form-group row">
-            <label asp-for="Child.Child.Name" class="col-sm-2 col-form-label"></label>
+            @Html.LabelFor(m => m.Child.Child.Name, new { @class = "col-sm-2 col-form-label" })
             <div class="col-sm-10">
-                <input asp-for="Child.Child.Name" class="form-control">
-                <span asp-validation-for="Child.Child.Name"></span>
+                @Html.TextBoxFor(m => m.Child.Child.Name, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Child.Child.Name)
             </div>
         </div>
 
