@@ -17,7 +17,8 @@ namespace Dryv.AspNetMvc
         public override IEnumerable<ModelClientValidationRule> GetClientValidationRules()
         {
             var modelType = this.ControllerContext.Controller.ViewData.ModelMetadata?.ModelType
-                ?? this.Metadata.ContainerType;
+                            ?? this.Metadata.Container?.GetType()
+                            ?? this.Metadata.ContainerType;
             var services = DependencyResolver.Current;
             var property = this.Metadata.ContainerType.GetRuntimeProperty(this.Metadata.PropertyName);
             var options = services.GetService(typeof(DryvOptions)) as DryvOptions;
