@@ -1,5 +1,6 @@
 ﻿@using System.Web.Mvc.Html
 @using DryvDemo.Areas.Examples.Models
+@using DryvDemo.HtmlHelpers
 @{
     Layout = "~/views/Shared/_Layout.cshtml";
     ViewBag.Title = "Examples";
@@ -11,33 +12,23 @@
         </h1>
     </div>
     <div class="section-block">
-        <cache>
-            <markdown file="example1.md"></markdown>
-        </cache>
+        @Html.Markdown("example1.md")
         @Html.Partial("example1.partial", new Model1())
     </div>
     <div class="section-block">
-        <cache>
-            <markdown file="example2.md"></markdown>
-        </cache>
+        @Html.Markdown("example2.md")
         @Html.Partial("example2.partial", new Model2())
     </div>
     <div class="section-block">
-        <cache>
-            <markdown file="example3.md"></markdown>
-        </cache>
+        @Html.Markdown("example3.md")
         @Html.Partial("example3.partial", new Model3())
     </div>
     <div class="section-block">
-        <cache>
-            <markdown file="example4.md"></markdown>
-        </cache>
+        @Html.Markdown("example4.md")
         @Html.Partial("example4.partial", new Model4())
     </div>
     <div class="section-block">
-        <cache>
-            <markdown file="example5.md"></markdown>
-        </cache>
+        @Html.Markdown("example5.md")
         @Html.Partial("example5.partial", new Model5
         {
             Name = "Hello",
