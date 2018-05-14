@@ -90,10 +90,6 @@
     <None Include="Readme.md" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Dryv.AspNetMvc.CastleWindsor\Dryv.AspNetMvc.CastleWindsor.csproj">
-      <Project>{B0276280-03DC-4EB3-9634-DA23D613EC58}</Project>
-      <Name>Dryv.AspNetMvc.CastleWindsor</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Dryv.AspNetMvc.Tests\Dryv.AspNetMvc.Tests.csproj">
       <Project>{823C0A30-42A9-4775-96A7-C943AF86D232}</Project>
       <Name>Dryv.AspNetMvc.Tests</Name>
