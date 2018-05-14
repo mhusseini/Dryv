@@ -92,6 +92,9 @@
       <HintPath>..\packages\StructureMap.4.6.1\lib\net45\StructureMap.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Collections.Immutable, Version=1.2.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Collections.Immutable.1.4.0\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
+    </Reference>
     <Reference Include="System.ComponentModel.Annotations, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.ComponentModel.Annotations.4.4.1\lib\net461\System.ComponentModel.Annotations.dll</HintPath>
     </Reference>
@@ -177,29 +180,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.ApplicationInsights">
-      <HintPath>..\packages\Microsoft.ApplicationInsights.2.2.0\lib\net45\Microsoft.ApplicationInsights.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AI.Agent.Intercept">
-      <HintPath>..\packages\Microsoft.ApplicationInsights.Agent.Intercept.2.0.6\lib\net45\Microsoft.AI.Agent.Intercept.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AI.DependencyCollector">
-      <HintPath>..\packages\Microsoft.ApplicationInsights.DependencyCollector.2.2.0\lib\net45\Microsoft.AI.DependencyCollector.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AI.PerfCounterCollector">
-      <HintPath>..\packages\Microsoft.ApplicationInsights.PerfCounterCollector.2.2.0\lib\net45\Microsoft.AI.PerfCounterCollector.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AI.ServerTelemetryChannel">
-      <HintPath>..\packages\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.2.2.0\lib\net45\Microsoft.AI.ServerTelemetryChannel.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AI.WindowsServer">
-      <HintPath>..\packages\Microsoft.ApplicationInsights.WindowsServer.2.2.0\lib\net45\Microsoft.AI.WindowsServer.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AI.Web">
-      <HintPath>..\packages\Microsoft.ApplicationInsights.Web.2.2.0\lib\net45\Microsoft.AI.Web.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\NinjectMvcActivator.cs" />
@@ -232,11 +212,15 @@
   <ItemGroup>
     <Content Include="css\custom.css" />
     <Content Include="css\resume.css" />
-    <Content Include="css\resume.min.css" />
+    <Content Include="css\resume.min.css">
+      <DependentUpon>resume.css</DependentUpon>
+    </Content>
     <Content Include="css\styles.css" />
     <Content Include="css\_resume.css" />
-    <Content Include="css\_resume.min.css" />
-    <Content Include="favicon.ico" />
+    <Content Include="css\_resume.min.css">
+      <DependentUpon>_resume.css</DependentUpon>
+    </Content>
+    <None Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="images\empty.gif" />
     <Content Include="images\logo.svg" />
@@ -244,21 +228,31 @@
     <Content Include="images\npm.svg" />
     <Content Include="images\nuget.svg" />
     <Content Include="js\dryv-jquery-unobtrusive.browser.js" />
-    <Content Include="js\dryv-jquery-unobtrusive.browser.min.js" />
+    <Content Include="js\dryv-jquery-unobtrusive.browser.min.js">
+      <DependentUpon>dryv-jquery-unobtrusive.browser.js</DependentUpon>
+    </Content>
     <Content Include="js\dryv-jquery-unobtrusive.min.js" />
     <Content Include="js\main.js" />
     <Content Include="js\menu.js" />
     <Content Include="js\resume.js" />
-    <Content Include="js\resume.min.js" />
+    <Content Include="js\resume.min.js">
+      <DependentUpon>resume.js</DependentUpon>
+    </Content>
     <Content Include="plugins\bootstrap\.gitattributes" />
     <Content Include="plugins\bootstrap\.gitignore" />
     <Content Include="plugins\bootstrap\css\bootstrap-theme.css" />
-    <Content Include="plugins\bootstrap\css\bootstrap-theme.min.css" />
+    <Content Include="plugins\bootstrap\css\bootstrap-theme.min.css">
+      <DependentUpon>bootstrap-theme.css</DependentUpon>
+    </Content>
     <Content Include="plugins\bootstrap\css\bootstrap.css" />
-    <Content Include="plugins\bootstrap\css\bootstrap.min.css" />
+    <Content Include="plugins\bootstrap\css\bootstrap.min.css">
+      <DependentUpon>bootstrap.css</DependentUpon>
+    </Content>
     <Content Include="plugins\bootstrap\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="plugins\bootstrap\js\bootstrap.js" />
-    <Content Include="plugins\bootstrap\js\bootstrap.min.js" />
+    <Content Include="plugins\bootstrap\js\bootstrap.min.js">
+      <DependentUpon>bootstrap.js</DependentUpon>
+    </Content>
     <Content Include="plugins\bootstrap\js\npm.js" />
     <Content Include="plugins\elegant_font\css\fonts\ElegantIcons.svg" />
     <Content Include="plugins\elegant_font\css\index.html" />
@@ -987,7 +981,9 @@
     <Content Include="plugins\elegant_font\Licensing\gpl_license.txt" />
     <Content Include="plugins\elegant_font\Licensing\mit_license.txt" />
     <Content Include="plugins\font-awesome\css\font-awesome.css" />
-    <Content Include="plugins\font-awesome\css\font-awesome.min.css" />
+    <Content Include="plugins\font-awesome\css\font-awesome.min.css">
+      <DependentUpon>font-awesome.css</DependentUpon>
+    </Content>
     <Content Include="plugins\font-awesome\fonts\fontawesome-webfont.svg" />
     <Content Include="plugins\font-awesome\HELP-US-OUT.txt" />
     <Content Include="plugins\jquery-1.12.3.min.js" />
@@ -998,14 +994,22 @@
     <Content Include="plugins\jquery-match-height\test.js" />
     <Content Include="plugins\jquery-scrollTo\.gitignore" />
     <Content Include="plugins\jquery-scrollTo\jquery.scrollTo.js" />
-    <Content Include="plugins\jquery-scrollTo\jquery.scrollTo.min.js" />
+    <Content Include="plugins\jquery-scrollTo\jquery.scrollTo.min.js">
+      <DependentUpon>jquery.scrollTo.js</DependentUpon>
+    </Content>
     <Content Include="plugins\jquery\jquery.validate.js" />
-    <Content Include="plugins\jquery\jquery.validate.unobtrusive.js" />
+    <Content Include="plugins\jquery\jquery.validate.unobtrusive.js">
+      <DependentUpon>jquery.validate.js</DependentUpon>
+    </Content>
     <Content Include="plugins\lightbox\.gitignore" />
     <Content Include="plugins\lightbox\dist\ekko-lightbox.css" />
     <Content Include="plugins\lightbox\dist\ekko-lightbox.js" />
-    <Content Include="plugins\lightbox\dist\ekko-lightbox.min.css" />
-    <Content Include="plugins\lightbox\dist\ekko-lightbox.min.js" />
+    <Content Include="plugins\lightbox\dist\ekko-lightbox.min.css">
+      <DependentUpon>ekko-lightbox.css</DependentUpon>
+    </Content>
+    <Content Include="plugins\lightbox\dist\ekko-lightbox.min.js">
+      <DependentUpon>ekko-lightbox.js</DependentUpon>
+    </Content>
     <Content Include="plugins\lightbox\Gruntfile.js" />
     <Content Include="plugins\lightbox\LICENSE.txt" />
     <Content Include="plugins\prism\prism.css" />
@@ -1017,7 +1021,9 @@
     <Content Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
-    <Content Include="Views\Web.config" />
+    <Content Include="Views\Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
   </ItemGroup>
@@ -1051,10 +1057,18 @@
     <Content Include="plugins\bootstrap\.editorconfig" />
     <Content Include="plugins\bootstrap\.hound.yml" />
     <Content Include="plugins\bootstrap\.travis.yml" />
-    <Content Include="plugins\bootstrap\css\bootstrap-theme.css.map" />
-    <Content Include="plugins\bootstrap\css\bootstrap-theme.min.css.map" />
-    <Content Include="plugins\bootstrap\css\bootstrap.css.map" />
-    <Content Include="plugins\bootstrap\css\bootstrap.min.css.map" />
+    <Content Include="plugins\bootstrap\css\bootstrap-theme.css.map">
+      <DependentUpon>bootstrap-theme.css</DependentUpon>
+    </Content>
+    <Content Include="plugins\bootstrap\css\bootstrap-theme.min.css.map">
+      <DependentUpon>bootstrap-theme.min.css</DependentUpon>
+    </Content>
+    <Content Include="plugins\bootstrap\css\bootstrap.css.map">
+      <DependentUpon>bootstrap.css</DependentUpon>
+    </Content>
+    <Content Include="plugins\bootstrap\css\bootstrap.min.css.map">
+      <DependentUpon>bootstrap.min.css</DependentUpon>
+    </Content>
     <Content Include="plugins\bootstrap\fonts\glyphicons-halflings-regular.eot" />
     <Content Include="plugins\bootstrap\fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="plugins\bootstrap\fonts\glyphicons-halflings-regular.woff" />
