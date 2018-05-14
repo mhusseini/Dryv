@@ -211,5 +211,43 @@ namespace Dryv.AspNetMvc
     }
 }
 ```
+### Stand-alone
+Dryv can be used without ASP.NET. Using just the base package, Dryv can be used to validate models.
+```csharp
+using System;
+using Dryv;
+
+namespace Demo
+{
+    internal class Program
+    {
+        private static void Main()
+        {
+            var model = new Model5
+            {
+                Name = "Hello",
+                Child = new Model6
+                {
+                    Name = "World",
+                    Child = new Model7()
+                },
+                Children = new[]
+                {
+                    new Model8()
+                }
+            };
+
+            var validator = new DryvValidator();
+            var errors = validator.Validate(model);
+
+            foreach (var error in errors)
+            {
+                Console.WriteLine(error);
+            }
+        }
+    }
+}
+```
+
 ## Examples and Documentation
 For detailed information and usage examples, please visit the project website at [https://dryv-lib.net](https://dryv-lib.net).

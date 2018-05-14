@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using Dryv.Demo.Models;
 
 namespace Dryv.Demo
@@ -19,15 +17,9 @@ namespace Dryv.Demo
                 },
                 Children = new[]
                 {
-                    new Model8(),
-                    new Model8(),
                     new Model8()
                 }
             };
-
-            var vc = new ValidationContext(model, null, null);
-            var results = new List<ValidationResult>();
-            var x = Validator.TryValidateObject(model, vc, results, true);
 
             var validator = new DryvValidator();
             var errors = validator.Validate(model);
