@@ -15,7 +15,7 @@ namespace Dryv.AspNetMvc
                 throw new ArgumentNullException(nameof(container));
             }
 
-            ModelValidatorProviders.Providers.Add(new DryModelValidatorProvider());
+            ModelValidatorProviders.Providers.Add(new DryvModelValidatorProvider());
 
             var options = new DryvOptions();
 

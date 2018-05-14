@@ -15,7 +15,8 @@ using System.Runtime.InteropServices;
 
 [assembly: Guid("d9081fec-6ef1-4158-8749-6fa1c533fe5c")]
 
-[assembly: AssemblyVersionAttribute("1.0.0.0")]
-[assembly: AssemblyFileVersionAttribute("1.0.0.0")]
+[assembly: AssemblyVersionAttribute("2.0.0.0")]
+[assembly: AssemblyFileVersionAttribute("2.0.0.0")]
+[assembly: AssemblyInformationalVersion("2.0.0.0")]
 
 [assembly: InternalsVisibleTo("Dryv.AspNetMvc.SimpleInjector.Tests")]

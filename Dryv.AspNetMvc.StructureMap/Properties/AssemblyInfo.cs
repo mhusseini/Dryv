@@ -15,7 +15,8 @@ using System.Runtime.InteropServices;
 
 [assembly: Guid("6641e0db-90d4-4c16-8a45-5fc14a2a5eeb")]
 
-[assembly: AssemblyVersionAttribute("1.0.0.0")]
-[assembly: AssemblyFileVersionAttribute("1.0.0.0")]
+[assembly: AssemblyVersionAttribute("2.0.0.0")]
+[assembly: AssemblyFileVersionAttribute("2.0.0.0")]
+[assembly: AssemblyInformationalVersion("2.0.0.0")]
 
 [assembly: InternalsVisibleTo("Dryv.AspNetMvc.StructureMap.Tests")]

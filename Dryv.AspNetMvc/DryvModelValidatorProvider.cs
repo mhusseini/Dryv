@@ -3,7 +3,7 @@ using System.Web.Mvc;
 
 namespace Dryv.AspNetMvc
 {
-    internal class DryModelValidatorProvider : ModelValidatorProvider
+    internal class DryvModelValidatorProvider : ModelValidatorProvider
     {
         public override IEnumerable<ModelValidator> GetValidators(ModelMetadata metadata, ControllerContext context)
         {

@@ -15,7 +15,8 @@ using System.Runtime.InteropServices;
 
 [assembly: Guid("fcf77f09-74dd-4c61-92b5-0b570999fcf2")]
 
-[assembly: AssemblyVersionAttribute("1.0.0.0")]
-[assembly: AssemblyFileVersionAttribute("1.0.0.0")]
+[assembly: AssemblyVersionAttribute("2.0.0.0")]
+[assembly: AssemblyFileVersionAttribute("2.0.0.0")]
+[assembly: AssemblyInformationalVersion("2.0.0.0")]
 
 [assembly: InternalsVisibleTo("Dryv.AspNetMvc.Ninject.Tests")]

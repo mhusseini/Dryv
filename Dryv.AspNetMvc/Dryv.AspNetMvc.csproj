@@ -80,7 +80,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DependencyResolverExtensions.cs" />
-    <Compile Include="DryModelValidatorProvider.cs" />
+    <Compile Include="DryvModelValidatorProvider.cs" />
     <Compile Include="DryvBuilder.cs" />
     <Compile Include="DryvModelClientValidationRule.cs" />
     <Compile Include="DryvModelValidator.cs" />

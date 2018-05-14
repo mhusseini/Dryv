@@ -15,7 +15,8 @@ using System.Runtime.InteropServices;
 
 [assembly: Guid("31571851-1bd8-4212-a803-b6ad570f670c")]
 
-[assembly: AssemblyVersionAttribute("1.0.0.0")]
-[assembly: AssemblyFileVersionAttribute("1.0.0.0")]
+[assembly: AssemblyVersionAttribute("2.0.0.0")]
+[assembly: AssemblyFileVersionAttribute("2.0.0.0")]
+[assembly: AssemblyInformationalVersion("2.0.0.0")]
 
 [assembly: InternalsVisibleTo("Dryv.AspNetMvc.Unity.Tests")]
