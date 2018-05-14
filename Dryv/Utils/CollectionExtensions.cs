@@ -1,10 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Dryv.Utils
 {
-    internal static class CollectionExtensions
+    public static class CollectionExtensions
     {
+        internal static bool ElementsEqual<T>(this IList<T> enumerable, params T[] items)
+        {
+            return enumerable.Count == items.Length && !items.Where((t, i) => !Equals(enumerable[i], t)).Any();
+        }
+
+        internal static HashSet<T> ToHashSet<T>(this IEnumerable<T> items)
+        {
+            return new HashSet<T>(items);
+        }
+
         public static void AddRange<T>(this ICollection<T> list, IEnumerable<T> items)
         {
             foreach (var item in items)
@@ -13,7 +24,7 @@ namespace Dryv.Utils
             }
         }
 
-        public static IEnumerable<T> Iterrate<T>(this T item, Func<T, T> next)
+        internal static IEnumerable<T> Iterrate<T>(this T item, Func<T, T> next)
         where T : class
         {
             do
@@ -23,7 +34,7 @@ namespace Dryv.Utils
             } while (item != null);
         }
 
-        public static bool TryRemove<T>(this ICollection<T> list, T item)
+        internal static bool TryRemove<T>(this ICollection<T> list, T item)
         {
             if (!list.Contains(item))
             {

@@ -106,23 +106,23 @@ namespace Dryv.Translation
             base.Write(value);
         }
 
-        public override void Write(string format, object arg0)
-        {
-            this.WriteIndent();
-            base.Write(format, arg0);
-        }
+        //public override void Write(string format, object arg0)
+        //{
+        //    this.WriteIndent();
+        //    base.Write(format, arg0);
+        //}
 
-        public override void Write(string format, object arg0, object arg1)
-        {
-            this.WriteIndent();
-            base.Write(format, arg0, arg1);
-        }
+        //public override void Write(string format, object arg0, object arg1)
+        //{
+        //    this.WriteIndent();
+        //    base.Write(format, arg0, arg1);
+        //}
 
-        public override void Write(string format, object arg0, object arg1, object arg2)
-        {
-            this.WriteIndent();
-            base.Write(format, arg0, arg1, arg2);
-        }
+        //public override void Write(string format, object arg0, object arg1, object arg2)
+        //{
+        //    this.WriteIndent();
+        //    base.Write(format, arg0, arg1, arg2);
+        //}
 
         public override void Write(string format, params object[] arg)
         {
@@ -232,23 +232,23 @@ namespace Dryv.Translation
             this.needsIndent = true;
         }
 
-        public override void WriteLine(string format, object arg0)
-        {
-            base.WriteLine(format, arg0);
-            this.needsIndent = true;
-        }
+        //public override void WriteLine(string format, object arg0)
+        //{
+        //    base.WriteLine(format, arg0);
+        //    this.needsIndent = true;
+        //}
 
-        public override void WriteLine(string format, object arg0, object arg1)
-        {
-            base.WriteLine(format, arg0, arg1);
-            this.needsIndent = true;
-        }
+        //public override void WriteLine(string format, object arg0, object arg1)
+        //{
+        //    base.WriteLine(format, arg0, arg1);
+        //    this.needsIndent = true;
+        //}
 
-        public override void WriteLine(string format, object arg0, object arg1, object arg2)
-        {
-            base.WriteLine(format, arg0, arg1, arg2);
-            this.needsIndent = true;
-        }
+        //public override void WriteLine(string format, object arg0, object arg1, object arg2)
+        //{
+        //    base.WriteLine(format, arg0, arg1, arg2);
+        //    this.needsIndent = true;
+        //}
 
         public override void WriteLine(string format, params object[] arg)
         {

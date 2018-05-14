@@ -20,6 +20,6 @@ namespace Dryv.Translation
         public MethodCallExpression Expression { get; set; }
         public bool Negated { get; set; }
         public string Result { get; set; }
-        public Translator Translator { get; set; }
+        public ITranslator Translator { get; set; }
     }
 }

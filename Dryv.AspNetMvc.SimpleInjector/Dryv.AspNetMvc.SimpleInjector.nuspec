@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <licenseUrl>https://github.com/mhusseini/Dryv/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://dryv-lib.net</projectUrl>
+    <iconUrl>https://github.com/mhusseini/Dryv/raw/master/logo.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <copyright>2018 Munir Husseini</copyright>
+    <tags>model-validation, JavaScript, C#, ASP.NET MVC, SimpleInjector</tags>
+  </metadata>
+</package>

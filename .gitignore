@@ -210,3 +210,8 @@ __pycache__/
 
 # Windows thumbnail cache files
 Thumbs.db
+/Dryv.AspNetMvc.Demo/plugins
+/Dryv.AspNetMvc.Demo/lib
+/Dryv.AspNetMvc.Demo/js
+/Dryv.AspNetMvc.Demo/images
+/Dryv.AspNetMvc.Demo/css

@@ -1,9 +1,9 @@
 ﻿namespace Dryv
 {
-    public class DryvRuleNode
+    internal class DryvRuleNode
     {
         public string Path { get; internal set; }
 
-        public DryvRule Rule { get; internal set; }
+        public DryvRuleDefinition Rule { get; internal set; }
     }
 }

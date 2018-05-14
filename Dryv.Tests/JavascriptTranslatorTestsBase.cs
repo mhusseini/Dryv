@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Dryv.DependencyInjection;
 using Dryv.Translation;
-using Dryv.Translators;
+using Dryv.Translation.Translators;
 using Dryv.Utils;
 using Escape;
 using Escape.Ast;
@@ -64,7 +63,7 @@ namespace Dryv.Tests
             translatorProvider.MethodCallTranslators.Add(new EnumerableTranslator());
             translatorProvider.GenericTranslators.Add(new RegexTranslator());
             translatorProvider.GenericTranslators.Add(new DryvResultTranslator());
-            translatorProvider.GenericTranslators.Add(new BaseMethodsTranslator());
+            translatorProvider.GenericTranslators.Add(new ObjectTranslator());
 
             if (translators != null)
             {

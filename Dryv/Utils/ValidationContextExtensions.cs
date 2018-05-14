@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Reflection;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace Dryv.Utils
 {
@@ -8,13 +7,13 @@ namespace Dryv.Utils
     {
         public static PropertyInfo GetProperty(this ValidationContext context)
         {
-            return context.ObjectType.GetProperty(context.MemberName);
-        }
-        public static PropertyInfo GetProperty(this ClientModelValidationContext context)
-        {
-            var metadata = context.ModelMetadata;
-            return metadata.ContainerType.GetProperty(metadata.PropertyName);
+            return context.ObjectType.GetTypeInfo().GetDeclaredProperty(context.MemberName);
         }
 
+        public static T GetService<T>(this ValidationContext context)
+        where T : class
+        {
+            return context.GetService(typeof(T)) as T;
+        }
     }
 }

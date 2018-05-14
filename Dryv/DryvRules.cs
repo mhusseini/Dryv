@@ -1,18 +1,11 @@
-﻿using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Reflection;
+﻿using System.Collections.Generic;
 
 namespace Dryv
 {
-    public class DryvRules
+    public abstract class DryvRules
     {
-        protected DryvRules()
-        {
-        }
+        internal List<DryvRuleDefinition> PropertyRules { get; } = new List<DryvRuleDefinition>();
 
-        internal List<DryvRule> PropertyRules { get; } = new List<DryvRule>();
-
-        public static Rules<TModel> For<TModel>() => new Rules<TModel>();
+        public static DryvRules<TModel> For<TModel>() => new DryvRules<TModel>();
     }
 }

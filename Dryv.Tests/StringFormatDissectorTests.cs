@@ -1,4 +1,4 @@
-using Dryv.Translators;
+using Dryv.Translation.Translators;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Dryv.Tests

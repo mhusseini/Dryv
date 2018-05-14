@@ -7,9 +7,9 @@ using Dryv.Utils;
 
 namespace Dryv
 {
-    public partial class Rules<TModel> : DryvRules
+    public partial class DryvRules<TModel> : DryvRules
     {
-        internal Rules()
+        internal DryvRules()
         {
         }
 
@@ -36,7 +36,7 @@ namespace Dryv
                 .Select(e => e.Member.Name.ToCamelCase())
                 .Reverse());
 
-            this.PropertyRules.Add(new DryvRule
+            this.PropertyRules.Add(new DryvRuleDefinition
             {
                 PropertyExpression = memberExpression,
                 Property = propertyInfo,

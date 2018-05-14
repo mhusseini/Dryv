@@ -33,7 +33,7 @@ function WriteMethod($propCount, $optionCount, $methodPrefix)
 	}
 
 	@"
-		public Rules<TModel> $($methodPrefix)Rule$gen(
+		public DryvRules<TModel> $($methodPrefix)Rule$gen(
 $parameters			Expression<Func<TModel, $($gen2)DryvResult>> rule$ruleSwitch)
         {
 			this.Add$($methodPrefix)(rule,

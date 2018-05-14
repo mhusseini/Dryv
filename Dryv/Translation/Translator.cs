@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
+using Dryv.Reflection;
 
 namespace Dryv.Translation
 {
@@ -17,22 +19,17 @@ namespace Dryv.Translation
 
         public virtual TranslationResult Translate(Expression expression, MemberExpression propertyExpression)
         {
-            var (code, optionTypes, optionDelegates) = this.GenerateJavaScriptCode(expression, propertyExpression);
-            return this.translationCompiler.GenerateTranslationDelegate(code, optionDelegates, optionTypes);
+            var result = this.GenerateJavaScriptCode(expression, propertyExpression);
+            return this.translationCompiler.GenerateTranslationDelegate(result.Code, result.OptionDelegates, result.OptionTypes);
         }
 
-        public virtual void Translate(Expression expression, TranslationContext context)
+        public virtual void Translate(Expression expression, TranslationContext context, bool negated = false)
         {
-            this.Visit(expression, context);
         }
 
-        public virtual object TranslateValue(object value)
+        public virtual string TranslateValue(object value)
         {
-            return value;
-        }
-
-        public virtual void Visit(Expression expression, TranslationContext context, bool negated = false)
-        {
+            return value?.ToString();
         }
 
         public virtual void Visit(BinaryExpression expression, TranslationContext context, bool negated = false)
@@ -43,7 +40,7 @@ namespace Dryv.Translation
         {
             foreach (dynamic child in expression.Expressions)
             {
-                this.Visit(child, context);
+                this.Translate(child, context);
             }
         }
 
@@ -71,9 +68,9 @@ namespace Dryv.Translation
         {
         }
 
-        public virtual void Visit(IDynamicExpression expression, TranslationContext context, bool negated = false)
-        {
-        }
+        //public virtual void Visit(IDynamicExpression expression, TranslationContext context, bool negated = false)
+        //{
+        //}
 
         public virtual void Visit(IndexExpression expression, TranslationContext context, bool negated = false)
         {
@@ -143,13 +140,9 @@ namespace Dryv.Translation
         {
         }
 
-        public virtual void VisitWithBrackets(Expression expression, TranslationContext context)
-        {
-        }
-
         protected object GetDefaultValue(Type type)
         {
-            return type.IsValueType ? Activator.CreateInstance(type) : null;
+            return type.GetTypeInfo().IsValueType ? Activator.CreateInstance(type) : null;
         }
 
         private static List<Type> GetOptionTypes(Expression expression)
@@ -158,11 +151,11 @@ namespace Dryv.Translation
             var genericArguments = lambda.Type.GetGenericArguments();
             return genericArguments
                 .Skip(1)
-                .Take(genericArguments.Length - 2)
+                .Take(genericArguments.Count - 2)
                 .ToList();
         }
 
-        private (string Code, List<Type> OptionTypes, List<LambdaExpression> OptionDelegates) GenerateJavaScriptCode(
+        private GeneratedJavaScriptCode GenerateJavaScriptCode(
             Expression expression,
             MemberExpression propertyExpression)
         {
@@ -186,12 +179,26 @@ namespace Dryv.Translation
                 this.Translate(expression, context);
             }
 
-            return
+            return new GeneratedJavaScriptCode
             (
-                Code: sb.ToString(),
-                OptionTypes: optionTypes,
-                OptionDelegates: optionDelegates
+                sb.ToString(),
+                optionTypes,
+                optionDelegates
             );
+        }
+
+        private struct GeneratedJavaScriptCode
+        {
+            public GeneratedJavaScriptCode(string code, List<Type> optionTypes, List<LambdaExpression> optionDelegates)
+            {
+                this.Code = code;
+                this.OptionTypes = optionTypes;
+                this.OptionDelegates = optionDelegates;
+            }
+
+            public string Code { get; }
+            public List<LambdaExpression> OptionDelegates { get; }
+            public List<Type> OptionTypes { get; }
         }
     }
 }

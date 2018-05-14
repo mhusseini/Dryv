@@ -1,4 +1,4 @@
-<a href="https://dryv-lib.net" target="_new" title="Got to project website"><img src="logo_slogan.svg" title="Dryv - DRY Validation for ASP.NET Core" width="300"></a>
+<a href="https://dryv-lib.net" target="_new" title="Got to project website"><img src="logo_slogan.svg" title="Dryv - DRY Validation for ASP.NET MVC and ASP.NET Core" width="300"></a>
 
 [![NuGet version](https://badge.fury.io/nu/dryv.svg)](https://badge.fury.io/nu/dryv) [![npm version](https://badge.fury.io/js/dryv-jquery-unobtrusive.svg)](https://badge.fury.io/js/dryv-jquery-unobtrusive)
 
@@ -16,6 +16,7 @@ and
 
 > "The validation support provided by MVC and Entity Framework Core Code First is a good example of the DRY principle in action. 
 You can declaratively specify validation rules in one place (in the model class) and the rules are enforced everywhere in the app" ([from Microsoft Docs](https://docs.microsoft.com/en-us/aspnet/core/tutorials/first-mvc-app-xplat/validation)).
+
 
 While this is the case for simple validation rules, applying complex validations rules is a different story. For instance, see the following model.
 
@@ -62,18 +63,33 @@ public class Customer
 In the code above, a set of rules for the class `Customer` is defined. This set of rules contains a rule for the property `TaxId`. The property `TaxId` has an attribute `DryvRulesAttributes` that makes Dryv play nicely with the ASP.NET MVC validation framework. On the client, you need to load the appropriate JavaScript implementation of Dryv. Currently, an implementation exists for jQuery unobtrusive. Other implementations (e.g. for VueJS or React) can easily be added (and will be over time). 
 
 ## Installation
-### Server
+### ASP.NET Core
 On the server, install the NuGet package:
 ```
-dotnet add package Dryv 
+Install-Package Dryv.AspNetCore 
 ```
-... or ...
+### ASP.NET MVC 4.5.1 with Unity
+On the server, install the NuGet package:
 ```
-Install-Package Dryv 
+Install-Package Dryv.AspNetMvc.Unity 
 ```
-... or ...
+
+### ASP.NET MVC 4.5.1 with Autofac
+On the server, install the NuGet package:
 ```
-paket add Dryv 
+Install-Package Dryv.AspNetMvc.Autofac 
+```
+
+### ASP.NET MVC 4.5.1 with Ninject
+On the server, install the NuGet package:
+```
+Install-Packag Dryv.AspNetMvc.Ninject 
+```
+
+### ASP.NET MVC 4.5.1 with SimpleInjector
+On the server, install the NuGet package:
+```
+Install-Package Dryv.AspNetMvc.SimpleInjector 
 ```
 
 ### Client
@@ -86,6 +102,7 @@ npm install --save dryv-jquery-unobtrusive
 <script src="js/dryv-jquery-unobtrusive.browser.min.js"></script>
 ```
 ## Usage
+### ASP.NET Core
 
 In the ASP.NET Core startup class, add Dryv in the ConfigureServices method using the AddDryv extension method:
 
@@ -120,8 +137,79 @@ public class Startup
 }
 ```
 
+Since version 2.0, Dryv uses TagHelper to add the client-side validation attributes. To activate the Dryv clienbt validation, register the Dryv TagHelpers, for example in *_ViewImports.cshtml*:
+```
+@addTagHelper *, Dryv.AspNetCore
+```
+
+### ASP.NET MVC 4.5.1
+
+In the ASP.NET MVC startup class (startup.cs or global.asax.cs), add Dryv in the startup method. The following sample demonstrates registering Dryv for usage with Ninject in global.asax.cs:
+
+```csharp
+using System.Web.Mvc;
+using Dryv.AspNetMvc;
+using Ninject;
+using Ninject.Web.Common;
+using Ninject.Web.Mvc;
+
+public class MvcApplication : HttpApplication
+{
+    protected void Application_Start()
+    {
+        var kernel = new StandardKernel(new NinjectSettings());
+        // The following line is special for Ninject and reactivates the default ASP.NET MVC model validation.
+        kernel.Unbind<ModelValidatorProvider>();
+		
+        // Register Dryv with the IoC framework.
+        kernel.RegisterDryv();
+		
+        DependencyResolver.SetResolver(new NinjectDependencyResolver(kernel));
+
+        AreaRegistration.RegisterAllAreas();
+        FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
+        RouteConfig.RegisterRoutes(RouteTable.Routes);
+
+        // Startup Dryv
+        DependencyResolver.Current.StartDryv();
+    }
+}
+```
+### Other IoC Frameworks
+Dryv currently supports Unity, Ninject, Autofac and SimpleInjector out of the box. More supported IoC frameworks will subsequently be added. If you need integration with a framework that is not yet supporte, implement the *IDependencyContainer* interface. Here is how the integration for Ninject was implemnented:
+
+```csharp
+using System;
+using Ninject;
+
+namespace Dryv.AspNetMvc
+{
+    internal class DependencyContainer : IDependencyContainer
+    {
+        private readonly IKernel kernel;
+
+        public DependencyContainer(IKernel kernel) 
+            => this.kernel = kernel;
+
+        public void AddInstance(Type iface, object implementation) 
+            => this.kernel.Bind(iface).ToConstant(implementation).InSingletonScope().Named(Guid.NewGuid().ToString());
+
+        public void AddSingleton(Type iface, Type implementation) 
+            => this.kernel.Bind(iface).To(implementation).InSingletonScope().Named(Guid.NewGuid().ToString());
+
+        public void RegisterInstance(Type iface, object implementation) 
+            => this.kernel.Bind(iface).ToConstant(implementation).InSingletonScope();
+
+        public void RegisterSingleton(Type iface, Type implementation) 
+            => this.kernel.Bind(iface).To(implementation).InSingletonScope();
+    }
+
+    public static class NinjectContainerExtensions
+    {
+        public static IDryvBuilder RegisterDryv(this IKernel kernel)
+            => DryvMvc.Configure(new DependencyContainer(kernel));
+    }
+}
+```
 ## Examples and Documentation
 For detailed information and usage examples, please visit the project website at [https://dryv-lib.net](https://dryv-lib.net).
-
-# Cloning This Repository
-This repository **uses submodules** (this repository and the repository for the project website share the examples code). When cloning this repository, make sure to use `git clone ... --recursive`.
