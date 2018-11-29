@@ -15,7 +15,7 @@ namespace Dryv
         public const string DataValAttribute = "data-val";
         public const string DataValDryAttribute = "data-val-dryv";
 
-        public IDictionary<string, string> GetValidationAttributes(
+        public ClientModelElementValidation GetValidationAttributes(
             Type modelType,
             string modelPath,
             PropertyInfo property,
@@ -36,21 +36,25 @@ namespace Dryv
                 services,
                 options,
                 modelPath,
-                modelType);
+                modelType).ToList();
 
-            return this.CreateValidationAttributes(modelType, property, translatedRules);
+            var name = $"v{Math.Abs(property.GetHashCode())}";
+
+            return new ClientModelElementValidation
+            {
+                ElementAttribute = this.CreateValidationAttributes(modelType, property, name),
+                ValidationCode = translatedRules.Any() ? $"[{string.Join(",", translatedRules)}]" : null,
+                Name = name
+            };
         }
 
-        protected virtual IDictionary<string, string> CreateValidationAttributes(
-            Type modelType,
-            PropertyInfo property,
-            IEnumerable<string> translatedRules)
+        protected virtual IDictionary<string, string> CreateValidationAttributes(Type modelType, PropertyInfo property, string name)
         {
             return new Dictionary<string, string>
             {
                 {DataValAttribute, "true"},
-                {DataValDryAttribute, $@"[{string.Join(",", translatedRules)}]"},
-                {DataTypeDryAttribute, property.PropertyType.GetJavaScriptType()}
+                {DataTypeDryAttribute, property.PropertyType.GetJavaScriptType()},
+                {DataValDryAttribute, name }
             };
         }
     }

@@ -40,14 +40,20 @@ namespace Dryv
             var property = this.AspFor.GetProperty();
             var modelPath = this.ViewContext.GetModelPath(this.AspFor);
 
-            var attributes = services.GetService<IDryvClientModelValidator>().GetValidationAttributes(
+            var clientValidation = services.GetService<IDryvClientModelValidator>().GetValidationAttributes(
                 modelType,
                 modelPath,
                 property,
                 services.GetService,
                 this.options.Value);
 
-            output.Attributes.AddRange(attributes.Select(i => new TagHelperAttribute(i.Key, i.Value)));
+            if (string.IsNullOrWhiteSpace(clientValidation.ValidationCode))
+            {
+                return Task.CompletedTask;
+            }
+
+            this.ViewContext.Store(clientValidation.Name, clientValidation.ValidationCode);
+            output.Attributes.AddRange(clientValidation.ElementAttribute.Select(i => new TagHelperAttribute(i.Key, i.Value)));
 
             return Task.CompletedTask;
         }
