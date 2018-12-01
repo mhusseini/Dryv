@@ -38,7 +38,7 @@ namespace Dryv
                 modelPath,
                 modelType).ToList();
 
-            var name = $"v{Math.Abs(property.GetHashCode())}";
+            var name = $"v{Math.Abs((modelType.FullName + property.Name + modelPath).GetHashCode())}";
 
             return new ClientModelElementValidation
             {

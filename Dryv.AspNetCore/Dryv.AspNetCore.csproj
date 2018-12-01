@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <RootNamespace>Dryv</RootNamespace>
-    <Version>3.0.0-alpha.1</Version>
+    <Version>3.0.0-alpha.2</Version>
     <Authors>Munir husseini</Authors>
     <Company>Munir husseini</Company>
     <Product>Dryv</Product>
@@ -15,6 +15,7 @@
     <RepositoryUrl>https://github.com/mhusseini/Dryv.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>model-validation, JavaScript, C#, ASP.NET Core</PackageTags>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
