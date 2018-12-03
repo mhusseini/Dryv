@@ -79,12 +79,21 @@ namespace Dryv.Translation
             var arrayItems = new List<Expression>();
             var arrayIndexes = new ConcurrentDictionary<Type, int>();
 
+            {
+                var index = 0;// arrayIndexes.Any() ? arrayIndexes.Values.Max() + 1 : 0;
+                var modelPathParameter = Expression.ArrayAccess(parameter, Expression.Constant(index));
+                // Put that item into the formatting array
+                arrayItems.Add(modelPathParameter);
+                // Replace all occurences of $$MODELPATH$$ with the appropriate formatting placeholder
+                code = code.Replace("$$MODELPATH$$", $"{{{index}}}");
+            }
+
             foreach (var lambda in optionDelegates)
             {
                 var optionType = GetTypeChain(lambda.Body).Last();
                 var index = arrayIndexes.GetOrAdd(optionType, t =>
                 {
-                    var idx = optionTypes.IndexOf(optionType);
+                    var idx = optionTypes.IndexOf(optionType) + 1;
                     // get item from input array (properly casted)
                     var p = Expression.Convert(Expression.ArrayAccess(parameter, Expression.Constant(idx)), optionType);
                     // invoke lambda with item as argument
@@ -98,15 +107,6 @@ namespace Dryv.Translation
                 });
 
                 code = code.Replace($"$${lambda.GetHashCode()}$$", $"{{{index}}}");
-            }
-
-            {
-                var index = arrayIndexes.Any() ? arrayIndexes.Values.Max() + 1 : 0;
-                var modelPathParameter = Expression.ArrayAccess(parameter, Expression.Constant(index));
-                // Put that item into the formatting array
-                arrayItems.Add(modelPathParameter);
-                // Replace all occurences of $$MODELPATH$$ with the appropriate formatting placeholder
-                code = code.Replace("$$MODELPATH$$", $"{{{index}}}");
             }
 
             return arrayItems;

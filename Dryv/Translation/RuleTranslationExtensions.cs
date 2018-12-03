@@ -15,7 +15,7 @@ namespace Dryv.Translation
                     let rule = r.Rule.Translate(translator, options)
                     where rule.TranslationError == null
                     let path = string.IsNullOrWhiteSpace(r.Path) ? r.Path : $".{r.Path}"
-                    let preevaluationOptions = rule.PreevaluationOptionTypes.Select(objectProvider).Union(new[] { path }).ToArray()
+                    let preevaluationOptions = new[] { path }.Union(rule.PreevaluationOptionTypes.Select(objectProvider)).ToArray()
                     select rule.TranslatedValidationExpression(preevaluationOptions)).ToList();
         }
 
