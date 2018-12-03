@@ -79,14 +79,11 @@ namespace Dryv.Translation
             var arrayItems = new List<Expression>();
             var arrayIndexes = new ConcurrentDictionary<Type, int>();
 
-            {
-                var index = 0;// arrayIndexes.Any() ? arrayIndexes.Values.Max() + 1 : 0;
-                var modelPathParameter = Expression.ArrayAccess(parameter, Expression.Constant(index));
-                // Put that item into the formatting array
-                arrayItems.Add(modelPathParameter);
-                // Replace all occurences of $$MODELPATH$$ with the appropriate formatting placeholder
-                code = code.Replace("$$MODELPATH$$", $"{{{index}}}");
-            }
+            // The first item is the model path.
+            arrayItems.Add(Expression.ArrayAccess(parameter, Expression.Constant(0)));
+
+            // Replace all occurrences of $$MODELPATH$$ with the appropriate formatting placeholder
+            code = code.Replace("$$MODELPATH$$", "{0}");
 
             foreach (var lambda in optionDelegates)
             {
@@ -106,6 +103,7 @@ namespace Dryv.Translation
                     return idx;
                 });
 
+                // Replace all occurrences of $$...$$ with the appropriate formatting placeholder
                 code = code.Replace($"$${lambda.GetHashCode()}$$", $"{{{index}}}");
             }
 
