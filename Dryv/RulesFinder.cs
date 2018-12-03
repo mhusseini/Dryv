@@ -181,6 +181,7 @@ namespace Dryv
         private static IEnumerable<DryvRuleNode> GetInheritedRules(Type modelType, PropertyInfo property, string modelPath)
         {
             return (from prop in property.GetInheritedProperties()
+                    where prop.GetCustomAttribute<DryvRulesAttribute>() != null
                     from rule in modelType.FindRulesForProperty(prop, modelPath)
                     select rule)
                 .Distinct()
