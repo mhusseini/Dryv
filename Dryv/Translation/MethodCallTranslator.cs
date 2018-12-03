@@ -55,6 +55,22 @@ namespace Dryv.Translation
             .Select(i => i.Value)
             .FirstOrDefault(), value);
 
+        protected static T FindValue<T>(MemberInfo member)
+            where T : class
+        {
+            switch (member)
+            {
+                case FieldInfo fieldInfo when fieldInfo.IsStatic:
+                    return fieldInfo.GetValue(null) as T;
+
+                case PropertyInfo propertyInfo when propertyInfo.GetMethod.IsStatic:
+                    return propertyInfo.GetValue(null) as T;
+
+                default:
+                    return default(T);
+            }
+        }
+
         protected static T FindValue<T>(params Expression[] expressions)
             => FindValue<T>((IList<Expression>)expressions);
 

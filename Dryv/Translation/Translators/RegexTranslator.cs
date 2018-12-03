@@ -65,7 +65,10 @@ namespace Dryv.Translation.Translators
                     break;
 
                 case MemberExpression memberExpression:
-                    var regex = FindValue<Regex>(memberExpression.Expression);
+                    var regex = memberExpression.Expression == null
+                        ? FindValue<Regex>(memberExpression.Member)
+                        : FindValue<Regex>(memberExpression.Expression);
+
                     if (regex != null)
                     {
                         result = new FindRegularExpressionResult(
