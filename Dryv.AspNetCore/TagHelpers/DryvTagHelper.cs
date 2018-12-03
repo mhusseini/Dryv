@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Dryv
+namespace Dryv.TagHelpers
 {
     [HtmlTargetElement("input", Attributes = "asp-for")]
     [HtmlTargetElement("textarea", Attributes = "asp-for")]

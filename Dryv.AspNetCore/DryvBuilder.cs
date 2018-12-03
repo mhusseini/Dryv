@@ -37,9 +37,9 @@ namespace Dryv
                 this.Services.AddSingleton(methodCallTranslator);
             }
 
-            if (translator is ICustomTranslator genericTranslator)
+            if (translator is ICustomTranslator customTranslator)
             {
-                this.Services.AddSingleton(genericTranslator);
+                this.Services.AddSingleton(customTranslator);
             }
 
             return this;

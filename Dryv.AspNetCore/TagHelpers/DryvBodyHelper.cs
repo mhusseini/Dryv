@@ -1,10 +1,10 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
+using Dryv.Utils;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
-namespace Dryv
+namespace Dryv.TagHelpers
 {
     [HtmlTargetElement("body")]
     public class DryvBodyTagHelper : DryvBodyTagHelperBase

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace Dryv
+namespace Dryv.TagHelpers
 {
-    public class DryvTagHelperResult
+    internal class DryvViewData
     {
         public IDictionary<string, string> ValidationFunctions { get; set; } = new Dictionary<string, string>();
     }

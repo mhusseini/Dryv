@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.2</TargetFramework>
-    <Version>3.0.0-alpha.1</Version>
+    <Version>3.0.0-beta.1</Version>
     <Copyright>2018 Munir Husseini</Copyright>
     <PackageProjectUrl>https://dryv-lib.net</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/mhusseini/Dryv/blob/master/LICENSE</PackageLicenseUrl>

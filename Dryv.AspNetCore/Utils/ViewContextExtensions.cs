@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
+using Dryv.TagHelpers;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace Dryv
+namespace Dryv.Utils
 {
     internal static class ViewContextExtensions
     {
@@ -9,16 +10,16 @@ namespace Dryv
 
         public static IDictionary<string, string> Load(this ViewContext viewContext)
         {
-            return viewContext.TempData.TryGetValue(ItemsKey, out var o) && o is DryvTagHelperResult result
+            return viewContext.TempData.TryGetValue(ItemsKey, out var o) && o is DryvViewData result
                 ? result.ValidationFunctions
                 : new Dictionary<string, string>();
         }
 
         public static void Store(this ViewContext viewContext, string key, string value)
         {
-            if (!viewContext.TempData.TryGetValue(ItemsKey, out var o) || !(o is DryvTagHelperResult result))
+            if (!viewContext.TempData.TryGetValue(ItemsKey, out var o) || !(o is DryvViewData result))
             {
-                result = new DryvTagHelperResult();
+                result = new DryvViewData();
                 viewContext.TempData.Add(ItemsKey, result);
             }
 
