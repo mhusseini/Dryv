@@ -28,7 +28,7 @@ namespace Dryv
         {
             return PropertyRules.GetOrAdd(
                 $"{modelType.FullName}|{modelPath}|{property.DeclaringType.FullName}|{property.Name}",
-                _ => GetInheritedRules(modelType, property, modelPath).ToList());
+                _ => GetInheritedRules(modelType, property, modelPath));
         }
 
         public static IEnumerable<DryvRuleDefinition> GetRulesOnType(this Type objectType) => TypeRules.GetOrAdd(objectType, type =>
@@ -178,12 +178,13 @@ namespace Dryv
             }
         }
 
-        private static IEnumerable<DryvRuleNode> GetInheritedRules(Type modelType, PropertyInfo property, string modelPath)
+        private static IList<DryvRuleNode> GetInheritedRules(Type modelType, PropertyInfo property, string modelPath)
         {
-            return (from prop in property.GetInheritedProperties()
-                    where prop.GetCustomAttribute<DryvRulesAttribute>() != null
-                    from rule in modelType.FindRulesForProperty(prop, modelPath)
-                    select rule)
+            return property.GetCustomAttribute<DryvRulesAttribute>() == null
+                ? (IList<DryvRuleNode>)new DryvRuleNode[0]
+                : (from prop in property.GetInheritedProperties()
+                   from rule in modelType.FindRulesForProperty(prop, modelPath)
+                   select rule)
                 .Distinct()
                 .ToList();
         }

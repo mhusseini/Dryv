@@ -105,6 +105,7 @@ namespace Dryv.Tests
                         ? DryvResult.Success
                         : DryvResult.Error("error"));
 
+            [DryvRules]
             public string Text { get; set; }
         }
 
@@ -112,6 +113,7 @@ namespace Dryv.Tests
         {
             public static DryvRules Rules = CommonRules.Text;
 
+            [DryvRules]
             public string Text { get; set; }
         }
 
@@ -119,6 +121,7 @@ namespace Dryv.Tests
         {
             public static DryvRules Rules => CommonRules.Text;
 
+            [DryvRules]
             public string Text { get; set; }
         }
 
@@ -131,6 +134,7 @@ namespace Dryv.Tests
                         ? DryvResult.Success
                         : DryvResult.Error("error"));
 
+            [DryvRules]
             public override string Text { get; set; }
         }
 
@@ -174,6 +178,7 @@ namespace Dryv.Tests
 
         private abstract class ModelBase
         {
+            [DryvRules]
             public virtual string Text { get; set; }
         }
 
@@ -191,6 +196,7 @@ namespace Dryv.Tests
 
         private class Model9
         {
+            [DryvRules]
             public string Text { get; set; }
         }
     }
