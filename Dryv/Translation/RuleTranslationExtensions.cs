@@ -33,6 +33,7 @@ namespace Dryv.Translation
 
                 rule.TranslatedValidationExpression = translatedRule.Factory;
                 rule.PreevaluationOptionTypes = translatedRule.OptionTypes;
+                rule.CodeTemplate = translatedRule.CodeTemplate;
             }
             catch (DryvException ex)
             {

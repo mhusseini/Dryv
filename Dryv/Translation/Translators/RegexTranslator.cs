@@ -123,12 +123,12 @@ namespace Dryv.Translation.Translators
 
             if (context.HasFlag(RegexOptions.IgnorePatternWhitespace))
             {
-                throw new ExpressionNotSupportedException($"{RegexOptions.IgnorePatternWhitespace} not translatable to JavaScript.");
+                throw new TranslationException($"{RegexOptions.IgnorePatternWhitespace} not translatable to JavaScript.");
             }
 
             if (context.HasFlag(RegexOptions.RightToLeft))
             {
-                throw new ExpressionNotSupportedException($"{RegexOptions.RightToLeft} not translatable to JavaScript.");
+                throw new TranslationException($"{RegexOptions.RightToLeft} not translatable to JavaScript.");
             }
 
             return sb.ToString();

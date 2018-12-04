@@ -18,5 +18,6 @@ namespace Dryv
         internal MemberExpression PropertyExpression { get; set; }
         internal Func<object[], string> TranslatedValidationExpression { get; set; }
         internal Exception TranslationError { get; set; }
+        public string CodeTemplate { get; internal set; }
     }
 }

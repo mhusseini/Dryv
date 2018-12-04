@@ -20,7 +20,7 @@ namespace Dryv.Translation
             this.translator = translator;
         }
 
-        public TranslationResult GenerateTranslationDelegate(string code, List<LambdaExpression> optionDelegates, List<Type> optionTypes)
+        public TranslationResult GenerateTranslationDelegate(string code, IDictionary<int, LambdaExpression> optionDelegates, IList<Type> optionTypes)
         {
             // Escape curly braces for usage within string.Format().
             code = code
@@ -42,7 +42,8 @@ namespace Dryv.Translation
             return new TranslationResult
             {
                 Factory = result.Compile(),
-                OptionTypes = optionTypes.ToArray()
+                OptionTypes = optionTypes.ToArray(),
+                CodeTemplate = code,
             };
         }
 
@@ -71,13 +72,13 @@ namespace Dryv.Translation
         }
 
         private IEnumerable<Expression> GenerateFormatArgumentExpressions(
-            IEnumerable<LambdaExpression> optionDelegates,
+            IDictionary<int, LambdaExpression> optionDelegates,
             IList<Type> optionTypes,
             Expression parameter,
             ref string code)
         {
             var arrayItems = new List<Expression>();
-            var arrayIndexes = new ConcurrentDictionary<Type, int>();
+            var arrayIndexes = new ConcurrentDictionary<string, int>();
 
             // The first item is the model path.
             arrayItems.Add(Expression.ArrayAccess(parameter, Expression.Constant(0)));
@@ -85,26 +86,32 @@ namespace Dryv.Translation
             // Replace all occurrences of $$MODELPATH$$ with the appropriate formatting placeholder
             code = code.Replace("$$MODELPATH$$", "{0}");
 
-            foreach (var lambda in optionDelegates)
+            foreach (var item in optionDelegates)
             {
-                var optionType = GetTypeChain(lambda.Body).Last();
-                var index = arrayIndexes.GetOrAdd(optionType, t =>
+                var lambda = item.Value;
+                var optionType = GetTypeChain(lambda.Body).LastOrDefault();
+                var key = optionType?.Name ?? item.Key.ToString();
+
+                var index = arrayIndexes.GetOrAdd(key, t =>
                 {
-                    var idx = optionTypes.IndexOf(optionType) + 1;
                     // get item from input array (properly casted)
-                    var p = Expression.Convert(Expression.ArrayAccess(parameter, Expression.Constant(idx)), optionType);
+                    var arguments = from p2 in lambda.Parameters
+                                    let idx2 = Expression.Constant(optionTypes.IndexOf(p2.Type) + 1)
+                                    let arrayAccess = Expression.ArrayAccess(parameter, idx2)
+                                    select Expression.Convert(arrayAccess, p2.Type);
+
                     // invoke lambda with item as argument
-                    var optionValue = Expression.Convert(Expression.Invoke(lambda, p), typeof(object));
+                    var optionValue = Expression.Convert(Expression.Invoke(lambda, arguments), typeof(object));
                     // translate result of lambda to JavaScript
                     var translatedOptionsValue = Expression.Call(Expression.Constant(this.translator), TranslateValueMethod, optionValue);
                     // Add the whole expression to the formatting array
                     arrayItems.Add(Expression.Convert(translatedOptionsValue, typeof(object)));
 
-                    return idx;
+                    return arrayIndexes.Count + 1;
                 });
 
                 // Replace all occurrences of $$...$$ with the appropriate formatting placeholder
-                code = code.Replace($"$${lambda.GetHashCode()}$$", $"{{{index}}}");
+                code = code.Replace($"$${item.Key}$$", $"{{{index}}}");
             }
 
             return arrayItems;

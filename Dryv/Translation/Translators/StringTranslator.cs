@@ -192,7 +192,7 @@ namespace Dryv.Translation.Translators
              */
             if (!(context.Expression.Arguments.First() is ConstantExpression pattern))
             {
-                throw new ExpressionNotSupportedException("Calls to string.Format with non-constant pattern strings are not supported.");
+                throw new ExpressionNotSupportedException(context.Expression, "Calls to string.Format with non-constant pattern strings are not supported.");
             }
 
             if (context.Expression.Method.GetParameters().First().ParameterType == typeof(IFormatProvider))
@@ -202,7 +202,7 @@ namespace Dryv.Translation.Translators
 
             if (context.Expression.Arguments.OfType<NewArrayExpression>().Any())
             {
-                throw new ExpressionNotSupportedException("Calls to string.Format with arguments being an array are not supported.");
+                throw new ExpressionNotSupportedException(context.Expression, "Calls to string.Format with arguments being an array are not supported.");
             }
 
             var arguments = context.Expression.Arguments.Skip(1).Cast<object>().ToArray();

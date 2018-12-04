@@ -165,5 +165,9 @@ namespace Dryv.Reflection
         {
             return type.GetTypeInfo().IsInterface;
         }
+        public static bool IsSystemType(this Type type)
+        {
+            return type.Namespace == "System";
+        }
     }
 }

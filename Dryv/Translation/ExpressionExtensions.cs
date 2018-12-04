@@ -65,5 +65,33 @@ namespace Dryv.Translation
                     return typeof(object);
             }
         }
+
+        public static T GetOuterExpression<T>(this Expression expression)
+        where T : Expression
+        {
+            while (true)
+            {
+                switch (expression)
+                {
+                    case T result:
+                        return result;
+
+                    case MethodCallExpression methodCallExpression:
+                        expression = methodCallExpression.Object;
+                        continue;
+
+                    case InvocationExpression invocationExpression:
+                        expression = invocationExpression.Expression;
+                        continue;
+
+                    case MemberExpression memberExpression:
+                        expression = memberExpression.Expression;
+                        continue;
+
+                    default:
+                        return null;
+                }
+            }
+        }
     }
 }

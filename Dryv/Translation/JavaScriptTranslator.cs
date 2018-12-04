@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Dryv.Reflection;
 using Dryv.Utils;
 
 namespace Dryv.Translation
@@ -108,6 +109,33 @@ namespace Dryv.Translation
 
         public bool UseLowercaseMembers { get; set; }
 
+        public override void Translate(Expression expression, TranslationContext context, bool negated = false)
+        {
+            var needsBrackets = GetNeedsBrackets(expression);
+
+            if (needsBrackets)
+            {
+                context.Writer.Write("(");
+            }
+
+            var context2 = new CustomTranslationContext(context)
+            {
+                Expression = expression,
+                Translator = this,
+                Negated = negated
+            };
+
+            if (!this.translatorProvider.GenericTranslators.Any(t => t.TryTranslate(context2)))
+            {
+                this.Visit((dynamic)expression, context2, negated);
+            }
+
+            if (needsBrackets)
+            {
+                context.Writer.Write(") ");
+            }
+        }
+
         public override string TranslateValue(object value)
         {
             switch (value)
@@ -204,33 +232,6 @@ namespace Dryv.Translation
             context.Writer.Write("]");
         }
 
-        public override void Translate(Expression expression, TranslationContext context, bool negated = false)
-        {
-            var needsBrackets = GetNeedsBrackets(expression);
-
-            if (needsBrackets)
-            {
-                context.Writer.Write("(");
-            }
-
-            var context2 = new CustomTranslationContext(context)
-            {
-                Expression = expression,
-                Translator = this,
-                Negated = negated
-            };
-
-            if (!this.translatorProvider.GenericTranslators.Any(t => t.TryTranslate(context2)))
-            {
-                this.Visit((dynamic)expression, context2, negated);
-            }
-
-            if (needsBrackets)
-            {
-                context.Writer.Write(") ");
-            }
-        }
-
         public override void Visit(InvocationExpression expression, TranslationContext context, bool negated = false)
         {
             if (expression.Expression is MemberExpression)
@@ -298,69 +299,6 @@ namespace Dryv.Translation
             }
         }
 
-        private void WriteMember(MemberExpression expression, TranslationContext context)
-        {
-            var parameter = GetParameter(expression);
-            if (context.OptionsTypes.Contains(parameter?.Type))
-            {
-                var func = Expression.Lambda(expression, parameter);
-                context.OptionDelegates.Add(func);
-                context.Writer.Write($"$${func.GetHashCode()}$$");
-                return;
-            }
-
-            if (expression.Expression is ConstantExpression ||
-                expression.Expression == null)
-            {
-                var instance = (expression.Expression as ConstantExpression)?.Value;
-                switch (expression.Member)
-                {
-                    case PropertyInfo property:
-                        {
-                            var value = property.GetValue(instance);
-                            context.Writer.Write(this.TranslateValue(value));
-                            break;
-                        }
-                    case FieldInfo field:
-                        {
-                            var value = field.GetValue(instance);
-                            context.Writer.Write(this.TranslateValue(value));
-                            break;
-                        }
-                }
-            }
-            else
-            {
-                if (context.PropertyExpression != null &&
-                    expression.Expression.ToString().Contains(context.PropertyExpression.ToString()))
-                {
-                    var e = expression;
-                    while (e.Expression is MemberExpression mex)
-                    {
-                        e = mex;
-                    }
-
-                    if (e.Expression is ParameterExpression parameterExpression)
-                    {
-                        this.Visit(parameterExpression, context);
-                        context.Writer.Write("$$MODELPATH$$");
-                    }
-                    else
-                    {
-                        this.Translate(expression.Expression, context);
-                    }
-                }
-                else
-                {
-                    this.Translate(expression.Expression, context);
-                }
-
-                context.Writer.Write(".");
-
-                context.Writer.Write(this.FormatIdentifier(expression.Member.Name.ToCamelCase()));
-            }
-        }
-
         public override void Visit(MemberInitExpression expression, TranslationContext context, bool negated = false)
         {
             this.Visit(expression.NewExpression, context);
@@ -375,14 +313,19 @@ namespace Dryv.Translation
                 return;
             }
 
+            if (TryWriteInjectedMethod(expression, context))
+            {
+                return;
+            }
+
+            var objectType = expression.Object?.Type ?? expression.Method.DeclaringType;
+
             var context2 = new MethodTranslationContext(context)
             {
                 Translator = this,
                 Expression = expression,
                 Negated = negated
             };
-
-            var objectType = context2.Expression.Method.DeclaringType;
 
             if (this.translatorProvider
                 .MethodCallTranslators
@@ -480,14 +423,72 @@ namespace Dryv.Translation
             return true;
         }
 
-        private static ParameterExpression GetParameter(Expression expression)
+        private static void PushInjectedExpression(Expression expression, TranslationContext context, ParameterExpression parameter)
         {
-            while (expression is MemberExpression memberExpression)
+            var hash = expression.ToString().GetHashCode();
+
+            if (!context.OptionDelegates.ContainsKey(hash))
             {
-                expression = memberExpression.Expression;
+                var func = Expression.Lambda(expression, parameter);
+                context.OptionDelegates.Add(hash, func);
             }
 
-            return expression as ParameterExpression;
+            context.Writer.Write($"$${hash}$$");
+        }
+
+        private static bool TryWriteInjectedExpression(Expression expression, TranslationContext context)
+        {
+            var parameter = expression.GetOuterExpression<ParameterExpression>();
+            if (!context.OptionsTypes.Contains(parameter?.Type))
+            {
+                return false;
+            }
+
+            PushInjectedExpression(expression, context, parameter);
+
+            return true;
+        }
+
+        private static bool TryWriteInjectedMethod(MethodCallExpression expression, TranslationContext context)
+        {
+            if (!expression.Type.IsSystemType())
+            {
+                return false;
+            }
+
+            var parameter = expression.Object.GetOuterExpression<ParameterExpression>();
+            if (parameter != null && !context.OptionsTypes.Contains(parameter.Type))
+            {
+                return false;
+            }
+
+            if (parameter == null && !expression.Method.IsStatic)
+            {
+                return false;
+            }
+
+            var parameterExpressions = (from a in expression.Arguments
+                                        let p = a.GetOuterExpression<ParameterExpression>()
+                                        where p != null
+                                        select p).ToList();
+
+            if (parameterExpressions.Any(p => p.Type == context.ModelType))
+            {
+                return false;
+            }
+
+            if (parameter == null && parameterExpressions.Any())
+            {
+                parameter = parameterExpressions.FirstOrDefault(p => context.OptionsTypes.Contains(p.Type));
+            }
+
+            if (parameter == null)
+            {
+                return false;
+            }
+
+            PushInjectedExpression(expression.Object ?? expression, context, parameter);
+            return true;
         }
 
         private static bool TryWriteTerminal(Expression expression, TextWriter writer)
@@ -508,6 +509,65 @@ namespace Dryv.Translation
                     ? name.ToLower()
                     : name.Substring(0, 1).ToLower() + name.Substring(1)
                 : name;
+        }
+
+        private void WriteMember(MemberExpression expression, TranslationContext context)
+        {
+            if (TryWriteInjectedExpression(expression, context))
+            {
+                return;
+            }
+
+            if (expression.Expression is ConstantExpression ||
+                expression.Expression == null)
+            {
+                var instance = (expression.Expression as ConstantExpression)?.Value;
+                switch (expression.Member)
+                {
+                    case PropertyInfo property:
+                        {
+                            var value = property.GetValue(instance);
+                            context.Writer.Write(this.TranslateValue(value));
+                            break;
+                        }
+                    case FieldInfo field:
+                        {
+                            var value = field.GetValue(instance);
+                            context.Writer.Write(this.TranslateValue(value));
+                            break;
+                        }
+                }
+            }
+            else
+            {
+                if (context.PropertyExpression != null &&
+                    expression.Expression.ToString().Contains(context.PropertyExpression.ToString()))
+                {
+                    var e = expression;
+                    while (e.Expression is MemberExpression mex)
+                    {
+                        e = mex;
+                    }
+
+                    if (e.Expression is ParameterExpression parameterExpression)
+                    {
+                        this.Visit(parameterExpression, context);
+                        context.Writer.Write("$$MODELPATH$$");
+                    }
+                    else
+                    {
+                        this.Translate(expression.Expression, context);
+                    }
+                }
+                else
+                {
+                    this.Translate(expression.Expression, context);
+                }
+
+                context.Writer.Write(".");
+
+                context.Writer.Write(this.FormatIdentifier(expression.Member.Name.ToCamelCase()));
+            }
         }
     }
 }
