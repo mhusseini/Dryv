@@ -14,7 +14,7 @@
 
         public static DryvResult Error(string message) => new DryvResult(message, DryvResultType.Error);
 
-        public static implicit operator DryvResult(string message) => Error(message);
+        public static implicit operator DryvResult(string message) => string.IsNullOrWhiteSpace(message) ? Success : Error(message);
 
         public static DryvResult Warning(string message) => new DryvResult(message, DryvResultType.Warning);
     }

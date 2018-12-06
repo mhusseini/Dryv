@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using DryvDemo.Controllers
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -100,6 +101,14 @@
         <div class="doc-wrapper">
             <div class="container">
                 <div class="doc-body">
+                    <ul class="nav hidden-xs" style="position: absolute">
+                        <li>@Html.ActionLink("Simple Example", "Index", "SimpleExample")</li>
+                        <li>@Html.ActionLink("Boolean Properties", "Index", "BooleanPropertyExample")</li>
+                        <li>@Html.ActionLink("Injected Statics", "Index", "InjectedStaticsExample")</li>
+                        <li>@Html.ActionLink("Injected Objects", "Index", "InjectedObjectsExample")</li>
+                        <li>@Html.ActionLink("Rule Switches", "Index", "RuleSwitchExample")</li>
+                        <li>@Html.ActionLink("Tree-Spanning Rules", "Index", "TreeSpanningRulesExample")</li>
+                    </ul>
                     <div class="doc-content">
                         <div class="content-inner">
                             @RenderBody()
@@ -107,7 +116,9 @@
                     </div><!--//doc-content-->
                     <div class="doc-sidebar">
                         <nav id="doc-nav">
-                            <ul id="doc-menu" class="nav doc-menu hidden-xs" data-spy="affix"></ul><!--//doc-menu-->
+                            <ul id="doc-menu" class="nav doc-menu hidden-xs" data-spy="affix">
+                                <li>testestest</li>
+                            </ul><!--//doc-menu-->
                         </nav>
                     </div><!--//doc-sidebar-->
                 </div><!--//doc-body-->

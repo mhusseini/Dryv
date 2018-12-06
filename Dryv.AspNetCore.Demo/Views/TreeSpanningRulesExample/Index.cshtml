@@ -1,0 +1,32 @@
+﻿@model DryvDemo.ViewModels.TreeSpanningRulesExampleVieWModel
+<div class="alert alert-info" role="alert">
+    <form>
+        <div class="form-group row">
+            <label asp-for="Name" class="col-sm-2 col-form-label"></label>
+            <div class="col-sm-10">
+                <input asp-for="Name" class="form-control">
+                <span asp-validation-for="Name"></span>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label asp-for="Child.ChildName" class="col-sm-2 col-form-label"></label>
+            <div class="col-sm-10">
+                <input asp-for="Child.ChildName" class="form-control">
+                <span asp-validation-for="Child.ChildName"></span>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label asp-for="Child.Child.GrandChildName" class="col-sm-2 col-form-label"></label>
+            <div class="col-sm-10">
+                <input asp-for="Child.Child.GrandChildName" class="form-control">
+                <span asp-validation-for="Child.Child.GrandChildName"></span>
+            </div>
+        </div>
+
+        <button class="btn btn-primary">Send</button>
+    </form>
+</div>
+
+<dryv-script />
