@@ -9,6 +9,7 @@ using Dryv.Utils;
 
 namespace Dryv
 {
+
     public class DryvClientModelValidator : IDryvClientModelValidator
     {
         public const string DataTypeDryAttribute = "data-val-dryv-type";
@@ -48,7 +49,10 @@ namespace Dryv
             };
         }
 
-        protected virtual IDictionary<string, string> CreateValidationAttributes(Type modelType, PropertyInfo property, string name)
+        protected virtual IDictionary<string, string> CreateValidationAttributes(
+            Type modelType,
+            PropertyInfo property,
+            string name)
         {
             return new Dictionary<string, string>
             {

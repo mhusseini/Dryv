@@ -7,7 +7,7 @@ using Dryv.Reflection;
 
 namespace Dryv.Utils
 {
-    internal static class TypeExtensions
+    public static class TypeExtensions
     {
         private static readonly TypeInfo EnumerableTypeInfo = typeof(IEnumerable).GetTypeInfo();
 

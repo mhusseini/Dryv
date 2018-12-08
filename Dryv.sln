@@ -24,9 +24,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Demos", "Demos", "{E9770556
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{16D7BA7D-0042-40D0-B33B-91721AA5B825}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApplication1", "..\..\tmp\validation-sample\WebApplication1\WebApplication1\WebApplication1.csproj", "{067092D7-76DF-4751-9ACF-324A0F601CDF}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication2", "..\..\tmp\validation-sample\WebApplication2\WebApplication2.csproj", "{AD8D9EC2-A5E1-41DC-9157-A93933B292F4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "vue-demo", "vue-demo\vue-demo.csproj", "{067092D7-76DF-4751-9ACF-324A0F601CDF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

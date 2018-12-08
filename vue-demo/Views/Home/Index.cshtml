@@ -1,0 +1,32 @@
+﻿@model DryvDemo.ViewModels.HomeViewModel
+
+<html>
+    <head>
+    </head>
+    <body>
+        <div id="app">
+            <form method="post" v-on:submit="onSubmit">
+                <div>
+                    <input type="text" asp-for="Name" />
+                    <span asp-validation-for="Name"></span>
+                    <span>{{ errors.first('Name') }}</span>
+                </div>
+                <div>
+                    <input type="text" asp-for="Company" />
+                    <span asp-validation-for="Company"></span>
+                    <span>{{ errors.first('Company') }}</span>
+                </div>
+                <div>
+                    <input type="text" asp-for="TaxId" />
+                    <span asp-validation-for="TaxId"></span>
+                    <span>{{ errors.first('TaxId') }}</span>
+                </div>
+
+                <button type="submit">Absenden</button>
+            </form>
+        </div>
+
+        <dryv-script/>
+        <script src="js/home.js"></script>
+    </body>
+</html>

@@ -25,7 +25,8 @@ namespace Dryv
 
             setupAction?.Invoke(options);
 
-            services.TryAddSingleton<IDryvClientModelValidator, DryvClientModelValidator>();
+            services.TryAddSingleton(typeof(IDryvClientModelValidator), options.ClientValidatorType ?? typeof(DryvClientModelValidator));
+            services.TryAddSingleton(typeof(IDryvScriptBlockGenerator), options.ClientBodyGeneratorType ?? typeof(DryvScriptBlockGenerator));
             services.AddSingleton<ITranslator, JavaScriptTranslator>();
             services.AddSingleton<ITranslatorProvider, TranslatorProvider>();
             services.AddSingleton(Options.Create(options));

@@ -36,7 +36,7 @@ Using the annotation attributes provides by .NET, we can state that the `Name` p
 
 Now consider the following case: neither the company nor the tax ID fields are required at first. But if the user enters a company name, the tax ID field becomes required. How would you implement such a validation?
 
-The recommended approach **until now** is to write an own validation attribute that inherits from [ValidationAttribute](https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.dataannotations.validationattribute?view=netframework-4.7.1), make it implement [IClientModelValidator](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.modelbinding.validation.iclientmodelvalidator.addvalidation?view=aspnetcore-2.0), implement server side validation and add client-side code to implement a jQuery validator. Real-world application can have lots and lots of different validation rules and implementing them in C# as well as JavaScript can become a cumbersome task.
+The recommended approach **until now** is to write a custom validation attribute that inherits from [ValidationAttribute](https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.dataannotations.validationattribute?view=netframework-4.7.1), make it implement [IClientModelValidator](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.modelbinding.validation.iclientmodelvalidator.addvalidation?view=aspnetcore-2.0), implement server side validation and add client-side code to implement a jQuery validator. Real-world application can have lots and lots of different validation rules and implementing them in C# as well as JavaScript can become a cumbersome task.
 
 **That's where Dryv comes in.** The name "Dryv" is derived from the term "DRY Validation". Using Dryv, you define the rules using C# expressions and some inner magic will translate them to JavaScript. Using Dryv, the example above would look like this:
 
@@ -67,29 +67,6 @@ In the code above, a set of rules for the class `Customer` is defined. This set 
 On the server, install the NuGet package:
 ```
 Install-Package Dryv.AspNetCore 
-```
-### ASP.NET MVC 4.5.1 with Unity
-On the server, install the NuGet package:
-```
-Install-Package Dryv.AspNetMvc.Unity 
-```
-
-### ASP.NET MVC 4.5.1 with Autofac
-On the server, install the NuGet package:
-```
-Install-Package Dryv.AspNetMvc.Autofac 
-```
-
-### ASP.NET MVC 4.5.1 with Ninject
-On the server, install the NuGet package:
-```
-Install-Packag Dryv.AspNetMvc.Ninject 
-```
-
-### ASP.NET MVC 4.5.1 with SimpleInjector
-On the server, install the NuGet package:
-```
-Install-Package Dryv.AspNetMvc.SimpleInjector 
 ```
 
 ### Client
@@ -141,76 +118,6 @@ Since version 2.0, Dryv uses TagHelper to add the client-side validation attribu
 ```
 @addTagHelper *, Dryv.AspNetCore
 ```
-
-### ASP.NET MVC 4.5.1
-
-In the ASP.NET MVC startup class (startup.cs or global.asax.cs), add Dryv in the startup method. The following sample demonstrates registering Dryv for usage with Ninject in global.asax.cs:
-
-```csharp
-using System.Web.Mvc;
-using Dryv.AspNetMvc;
-using Ninject;
-using Ninject.Web.Common;
-using Ninject.Web.Mvc;
-
-public class MvcApplication : HttpApplication
-{
-    protected void Application_Start()
-    {
-        var kernel = new StandardKernel(new NinjectSettings());
-        // The following line is special for Ninject and reactivates the default ASP.NET MVC model validation.
-        kernel.Unbind<ModelValidatorProvider>();
-		
-        // Register Dryv with the IoC framework.
-        kernel.RegisterDryv();
-		
-        DependencyResolver.SetResolver(new NinjectDependencyResolver(kernel));
-
-        AreaRegistration.RegisterAllAreas();
-        FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
-        RouteConfig.RegisterRoutes(RouteTable.Routes);
-
-        // Startup Dryv
-        DependencyResolver.Current.StartDryv();
-    }
-}
-```
-### Other IoC Frameworks
-Dryv currently supports Unity, Ninject, Autofac and SimpleInjector out of the box. More supported IoC frameworks will subsequently be added. If you need integration with a framework that is not yet supporte, implement the *IDependencyContainer* interface. Here is how the integration for Ninject was implemnented:
-
-```csharp
-using System;
-using Ninject;
-
-namespace Dryv.AspNetMvc
-{
-    internal class DependencyContainer : IDependencyContainer
-    {
-        private readonly IKernel kernel;
-
-        public DependencyContainer(IKernel kernel) 
-            => this.kernel = kernel;
-
-        public void AddInstance(Type iface, object implementation) 
-            => this.kernel.Bind(iface).ToConstant(implementation).InSingletonScope().Named(Guid.NewGuid().ToString());
-
-        public void AddSingleton(Type iface, Type implementation) 
-            => this.kernel.Bind(iface).To(implementation).InSingletonScope().Named(Guid.NewGuid().ToString());
-
-        public void RegisterInstance(Type iface, object implementation) 
-            => this.kernel.Bind(iface).ToConstant(implementation).InSingletonScope();
-
-        public void RegisterSingleton(Type iface, Type implementation) 
-            => this.kernel.Bind(iface).To(implementation).InSingletonScope();
-    }
-
-    public static class NinjectContainerExtensions
-    {
-        public static IDryvBuilder RegisterDryv(this IKernel kernel)
-            => DryvMvc.Configure(new DependencyContainer(kernel));
-    }
-}
-```
 ### Stand-alone
 Dryv can be used without ASP.NET. Using just the base package, Dryv can be used to validate models.
 ```csharp
@@ -251,3 +158,7 @@ namespace Demo
 
 ## Examples and Documentation
 For detailed information and usage examples, please visit the project website at [https://dryv-lib.net](https://dryv-lib.net).
+
+
+
+
