@@ -3,22 +3,21 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace Dryv.AspNetCore.TagHelpers
 {
-    [HtmlTargetElement("body")]
-    public class DryvBodyTagHelper : DryvBodyTagHelperBase
+    [HtmlTargetElement("dryv-script")]
+    public class DryvScriptTagHelper : DryvBodyTagHelperBase
     {
-        public DryvBodyTagHelper(IDryvScriptBlockGenerator scriptBlockGenerator)
-        : base(scriptBlockGenerator)
+        public DryvScriptTagHelper(IDryvScriptBlockGenerator scriptBlockGenerator)
+            : base(scriptBlockGenerator)
         { }
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             var content = this.GetContent();
+            output.TagName = null;
 
             if (!string.IsNullOrWhiteSpace(content))
             {
-                output
-                    .PostContent
-                    .AppendHtml(content);
+                output.Content.AppendHtml(content);
             }
 
             this.ViewContext.TempData.Remove(ViewContextExtensions.ItemsKey);

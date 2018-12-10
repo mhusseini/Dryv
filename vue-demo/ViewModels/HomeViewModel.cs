@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Dryv;
+using DryvDemo.Controllers;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DryvDemo.ViewModels
 {
@@ -18,6 +20,7 @@ namespace DryvDemo.ViewModels
         public string Company { get; set; }
 
         [DryvRules]
+        [Remote(controller:"Validation", action:nameof(ValidationController.Validate), AdditionalFields = "Name,Company")]
         public string TaxId { get; set; }
     }
 }

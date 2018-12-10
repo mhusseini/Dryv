@@ -1,9 +1,9 @@
-const path = require('path');
+var path = require('path');
 
 module.exports = {
     mode: "development",
     entry: './script/home.ts',
-    //devtool: 'inline-source-map',
+    devtool: 'inline-source-map',
     output: {
         path: path.resolve(__dirname, 'wwwroot/js'),
         filename: 'home.js'
@@ -18,9 +18,10 @@ module.exports = {
         ]
     },
     resolve: {
+        symlinks: true,
         alias: {
             'vue$': 'vue/dist/vue.esm.js'
         },
         extensions: ['.tsx', '.ts', '.js']
-    },
+    }
 };

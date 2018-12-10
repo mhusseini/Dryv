@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
-namespace Dryv.Mvc
+namespace Dryv.AspNetCore.Mvc
 {
     /// <summary>
     /// An override of the default ObjectModelValidator. Used to provide the current model for <see cref="IModelProvider"/>.

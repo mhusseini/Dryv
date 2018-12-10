@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Dryv.TagHelpers
+namespace Dryv.AspNetCore.TagHelpers
 {
     internal class DryvViewData
     {

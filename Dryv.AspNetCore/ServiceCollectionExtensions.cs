@@ -1,6 +1,6 @@
 ﻿using System;
+using Dryv.AspNetCore.Mvc;
 using Dryv.Configuration;
-using Dryv.Mvc;
 using Dryv.Translation;
 using Dryv.Translation.Translators;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
-namespace Dryv
+namespace Dryv.AspNetCore
 {
     public static class ServiceCollectionExtensions
     {

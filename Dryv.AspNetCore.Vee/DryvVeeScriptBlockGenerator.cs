@@ -1,7 +1,7 @@
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 
-namespace Dryv
+namespace Dryv.AspNetCore
 {
     public class DryvVeeScriptBlockGenerator : DryvScriptBlockGenerator
     {
@@ -10,10 +10,10 @@ namespace Dryv
             return validators.Any()
                ? @"<script>
                     (function(w){
-                        var a = w.dryv = w.dryv || {};
-                        var v = a.vee = a.vee || {};
+                        var a = w.dryv = (w.dryv || {});
+                        var v = a.vee = (a.vee || {});
                         " + string.Concat(validators.Select(i =>
-                        $"v.{i.Key} = {{m: null, v:{i.Value}}};")) + @"
+                        $"v.{i.Key} = {{v:{i.Value}}};")) + @"
                     })(window);
                 </script>"
                : null;

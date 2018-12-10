@@ -1,29 +1,14 @@
 import Vue from "vue";
 import VeeValidate from 'vee-validate';
-import dryv from './dryv-vee-validator';
+import DryvVee from "dryv-vee-validate";
 
-Vue.use(VeeValidate, {
-    events: 'input|blur',
-    fastExit: false,
-});
-
-VeeValidate.Validator.extend('dryv', dryv.validator);
+Vue.use(VeeValidate);
+DryvVee.init(VeeValidate);
 
 const app = new Vue({
     el: "#app",
-    data: {},
-    methods: {
-        onSubmit(e: Event) {
-            dryv.prepare(this, e.target as HTMLFormElement);
-
-            this.$validator.validate().then((result: boolean) => {
-                if (!result) {
-                    e.preventDefault();
-                }
-            });
-        }
-
-    }
+    mixins: [DryvVee.mixin],
+    data: {}
 });
 
 export default app;

@@ -1,4 +1,5 @@
 ﻿using Dryv;
+using Dryv.AspNetCore;
 using DryvDemo.Controllers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -31,11 +32,7 @@ namespace DryvDemo
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            services.AddDryv(options =>
-            {
-                options.UseClientValidator<DryvVeeValidateModelValidator>();
-                options.UseClientBodyGenerator<DryvVeeScriptBlockGenerator>();
-            });
+            services.AddDryv(options => options.UseVeeValidate());
         }
     }
 }

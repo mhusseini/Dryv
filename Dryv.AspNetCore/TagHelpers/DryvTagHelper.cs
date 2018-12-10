@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using Dryv.AspNetCore.Utils;
 using Dryv.Configuration;
 using Dryv.Utils;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -8,7 +9,7 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Dryv.TagHelpers
+namespace Dryv.AspNetCore.TagHelpers
 {
     [HtmlTargetElement("input", Attributes = "asp-for")]
     [HtmlTargetElement("textarea", Attributes = "asp-for")]

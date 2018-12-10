@@ -1,4 +1,4 @@
-﻿namespace Dryv.Mvc
+﻿namespace Dryv.AspNetCore.Mvc
 {
     internal class ModelProvider : IModelProvider
     {

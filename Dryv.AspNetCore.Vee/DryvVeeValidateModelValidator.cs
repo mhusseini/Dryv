@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using Dryv.Utils;
 
-namespace Dryv
+namespace Dryv.AspNetCore
 {
     public class DryvVeeValidateModelValidator : DryvClientModelValidator
     {

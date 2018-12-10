@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using Dryv.TagHelpers;
+using Dryv.AspNetCore.TagHelpers;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace Dryv.Utils
+namespace Dryv.AspNetCore.Utils
 {
     internal static class ViewContextExtensions
     {

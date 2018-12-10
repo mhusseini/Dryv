@@ -13,7 +13,7 @@ namespace DryvDemo.Controllers
         [HttpPost]
         public IActionResult Post(HomeViewModel model)
         {
-            return this.View(model);
+            return this.View(nameof(this.Index), model);
         }
     }
 }
