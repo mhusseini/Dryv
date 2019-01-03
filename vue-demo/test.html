@@ -1,0 +1,21 @@
+<html>
+
+<body>
+    <div id="app">
+        <form>
+            <input v-dryv="'string:xxx'" name="Name" v-model="name">
+            <span>{{ errors.first('Name') }}</span>
+            
+            <input v-dryv="'number:yyy'" name="Age">
+            <span>{{ errors.first('Age') }}</span>
+        </form>
+    </div>
+    <script src="wwwroot/js/home.js"></script>
+    <script>
+        window.xxx = {
+            name: "hello"
+        };
+    </script>
+</body>
+
+</html>
