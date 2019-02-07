@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading.Tasks;
 using Dryv;
 using Microsoft.Extensions.Options;
 
@@ -13,15 +14,17 @@ namespace DryvDemo.ViewModels
                     ? $"Die Steuernummer der Firma {m.Company} muss angegeben werden."
                     : DryvResultMessage.Success)
             .Rule<IOptions<DemoValidationOptions>>(m => m.PostalCode,
-                (m, options) => (!options.Value.IsAddressRequired && !m.IsAddressVisible) || !string.IsNullOrWhiteSpace(m.PostalCode)
+                (m, options) => !options.Value.IsAddressRequired && !m.IsAddressVisible || !string.IsNullOrWhiteSpace(m.PostalCode)
                     ? DryvResultMessage.Success
                     : "Die PLZ muss angegeben werden.")
             .ServerRule<IOptions<DemoValidationOptions>, ZipCodeValidator>(m => m.PostalCode,
-                (m, options, validator) => validator.ValidateZipCode(m.PostalCode).ContinueWith(t => t.Result
-                    ? DryvResultMessage.Success
-                    : "Die PLZ ist nicht gültig."))
+                (m, options, validator) => !options.Value.IsAddressRequired && !m.IsAddressVisible && string.IsNullOrWhiteSpace(m.PostalCode)
+                    ? Task.FromResult(DryvResultMessage.Success)
+                    : validator.ValidateZipCode(m.PostalCode).ContinueWith(t => t.Result
+                        ? DryvResultMessage.Success
+                        : "Die PLZ ist nicht gültig."))
             .Rule<IOptions<DemoValidationOptions>, ZipCodeValidator>(m => m.City,
-                (m, options, validator) => (!options.Value.IsAddressRequired && !m.IsAddressVisible) || !string.IsNullOrWhiteSpace(m.City)
+                (m, options, validator) => !options.Value.IsAddressRequired && !m.IsAddressVisible || !string.IsNullOrWhiteSpace(m.City)
                     ? DryvResultMessage.Success
                     : "Die Stadt muss angegeben werden.")
             .Rule(m => m.SelectionA, m => m.SelectionB,
