@@ -27,7 +27,7 @@ namespace DryvDemo.ViewModels
                 (m, options, validator) => !options.Value.IsAddressRequired && !m.IsAddressVisible || !string.IsNullOrWhiteSpace(m.City)
                     ? DryvResultMessage.Success
                     : "Die Stadt muss angegeben werden.")
-            .Rule(m => m.SelectionA, m => m.SelectionB,
+            .Rule(m => m.SelectionGroup,
                 m => (m.SelectionA == null ? 0 : m.SelectionA.Count(i => i.IsSelected)) == (m.SelectionB == null ? 0 : m.SelectionB.Count(i => i.IsSelected))
                     ? DryvResultMessage.Success
                     : "Aus beiden listen müssen gleich viele Elemente ausgewählt werden.");
@@ -46,9 +46,10 @@ namespace DryvDemo.ViewModels
         public string PostalCode { get; set; }
 
         [DryvRules]
+        public string SelectionGroup { get; set; }
+
         public SelectionItem[] SelectionA { get; set; }
 
-        [DryvRules]
         public SelectionItem[] SelectionB { get; set; }
 
         [DryvRules]
