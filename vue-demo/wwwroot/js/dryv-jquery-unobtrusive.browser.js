@@ -69,7 +69,11 @@
         obj.isNew = !existing;
         return obj;
     };
-    $.validator.addMethod("dryv", function (_, element, func) {
+    $.validator.addMethod("dryv", function (_, element, message) {
+        var func = window.dryv[message];
+        if (!func) {
+            throw "Cannot find Dryv validation function '" + message + "'.";
+        }
         var obj = getObject($(this.currentForm));
         if (!obj.isNew) {
             updateField(element, obj);
@@ -102,12 +106,6 @@
                     });
                 });
         }
-        var func = window.dryv[options.message];
-        if (!func) {
-            console.error("Cannot find Dryv validation function '" + options.message + "'.");
-        }
-        else {
-            options.rules["dryv"] = func;
-        }
+        options.rules["dryv"] = options.message;
     });
 })();

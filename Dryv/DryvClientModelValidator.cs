@@ -16,7 +16,7 @@ namespace Dryv
         public const string DataValAttribute = "data-val";
         public const string DataValDryAttribute = "data-val-dryv";
 
-        public ClientModelElementValidation GetValidationAttributes(
+        public DryvClientPropertyValidation GetValidationAttributes(
             Type modelType,
             string modelPath,
             PropertyInfo property,
@@ -40,12 +40,16 @@ namespace Dryv
                 modelType).ToList();
 
             var name = $"v{Math.Abs((modelType.FullName + property.Name + modelPath).GetHashCode())}";
+            var code = translatedRules.Any() ? $@"function(m) {{ return {string.Join("||", translatedRules.Select(f => $"({f})(m)"))}; }}" : null;
 
-            return new ClientModelElementValidation
+            return code == null ? null : new DryvClientPropertyValidation
             {
                 ElementAttribute = this.CreateValidationAttributes(modelType, property, name),
-                ValidationCode = translatedRules.Any() ? $"[{string.Join(",", translatedRules)}]" : null,
-                Name = name
+                ValidationFunction = code,
+                Name = name,
+                ModelType = modelType,
+                Property = property,
+                ModelPath = modelPath,
             };
         }
 

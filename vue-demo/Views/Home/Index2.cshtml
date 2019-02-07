@@ -1,0 +1,46 @@
+﻿@using Dryv
+@using Dryv.Utils
+@model DryvDemo.ViewModels.HomeViewModel
+
+<html>
+<head>
+</head>
+<body>
+    <form method="post">
+        <div>
+            <label></label>
+            <input type="text" />
+        </div>
+        <div>
+            <label></label>
+            <input type="text" />
+        </div>
+        <div>
+            <label></label>
+            <input type="text" />
+        </div>
+
+        <div>
+            <label></label>
+            <input type="checkbox" />
+        </div>
+
+        <div>
+            <label></label>
+            <input type="text" />
+        </div>
+        <div>
+            <label></label>
+            <input type="text" />
+        </div>
+
+        <button type="submit">Absenden</button>
+    </form>
+
+    <script>
+    var validation = {
+        @Html.Raw(string.Join(",\n", Html.GetDryvClientValidation().Select(val => $"{val.Property.Name.ToCamelCase()}: {val.ValidationFunction}")))
+    };
+    </script>
+</body>
+</html>

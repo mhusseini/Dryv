@@ -15,7 +15,7 @@ namespace Dryv
         /// </summary>
         /// <param name="property">The property for which the rules are created.</param>
         /// <param name="rules">The validation rules to be written to the client.</param>
-        ClientModelElementValidation GetValidationAttributes(
+        DryvClientPropertyValidation GetValidationAttributes(
             Type modelType,
             string modelPath,
             PropertyInfo property,

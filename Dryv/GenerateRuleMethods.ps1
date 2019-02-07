@@ -41,15 +41,25 @@ $parameters			Expression<Func<TModel, $($gen2)DryvResult>> rule$ruleSwitch)
 				$ruleSwitchArgument);
 			return this;
         }
+		/*
+		public DryvRules<TModel> $($methodPrefix)Rule$gen(
+$parameters			Expression<Func<TModel, $($gen2)Task<DryvResult>>> rule$ruleSwitch)
+        {
+			this.Add$($methodPrefix)(rule,
+				new[] { $properties},
+				$ruleSwitchArgument);
+			return this;
+        }*/
 "@ | Add-Content $fn;
 }
 
 'using System;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace Dryv
 {
-    partial class Rules<TModel>
+    partial class DryvRules<TModel>
     {
 ' | Out-File $fn
 

@@ -1,7 +1,10 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Dryv.Configuration;
 using Dryv.Utils;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
@@ -36,23 +39,23 @@ namespace Dryv.TagHelpers
 
             var modelType = this.ViewContext.ViewData.ModelMetadata.ModelType
                             ?? this.AspFor.Metadata.ContainerType;
-            var services = this.ViewContext.HttpContext.RequestServices;
             var property = this.AspFor.GetProperty();
             var modelPath = this.ViewContext.GetModelPath(this.AspFor);
+            var httpContext = this.ViewContext.HttpContext;
 
-            var clientValidation = services.GetService<IDryvClientModelValidator>().GetValidationAttributes(
+            var clientValidation = httpContext.RequestServices.GetService<IDryvClientModelValidator>().GetValidationAttributes(
                 modelType,
                 modelPath,
                 property,
-                services.GetService,
+                this.ViewContext.HttpContext.RequestServices.GetService,
                 this.options.Value);
 
-            if (string.IsNullOrWhiteSpace(clientValidation.ValidationCode))
+            if (clientValidation == null)
             {
                 return Task.CompletedTask;
             }
 
-            this.ViewContext.Store(clientValidation.Name, clientValidation.ValidationCode);
+            this.ViewContext.StoreValidationCode(clientValidation.Name, clientValidation);
             output.Attributes.AddRange(clientValidation.ElementAttribute.Select(i => new TagHelperAttribute(i.Key, i.Value)));
 
             return Task.CompletedTask;

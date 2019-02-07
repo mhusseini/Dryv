@@ -1,32 +1,52 @@
-﻿@model DryvDemo.ViewModels.HomeViewModel
+﻿@using Dryv
+@using Dryv.Utils
+@model DryvDemo.ViewModels.HomeViewModel
 
 <html>
-    <head>
-    </head>
-    <body>
-        <div id="app">
-            <form method="post" v-on:submit="onSubmit">
-                <div>
-                    <input type="text" asp-for="Name" />
-                    <span asp-validation-for="Name"></span>
-                    <span>{{ errors.first('Name') }}</span>
-                </div>
-                <div>
-                    <input type="text" asp-for="Company" />
-                    <span asp-validation-for="Company"></span>
-                    <span>{{ errors.first('Company') }}</span>
-                </div>
-                <div>
-                    <input type="text" asp-for="TaxId" />
-                    <span asp-validation-for="TaxId"></span>
-                    <span>{{ errors.first('TaxId') }}</span>
-                </div>
-
-                <button type="submit">Absenden</button>
-            </form>
+<head>
+</head>
+<body>
+    <form method="post">
+        <div>
+            <label asp-for="Name"></label>
+            <input type="text" asp-for="Name" />
+            <span asp-validation-for="Name"></span>
+        </div>
+        <div>
+            <label asp-for="Company"></label>
+            <input type="text" asp-for="Company" />
+            <span asp-validation-for="Company"></span>
+        </div>
+        <div>
+            <label asp-for="TaxId"></label>
+            <input type="text" asp-for="TaxId" />
+            <span asp-validation-for="TaxId"></span>
         </div>
 
-        <dryv-script/>
-        <script src="js/home.js"></script>
-    </body>
+        <div>
+            <label asp-for="IsAddressVisible"></label>
+            <input type="checkbox" asp-for="IsAddressVisible" />
+        </div>
+
+        <div>
+            <label asp-for="PostalCode"></label>
+            <input type="text" asp-for="PostalCode" />
+            <span asp-validation-for="PostalCode"></span>
+        </div>
+        <div>
+            <label asp-for="City"></label>
+            <input type="text" asp-for="City" />
+            <span asp-validation-for="City"></span>
+        </div>
+
+        <button type="submit">Absenden</button>
+    </form>
+
+    <dryv-script />
+
+    <script type="text/javascript" src="~/js/jquery-1.12.3.min.js"></script>
+    <script type="text/javascript" src="~/js/jquery.validate.js"></script>
+    <script type="text/javascript" src="~/js/jquery.validate.unobtrusive.js"></script>
+    <script type="text/javascript" src="~/js/dryv-jquery-unobtrusive.browser.js"></script>
+</body>
 </html>

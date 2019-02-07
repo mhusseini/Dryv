@@ -9,9 +9,13 @@ namespace DryvDemo.Controllers
         {
             return this.View(new HomeViewModel());
         }
+        public IActionResult Index2()
+        {
+            return this.View(new HomeViewModel());
+        }
 
         [HttpPost]
-        public IActionResult Post(HomeViewModel model)
+        public IActionResult Index(HomeViewModel model)
         {
             return this.View(model);
         }

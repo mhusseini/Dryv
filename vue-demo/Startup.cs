@@ -31,10 +31,11 @@ namespace DryvDemo
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            services.AddDryv(options =>
+            services.AddDryv();
+
+            services.Configure<DemoValidationOptions>(options =>
             {
-                options.UseClientValidator<DryvVeeValidateModelValidator>();
-                options.UseClientBodyGenerator<DryvVeeScriptBlockGenerator>();
+                options.IsAddressRequired = true;
             });
         }
     }

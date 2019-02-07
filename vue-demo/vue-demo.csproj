@@ -16,5 +16,17 @@
     <ProjectReference Include="..\Dryv.AspNetCore\Dryv.AspNetCore.csproj" />
     <ProjectReference Include="..\Dryv\Dryv.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Views\Home\Index2.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="wwwroot\js\home.js">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\js\home.js.map">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
   
 </Project>

@@ -1,29 +1,41 @@
 ﻿using System.Collections.Generic;
-using Dryv.TagHelpers;
+using System.Collections.ObjectModel;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Dryv.Utils
 {
     internal static class ViewContextExtensions
     {
-        internal const string ItemsKey = "dryv";
+        private static readonly IDictionary<string, DryvClientPropertyValidation> EmptyValidation = new ReadOnlyDictionary<string, DryvClientPropertyValidation>(new Dictionary<string, DryvClientPropertyValidation>());
 
-        public static IDictionary<string, string> Load(this ViewContext viewContext)
+        public static IDictionary<string, DryvClientPropertyValidation> LoadValidationCode(this ViewContext viewContext)
         {
-            return viewContext.TempData.TryGetValue(ItemsKey, out var o) && o is DryvViewData result
-                ? result.ValidationFunctions
-                : new Dictionary<string, string>();
+            return viewContext.HttpContext.Features.Get<DryvFeature>()?.PropertyValidations ?? EmptyValidation;
         }
 
-        public static void Store(this ViewContext viewContext, string key, string value)
+        public static IDictionary<string, DryvClientPropertyValidation> PopValidationCode(this ViewContext viewContext)
         {
-            if (!viewContext.TempData.TryGetValue(ItemsKey, out var o) || !(o is DryvViewData result))
+            var result = LoadValidationCode(viewContext);
+            if (result != null)
             {
-                result = new DryvViewData();
-                viewContext.TempData.Add(ItemsKey, result);
+                result = result.ToDictionary(i => i.Key, i => i.Value);
+                viewContext.HttpContext.Features.Get<DryvFeature>()?.PropertyValidations.Clear();
             }
 
-            result.ValidationFunctions[key] = value;
+            return result;
+        }
+
+        public static void StoreValidationCode(this ViewContext viewContext, string key, DryvClientPropertyValidation value)
+        {
+            var feature = viewContext.HttpContext.Features.Get<DryvFeature>();
+            if (feature == null)
+            {
+                feature = new DryvFeature();
+                viewContext.HttpContext.Features.Set(feature);
+            }
+
+            feature.PropertyValidations[key] = value;
         }
     }
 }

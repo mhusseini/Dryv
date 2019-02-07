@@ -56,6 +56,7 @@ Vue.directive('dryv', {
         }
     },
     inserted(el: HTMLInputElement, binding, vnode) {
+        debugger;
         const myDryv = getFormContext(el, binding, vnode);
         const parts = binding.value.split(":");
         const type = parts[0];
@@ -77,7 +78,8 @@ Vue.directive('dryv', {
 const app = new Vue({
     el: "#app",
     data: {
-        name: "hallo"
+        name: "hallo",
+        age: 23
     },
     methods: {
         onSubmit(e: Event) {
