@@ -21,7 +21,7 @@ namespace DryvDemo.ViewModels
                 (m, options, validator) => (!options.Value.IsAddressRequired && !m.IsAddressVisible) || !string.IsNullOrWhiteSpace(m.City)
                     ? DryvResult.Success
                     : "Die Stadt muss angegeben werden.")
-            .Rule(m => m.SelectionA,
+            .Rule(m => m.SelectionA, m => m.SelectionB,
                 m => (m.SelectionA == null ? 0 : m.SelectionA.Count(i => i.IsSelected)) == (m.SelectionB == null ? 0 : m.SelectionB.Count(i => i.IsSelected))
                     ? DryvResult.Success
                     : "Aus beiden listen müssen gleich viele Elemente ausgewählt werden.");
