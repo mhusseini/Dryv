@@ -7,38 +7,65 @@
 </head>
 <body>
     <form method="post">
-        <div>
-            <label asp-for="Name"></label>
-            <input type="text" asp-for="Name" />
-            <span asp-validation-for="Name"></span>
-        </div>
-        <div>
-            <label asp-for="Company"></label>
-            <input type="text" asp-for="Company" />
-            <span asp-validation-for="Company"></span>
-        </div>
-        <div>
-            <label asp-for="TaxId"></label>
-            <input type="text" asp-for="TaxId" />
-            <span asp-validation-for="TaxId"></span>
-        </div>
+        <fieldset>
+            <div>
+                <label asp-for="Name"></label>
+                <input type="text" asp-for="Name" />
+                <span asp-validation-for="Name"></span>
+            </div>
+            <div>
+                <label asp-for="Company"></label>
+                <input type="text" asp-for="Company" />
+                <span asp-validation-for="Company"></span>
+            </div>
+            <div>
+                <label asp-for="TaxId"></label>
+                <input type="text" asp-for="TaxId" />
+                <span asp-validation-for="TaxId"></span>
+            </div>
+        </fieldset>
+        <fieldset>
+            <div>
+                <input type="checkbox" asp-for="IsAddressVisible" />
+                <label asp-for="IsAddressVisible"></label>
+            </div>
 
-        <div>
-            <label asp-for="IsAddressVisible"></label>
-            <input type="checkbox" asp-for="IsAddressVisible" />
-        </div>
+            <div>
+                <label asp-for="PostalCode"></label>
+                <input type="text" asp-for="PostalCode" />
+                <span asp-validation-for="PostalCode"></span>
+            </div>
+            <div>
+                <label asp-for="City"></label>
+                <input type="text" asp-for="City" />
+                <span asp-validation-for="City"></span>
+            </div>
+        </fieldset>
+        <fieldset>
+            <span asp-validation-for="SelectionA"></span>
 
-        <div>
-            <label asp-for="PostalCode"></label>
-            <input type="text" asp-for="PostalCode" />
-            <span asp-validation-for="PostalCode"></span>
-        </div>
-        <div>
-            <label asp-for="City"></label>
-            <input type="text" asp-for="City" />
-            <span asp-validation-for="City"></span>
-        </div>
+            <div>
+                <label asp-for="SelectionA"></label>
+                <span asp-validation-for="SelectionB"></span>
+                <input type="hidden" dryv-for="SelectionA" />
+                @for (var i = 0; i < Model.SelectionA.Count(); i++)
+                {
+                    <input type="checkbox" asp-for="@Model.SelectionA[i].IsSelected" />
+                    <label asp-for="@Model.SelectionA[i].IsSelected">@Model.SelectionA[i].Name</label>
+                }
+            </div>
 
+            <div>
+                <label asp-for="SelectionB"></label>
+                <input type="hidden" dryv-for="SelectionB" />
+                @for (var i = 0; i < Model.SelectionB.Count(); i++)
+                {
+                    <input type="checkbox" asp-for="@Model.SelectionB[i].IsSelected" />
+                    <label asp-for="@Model.SelectionB[i].IsSelected">@Model.SelectionB[i].Name</label>
+                }
+            </div>
+
+        </fieldset>
         <button type="submit">Absenden</button>
     </form>
 
@@ -48,5 +75,6 @@
     <script type="text/javascript" src="~/js/jquery.validate.js"></script>
     <script type="text/javascript" src="~/js/jquery.validate.unobtrusive.js"></script>
     <script type="text/javascript" src="~/js/dryv-jquery-unobtrusive.browser.js"></script>
+    <script>$.validator.setDefaults({ ignore: null });</script>
 </body>
 </html>

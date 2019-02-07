@@ -7,7 +7,19 @@ namespace DryvDemo.Controllers
     {
         public IActionResult Index()
         {
-            return this.View(new HomeViewModel());
+            return this.View(new HomeViewModel
+            {
+                SelectionA = new[]
+                {
+                    new SelectionItem{Name = "Selection A1"},
+                    new SelectionItem{Name = "Selection A2"},
+                },
+                SelectionB = new[]
+                {
+                    new SelectionItem{Name = "Selection B1"},
+                    new SelectionItem{Name = "Selection B2"},
+                }
+            });
         }
         public IActionResult Index2()
         {

@@ -21,7 +21,11 @@
         if (el.data("dryv-ignore")) {
             return;
         }
-        var names = el.attr("name").replace(/^\w|\.\w/g, function (m) { return m.toLowerCase(); }).split(".");
+        var name = el.attr("name");
+        if (!name) {
+            return;
+        }
+        var names = name.replace(/^\w|\.\w/g, function (m) { return m.toLowerCase(); }).split(".");
         var max = names.length - 1;
         for (var i = 0; i < names.length; i++) {
             var name_1 = names[i];
