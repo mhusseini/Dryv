@@ -8,13 +8,13 @@ namespace DryvDemo.ViewModels
         public static readonly DryvRules Rules = DryvRules.For<BooleanPropertyExampleVieWModel>()
             .Rule(m => m.Name,
                 m => !m.IsOverlyManly || m.Name.EndsWith("or")
-                    ? DryvResult.Success
-                    : DryvResult.Error("Overly manly names must end with 'or'."))
+                    ? DryvResultMessage.Success
+                    : DryvResultMessage.Error("Overly manly names must end with 'or'."))
 
             .Rule(m => m.HasNoFear,
                 m => !m.IsOverlyManly || m.HasNoFear
-                    ? DryvResult.Success
-                    : DryvResult.Error("Must not have fear."));
+                    ? DryvResultMessage.Success
+                    : DryvResultMessage.Error("Must not have fear."));
 
         public bool IsOverlyManly { get; set; }
 

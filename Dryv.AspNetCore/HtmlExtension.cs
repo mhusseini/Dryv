@@ -4,7 +4,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Dryv.Configuration;
-using Dryv.Utils;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,7 +11,7 @@ using Microsoft.Extensions.Options;
 
 namespace Dryv
 {
-    public static class HtmlExtension
+    public static class HtmlExtensions
     {
         public static IHtmlContent DryvClientValidationFor<TModel>(this IHtmlHelper<TModel> htmlHelper, Expression<Func<TModel, object>> propertyExpression)
         {

@@ -2,8 +2,8 @@
 {
     public static class ResultExtensions
     {
-        public static bool IsError(this DryvResult result) => !result.IsSuccess();
+        public static bool IsError(this DryvResultMessage result) => !result.IsSuccess();
 
-        public static bool IsSuccess(this DryvResult result) => result == null || result == DryvResult.Success;
+        public static bool IsSuccess(this DryvResultMessage result) => result == null || result == DryvResultMessage.Success;
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Dryv.Utils
@@ -8,6 +9,18 @@ namespace Dryv.Utils
     internal static class ViewContextExtensions
     {
         private static readonly IDictionary<string, DryvClientPropertyValidation> EmptyValidation = new ReadOnlyDictionary<string, DryvClientPropertyValidation>(new Dictionary<string, DryvClientPropertyValidation>());
+
+        public static DryvFeature GetDryvFeature(this HttpContext httpContext)
+        {
+            var feature = httpContext.Features.Get<DryvFeature>();
+            if (feature == null)
+            {
+                feature = new DryvFeature();
+                httpContext.Features.Set(feature);
+            }
+
+            return feature;
+        }
 
         public static IDictionary<string, DryvClientPropertyValidation> LoadValidationCode(this ViewContext viewContext)
         {
@@ -28,14 +41,7 @@ namespace Dryv.Utils
 
         public static void StoreValidationCode(this ViewContext viewContext, string key, DryvClientPropertyValidation value)
         {
-            var feature = viewContext.HttpContext.Features.Get<DryvFeature>();
-            if (feature == null)
-            {
-                feature = new DryvFeature();
-                viewContext.HttpContext.Features.Set(feature);
-            }
-
-            feature.PropertyValidations[key] = value;
+            viewContext.HttpContext.GetDryvFeature().PropertyValidations[key] = value;
         }
     }
 }

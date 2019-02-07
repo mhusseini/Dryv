@@ -21,7 +21,7 @@ namespace DryvDemo.ViewModels
             //
             .Rule<IOptions<InjectedObjectsExampleVieWModelOptions>>(m => m.Company,
                 (m, o) => m.Company.StartsWith(o.Value.CompanyPrefix, StringComparison.OrdinalIgnoreCase)
-                    ? DryvResult.Success
+                    ? DryvResultMessage.Success
                     : $"The company name must begin with '{o.Value.CompanyPrefix}'.")
 
             //
@@ -30,7 +30,7 @@ namespace DryvDemo.ViewModels
             //
             .Rule<IOptions<InjectedObjectsExampleVieWModelOptions>>(m => m.Slogan,
                 (m, o) => string.IsNullOrWhiteSpace(m.Slogan) || m.Slogan.EndsWith(o.GetSloganPostfix(), StringComparison.OrdinalIgnoreCase)
-                    ? DryvResult.Success
+                    ? DryvResultMessage.Success
                     : o.GetSloganError());
 
         [Required]

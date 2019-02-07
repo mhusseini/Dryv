@@ -55,8 +55,7 @@ namespace DryvDemo
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
-            services.AddDryv();
+            services.AddMvc().AddDryv();
 
             services.Configure<RuleSwitchExampleVieWModelOptions>(options =>
             {

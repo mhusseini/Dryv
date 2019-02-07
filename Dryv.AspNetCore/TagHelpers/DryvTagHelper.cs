@@ -75,6 +75,10 @@ namespace Dryv.TagHelpers
             return Task.CompletedTask;
         }
 
-        private string GetName(string modelPath, PropertyInfo property) => this.name ?? (this.name = modelPath + (string.IsNullOrWhiteSpace(modelPath) ? string.Empty : ".") + property.Name);
+        private string GetName(string modelPath, MemberInfo property)
+        {
+            var prefix = this.DryvFor == null ? string.Empty : "_";
+            return this.name ?? (this.name = modelPath + (string.IsNullOrWhiteSpace(modelPath) ? string.Empty : ".") + prefix + property.Name);
+        }
     }
 }

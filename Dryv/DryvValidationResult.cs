@@ -1,22 +1,25 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
+using Dryv.Utils;
 
 namespace Dryv
 {
-    [DebuggerDisplay("{" + nameof(Path) + "}: {" + nameof(ValidationResult) + "}")]
+    [DebuggerDisplay("{Path}.{Property.Name}")]
     public struct DryvValidationResult
     {
-        public DryvValidationResult(object model, PropertyInfo property, string path, DryvResult validationResult)
+        public DryvValidationResult(object model, PropertyInfo property, string path, IEnumerable<DryvResultMessage> messages)
         {
             this.Model = model;
             this.Property = property;
             this.Path = path;
-            this.ValidationResult = validationResult;
+            this.Message = messages.Where(m => !m.IsSuccess()).ToList();
         }
 
+        public IReadOnlyCollection<DryvResultMessage> Message { get; }
         public object Model { get; }
         public string Path { get; }
         public PropertyInfo Property { get; }
-        public DryvResult ValidationResult { get; }
     }
 }

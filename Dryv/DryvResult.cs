@@ -1,21 +1,24 @@
-﻿namespace Dryv
+﻿using System.Diagnostics;
+
+namespace Dryv
 {
-    public sealed class DryvResult
+    [DebuggerDisplay("{Type} - {Text}")]
+    public sealed class DryvResultMessage
     {
-        public static readonly DryvResult Success = new DryvResult(DryvResultType.Success);
+        public static readonly DryvResultMessage Success = new DryvResultMessage(DryvResultType.Success);
 
-        private DryvResult(DryvResultType type) => this.Type = type;
+        private DryvResultMessage(DryvResultType type) => this.Type = type;
 
-        private DryvResult(string message, DryvResultType type) : this(type) => this.Message = message;
+        private DryvResultMessage(string text, DryvResultType type) : this(type) => this.Text = text;
 
-        public string Message { get; }
+        public string Text { get; }
 
         public DryvResultType Type { get; }
 
-        public static DryvResult Error(string message) => new DryvResult(message, DryvResultType.Error);
+        public static DryvResultMessage Error(string text) => new DryvResultMessage(text, DryvResultType.Error);
 
-        public static implicit operator DryvResult(string message) => string.IsNullOrWhiteSpace(message) ? Success : Error(message);
+        public static implicit operator DryvResultMessage(string text) => string.IsNullOrWhiteSpace(text) ? Success : Error(text);
 
-        public static DryvResult Warning(string message) => new DryvResult(message, DryvResultType.Warning);
+        public static DryvResultMessage Warning(string text) => new DryvResultMessage(text, DryvResultType.Warning);
     }
 }

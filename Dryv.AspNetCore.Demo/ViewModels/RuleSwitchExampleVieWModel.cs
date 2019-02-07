@@ -14,7 +14,7 @@ namespace DryvDemo.ViewModels
             .Rule<IOptions<RuleSwitchExampleVieWModelOptions>>(m => m.Company,
                 (m, o) => string.IsNullOrWhiteSpace(m.Company)
                     ? "The company name must be specified."
-                    : DryvResult.Success,
+                    : DryvResultMessage.Success,
                 o => o.Value.CompanyNameRequired);
 
         [DryvRules]

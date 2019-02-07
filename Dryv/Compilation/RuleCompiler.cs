@@ -30,20 +30,20 @@ namespace Dryv.Compilation
             return rule.CompiledEnablingExpression(options);
         }
 
-        public static DryvResult Validate(DryvRuleDefinition rule, object model, Func<Type, object> objectFactory)
+        public static DryvResultMessage Validate(DryvRuleDefinition rule, object model, Func<Type, object> objectFactory)
         {
             if (typeof(Task).IsAssignableFrom(rule.ValidationExpression.ReturnType))
             {
-                return DryvResult.Success;
+                return DryvResultMessage.Success;
             }
 
             Compile(rule);
             var options = GetPreevaluationOptions(rule, objectFactory);
 
-            return (DryvResult)rule.CompiledValidationExpression(model, options);
+            return (DryvResultMessage)rule.CompiledValidationExpression(model, options);
         }
 
-        public static Task<DryvResult> ValidateAsync(DryvRuleDefinition rule, object model, Func<Type, object> objectFactory)
+        public static Task<DryvResultMessage> ValidateAsync(DryvRuleDefinition rule, object model, Func<Type, object> objectFactory)
         {
             Compile(rule);
             var options = GetPreevaluationOptions(rule, objectFactory);
@@ -52,9 +52,9 @@ namespace Dryv.Compilation
 
             switch (result)
             {
-                case DryvResult dryvResult: return Task.FromResult(dryvResult);
-                case Task<DryvResult> task: return task;
-                default: throw new InvalidOperationException($"Compiled validation expression for property {rule.Property.DeclaringType.FullName}.{rule.Property.Name} should return '{result.GetType().FullName}'. Only DryvResult and Task<DryvResult> are allowed.");
+                case DryvResultMessage dryvResult: return Task.FromResult(dryvResult);
+                case Task<DryvResultMessage> task: return task;
+                default: throw new InvalidOperationException($"Compiled validation expression for property {rule.Property.DeclaringType.FullName}.{rule.Property.Name} should return '{result.GetType().FullName}'. Only DryvResultMessage and Task<DryvResultMessage> are allowed.");
             }
         }
 

@@ -74,6 +74,29 @@ namespace Dryv.Utils
             var pathPrefix = string.IsNullOrWhiteSpace(path) ? string.Empty : ".";
             var rootType = root.GetType();
 
+            if (!(root is string) && root is IList list)
+            {
+                var models2 = models.Add(model);
+
+                var index = list.IndexOf(model);
+                if (index >= 0)
+                {
+                    return new TreeInfo(models2, paths.Add($"{path}[{index}]"));
+                }
+
+                index = 0;
+                foreach (var child in list)
+                {
+                    var childResult = GetTreeInfo(model, child, models2, paths.Add($"{path}[{index++}]"));
+                    if (childResult != null)
+                    {
+                        return childResult;
+                    }
+                }
+
+                return null;
+            }
+
             foreach (var property in rootType.GetProperties())
             {
                 var child = property.GetValue(root);

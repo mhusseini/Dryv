@@ -13,10 +13,10 @@ namespace Dryv.Tests
 {
     public class JavascriptTranslatorTestsBase
     {
-        protected static System.Linq.Expressions.Expression<Func<TestModel, DryvResult>> Expression(System.Linq.Expressions.Expression<Func<TestModel, DryvResult>> exp) =>
+        protected static System.Linq.Expressions.Expression<Func<TestModel, DryvResultMessage>> Expression(System.Linq.Expressions.Expression<Func<TestModel, DryvResultMessage>> exp) =>
             exp;
 
-        protected static System.Linq.Expressions.Expression<Func<TModel, DryvResult>> Expression<TModel>(System.Linq.Expressions.Expression<Func<TModel, DryvResult>> exp) =>
+        protected static System.Linq.Expressions.Expression<Func<TModel, DryvResultMessage>> Expression<TModel>(System.Linq.Expressions.Expression<Func<TModel, DryvResultMessage>> exp) =>
             exp;
 
         protected static T GetBodyExpression<T>(FunctionExpression jsProgram)

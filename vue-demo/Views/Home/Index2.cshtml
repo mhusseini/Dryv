@@ -39,7 +39,9 @@
 
     <script>
     var validation = {
-        @Html.Raw(string.Join(",\n", Html.GetDryvClientValidation().Select(val => $"{val.Property.Name.ToCamelCase()}: {val.ValidationFunction}")))
+        @Html.Raw(string.Join(",\n", from val in Html.GetDryvClientValidation()
+                                     let field = val.Property.Name.ToCamelCase()
+                                     select  $"{field}: {val.ValidationFunction}"))
     };
     </script>
 </body>

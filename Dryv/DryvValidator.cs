@@ -18,10 +18,10 @@ namespace Dryv
         private static readonly MethodInfo AddResultMethod = typeof(ICollection<DryvValidationResult>).GetTypeInfo().GetDeclaredMethod(nameof(ICollection<DryvValidationResult>.Add));
         private static readonly ConstructorInfo AsyncValidationResultCtor = typeof(DryvAsyncValidationResult).GetTypeInfo().DeclaredConstructors.First();
         private static readonly MethodInfo StringConcatMethod = typeof(string).GetTypeInfo().DeclaredMethods.First(m => m.Name == nameof(string.Concat) && m.GetParameters().Select(p => p.ParameterType).ToList().ElementsEqual(typeof(string), typeof(string)));
-        private static readonly MethodInfo ValidateAsyncMethod = typeof(DryvValidator).GetTypeInfo().GetDeclaredMethod(nameof(ValidateCoreAsync));
         private static readonly ConcurrentDictionary<Type, ValidateAsyncAction> ValidateAsyncMethods = new ConcurrentDictionary<Type, ValidateAsyncAction>();
-        private static readonly MethodInfo ValidateMethod = typeof(DryvValidator).GetTypeInfo().GetDeclaredMethod(nameof(ValidateCore));
         private static readonly ConcurrentDictionary<Type, ValidateAction> ValidateMethods = new ConcurrentDictionary<Type, ValidateAction>();
+        private static readonly MethodInfo ValidatePathAsyncMethod = typeof(DryvValidator).GetTypeInfo().GetDeclaredMethod(nameof(ValidatePathAsync));
+        private static readonly MethodInfo ValidatePathMethod = typeof(DryvValidator).GetTypeInfo().GetDeclaredMethod(nameof(ValidatePath));
         private static readonly MethodInfo ValidatePropertyAsyncMethod = typeof(DryvValidator).GetTypeInfo().GetDeclaredMethod(nameof(ValidatePropertyAsync));
         private static readonly MethodInfo ValidatePropertyMethod = typeof(DryvValidator).GetTypeInfo().GetDeclaredMethod(nameof(ValidateProperty));
         private static readonly ConstructorInfo ValidationResultCtor = typeof(DryvValidationResult).GetTypeInfo().DeclaredConstructors.First();
@@ -43,20 +43,21 @@ namespace Dryv
             IDictionary<object, object> cache,
             bool asyncOnly);
 
-        public List<DryvValidationResult> Validate(object model, Func<Type, object> services = null)
+        public static List<DryvValidationResult> Validate(object model, Func<Type, object> services = null)
         {
-            return this.ValidateCore(model, services, new Dictionary<object, object>());
+            return ValidateCore(model, services ?? (t => null), new Dictionary<object, object>()).Where(r => r.Message.Any(vr => !vr.IsSuccess())).ToList();
         }
 
-        public Task<List<DryvValidationResult>> ValidateAsync(
+        public static async Task<List<DryvValidationResult>> ValidateAsync(
             object model,
             bool asyncOnly = false,
             Func<Type, object> services = null)
         {
-            return this.ValidateCoreAsync(model, asyncOnly, services, new Dictionary<object, object>());
+            var result = await ValidateCoreAsync(model, services ?? (t => null), new Dictionary<object, object>(), asyncOnly);
+            return result.Where(r => r.Message.Any(vr => !vr.IsSuccess())).ToList();
         }
 
-        internal static IReadOnlyCollection<DryvResult> ValidateProperty(
+        internal static IReadOnlyCollection<DryvResultMessage> ValidateProperty(
             object currentModel,
             object rootModel,
             PropertyInfo property,
@@ -98,52 +99,32 @@ namespace Dryv
                                         where (p.PropertyType.IsClass() || p.PropertyType.IsInterface())
                                               && p.PropertyType != typeof(string)
                                         select p).ToList();
-            var returnLabel = Expression.Label();
+
             var propertyValidationExpressions = from property in properties
-                                                let task = Expression.Parameter(typeof(Task<IReadOnlyCollection<DryvResult>>), "task")
-                                                select Expression.Block(
-                                                    new[] { task },
-                                                    Expression.Assign(
-                                                        task,
-                                                        Expression.Call(ValidatePropertyAsyncMethod,
-                                                            typedModel,
-                                                            parameterRootModel,
-                                                            Expression.Constant(property),
-                                                            parameterServices,
-                                                            parameterCache,
-                                                            parameterAsyncOnly)),
-                                                    Expression.Call(parameterResult, AddAsyncResultMethod,
+                                                select Expression.Call(parameterResult, AddAsyncResultMethod,
                                                         Expression.New(AsyncValidationResultCtor,
                                                             parameterModel,
                                                             Expression.Constant(property),
-                                                            Expression.Call(StringConcatMethod,
-                                                                parameterPath,
-                                                                Expression.Constant(property.Name)),
-                                                            task)),
-                                                    Expression.Return(returnLabel, task),
-                                                    Expression.Label(returnLabel)
-                                                );
+                                                            Expression.Call(StringConcatMethod, parameterPath, Expression.Constant(property.Name)),
+                                                            Expression.Call(ValidatePropertyAsyncMethod,
+                                                                typedModel,
+                                                                parameterRootModel,
+                                                                Expression.Constant(property),
+                                                                parameterServices,
+                                                                parameterCache,
+                                                                parameterAsyncOnly)));
+
             var navigationExpressions = from property in navigationProperties
-                                        let childVariable = Expression.Parameter(property.PropertyType, "child")
-                                        select Expression.Block(
-                                            new[] { childVariable },
-                                            Expression.Assign(
-                                                childVariable,
-                                                Expression.Property(typedModel, property)),
-                                            Expression.Return(returnLabel,
-                                                Expression.Call(ValidateAsyncMethod,
-                                                    childVariable,
-                                                    parameterRootModel,
-                                                    Expression.Call(StringConcatMethod,
-                                                        parameterPath,
-                                                        Expression.Constant(property.Name + ".")),
-                                                    parameterResult,
-                                                    parameterProcessed,
-                                                    parameterServices,
-                                                    parameterCache,
-                                                    parameterAsyncOnly)),
-                                            Expression.Label(returnLabel)
-                                        );
+                                        select Expression.Call(ValidatePathAsyncMethod,
+                                            Expression.Property(typedModel, property),
+                                            parameterRootModel,
+                                            Expression.Call(StringConcatMethod, parameterPath, Expression.Constant(property.Name + ".")),
+                                            parameterResult,
+                                            parameterProcessed,
+                                            parameterServices,
+                                            parameterCache,
+                                            parameterAsyncOnly);
+
             var lambda = Expression.Lambda<ValidateAsyncAction>(
                 Expression.Block(propertyValidationExpressions.Union(navigationExpressions)),
                 parameterModel,
@@ -167,17 +148,17 @@ namespace Dryv
             var parameterProcessed = Expression.Parameter(typeof(ICollection<object>), "processed");
             var parameterResult = Expression.Parameter(typeof(IList<DryvValidationResult>), "result");
             var parameterPath = Expression.Parameter(typeof(string), "path");
-
             var typedModel = Expression.Convert(parameterModel, type);
-
             var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy);
+
             var navigationProperties = (from p in properties
                                         where (p.PropertyType.IsClass() || p.PropertyType.IsInterface())
                                               && p.PropertyType != typeof(string)
                                         select p).ToList();
+
             var propertyValidationExpressions = from property in properties
-                                                let errorVariable = Expression.Parameter(typeof(string), "error")
-                                                select Expression.Block(
+                                                let errorVariable = Expression.Parameter(typeof(IReadOnlyCollection<DryvResultMessage>), "error")
+                                                select (Expression)Expression.Block(
                                                     new[] { errorVariable },
                                                     Expression.Assign(
                                                         errorVariable,
@@ -193,29 +174,20 @@ namespace Dryv
                                                             Expression.New(ValidationResultCtor,
                                                                 parameterModel,
                                                                 Expression.Constant(property),
-                                                                Expression.Call(StringConcatMethod,
-                                                                    parameterPath,
-                                                                    Expression.Constant(property.Name)),
-                                                                errorVariable)))
-                                                );
+                                                                Expression.Call(StringConcatMethod, parameterPath, Expression.Constant(property.Name)),
+                                                                errorVariable))));
+
             var navigationExpressions = from property in navigationProperties
                                         let childVariable = Expression.Parameter(property.PropertyType, "child")
-                                        select Expression.Block(
-                                            new[] { childVariable },
-                                            Expression.Assign(
-                                                childVariable,
-                                                Expression.Property(typedModel, property)),
-                                                Expression.Call(ValidateMethod,
-                                                    childVariable,
-                                                    parameterRootModel,
-                                                    Expression.Call(StringConcatMethod,
-                                                        parameterPath,
-                                                        Expression.Constant(property.Name + ".")),
-                                                    parameterResult,
-                                                    parameterProcessed,
-                                                    parameterServices,
-                                                    parameterCache)
-                                            );
+                                        select Expression.Call(ValidatePathMethod,
+                                            Expression.Property(typedModel, property),
+                                            parameterRootModel,
+                                            Expression.Call(StringConcatMethod, parameterPath, Expression.Constant(property.Name + ".")),
+                                            parameterResult,
+                                            parameterProcessed,
+                                            parameterServices,
+                                            parameterCache);
+
             var lambda = Expression.Lambda<ValidateAction>(
                 Expression.Block(propertyValidationExpressions.Union(navigationExpressions)),
                 parameterModel,
@@ -229,6 +201,47 @@ namespace Dryv
             return lambda.Compile();
         }
 
+        private static IEnumerable<DryvValidationResult> ValidateCore(object model, Func<Type, object> services, IDictionary<object, object> cache)
+        {
+            var result = new List<DryvValidationResult>();
+            if (model == null)
+            {
+                return result;
+            }
+
+            ValidatePath(model, model, string.Empty, result, new HashSet<object>(), services, cache);
+
+            return result;
+        }
+
+        private static async Task<IList<DryvValidationResult>> ValidateCoreAsync(object model, Func<Type, object> services, IDictionary<object, object> cache, bool asyncOnly)
+        {
+            var result = new List<DryvValidationResult>();
+            if (model == null)
+            {
+                return result;
+            }
+
+            if (cache == null)
+            {
+                cache = new Dictionary<object, object>();
+            }
+
+            if (services == null)
+            {
+                services = t => null;
+            }
+
+            var asyncResults = new List<DryvAsyncValidationResult>();
+            await ValidatePathAsync(model, model, string.Empty, asyncResults, new HashSet<object>(), services, cache, asyncOnly);
+            await Task.WhenAll(asyncResults.Select(r => r.Task));
+
+            result.AddRange(from r in asyncResults
+                            select new DryvValidationResult(r.Model, r.Property, r.Path, r.Task.Result));
+
+            return result;
+        }
+
         private static void ValidatePath(
             object input,
             object rootModel,
@@ -236,7 +249,7 @@ namespace Dryv
             IList<DryvValidationResult> result,
             ICollection<object> processed,
             Func<Type, object> services,
-            IDictionary<object, object> cache = null)
+            IDictionary<object, object> cache)
         {
             if (input is IEnumerable items)
             {
@@ -298,7 +311,7 @@ namespace Dryv
             }
         }
 
-        private static async Task<IReadOnlyCollection<DryvResult>> ValidatePropertyAsync(
+        private static async Task<IReadOnlyCollection<DryvResultMessage>> ValidatePropertyAsync(
                                             object currentModel,
             object rootModel,
             PropertyInfo property,
@@ -318,7 +331,7 @@ namespace Dryv
             return await Task.WhenAll(from node in RulesFinder.GetRulesForProperty(rootModelType, property, modelPath)
                                       where RuleCompiler.IsEnabled(node.Rule, services) &&
                                             node.Rule.EvaluationLocation.HasFlag(RuleEvaluationLocation.Server)
-                                      where !asyncOnly || typeof(Task).IsAssignableFrom(node.Rule.ValidationExpression.ReturnType)
+                                      where typeof(Task).IsAssignableFrom(node.Rule.ValidationExpression.ReturnType) || !asyncOnly
                                       let model = treeInfo.FindModel(node.Rule.ModelPath, currentModel, cache)
                                       select RuleCompiler.ValidateAsync(node.Rule, model, services));
         }
@@ -349,7 +362,7 @@ namespace Dryv
                 cache);
         }
 
-        private static async Task ValidateSingleItemAsync(object model,
+        private static void ValidateSingleItemAsync(object model,
             object rootModel,
             string path,
             IList<DryvAsyncValidationResult> result,
@@ -374,65 +387,6 @@ namespace Dryv
                 services,
                 cache,
                 asyncOnly);
-        }
-
-        private List<DryvValidationResult> ValidateCore(
-                                                                                    object model,
-            Func<Type, object> services = null,
-            IDictionary<object, object> cache = null)
-        {
-            var result = new List<DryvValidationResult>();
-            if (model == null)
-            {
-                return result;
-            }
-
-            if (cache == null)
-            {
-                cache = new Dictionary<object, object>();
-            }
-
-            if (services == null)
-            {
-                services = t => null;
-            }
-
-            ValidatePath(model, model, string.Empty, result, new HashSet<object>(), services, cache);
-
-            return result;
-        }
-
-        private async Task<List<DryvValidationResult>> ValidateCoreAsync(
-            object model,
-            bool asyncOnly = false,
-            Func<Type, object> services = null,
-            IDictionary<object, object> cache = null)
-        {
-            var result = new List<DryvValidationResult>();
-            if (model == null)
-            {
-                return result;
-            }
-
-            if (cache == null)
-            {
-                cache = new Dictionary<object, object>();
-            }
-
-            if (services == null)
-            {
-                services = t => null;
-            }
-
-            var asyncResults = new List<DryvAsyncValidationResult>();
-            await ValidatePathAsync(model, model, string.Empty, asyncResults, new HashSet<object>(), services, cache, asyncOnly);
-            await Task.WhenAll(asyncResults.Select(r => r.Task));
-
-            result.AddRange(from r in asyncResults
-                            from dr in r.Task.Result
-                            select new DryvValidationResult(r.Model, r.Property, r.Path, dr));
-
-            return result;
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Threading.Tasks;
+using Dryv;
+using Microsoft.AspNetCore.Mvc;
 using DryvDemo.ViewModels;
 
 namespace DryvDemo.Controllers
@@ -27,8 +29,10 @@ namespace DryvDemo.Controllers
         }
 
         [HttpPost]
-        public IActionResult Index(HomeViewModel model)
+        public async Task<IActionResult> Index(HomeViewModel model)
         {
+            await DryvAspNetCoreValidator.ValidateAsync(this, model);
+
             return this.View(model);
         }
     }

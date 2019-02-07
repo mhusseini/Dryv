@@ -6,7 +6,7 @@ namespace Dryv
 {
     internal struct DryvAsyncValidationResult
     {
-        public DryvAsyncValidationResult(object model, PropertyInfo property, string path, Task<IReadOnlyCollection<DryvResult>> task)
+        public DryvAsyncValidationResult(object model, PropertyInfo property, string path, Task<IReadOnlyCollection<DryvResultMessage>> task)
         {
             this.Model = model;
             this.Property = property;
@@ -17,6 +17,6 @@ namespace Dryv
         public object Model { get; }
         public string Path { get; }
         public PropertyInfo Property { get; }
-        public Task<IReadOnlyCollection<DryvResult>> Task { get; }
+        public Task<IReadOnlyCollection<DryvResultMessage>> Task { get; }
     }
 }

@@ -8,13 +8,13 @@ namespace DryvDemo.ViewModels
             .Rule(m => m.GrandChildName,
                 m => string.IsNullOrWhiteSpace(m.GrandChildName)
                     ? $"{nameof(m.GrandChildName)} must be specified."
-                    : DryvResult.Success);
+                    : DryvResultMessage.Success);
 
         public static readonly DryvRules Rules = DryvRules.For<TreeSpanningRulesExampleVieWModel>()
             .Rule(m => m.Child.ChildName,
                 m => string.IsNullOrWhiteSpace(m.Child.ChildName)
                     ? $"{nameof(m.Child.ChildName)} of must be specified."
-                    : DryvResult.Success);
+                    : DryvResultMessage.Success);
 
         public TreeSpanningRulesExampleVieWModelChild Child { get; set; }
 

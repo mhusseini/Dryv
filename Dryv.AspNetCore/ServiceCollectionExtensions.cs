@@ -1,25 +1,26 @@
 ﻿using System;
 using Dryv.Configuration;
-using Dryv.Mvc;
 using Dryv.Translation;
 using Dryv.Translation.Translators;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
 namespace Dryv
 {
-    public static class ServiceCollectionExtensions
+    public static class DryvMvcExtensions
     {
-        public static IDryvBuilder AddDryv(this IServiceCollection services)
+        public static IDryvBuilder AddDryv(this IMvcBuilder mvcBuilder, Action<DryvOptions> setupAction = null)
         {
-            return services.AddDryv(null);
+            mvcBuilder.AddMvcOptions(options =>
+            {
+                options.ModelValidatorProviders.Add(new DryvModelValidatorProvider());
+
+            });
+            return RegsterServices(mvcBuilder.Services, setupAction);
         }
 
-        public static IDryvBuilder AddDryv(this IServiceCollection services, Action<DryvOptions> setupAction)
+        private static IDryvBuilder RegsterServices(this IServiceCollection services, Action<DryvOptions> setupAction)
         {
             var options = new DryvOptions();
 
@@ -30,10 +31,6 @@ namespace Dryv
             services.AddSingleton<ITranslator, JavaScriptTranslator>();
             services.AddSingleton<ITranslatorProvider, TranslatorProvider>();
             services.AddSingleton(Options.Create(options));
-            services.AddScoped<IModelProvider, ModelProvider>();
-            services.AddSingleton<IObjectModelValidator, ObjectModelValidator>(s => new ObjectModelValidator(
-                s.GetRequiredService<IModelMetadataProvider>(),
-                s.GetRequiredService<IOptions<MvcOptions>>().Value.ModelValidatorProviders));
 
             return new DryvBuilder(services)
                 .AddTranslator<ObjectTranslator>()

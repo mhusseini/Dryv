@@ -38,13 +38,25 @@
                 <input type="text" asp-for="City" />
                 <span asp-validation-for="City"></span>
             </div>
+
+            <div>
+                <label asp-for="Child.Name2"></label>
+                <input type="text" asp-for="Child.Name2" />
+                <span asp-validation-for="Child.Name2"></span>
+            </div>
+
+            <div>
+                <label asp-for="Child.Child.Name3"></label>
+                <input type="text" asp-for="Child.Child.Name3" />
+                <span asp-validation-for="Child.Child.Name3"></span>
+            </div>
         </fieldset>
         <fieldset>
             <span asp-validation-for="SelectionA"></span>
 
             <div>
                 <label asp-for="SelectionA"></label>
-                <input type="hidden" dryv-for="SelectionA" disabled />
+                <input type="hidden" dryv-for="SelectionA" />
                 @for (var i = 0; i < Model.SelectionA.Length; i++)
                 {
                     <input type="hidden" asp-for="@Model.SelectionA[i].Name" />
@@ -55,7 +67,7 @@
 
             <div>
                 <label asp-for="SelectionB"></label>
-                <input type="hidden" dryv-for="SelectionB" disabled />
+                <input type="hidden" dryv-for="SelectionB" />
                 @for (var i = 0; i < Model.SelectionB.Length; i++)
                 {
                     <input type="hidden" asp-for="@Model.SelectionB[i].Name" />
@@ -63,8 +75,8 @@
                     <label asp-for="@Model.SelectionB[i].IsSelected">@Model.SelectionB[i].Name</label>
                 }
             </div>
-
         </fieldset>
+
         <button type="submit">Absenden</button>
     </form>
 
@@ -72,8 +84,8 @@
 
     <script type="text/javascript" src="~/js/jquery-1.12.3.min.js"></script>
     <script type="text/javascript" src="~/js/jquery.validate.js"></script>
+    <script>$.validator.setDefaults({ ignore: null });</script>
     <script type="text/javascript" src="~/js/jquery.validate.unobtrusive.js"></script>
     <script type="text/javascript" src="~/js/dryv-jquery-unobtrusive.browser.js"></script>
-    <script>$.validator.setDefaults({ ignore: null });</script>
 </body>
 </html>
