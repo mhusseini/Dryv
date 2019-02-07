@@ -11,7 +11,7 @@ namespace Dryv
         public PropertyInfo Property { get; internal set; }
         public LambdaExpression ValidationExpression { get; internal set; }
         internal Func<object[], bool> CompiledEnablingExpression { get; set; }
-        internal Func<object, object[], DryvResult> CompiledValidationExpression { get; set; }
+        internal Func<object, object[], object> CompiledValidationExpression { get; set; }
         internal LambdaExpression EnablingExpression { get; set; }
         internal string ModelPath { get; set; }
         internal Type[] PreevaluationOptionTypes { get; set; }

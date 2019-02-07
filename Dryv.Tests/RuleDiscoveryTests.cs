@@ -12,11 +12,10 @@ namespace Dryv.Tests
         }
 
         [TestMethod]
-        public void FindRulesForBaseClass()
+        public void FindeRuleOnParentNode()
         {
-            var model = new Model4();
-            var property = model.GetType().GetProperty(nameof(model.Text));
-            var rules = model.GetType().GetRulesForProperty(property);
+            var property = typeof(Model9).GetProperty(nameof(Model9.Text));
+            var rules = RulesFinder.GetRulesForProperty(typeof(Model9), property);
 
             Assert.IsNotNull(rules);
             Assert.IsTrue(rules.Any());
@@ -27,7 +26,7 @@ namespace Dryv.Tests
         {
             var model = new Model();
             var property = model.GetType().GetProperty(nameof(model.Text));
-            var rules = model.GetType().GetRulesForProperty(property);
+            var rules = RulesFinder.GetRulesForProperty(model.GetType(), property);
 
             Assert.IsNotNull(rules);
             Assert.IsTrue(rules.Any());
@@ -38,7 +37,7 @@ namespace Dryv.Tests
         {
             var model = new Model3();
             var property = model.GetType().GetProperty(nameof(model.Text));
-            var rules = model.GetType().GetRulesForProperty(property);
+            var rules = RulesFinder.GetRulesForProperty(model.GetType(), property);
 
             Assert.IsNotNull(rules);
             Assert.IsTrue(rules.Any());
@@ -49,7 +48,7 @@ namespace Dryv.Tests
         {
             var model = new Model5();
             var property = model.GetType().GetProperty(nameof(model.Text));
-            var rules = model.GetType().GetRulesForProperty(property);
+            var rules = RulesFinder.GetRulesForProperty(model.GetType(), property);
 
             Assert.IsNotNull(rules);
             Assert.IsTrue(rules.Any());
@@ -60,7 +59,7 @@ namespace Dryv.Tests
         {
             var model = new Model2();
             var property = model.GetType().GetProperty(nameof(model.Text));
-            var rules = model.GetType().GetRulesForProperty(property);
+            var rules = RulesFinder.GetRulesForProperty(model.GetType(), property);
 
             Assert.IsNotNull(rules);
             Assert.IsTrue(rules.Any());
@@ -70,17 +69,18 @@ namespace Dryv.Tests
         public void FindeRuleTree()
         {
             var property = typeof(Model7).GetProperty(nameof(Model7.Text));
-            var rules = typeof(Model6).GetRulesForProperty(property);
+            var rules = RulesFinder.GetRulesForProperty(typeof(Model7), property);
 
             Assert.IsNotNull(rules);
             Assert.IsTrue(rules.Any());
         }
 
         [TestMethod]
-        public void FindeRuleOnParentNode()
+        public void FindRulesForBaseClass()
         {
-            var property = typeof(Model9).GetProperty(nameof(Model9.Text));
-            var rules = typeof(Model8).GetRulesForProperty(property);
+            var model = new Model4();
+            var property = model.GetType().GetProperty(nameof(model.Text));
+            var rules = RulesFinder.GetRulesForProperty(model.GetType(), property);
 
             Assert.IsNotNull(rules);
             Assert.IsTrue(rules.Any());
@@ -170,16 +170,10 @@ namespace Dryv.Tests
                         ? DryvResult.Success
                         : DryvResult.Error("error"));
 
+            public Model7 Child { get; set; }
+
             [DryvRules]
             public string Text { get; set; }
-
-            public Model7 Child { get; set; }
-        }
-
-        private abstract class ModelBase
-        {
-            [DryvRules]
-            public virtual string Text { get; set; }
         }
 
         private class Model8
@@ -198,6 +192,12 @@ namespace Dryv.Tests
         {
             [DryvRules]
             public string Text { get; set; }
+        }
+
+        private abstract class ModelBase
+        {
+            [DryvRules]
+            public virtual string Text { get; set; }
         }
     }
 }

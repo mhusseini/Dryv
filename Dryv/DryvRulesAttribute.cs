@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using Dryv.Utils;
 
 namespace Dryv
@@ -12,12 +13,16 @@ namespace Dryv
             var model = context.ObjectInstance;
             var modelProvider = context.GetService<IModelProvider>() ?? AddModelProvider(context, model);
 
-            var errorMessage = DryvValidator.ValidateProperty(
-                model,
-                modelProvider.GetModel(),
-                context.GetProperty(),
-                context.GetService,
-                context.Items);
+            var errorMessage = DryvValidator
+                .ValidateProperty(
+                    model,
+                    modelProvider.GetModel(),
+                    context.GetProperty(),
+                    context.GetService,
+                    context.Items)
+                .Where(i => i.IsError())
+                .Select(i => i.Message)
+                .FirstOrDefault();
 
             return errorMessage == null
                 ? ValidationResult.Success

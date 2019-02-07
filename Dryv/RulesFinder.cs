@@ -24,14 +24,14 @@ namespace Dryv
 
         private static readonly ConcurrentDictionary<Type, IList<DryvRuleDefinition>> TypeRules = new ConcurrentDictionary<Type, IList<DryvRuleDefinition>>();
 
-        public static IEnumerable<DryvRuleNode> GetRulesForProperty(this Type modelType, PropertyInfo property, string modelPath = "")
+        public static IEnumerable<DryvRuleNode> GetRulesForProperty(Type modelType, PropertyInfo property, string modelPath = "")
         {
             return PropertyRules.GetOrAdd(
                 $"{modelType.FullName}|{modelPath}|{property.DeclaringType.FullName}|{property.Name}",
                 _ => GetInheritedRules(modelType, property, modelPath));
         }
 
-        public static IEnumerable<DryvRuleDefinition> GetRulesOnType(this Type objectType) => TypeRules.GetOrAdd(objectType, type =>
+        public static IEnumerable<DryvRuleDefinition> GetRulesOnType(Type objectType) => TypeRules.GetOrAdd(objectType, type =>
         {
             var typeInfo = type.GetTypeInfo();
 
@@ -55,9 +55,9 @@ namespace Dryv
                     select rule).ToList();
         });
 
-        internal static IEnumerable<DryvRuleNode> FindRulesForProperty(this Type type, PropertyInfo property, string modelPath)
+        private static IEnumerable<DryvRuleNode> FindRulesForProperty(Type type, PropertyInfo property, string modelPath)
         {
-            var tuples = type.FindRulesForProperty(
+            var tuples = FindRulesForProperty(type,
                 property,
                 new List<RulePaths>(),
                 new HashSet<Type>(),
@@ -81,7 +81,7 @@ namespace Dryv
                 .ToList();
         }
 
-        private static void DeterminePropertyPathOrDeferr(Type type, ICollection<RulePaths> propertiesToFind, ConcurrentDictionary<Type, List<DryvRuleDefinition>> deferredRules, DryvRuleDefinition rule)
+        private static void DeterminePropertyPathOrDefer(Type type, ICollection<RulePaths> propertiesToFind, ConcurrentDictionary<Type, List<DryvRuleDefinition>> deferredRules, DryvRuleDefinition rule)
         {
             var targetType = rule.ValidationExpression.Parameters.First().Type;
             var currentTypeHierarchy = type.GetTypeHierarchyAndInterfaces().ToHashSet();
@@ -104,18 +104,18 @@ namespace Dryv
             }
         }
 
-        private static IEnumerable<DryvRuleNode> FindRulesForProperty(this Type type, PropertyInfo property, IList<RulePaths> propertiesToFind, ISet<Type> processed, string path, string modelPath, ConcurrentDictionary<Type, List<DryvRuleDefinition>> deferredRules)
+        private static IEnumerable<DryvRuleNode> FindRulesForProperty(Type type, PropertyInfo property, IList<RulePaths> propertiesToFind, ISet<Type> processed, string path, string modelPath, ConcurrentDictionary<Type, List<DryvRuleDefinition>> deferredRules)
         {
             processed.Add(type);
 
             var pathPrefix = string.IsNullOrWhiteSpace(path) ? string.Empty : $"{path}.";
             var deferredRulesForType = deferredRules.GetOrAdd(type, _ => new List<DryvRuleDefinition>());
 
-            foreach (var rule in from rule in deferredRulesForType.Union(type.GetRulesOnType())
+            foreach (var rule in from rule in deferredRulesForType.Union(GetRulesOnType(type))
                                  where Equals(rule.Property, property)
                                  select rule)
             {
-                DeterminePropertyPathOrDeferr(type, propertiesToFind, deferredRules, rule);
+                DeterminePropertyPathOrDefer(type, propertiesToFind, deferredRules, rule);
             }
 
             foreach (var ruleNode in from childProperty in type.GetProperties(BindingFlagsForProperties)
@@ -166,7 +166,8 @@ namespace Dryv
                 yield break;
             }
 
-            foreach (var node in childType.FindRulesForProperty(
+            foreach (var node in FindRulesForProperty(
+                childType,
                 property,
                 propertiesToFind,
                 processed,
@@ -183,7 +184,7 @@ namespace Dryv
             return property.GetCustomAttribute<DryvRulesAttribute>() == null
                 ? (IList<DryvRuleNode>)new DryvRuleNode[0]
                 : (from prop in property.GetInheritedProperties()
-                   from rule in modelType.FindRulesForProperty(prop, modelPath)
+                   from rule in FindRulesForProperty(modelType, prop, modelPath)
                    select rule)
                 .Distinct()
                 .ToList();

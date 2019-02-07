@@ -28,8 +28,8 @@ namespace Dryv
                 modelPath = string.Empty;
             }
 
-            var rules = from rule in modelType.GetRulesForProperty(property, modelPath)
-                        where rule.Rule.IsEnabled(services) &&
+            var rules = from rule in RulesFinder.GetRulesForProperty(modelType, property, modelPath)
+                        where RuleCompiler.IsEnabled(rule.Rule, services) &&
                               rule.Rule.EvaluationLocation.HasFlag(RuleEvaluationLocation.Client)
                         select rule;
 

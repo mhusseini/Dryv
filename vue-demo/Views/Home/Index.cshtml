@@ -1,6 +1,4 @@
-﻿@using Dryv
-@using Dryv.Utils
-@model DryvDemo.ViewModels.HomeViewModel
+﻿@model DryvDemo.ViewModels.HomeViewModel
 
 <html>
 <head>
@@ -46,10 +44,10 @@
 
             <div>
                 <label asp-for="SelectionA"></label>
-                <span asp-validation-for="SelectionB"></span>
-                <input type="hidden" dryv-for="SelectionA" />
-                @for (var i = 0; i < Model.SelectionA.Count(); i++)
+                <input type="hidden" dryv-for="SelectionA" disabled />
+                @for (var i = 0; i < Model.SelectionA.Length; i++)
                 {
+                    <input type="hidden" asp-for="@Model.SelectionA[i].Name" />
                     <input type="checkbox" asp-for="@Model.SelectionA[i].IsSelected" />
                     <label asp-for="@Model.SelectionA[i].IsSelected">@Model.SelectionA[i].Name</label>
                 }
@@ -57,9 +55,10 @@
 
             <div>
                 <label asp-for="SelectionB"></label>
-                <input type="hidden" dryv-for="SelectionB" />
-                @for (var i = 0; i < Model.SelectionB.Count(); i++)
+                <input type="hidden" dryv-for="SelectionB" disabled />
+                @for (var i = 0; i < Model.SelectionB.Length; i++)
                 {
+                    <input type="hidden" asp-for="@Model.SelectionB[i].Name" />
                     <input type="checkbox" asp-for="@Model.SelectionB[i].IsSelected" />
                     <label asp-for="@Model.SelectionB[i].IsSelected">@Model.SelectionB[i].Name</label>
                 }
