@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Dryv.Extensions;
 using Dryv.Utils;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
-namespace Dryv
+namespace Dryv.Internal
 {
     internal class DryvModelValidator : IModelValidator
     {

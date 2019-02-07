@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
-namespace Dryv
+namespace Dryv.Internal
 {
     internal class DryvModelValidatorProvider : IModelValidatorProvider
     {
         public void CreateValidators(ModelValidatorProviderContext context)
         {
-            context.Results.Insert(0, new ValidatorItem
+            context.Results.Add(new ValidatorItem
             {
                 IsReusable = true,
                 Validator = new DryvModelValidator()

@@ -30,14 +30,12 @@ namespace DryvDemo
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<ZipCodeValidator>();
-            services.AddMvc()
+            services
+                .AddMvc()
                 .AddDryv();
 
-            services.Configure<DemoValidationOptions>(options =>
-            {
-                options.IsAddressRequired = true;
-            });
+            services.AddSingleton<ZipCodeValidator>();
+            services.Configure<DemoValidationOptions>(options => options.IsAddressRequired = false);
         }
     }
 }

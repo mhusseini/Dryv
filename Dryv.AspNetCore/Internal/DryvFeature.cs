@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Dryv
+namespace Dryv.Internal
 {
     internal sealed class DryvFeature
     {

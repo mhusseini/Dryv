@@ -2,7 +2,7 @@
 using Dryv.Translation;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Dryv
+namespace Dryv.Internal
 {
     internal class DryvBuilder : IDryvBuilder
     {

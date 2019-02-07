@@ -31,8 +31,6 @@ namespace DryvDemo.Controllers
         [HttpPost]
         public async Task<IActionResult> Index(HomeViewModel model)
         {
-            await DryvAspNetCoreValidator.ValidateAsync(this, model);
-
             return this.View(model);
         }
     }
