@@ -97,7 +97,7 @@ namespace Dryv.Utils
                 return null;
             }
 
-            foreach (var property in rootType.GetProperties())
+            foreach (var property in rootType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy))
             {
                 var child = property.GetValue(root);
                 if (child == null)
@@ -129,7 +129,7 @@ namespace Dryv.Utils
                 }
             }
 
-            foreach (var property in rootType.GetFields())
+            foreach (var property in rootType.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy))
             {
                 var child = property.GetValue(root);
                 if (child == null)

@@ -45,11 +45,10 @@
                 <input type="text" asp-for="Child.Name2" />
                 <span asp-validation-for="Child.Name2"></span>
             </div>
-
-            <div>
-                <label asp-for="Child.Child.Name3"></label>
-                <input type="text" asp-for="Child.Child.Name3" />
-                <span asp-validation-for="Child.Child.Name3"></span>
+            div>
+            <label asp-for="Child.Child.Name3"></label>
+            <input type="text" asp-for="Child.Child.Name3" />
+            <span asp-validation-for="Child.Child.Name3"></span>
             </div>
         </fieldset>
         <fieldset>
@@ -60,7 +59,7 @@
                 <label asp-for="SelectionA"></label>
                 @for (var i = 0; i < Model.SelectionA.Length; i++)
                 {
-                    <input type="hidden" asp-for="@Model.SelectionA[i].Name" />
+                    <input type="text" asp-for="@Model.SelectionA[i].Name" />
                     <input type="checkbox" asp-for="@Model.SelectionA[i].IsSelected" />
                     <label asp-for="@Model.SelectionA[i].IsSelected">@Model.SelectionA[i].Name</label>
                 }
@@ -70,7 +69,7 @@
                 <label asp-for="SelectionB"></label>
                 @for (var i = 0; i < Model.SelectionB.Length; i++)
                 {
-                    <input type="hidden" asp-for="@Model.SelectionB[i].Name" />
+                    <input type="text" asp-for="@Model.SelectionB[i].Name" />
                     <input type="checkbox" asp-for="@Model.SelectionB[i].IsSelected" />
                     <label asp-for="@Model.SelectionB[i].IsSelected">@Model.SelectionB[i].Name</label>
                 }
@@ -80,6 +79,11 @@
         <button type="submit">Absenden</button>
     </form>
 
+    <script>
+        function ajax(url, error) {
+            console.log(url);
+        }
+    </script>
     <dryv-script />
 
     <script type="text/javascript" src="~/js/jquery-1.12.3.min.js"></script>

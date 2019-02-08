@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -68,7 +69,15 @@ namespace DryvDemo.ViewModels
 
     public class SelectionItem
     {
+        public static readonly DryvRules Rules = DryvRules.For<SelectionItem>()
+            .Rule(m => m.Name,
+                m => "doof".Equals(m.Name, StringComparison.OrdinalIgnoreCase)
+                    ? "Der Name darf nicht 'doof' sein."
+                    : DryvResultMessage.Success);
+
         public bool IsSelected { get; set; }
+
+        [DryvRules]
         public string Name { get; set; }
     }
 

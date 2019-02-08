@@ -5,7 +5,7 @@ namespace Dryv
     [Flags]
     public enum RuleEvaluationLocation
     {
-        Server,
-        Client
+        Server = 1,
+        Client = 2
     }
 }

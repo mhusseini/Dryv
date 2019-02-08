@@ -55,24 +55,6 @@ namespace Dryv
                     select rule).ToList();
         });
 
-        private static IEnumerable<DryvRuleNode> FindRulesForProperty(Type type, PropertyInfo property, string modelPath)
-        {
-            var tuples = FindRulesForProperty(type,
-                property,
-                new List<RulePaths>(),
-                new HashSet<Type>(),
-                null,
-                modelPath,
-                new ConcurrentDictionary<Type, List<DryvRuleDefinition>>());
-
-            return (from tuple in tuples
-                    select new DryvRuleNode
-                    {
-                        Path = string.Join(".", tuple.Path.Split('.').Reverse().Skip(1).Reverse()),
-                        Rule = tuple.Rule
-                    }).ToList();
-        }
-
         private static List<RulePaths> AdvancePathForCurrentProperty(IList<RulePaths> propertiesToFind, string childPropertyName)
         {
             return propertiesToFind
@@ -104,9 +86,27 @@ namespace Dryv
             }
         }
 
+        private static IEnumerable<DryvRuleNode> FindRulesForProperty(Type type, PropertyInfo property, string modelPath)
+        {
+            var tuples = FindRulesForProperty(type, property, new List<RulePaths>(), new HashSet<Type>(), null, modelPath, new ConcurrentDictionary<Type, List<DryvRuleDefinition>>()).ToList();
+
+            return (from tuple in tuples
+                    select new DryvRuleNode
+                    {
+                        Path = string.Join(".", tuple.Path.Split('.').Reverse().Skip(1).Reverse()),
+                        Rule = tuple.Rule
+                    }).ToList();
+        }
+
         private static IEnumerable<DryvRuleNode> FindRulesForProperty(Type type, PropertyInfo property, IList<RulePaths> propertiesToFind, ISet<Type> processed, string path, string modelPath, ConcurrentDictionary<Type, List<DryvRuleDefinition>> deferredRules)
         {
             processed.Add(type);
+
+            if (type.HasElementType && type != typeof(string))
+            {
+                type = type.GetElementType();
+                processed.Add(type);
+            }
 
             var pathPrefix = string.IsNullOrWhiteSpace(path) ? string.Empty : $"{path}.";
             var deferredRulesForType = deferredRules.GetOrAdd(type, _ => new List<DryvRuleDefinition>());
@@ -119,14 +119,7 @@ namespace Dryv
             }
 
             foreach (var ruleNode in from childProperty in type.GetProperties(BindingFlagsForProperties)
-                                     from ruleNode in FindRulesForPropertyInChild(
-                                         property,
-                                         propertiesToFind,
-                                         processed,
-                                         modelPath,
-                                         deferredRules,
-                                         childProperty,
-                                         pathPrefix)
+                                     from ruleNode in FindRulesForPropertyInChild(property, propertiesToFind, processed, modelPath, deferredRules, childProperty, pathPrefix)
                                      select ruleNode)
             {
                 yield return ruleNode;
@@ -166,14 +159,7 @@ namespace Dryv
                 yield break;
             }
 
-            foreach (var node in FindRulesForProperty(
-                childType,
-                property,
-                propertiesToFind,
-                processed,
-                pathToChildProperty,
-                modelPath,
-                deferredRules.Clone()))
+            foreach (var node in FindRulesForProperty(childType, property, propertiesToFind, processed, pathToChildProperty, modelPath, deferredRules.Clone()))
             {
                 yield return node;
             }
@@ -214,9 +200,7 @@ namespace Dryv
 
         private static List<RulePaths> RemoveRulesAtCurrentPath(IEnumerable<RulePaths> propertiesToFind2)
         {
-            return propertiesToFind2
-                .Where(i => i.Path.Any())
-                .ToList();
+            return propertiesToFind2.Where(i => i.Path.Any()).ToList();
         }
 
         private struct RulePaths
