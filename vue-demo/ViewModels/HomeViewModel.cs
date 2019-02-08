@@ -13,6 +13,7 @@ namespace DryvDemo.ViewModels
                 m => !string.IsNullOrWhiteSpace(m.Company) && string.IsNullOrWhiteSpace(m.TaxId)
                     ? $"Die Steuernummer der Firma {m.Company} muss angegeben werden."
                     : DryvResultMessage.Success)
+
             .Rule<IOptions<DemoValidationOptions>>(m => m.PostalCode,
                 (m, options) => !options.Value.IsAddressRequired && !m.IsAddressVisible || !string.IsNullOrWhiteSpace(m.PostalCode)
                     ? DryvResultMessage.Success
@@ -23,6 +24,9 @@ namespace DryvDemo.ViewModels
                     : validator.ValidateZipCode(m.PostalCode).ContinueWith(t => t.Result
                         ? DryvResultMessage.Success
                         : "Die PLZ ist nicht gültig."))
+            .ClientRule<IOptions<DemoValidationOptions>>(m => m.PostalCode,
+                (m, o) => DryvClientCode.CustomMethod("ajax", $"Home/ValidateZip/{m.PostalCode}", "Die PLZ ist nicht gültig."))
+
             .Rule<IOptions<DemoValidationOptions>, ZipCodeValidator>(m => m.City,
                 (m, options, validator) => !options.Value.IsAddressRequired && !m.IsAddressVisible || !string.IsNullOrWhiteSpace(m.City)
                     ? DryvResultMessage.Success
@@ -30,7 +34,11 @@ namespace DryvDemo.ViewModels
             .Rule(m => m.SelectionGroup,
                 m => (m.SelectionA == null ? 0 : m.SelectionA.Count(i => i.IsSelected)) == (m.SelectionB == null ? 0 : m.SelectionB.Count(i => i.IsSelected))
                     ? DryvResultMessage.Success
-                    : "Aus beiden listen müssen gleich viele Elemente ausgewählt werden.");
+                    : "Aus beiden listen müssen gleich viele Elemente ausgewählt werden.")
+            .Rule(m => m.Child.Name2,
+                m => string.IsNullOrWhiteSpace(m.Company) || string.Equals(m.Child.Name2, m.Company)
+                    ? DryvResultMessage.Success
+                    : $"Der Name muss '{m.Company}' sein.");
 
         [DryvRules]
         public string City { get; set; }
@@ -66,12 +74,6 @@ namespace DryvDemo.ViewModels
 
     public class ModelChild
     {
-        public static readonly DryvRules Rules = DryvRules.For<ModelChild>()
-            .Rule(m => m.Name2,
-                m => !"test".Equals(m.Name2)
-                    ? "Der Name muss 'test' sein"
-                    : DryvResultMessage.Success);
-
         [DryvRules]
         public string Name2 { get; set; }
 

@@ -41,7 +41,8 @@ namespace Dryv
                 .AddTranslator<DryvResultTranslator>()
                 .AddTranslator<StringTranslator>()
                 .AddTranslator<EnumerableTranslator>()
-                .AddTranslator<RegexTranslator>();
+                .AddTranslator<RegexTranslator>()
+                .AddTranslator<CustomCodeTranslator>();
         }
     }
 }

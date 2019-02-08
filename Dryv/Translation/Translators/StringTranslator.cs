@@ -161,9 +161,9 @@ namespace Dryv.Translation.Translators
              √ public static bool Equals(String a, String b, StringComparison comparisonType);
              √ public static bool Equals(String a, String b);
              */
-            context.Translator.Translate(context.Expression.Object, context);
 
             var value = context.Expression.Arguments.First();
+            context.Translator.Translate(value, context);
             var isCaseInsensitive = GetIsCaseInsensitive(context.Expression);
             if (isCaseInsensitive)
             {
@@ -171,7 +171,9 @@ namespace Dryv.Translation.Translators
             }
 
             context.Writer.Write(context.Negated ? "!==" : " === ");
-            WriteArguments(context.Translator, new[] { value }, context);
+
+            var value2 = context.Expression.Arguments.First();
+            WriteArguments(context.Translator, new[] { value2 }, context);
             if (isCaseInsensitive)
             {
                 context.Writer.Write(".toLowerCase()");

@@ -180,7 +180,7 @@ namespace Dryv.Translation
             // Find all option types used in the validation expression.
             var optionTypes = GetOptionTypes(expression);
             // Collect delegates that use options from withing the validation expression.
-            var optionDelegates = new Dictionary<int, LambdaExpression>();
+            var optionDelegates = new Dictionary<int, OptionDelegate>();
             var sb = new StringBuilder();
 
             using (var writer = new IndentingStringWriter(sb))
@@ -201,13 +201,13 @@ namespace Dryv.Translation
             (
                 sb.ToString(),
                 optionTypes,
-                optionDelegates
+                optionDelegates.Values.ToList()
             );
         }
 
         private struct GeneratedJavaScriptCode
         {
-            public GeneratedJavaScriptCode(string code, IList<Type> optionTypes, IDictionary<int, LambdaExpression> optionDelegates)
+            public GeneratedJavaScriptCode(string code, IList<Type> optionTypes, IList<OptionDelegate> optionDelegates)
             {
                 this.Code = code;
                 this.OptionTypes = optionTypes;
@@ -215,7 +215,7 @@ namespace Dryv.Translation
             }
 
             public string Code { get; }
-            public IDictionary<int, LambdaExpression> OptionDelegates { get; }
+            public IList<OptionDelegate> OptionDelegates { get; }
             public IList<Type> OptionTypes { get; }
         }
     }

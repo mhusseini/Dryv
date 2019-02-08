@@ -340,7 +340,12 @@ namespace Dryv.Translation
 
         public override void Visit(NewArrayExpression expression, TranslationContext context, bool negated = false)
         {
-            context.Writer.Write("[]");
+            context.Writer.Write("[");
+            foreach (var child in expression.Expressions)
+            {
+                this.Translate(child, context);
+            }
+            context.Writer.Write("]");
         }
 
         public override void Visit(NewExpression expression, TranslationContext context, bool negated = false)
@@ -423,19 +428,6 @@ namespace Dryv.Translation
             return true;
         }
 
-        private static void PushInjectedExpression(Expression expression, TranslationContext context, ParameterExpression parameter)
-        {
-            var hash = expression.ToString().GetHashCode();
-
-            if (!context.OptionDelegates.ContainsKey(hash))
-            {
-                var func = Expression.Lambda(expression, parameter);
-                context.OptionDelegates.Add(hash, func);
-            }
-
-            context.Writer.Write($"$${hash}$$");
-        }
-
         private static bool TryWriteInjectedExpression(Expression expression, TranslationContext context)
         {
             var parameter = expression.GetOuterExpression<ParameterExpression>();
@@ -444,7 +436,7 @@ namespace Dryv.Translation
                 return false;
             }
 
-            PushInjectedExpression(expression, context, parameter);
+            context.InjectRuntimeExpression(expression, parameter);
 
             return true;
         }
@@ -487,7 +479,7 @@ namespace Dryv.Translation
                 return false;
             }
 
-            PushInjectedExpression(expression.Object ?? expression, context, parameter);
+            context.InjectRuntimeExpression(expression.Object ?? expression, parameter);
             return true;
         }
 
