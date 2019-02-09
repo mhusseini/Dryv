@@ -5,6 +5,8 @@ namespace Dryv.Translation.Translators
 {
     public class ObjectTranslator : ICustomTranslator
     {
+        public bool? AllowSurroundingBrackets(Expression expression) => null;
+
         public bool TryTranslate(CustomTranslationContext context)
         {
             if (!(context.Expression is MethodCallExpression methodCallExpression))

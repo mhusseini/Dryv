@@ -1,27 +1,55 @@
-﻿using System.Linq;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 
 namespace Dryv.Translation.Translators
 {
-    public class CustomCodeTranslator : MethodCallTranslator
+    public class CustomCodeTranslator : MethodCallTranslator, ICustomTranslator
     {
         public CustomCodeTranslator()
         {
             this.Supports<DryvClientCode>();
-            this.AddMethodTranslator(nameof(DryvClientCode.CustomMethod), CustomMethod);
+            this.AddMethodTranslator(nameof(DryvClientCode.CustomScript), CustomScript);
         }
 
-        private static void CustomMethod(MethodTranslationContext context)
-        {
-            var script = context.Expression.Arguments.First();
+        public bool? AllowSurroundingBrackets(Expression expression) => !TryGetBinaryExpression(expression, out _);
 
-            context.InjectRuntimeExpression(script, true);
-            context.Writer.Write("(");
-            if (context.Expression.Arguments.Skip(1).FirstOrDefault() is NewArrayExpression array)
+        public bool TryTranslate(CustomTranslationContext context)
+        {
+            if (!TryGetBinaryExpression(context.Expression, out var binaryExpression))
             {
-                WriteArguments(context.Translator, array.Expressions, context);
+                return false;
             }
-            context.Writer.Write(")");
+
+            context.Translator.Translate(binaryExpression.Left, context);
+            context.Translator.Translate(binaryExpression.Right, context);
+
+            return true;
+        }
+
+        private static void CustomScript(MethodTranslationContext context)
+        {
+            foreach (var script in context.Expression.Arguments)
+            {
+                context.InjectRuntimeExpression(script, true);
+            }
+        }
+
+        private static MethodCallExpression GetDryvClientCodeMethodCall(Expression expression) =>
+            expression is MethodCallExpression callExpression2 && callExpression2.Method.DeclaringType == typeof(DryvClientCode)
+            ? callExpression2
+            : null;
+
+        private static bool TryGetBinaryExpression(Expression expression, out BinaryExpression binaryExpression)
+        {
+            if (expression.NodeType != ExpressionType.Add || !(expression is BinaryExpression b))
+            {
+                binaryExpression = null;
+                return false;
+            }
+
+            binaryExpression = b;
+
+            var clientCodeMethodCall = GetDryvClientCodeMethodCall(binaryExpression.Left) ?? GetDryvClientCodeMethodCall(binaryExpression.Right);
+            return clientCodeMethodCall != null;
         }
     }
 }

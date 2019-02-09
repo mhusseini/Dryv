@@ -413,7 +413,7 @@ namespace Dryv.Translation
             this.Translate(expression.Operand, context, negatedExpression);
         }
 
-        private static bool GetNeedsBrackets(Expression expression)
+        private bool GetNeedsBrackets(Expression expression)
         {
             switch (expression)
             {
@@ -425,7 +425,7 @@ namespace Dryv.Translation
                     return false;
             }
 
-            return true;
+            return this.translatorProvider.GenericTranslators.All(t => t.AllowSurroundingBrackets(expression) != false);
         }
 
         private static bool TryWriteInjectedExpression(Expression expression, TranslationContext context)

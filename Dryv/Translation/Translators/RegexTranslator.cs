@@ -16,6 +16,8 @@ namespace Dryv.Translation.Translators
             this.AddMethodTranslator(nameof(Regex.IsMatch), IsMatch);
         }
 
+        public bool? AllowSurroundingBrackets(Expression expression) => null;
+
         public bool TryTranslate(CustomTranslationContext context)
         {
             if (!(context.Expression is MemberExpression memberExpression))
