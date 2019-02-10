@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reflection;
 using Dryv.Configuration;
 
-namespace Dryv
+namespace Dryv.Validation
 {
     /// <summary>
     /// Defines objects that write validation rules to the client.

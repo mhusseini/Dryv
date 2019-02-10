@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Dryv.Extensions;
-using Dryv.Utils;
+using Dryv.Validation;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace Dryv.Internal
@@ -15,7 +15,7 @@ namespace Dryv.Internal
             return CreateModelValidationResults(context, validationResults);
         }
 
-        private static IEnumerable<ModelValidationResult> CreateModelValidationResults(ModelValidationContext context, IReadOnlyDictionary<object, Dictionary<string, List<DryvValidationResult>>> validationResults)
+        private static IEnumerable<ModelValidationResult> CreateModelValidationResults(ModelValidationContext context, IReadOnlyDictionary<object, Dictionary<string, List<DryvResult>>> validationResults)
             => !validationResults.TryGetValue(context.Container, out var d) || !d.TryGetValue(context.ModelMetadata.PropertyName, out var results)
             ? (IEnumerable<ModelValidationResult>)Array.Empty<ModelValidationResult>()
             : (from r in results
@@ -23,7 +23,7 @@ namespace Dryv.Internal
                where msg.IsError()
                select new ModelValidationResult(null, msg.Text)).ToList();
 
-        private static Dictionary<object, Dictionary<string, List<DryvValidationResult>>> GetGroupedValidationResults(ModelValidationContext context)
+        private static Dictionary<object, Dictionary<string, List<DryvResult>>> GetGroupedValidationResults(ModelValidationContext context)
             => context.ActionContext.HttpContext.GetDryvFeature()
             .CurrentValidationResults
             .GetOrAdd(context.ActionContext, _ => ValidateCore(context)
@@ -34,7 +34,7 @@ namespace Dryv.Internal
                         i2 => i2.Key,
                         i2 => i2.ToList())));
 
-        private static IEnumerable<DryvValidationResult> ValidateCore(ModelValidationContext context)
+        private static IEnumerable<DryvResult> ValidateCore(ModelValidationContext context)
             => DryvValidator.Validate(context.Container, context.ActionContext.HttpContext.RequestServices.GetService);
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 
-namespace Dryv.Utils
+namespace Dryv.Extensions
 {
     internal static class ValidationContextExtensions
     {

@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Dryv;
+using Dryv.Rules;
 using Microsoft.Extensions.Options;
 
 namespace DryvDemo.ViewModels
@@ -26,7 +27,7 @@ namespace DryvDemo.ViewModels
                         ? DryvResultMessage.Success
                         : "Die PLZ ist nicht gültig."))
             .ClientRule<IOptions<DemoValidationOptions>>(m => m.PostalCode,
-                (m, o) => DryvClientCode.CustomScript("ajax(") + $"Home/ValidateZip/{m.PostalCode}" + DryvClientCode.CustomScript(", 'Die PLZ ist nicht gültig.')"))
+                (m, o) => DryvClientCode.Raw("ajax(") + $"Home/ValidateZip/{m.PostalCode}" + DryvClientCode.Raw(", 'Die PLZ ist nicht gültig.')"))
 
             .Rule<IOptions<DemoValidationOptions>, ZipCodeValidator>(m => m.City,
                 (m, options, validator) => !options.Value.IsAddressRequired && !m.IsAddressVisible || !string.IsNullOrWhiteSpace(m.City)

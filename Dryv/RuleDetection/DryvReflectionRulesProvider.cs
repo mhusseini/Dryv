@@ -3,12 +3,14 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Dryv.Compilation;
+using Dryv.Extensions;
 using Dryv.Reflection;
-using Dryv.Utils;
+using Dryv.Rules;
 
-namespace Dryv
+namespace Dryv.RuleDetection
 {
-    public class DryvReflectionRulesProvider
+    internal static class DryvReflectionRulesProvider
     {
         private const BindingFlags BindingFlagsForProperties = BindingFlags.FlattenHierarchy |
                                                                BindingFlags.Instance |
@@ -23,6 +25,13 @@ namespace Dryv
         private static readonly ConcurrentDictionary<string, IList<DryvRuleNode>> PropertyRules = new ConcurrentDictionary<string, IList<DryvRuleNode>>();
 
         private static readonly ConcurrentDictionary<Type, IList<DryvRuleDefinition>> TypeRules = new ConcurrentDictionary<Type, IList<DryvRuleDefinition>>();
+
+        public static IEnumerable<DryvRuleNode> GetCompiledRulesForProperty(Type modelType, PropertyInfo property, Func<Type, object> services, string modelPath = "")
+        {
+            return from rule in GetRulesForProperty(modelType, property, modelPath)
+                   where RuleCompiler.IsEnabled(rule.Rule, services)
+                   select rule;
+        }
 
         public static IEnumerable<DryvRuleNode> GetRulesForProperty(Type modelType, PropertyInfo property, string modelPath = "")
         {

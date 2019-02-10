@@ -1,6 +1,7 @@
 using System.Collections.Generic;
+using Dryv.Validation;
 
-namespace Dryv
+namespace Dryv.Translation
 {
     public interface IDryvScriptBlockGenerator
     {

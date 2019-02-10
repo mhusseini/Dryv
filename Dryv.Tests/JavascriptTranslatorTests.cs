@@ -1,5 +1,6 @@
 using System;
 using System.Text.RegularExpressions;
+using Dryv.Translation;
 using Escape;
 using Escape.Ast;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -38,7 +39,7 @@ namespace Dryv.Tests
                 var translation = Translate(expression);
                 Assert.Fail();
             }
-            catch (ExpressionNotSupportedException)
+            catch (DryvExpressionNotSupportedException)
             {
             }
         }

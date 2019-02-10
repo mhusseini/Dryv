@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Dryv.Reflection;
+using Dryv.Rules;
 
 namespace Dryv.Compilation
 {

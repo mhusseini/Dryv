@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reflection;
 
-namespace Dryv
+namespace Dryv.Validation
 {
     public class DryvClientPropertyValidation
     {
-        public string ValidationFunction { get; set; }
-        public IDictionary<string, string> ElementAttribute { get; set; }
+        public string Key { get; set; }
         public string ModelPath { get; set; }
         public Type ModelType { get; set; }
-        public string Name { get; set; }
         public PropertyInfo Property { get; set; }
+        public string ValidationFunction { get; set; }
     }
 }

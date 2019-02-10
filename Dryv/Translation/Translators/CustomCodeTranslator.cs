@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using Dryv.Rules;
 
 namespace Dryv.Translation.Translators
 {
@@ -7,7 +8,7 @@ namespace Dryv.Translation.Translators
         public CustomCodeTranslator()
         {
             this.Supports<DryvClientCode>();
-            this.AddMethodTranslator(nameof(DryvClientCode.CustomScript), CustomScript);
+            this.AddMethodTranslator(nameof(DryvClientCode.Raw), CustomScript);
         }
 
         public bool? AllowSurroundingBrackets(Expression expression) => !TryGetBinaryExpression(expression, out _);

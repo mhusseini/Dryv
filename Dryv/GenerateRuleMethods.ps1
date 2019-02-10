@@ -1,4 +1,4 @@
-﻿$fn = "Rules``.g.cs"
+﻿$fn = "DryvRules``.g.cs"
 
 function WriteMethod($propCount, $optionCount, $methodPrefix)
 {
@@ -57,7 +57,7 @@ $parameters			Expression<Func<TModel, $($gen2)Task<DryvResult>>> rule$ruleSwitch
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace Dryv
+namespace Dryv.Rules
 {
     partial class DryvRules<TModel>
     {

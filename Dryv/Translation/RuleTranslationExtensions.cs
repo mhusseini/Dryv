@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Dryv.Configuration;
+using Dryv.Internal;
+using Dryv.RuleDetection;
+using Dryv.Rules;
 
 namespace Dryv.Translation
 {

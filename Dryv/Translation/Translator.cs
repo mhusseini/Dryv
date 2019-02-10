@@ -33,7 +33,7 @@ namespace Dryv.Translation
                     {
                         if (typeof(Task).IsAssignableFrom(lambdaExpression.ReturnType))
                         {
-                            throw new ExpressionNotSupportedException(expression, "Asynchronous expressions cannot be translated to client code. Use the ServerRule<> method to add validation rules with asynchronous expression.");
+                            throw new DryvExpressionNotSupportedException(expression, "Asynchronous expressions cannot be translated to client code. Use the ServerRule<> method to add validation rules with asynchronous expression.");
                         }
 
                         break;

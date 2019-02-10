@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using Dryv.Reflection;
 
-namespace Dryv.Utils
+namespace Dryv.Extensions
 {
     public static class TypeExtensions
     {

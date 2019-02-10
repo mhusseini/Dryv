@@ -1,8 +1,9 @@
 ﻿using System;
+using Dryv.Rules;
 
-namespace Dryv
+namespace Dryv.RuleDetection
 {
-    public class DryvRuleNode
+    internal class DryvRuleNode
     {
         public DryvRuleNode(string path, DryvRuleDefinition rule)
         {

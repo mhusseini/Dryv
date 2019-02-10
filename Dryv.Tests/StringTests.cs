@@ -1,5 +1,5 @@
 using System;
-using Dryv.Utils;
+using Dryv.Extensions;
 using Escape.Ast;
 using Jurassic;
 using Jurassic.Library;

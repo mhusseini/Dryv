@@ -39,7 +39,7 @@ namespace Dryv.Translation.Translators
 
             if (result == null)
             {
-                throw new MethodNotSupportedException(methodCallExpression, "Could not determine regular context.Expression.");
+                throw new DryvMethodNotSupportedException(methodCallExpression, "Could not determine regular context.Expression.");
             }
 
             var clientRegexp = $"/{result.Pattern}/{TranslateRegexOptions(result.Options)}";
@@ -100,7 +100,7 @@ namespace Dryv.Translation.Translators
 
             if (result == null)
             {
-                throw new MethodNotSupportedException(context.Expression, "Could not determine regular context.Expression.");
+                throw new DryvMethodNotSupportedException(context.Expression, "Could not determine regular context.Expression.");
             }
 
             var clientRegexp = $"/{result.Pattern}/{TranslateRegexOptions(result.Options)}";
@@ -125,12 +125,12 @@ namespace Dryv.Translation.Translators
 
             if (context.HasFlag(RegexOptions.IgnorePatternWhitespace))
             {
-                throw new TranslationException($"{RegexOptions.IgnorePatternWhitespace} not translatable to JavaScript.");
+                throw new DryvTranslationException($"{RegexOptions.IgnorePatternWhitespace} not translatable to JavaScript.");
             }
 
             if (context.HasFlag(RegexOptions.RightToLeft))
             {
-                throw new TranslationException($"{RegexOptions.RightToLeft} not translatable to JavaScript.");
+                throw new DryvTranslationException($"{RegexOptions.RightToLeft} not translatable to JavaScript.");
             }
 
             return sb.ToString();

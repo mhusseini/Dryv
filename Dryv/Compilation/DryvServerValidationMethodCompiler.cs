@@ -4,27 +4,29 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
+using Dryv.Extensions;
+using Dryv.Internal;
 using Dryv.Reflection;
-using Dryv.Utils;
+using Dryv.Validation;
 
-namespace Dryv
+namespace Dryv.Compilation
 {
-    internal class DryvServerValidationCompiler
+    internal class DryvServerValidationMethodCompiler
     {
-        private static readonly MethodInfo AddAsyncResultMethod = typeof(ICollection<DryvAsyncValidationResult>).GetTypeInfo().GetDeclaredMethod(nameof(ICollection<Task<DryvAsyncValidationResult>>.Add));
-        private static readonly MethodInfo AddResultMethod = typeof(ICollection<DryvValidationResult>).GetTypeInfo().GetDeclaredMethod(nameof(ICollection<DryvValidationResult>.Add));
-        private static readonly ConstructorInfo AsyncValidationResultCtor = typeof(DryvAsyncValidationResult).GetTypeInfo().DeclaredConstructors.First();
+        private static readonly MethodInfo AddAsyncResultMethod = typeof(ICollection<DryvAsyncResult>).GetTypeInfo().GetDeclaredMethod(nameof(ICollection<Task<DryvAsyncResult>>.Add));
+        private static readonly MethodInfo AddResultMethod = typeof(ICollection<DryvResult>).GetTypeInfo().GetDeclaredMethod(nameof(ICollection<DryvResult>.Add));
+        private static readonly ConstructorInfo AsyncValidationResultCtor = typeof(DryvAsyncResult).GetTypeInfo().DeclaredConstructors.First();
         private static readonly MethodInfo StringConcatMethod = typeof(string).GetTypeInfo().DeclaredMethods.First(m => m.Name == nameof(string.Concat) && m.GetParameters().Select(p => p.ParameterType).ToList().ElementsEqual(typeof(string), typeof(string)));
         private static readonly MethodInfo ValidatePathAsyncMethod = typeof(DryvValidator).GetTypeInfo().GetDeclaredMethod(nameof(DryvValidator.ValidatePathAsync));
         private static readonly MethodInfo ValidatePathMethod = typeof(DryvValidator).GetTypeInfo().GetDeclaredMethod(nameof(DryvValidator.ValidatePath));
         private static readonly MethodInfo ValidatePropertyAsyncMethod = typeof(DryvValidator).GetTypeInfo().GetDeclaredMethod(nameof(DryvValidator.ValidatePropertyAsync));
         private static readonly MethodInfo ValidatePropertyMethod = typeof(DryvValidator).GetTypeInfo().GetDeclaredMethod(nameof(DryvValidator.ValidateProperty));
-        private static readonly ConstructorInfo ValidationResultCtor = typeof(DryvValidationResult).GetTypeInfo().DeclaredConstructors.First();
+        private static readonly ConstructorInfo ValidationResultCtor = typeof(DryvResult).GetTypeInfo().DeclaredConstructors.First();
 
         internal delegate void ValidateAction(object currentModel,
             object rootModel,
             string path,
-            IList<DryvValidationResult> result,
+            IList<DryvResult> result,
             ICollection<object> processed,
             Func<Type, object> services,
             IDictionary<object, object> cache);
@@ -32,7 +34,7 @@ namespace Dryv
         internal delegate void ValidateAsyncAction(object currentModel,
             object rootModel,
             string path,
-            IList<DryvAsyncValidationResult> result,
+            IList<DryvAsyncResult> result,
             ICollection<object> processed,
             Func<Type, object> services,
             IDictionary<object, object> cache,
@@ -45,7 +47,7 @@ namespace Dryv
             var parameterServices = Expression.Parameter(typeof(Func<Type, object>), "services");
             var parameterCache = Expression.Parameter(typeof(IDictionary<object, object>), "cache");
             var parameterProcessed = Expression.Parameter(typeof(ICollection<object>), "processed");
-            var parameterResult = Expression.Parameter(typeof(IList<DryvAsyncValidationResult>), "result");
+            var parameterResult = Expression.Parameter(typeof(IList<DryvAsyncResult>), "result");
             var parameterPath = Expression.Parameter(typeof(string), "path");
             var parameterAsyncOnly = Expression.Parameter(typeof(bool), "asyncOnly");
 
@@ -103,7 +105,7 @@ namespace Dryv
             var parameterServices = Expression.Parameter(typeof(Func<Type, object>), "services");
             var parameterCache = Expression.Parameter(typeof(IDictionary<object, object>), "cache");
             var parameterProcessed = Expression.Parameter(typeof(ICollection<object>), "processed");
-            var parameterResult = Expression.Parameter(typeof(IList<DryvValidationResult>), "result");
+            var parameterResult = Expression.Parameter(typeof(IList<DryvResult>), "result");
             var parameterPath = Expression.Parameter(typeof(string), "path");
             var typedModel = Expression.Convert(parameterModel, type);
             var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy);

@@ -2,13 +2,13 @@
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using Dryv.Utils;
+using Dryv.Extensions;
 
-namespace Dryv
+namespace Dryv.Rules
 {
     public sealed class DryvRuleDefinition
     {
-        public RuleEvaluationLocation EvaluationLocation { get; internal set; }
+        public DryvRuleEvaluationLocation EvaluationLocation { get; internal set; }
         public Type ModelType { get; internal set; }
         public PropertyInfo Property { get; internal set; }
         public LambdaExpression ValidationExpression { get; internal set; }
@@ -22,7 +22,7 @@ namespace Dryv
         internal Exception TranslationError { get; set; }
         public string CodeTemplate { get; internal set; }
 
-        public static DryvRuleDefinition Create<TModel, TProperty>(Expression<Func<TModel, TProperty>> property, LambdaExpression rule, LambdaExpression enabled, RuleEvaluationLocation ruleLocation)
+        public static DryvRuleDefinition Create<TModel, TProperty>(Expression<Func<TModel, TProperty>> property, LambdaExpression rule, LambdaExpression enabled, DryvRuleEvaluationLocation ruleLocation)
         {
             if (!(property.Body is MemberExpression memberExpression) ||
                 !(memberExpression.Member is PropertyInfo propertyInfo))

@@ -4,8 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Dryv.Extensions;
 using Dryv.Reflection;
-using Dryv.Utils;
 
 namespace Dryv.Translation
 {
@@ -161,8 +161,8 @@ namespace Dryv.Translation
             if (!TryWriteTerminal(expression, context.Writer))
             {
                 throw expression.Method != null
-                    ? (Exception)new MethodNotSupportedException(expression)
-                    : new ExpressionNotSupportedException(expression);
+                    ? (Exception)new DryvMethodNotSupportedException(expression)
+                    : new DryvExpressionNotSupportedException(expression);
             }
 
             this.Translate(expression.Right, context);
@@ -236,7 +236,7 @@ namespace Dryv.Translation
         {
             if (expression.Expression is MemberExpression)
             {
-                throw new ExpressionNotSupportedException(expression);
+                throw new DryvExpressionNotSupportedException(expression);
             }
 
             this.Translate(expression.Expression, context);
@@ -335,7 +335,7 @@ namespace Dryv.Translation
                 return;
             }
 
-            throw new MethodNotSupportedException(expression);
+            throw new DryvMethodNotSupportedException(expression);
         }
 
         public override void Visit(NewArrayExpression expression, TranslationContext context, bool negated = false)
@@ -399,7 +399,7 @@ namespace Dryv.Translation
 
         public override void Visit(TypeBinaryExpression expression, TranslationContext context, bool negated = false)
         {
-            throw new ExpressionNotSupportedException(expression);
+            throw new DryvExpressionNotSupportedException(expression);
         }
 
         public override void Visit(UnaryExpression expression, TranslationContext context, bool negated = false)

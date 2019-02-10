@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Dryv.Utils
+namespace Dryv.Extensions
 {
     internal static class ServiceProviderExtensions
     {

@@ -1,5 +1,5 @@
 using System.Diagnostics;
-using Dryv.Utils;
+using Dryv.Extensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Dryv.Tests

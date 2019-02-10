@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Dryv
+namespace Dryv.RuleDetection
 {
     internal class ModelTreeInfo
     {

@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Dryv.Configuration;
 using Dryv.Extensions;
-using Dryv.Utils;
+using Dryv.Validation;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
@@ -17,6 +17,10 @@ namespace Dryv.TagHelpers
     [HtmlTargetElement("textarea", Attributes = "asp-for")]
     public class DryvTagHelper : TagHelper
     {
+        public const string DataTypeDryAttribute = "data-val-dryv-type";
+        public const string DataValAttribute = "data-val";
+        public const string DataValDryAttribute = "data-val-dryv";
+
         private readonly IOptions<DryvOptions> options;
 
         private string name;
@@ -60,8 +64,11 @@ namespace Dryv.TagHelpers
                 return Task.CompletedTask;
             }
 
-            this.ViewContext.StoreValidationCode(clientValidation.Name, clientValidation);
-            output.Attributes.AddRange(clientValidation.ElementAttribute.Select(i => new TagHelperAttribute(i.Key, i.Value)));
+            this.ViewContext.StoreValidationCode(clientValidation.Key, clientValidation);
+
+            output.Attributes.Add(new TagHelperAttribute(DataValAttribute, "true"));
+            output.Attributes.Add(new TagHelperAttribute(DataTypeDryAttribute, property.PropertyType.GetJavaScriptType()));
+            output.Attributes.Add(new TagHelperAttribute(DataValDryAttribute, clientValidation.Key));
 
             if (!output.Attributes.ContainsName("name"))
             {

@@ -1,6 +1,8 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Dryv.Utils;
+using Dryv.Extensions;
+using Dryv.Rules;
+using Dryv.Validation;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Dryv.Tests

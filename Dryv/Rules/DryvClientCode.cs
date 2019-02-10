@@ -1,14 +1,14 @@
 using System;
 
-namespace Dryv
+namespace Dryv.Rules
 {
     public abstract class DryvClientCode
     {
-        public static DryvResultMessage CustomScript(string script)
+        public static DryvResultMessage Raw(string script)
         {
             throw new InvalidOperationException("This method is not intended to be called.");
         }
-        public static TResult CustomScript<TResult>(string script)
+        public static TResult Eaw<TResult>(string script)
         {
             throw new InvalidOperationException("This method is not intended to be called.");
         }

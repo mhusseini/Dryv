@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using Dryv.Reflection;
+using Dryv.RuleDetection;
 
-namespace Dryv.Utils
+namespace Dryv.Extensions
 {
     internal static class ModelTreeInfoExtensions
     {

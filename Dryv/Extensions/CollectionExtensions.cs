@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Dryv.Utils
+namespace Dryv.Extensions
 {
     public static class CollectionExtensions
     {

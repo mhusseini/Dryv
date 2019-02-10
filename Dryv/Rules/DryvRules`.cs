@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
-using Dryv.Utils;
 
-namespace Dryv
+namespace Dryv.Rules
 {
     public partial class DryvRules<TModel> : DryvRules
     {
@@ -17,7 +14,7 @@ namespace Dryv
             Expression<Func<TModel, TProperty>> property,
             LambdaExpression rule,
             LambdaExpression enabled,
-            RuleEvaluationLocation ruleLocation)
+            DryvRuleEvaluationLocation ruleLocation)
         {
             var ruleDefinition = DryvRuleDefinition.Create(property, rule, enabled, ruleLocation);
 
@@ -31,7 +28,7 @@ namespace Dryv
         {
             foreach (var property in properties)
             {
-                this.Add(property, rule, ruleSwitch, RuleEvaluationLocation.Server | RuleEvaluationLocation.Client);
+                this.Add(property, rule, ruleSwitch, DryvRuleEvaluationLocation.Server | DryvRuleEvaluationLocation.Client);
             }
         }
 
@@ -42,7 +39,7 @@ namespace Dryv
         {
             foreach (var property in properties)
             {
-                this.Add(property, rule, ruleSwitch, RuleEvaluationLocation.Server);
+                this.Add(property, rule, ruleSwitch, DryvRuleEvaluationLocation.Server);
             }
         }
 
@@ -53,7 +50,7 @@ namespace Dryv
         {
             foreach (var property in properties)
             {
-                this.Add(property, rule, ruleSwitch, RuleEvaluationLocation.Client);
+                this.Add(property, rule, ruleSwitch, DryvRuleEvaluationLocation.Client);
             }
         }
     }
