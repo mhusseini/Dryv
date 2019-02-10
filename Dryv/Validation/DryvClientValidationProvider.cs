@@ -22,7 +22,7 @@ namespace Dryv.Validation
             }
 
             var rules = from rule in DryvReflectionRulesProvider.GetCompiledRulesForProperty(modelType, property, services, modelPath)
-                        where rule.Rule.EvaluationLocation.HasFlag(DryvRuleEvaluationLocation.Client)
+                        where rule.Rule.EvaluationLocation.HasFlag(DryvRuleLocation.Client)
                         select rule;
 
             var translatedRules = rules.Translate(services, options, modelPath, modelType).ToList();

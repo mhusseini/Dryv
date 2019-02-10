@@ -14,7 +14,7 @@ namespace Dryv.Rules
             Expression<Func<TModel, TProperty>> property,
             LambdaExpression rule,
             LambdaExpression enabled,
-            DryvRuleEvaluationLocation ruleLocation)
+            DryvRuleLocation ruleLocation)
         {
             var ruleDefinition = DryvRuleDefinition.Create(property, rule, enabled, ruleLocation);
 
@@ -28,7 +28,7 @@ namespace Dryv.Rules
         {
             foreach (var property in properties)
             {
-                this.Add(property, rule, ruleSwitch, DryvRuleEvaluationLocation.Server | DryvRuleEvaluationLocation.Client);
+                this.Add(property, rule, ruleSwitch, DryvRuleLocation.Server | DryvRuleLocation.Client);
             }
         }
 
@@ -39,7 +39,7 @@ namespace Dryv.Rules
         {
             foreach (var property in properties)
             {
-                this.Add(property, rule, ruleSwitch, DryvRuleEvaluationLocation.Server);
+                this.Add(property, rule, ruleSwitch, DryvRuleLocation.Server);
             }
         }
 
@@ -50,7 +50,7 @@ namespace Dryv.Rules
         {
             foreach (var property in properties)
             {
-                this.Add(property, rule, ruleSwitch, DryvRuleEvaluationLocation.Client);
+                this.Add(property, rule, ruleSwitch, DryvRuleLocation.Client);
             }
         }
     }

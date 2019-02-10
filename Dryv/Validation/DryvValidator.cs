@@ -141,7 +141,7 @@ namespace Dryv.Validation
             var ruleNodes = FindRulesForProperty(rootModel, property, services, treeInfo);
 
             return from node in ruleNodes
-                   where node.Rule.EvaluationLocation.HasFlag(DryvRuleEvaluationLocation.Server)
+                   where node.Rule.EvaluationLocation.HasFlag(DryvRuleLocation.Server)
                    let isAsync = typeof(Task).IsAssignableFrom(node.Rule.ValidationExpression.ReturnType)
                    where (asyncAllowed || !isAsync) && (!asyncAllowed || !syncAllowed || isAsync)
                    let model = treeInfo.FindModel(node.Rule.ModelPath, currentModel, cache)

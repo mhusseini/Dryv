@@ -94,7 +94,7 @@ namespace DryvDemo.ViewModels
     {
         public static readonly DryvRules Rules = DryvRules.For<ModelGrandChild>()
             .Rule(m => m.Name3,
-                m => !"test".Equals(m.Name3)
+                m => !"blah".Equals(m.Name3)
                     ? "Der Name muss 'blah' sein"
                     : DryvResultMessage.Success);
 

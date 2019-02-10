@@ -8,7 +8,7 @@ namespace Dryv.Rules
 {
     public sealed class DryvRuleDefinition
     {
-        public DryvRuleEvaluationLocation EvaluationLocation { get; internal set; }
+        public DryvRuleLocation EvaluationLocation { get; internal set; }
         public Type ModelType { get; internal set; }
         public PropertyInfo Property { get; internal set; }
         public LambdaExpression ValidationExpression { get; internal set; }
@@ -22,7 +22,7 @@ namespace Dryv.Rules
         internal Exception TranslationError { get; set; }
         public string CodeTemplate { get; internal set; }
 
-        public static DryvRuleDefinition Create<TModel, TProperty>(Expression<Func<TModel, TProperty>> property, LambdaExpression rule, LambdaExpression enabled, DryvRuleEvaluationLocation ruleLocation)
+        public static DryvRuleDefinition Create<TModel, TProperty>(Expression<Func<TModel, TProperty>> property, LambdaExpression rule, LambdaExpression enabled, DryvRuleLocation ruleLocation)
         {
             if (!(property.Body is MemberExpression memberExpression) ||
                 !(memberExpression.Member is PropertyInfo propertyInfo))

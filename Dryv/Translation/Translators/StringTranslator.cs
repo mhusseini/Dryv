@@ -160,10 +160,24 @@ namespace Dryv.Translation.Translators
             /*
              √ public static bool Equals(String a, String b, StringComparison comparisonType);
              √ public static bool Equals(String a, String b);
+             √ public bool Equals(String b, StringComparison comparisonType);
+             √ public bool Equals(String b);
              */
+            Expression value1;
+            Expression value2;
 
-            var value = context.Expression.Arguments.First();
-            context.Translator.Translate(value, context);
+            if (context.Expression.Method.IsStatic)
+            {
+                value1 = context.Expression.Arguments.First();
+                value2 = context.Expression.Arguments.Skip(1).First();
+            }
+            else
+            {
+                value1 = context.Expression.Object;
+                value2 = context.Expression.Arguments.First();
+            }
+
+            context.Translator.Translate(value1, context);
             var isCaseInsensitive = GetIsCaseInsensitive(context.Expression);
             if (isCaseInsensitive)
             {
@@ -172,7 +186,7 @@ namespace Dryv.Translation.Translators
 
             context.Writer.Write(context.Negated ? "!==" : " === ");
 
-            var value2 = context.Expression.Arguments.First();
+
             WriteArguments(context.Translator, new[] { value2 }, context);
             if (isCaseInsensitive)
             {

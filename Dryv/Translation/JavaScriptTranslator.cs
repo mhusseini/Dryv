@@ -111,7 +111,7 @@ namespace Dryv.Translation
 
         public override void Translate(Expression expression, TranslationContext context, bool negated = false)
         {
-            var needsBrackets = GetNeedsBrackets(expression);
+            var needsBrackets = this.GetNeedsBrackets(expression);
 
             if (needsBrackets)
             {
