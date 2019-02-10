@@ -48,7 +48,7 @@ namespace Dryv.TagHelpers
             var modelPath = this.ViewContext.GetModelPath(aspFor);
             var httpContext = this.ViewContext.HttpContext;
 
-            var clientValidation = httpContext.RequestServices.GetService<IDryvClientModelValidator>().GetValidationAttributes(
+            var clientValidation = httpContext.RequestServices.GetService<IDryvClientValidationProvider>().GetValidationCodeForProperty(
                 modelType,
                 modelPath,
                 property,

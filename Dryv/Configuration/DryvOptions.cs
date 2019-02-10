@@ -8,7 +8,7 @@ namespace Dryv.Configuration
 
         public Type ClientValidatorType { get; private set; }
 
-        public void UseClientValidator<T>() where T : IDryvClientModelValidator
+        public void UseClientValidator<T>() where T : IDryvClientValidationProvider
         {
             this.ClientValidatorType = typeof(T);
         }

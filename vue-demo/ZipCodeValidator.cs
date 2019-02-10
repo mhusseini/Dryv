@@ -4,6 +4,10 @@ namespace DryvDemo
 {
     public class ZipCodeValidator
     {
-        public Task<bool> ValidateZipCode(string zip) => Task.FromResult(!string.IsNullOrWhiteSpace(zip) && zip != "12345");
+        public async Task<bool> ValidateZipCode(string zip)
+        {
+            await Task.Delay(200);
+            return !string.IsNullOrWhiteSpace(zip) && zip != "12345";
+        }
     }
 }

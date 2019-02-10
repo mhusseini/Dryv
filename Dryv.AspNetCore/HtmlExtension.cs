@@ -26,7 +26,7 @@ namespace Dryv
             var modelType = htmlHelper.ViewData.Model.GetType();
             var modelPath = string.Empty;
 
-            var clientValidation = services.GetService<IDryvClientModelValidator>().GetValidationAttributes(
+            var clientValidation = services.GetService<IDryvClientValidationProvider>().GetValidationCodeForProperty(
                 modelType,
                 modelPath,
                 property,
@@ -44,9 +44,9 @@ namespace Dryv
             var modelType = htmlHelper.ViewData.Model.GetType();
             var modelPath = string.Empty;
 
-            var validator = services.GetService<IDryvClientModelValidator>();
+            var validator = services.GetService<IDryvClientValidationProvider>();
             return from property in modelType.GetProperties()
-                   let clientValidation = validator.GetValidationAttributes(
+                   let clientValidation = validator.GetValidationCodeForProperty(
                        modelType,
                        modelPath,
                        property,

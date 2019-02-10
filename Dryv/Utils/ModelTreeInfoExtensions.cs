@@ -36,11 +36,6 @@ namespace Dryv.Utils
             return orderedItems.FirstOrDefault(i => i.Key == k).Value;
         }
 
-        public static ModelTreeInfo GetTreeInfo(this object model, object root, IDictionary<object, object> cache)
-        {
-            return cache.GetOrAdd(model, m => GetTreeInfo(m, root));
-        }
-
         public static ModelTreeInfo GetTreeInfo(this object model, object root)
         {
             var x = GetTreeInfo(model, root, ImmutableList<object>.Empty.Add(root), ImmutableList<string>.Empty.Add(string.Empty));

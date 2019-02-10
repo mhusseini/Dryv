@@ -10,13 +10,19 @@ using Dryv.Utils;
 namespace Dryv
 {
 
-    public class DryvClientModelValidator : IDryvClientModelValidator
+    public class DryvClientValidationProvider : IDryvClientValidationProvider
     {
+        private readonly IDryvValidationRulesProvider rulesFinder;
         public const string DataTypeDryAttribute = "data-val-dryv-type";
         public const string DataValAttribute = "data-val";
         public const string DataValDryAttribute = "data-val-dryv";
 
-        public DryvClientPropertyValidation GetValidationAttributes(
+        public DryvClientValidationProvider(IDryvValidationRulesProvider rulesFinder)
+        {
+            this.rulesFinder = rulesFinder;
+        }
+
+        public DryvClientPropertyValidation GetValidationCodeForProperty(
             Type modelType,
             string modelPath,
             PropertyInfo property,
@@ -28,7 +34,7 @@ namespace Dryv
                 modelPath = string.Empty;
             }
 
-            var rules = from rule in RulesFinder.GetRulesForProperty(modelType, property, modelPath)
+            var rules = from rule in this.rulesFinder.GetRulesForProperty(modelType, property, modelPath)
                         where RuleCompiler.IsEnabled(rule.Rule, services) &&
                               rule.Rule.EvaluationLocation.HasFlag(RuleEvaluationLocation.Client)
                         select rule;

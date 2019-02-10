@@ -8,7 +8,7 @@ using Dryv.Utils;
 
 namespace Dryv
 {
-    internal static class RulesFinder
+    public class DryvReflectionRulesProvider
     {
         private const BindingFlags BindingFlagsForProperties = BindingFlags.FlattenHierarchy |
                                                                BindingFlags.Instance |
@@ -30,30 +30,6 @@ namespace Dryv
                 $"{modelType.FullName}|{modelPath}|{property.DeclaringType.FullName}|{property.Name}",
                 _ => GetInheritedRules(modelType, property, modelPath));
         }
-
-        public static IEnumerable<DryvRuleDefinition> GetRulesOnType(Type objectType) => TypeRules.GetOrAdd(objectType, type =>
-        {
-            var typeInfo = type.GetTypeInfo();
-
-            var fromFields = from p in typeInfo.GetFields(BindingFlagsForRules)
-                             where typeof(DryvRules).IsAssignableFrom(p.FieldType)
-                             select p.GetValue(null) as DryvRules;
-
-            var fromProperties = from p in typeInfo.GetProperties(BindingFlagsForRules)
-                                 where typeof(DryvRules).IsAssignableFrom(p.PropertyType)
-                                 select p.GetValue(null) as DryvRules;
-
-            var fromMethods = from m in typeInfo.GetMethods(BindingFlagsForRules)
-                              where m.IsStatic
-                                    && !m.GetParameters().Any()
-                                    && typeof(DryvRules).IsAssignableFrom(m.ReturnType)
-                                    && !m.ContainsGenericParameters
-                              select m.Invoke(null, null) as DryvRules;
-
-            return (from rules in fromFields.Union(fromProperties).Union(fromMethods)
-                    from rule in rules.PropertyRules
-                    select rule).ToList();
-        });
 
         private static List<RulePaths> AdvancePathForCurrentProperty(IList<RulePaths> propertiesToFind, string childPropertyName)
         {
@@ -92,10 +68,10 @@ namespace Dryv
 
             return (from tuple in tuples
                     select new DryvRuleNode
-                    {
-                        Path = string.Join(".", tuple.Path.Split('.').Reverse().Skip(1).Reverse()),
-                        Rule = tuple.Rule
-                    }).ToList();
+                    (
+                        path: string.Join(".", tuple.Path.Split('.').Reverse().Skip(1).Reverse()),
+                        rule: tuple.Rule
+                    )).ToList();
         }
 
         private static IEnumerable<DryvRuleNode> FindRulesForProperty(Type type, PropertyInfo property, IList<RulePaths> propertiesToFind, ISet<Type> processed, string path, string modelPath, ConcurrentDictionary<Type, List<DryvRuleDefinition>> deferredRules)
@@ -191,12 +167,36 @@ namespace Dryv
                                  select kvp.Rule)
             {
                 yield return new DryvRuleNode
-                {
-                    Path = pathToChildProperty,
-                    Rule = rule
-                };
+                (
+                    path: pathToChildProperty,
+                    rule: rule
+                );
             }
         }
+
+        private static IEnumerable<DryvRuleDefinition> GetRulesOnType(Type objectType) => TypeRules.GetOrAdd(objectType, type =>
+                                                                {
+                                                                    var typeInfo = type.GetTypeInfo();
+
+                                                                    var fromFields = from p in typeInfo.GetFields(BindingFlagsForRules)
+                                                                                     where typeof(DryvRules).IsAssignableFrom(p.FieldType)
+                                                                                     select p.GetValue(null) as DryvRules;
+
+                                                                    var fromProperties = from p in typeInfo.GetProperties(BindingFlagsForRules)
+                                                                                         where typeof(DryvRules).IsAssignableFrom(p.PropertyType)
+                                                                                         select p.GetValue(null) as DryvRules;
+
+                                                                    var fromMethods = from m in typeInfo.GetMethods(BindingFlagsForRules)
+                                                                                      where m.IsStatic
+                                                                                            && !m.GetParameters().Any()
+                                                                                            && typeof(DryvRules).IsAssignableFrom(m.ReturnType)
+                                                                                            && !m.ContainsGenericParameters
+                                                                                      select m.Invoke(null, null) as DryvRules;
+
+                                                                    return (from rules in fromFields.Union(fromProperties).Union(fromMethods)
+                                                                            from rule in rules.PropertyRules
+                                                                            select rule).ToList();
+                                                                });
 
         private static List<RulePaths> RemoveRulesAtCurrentPath(IEnumerable<RulePaths> propertiesToFind2)
         {

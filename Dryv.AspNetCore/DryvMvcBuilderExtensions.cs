@@ -30,7 +30,7 @@ namespace Dryv
 
         private static IDryvBuilder RegsterServices(this IServiceCollection services, DryvOptions options)
         {
-            services.TryAddSingleton(typeof(IDryvClientModelValidator), options.ClientValidatorType ?? typeof(DryvClientModelValidator));
+            services.TryAddSingleton(typeof(IDryvClientValidationProvider), options.ClientValidatorType ?? typeof(DryvClientValidationProvider));
             services.TryAddSingleton(typeof(IDryvScriptBlockGenerator), options.ClientBodyGeneratorType ?? typeof(DryvScriptBlockGenerator));
             services.AddSingleton<ITranslator, JavaScriptTranslator>();
             services.AddSingleton<ITranslatorProvider, TranslatorProvider>();

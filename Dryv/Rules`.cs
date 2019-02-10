@@ -19,33 +19,9 @@ namespace Dryv
             LambdaExpression enabled,
             RuleEvaluationLocation ruleLocation)
         {
-            if (!(property.Body is MemberExpression memberExpression) ||
-                !(memberExpression.Member is PropertyInfo propertyInfo))
-            {
-                return;
-            }
+            var ruleDefinition = DryvRuleDefinition.Create(property, rule, enabled, ruleLocation);
 
-            var members = memberExpression
-                .Iterrate(e => e.Expression as MemberExpression)
-                .ToList();
-
-            var parameter = (ParameterExpression)members.Last().Expression;
-
-            var modelPath = string.Join(".", members
-                .Skip(1)
-                .Select(e => e.Member.Name.ToCamelCase())
-                .Reverse());
-
-            this.PropertyRules.Add(new DryvRuleDefinition
-            {
-                PropertyExpression = memberExpression,
-                Property = propertyInfo,
-                ModelPath = modelPath,
-                ModelType = parameter.Type,
-                ValidationExpression = rule,
-                EnablingExpression = enabled,
-                EvaluationLocation = ruleLocation
-            });
+            this.PropertyRules.Add(ruleDefinition);
         }
 
         private void Add<TProperty>(
