@@ -33,7 +33,7 @@ namespace Dryv.Translation.Translators
 
         private static void Error(MethodTranslationContext context)
         {
-            context.Writer.Write("{ type:'error', message:");
+            context.Writer.Write("{ type:\"error\", message:");
             context.Translator.Translate(context.Expression.Arguments.First(), context);
             context.Writer.Write(" }");
         }
@@ -45,7 +45,7 @@ namespace Dryv.Translation.Translators
 
         private static void Warning(MethodTranslationContext context)
         {
-            context.Writer.Write("{ type:'error', warning:");
+            context.Writer.Write("{ type:\"warning\", message:");
             context.Translator.Translate(context.Expression.Arguments.First(), context);
             context.Writer.Write(" }");
         }

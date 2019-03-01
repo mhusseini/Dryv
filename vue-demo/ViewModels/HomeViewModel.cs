@@ -13,7 +13,7 @@ namespace DryvDemo.ViewModels
         public static readonly DryvRules Rules = DryvRules.For<HomeViewModel>()
             .Rule(m => m.TaxId,
                 m => !string.IsNullOrWhiteSpace(m.Company) && string.IsNullOrWhiteSpace(m.TaxId)
-                    ? $"Die Steuernummer der Firma {m.Company} muss angegeben werden."
+                    ? DryvResultMessage.Warning($"Die Steuernummer der Firma {m.Company} sollte angegeben werden.")
                     : DryvResultMessage.Success)
 
             .Rule<IOptions<DemoValidationOptions>>(m => m.PostalCode,

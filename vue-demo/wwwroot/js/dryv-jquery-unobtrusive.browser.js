@@ -68,8 +68,7 @@
     };
     var getObject = function ($form) {
         var existing;
-        var obj = (existing = $form.data("dryv-object"))
-            || createObject($form);
+        var obj = (existing = $form.data("dryv-object")) || createObject($form);
         obj.isNew = !existing;
         return obj;
     };
@@ -83,11 +82,24 @@
             updateField(element, obj);
         }
         var e = $(element);
-        e.data("msgDryv", null);
         var error = func(obj);
         if (error) {
             e.data("msgDryv", error.message || error);
+            if (error.type === "warning") {
+                var lastWarning = e.data("dryvWarning");
+                if (lastWarning === error.message) {
+                    e.data("dryvWarningCanIgnore", true);
+                    return true;
+                }
+                e.data("dryvWarning", error.message);
+            }
+            e.data("dryvWarningCanIgnore", null);
             return false;
+        }
+        else {
+            e.data("dryvWarningCanIgnore", null);
+            e.data("dryvWarning", null);
+            e.data("msgDryv", null);
         }
         return true;
     });
@@ -97,7 +109,7 @@
         if (!$form.data("dryv-init")) {
             $form.data("dryv-init", true);
             $form.bind("submit", function () { $(this).data("dryv-object", null); });
-            $("input:not([data-val-dryv]), textarea:not([data-val-dryv])", $form)
+            $("input:not([data-val-dryv]), textarea:not([data-val-dryv]), select:not([data-val-dryv]), datalist:not([data-val-dryv]), button:not([data-val-dryv])", $form)
                 .each(function (i, el) {
                     if (el["type"] === "hidden" &&
                         $("input[type=checkbox][name='" + el["name"] + "']", $form).length) {
@@ -112,4 +124,52 @@
         }
         options.rules["dryv"] = options.message;
     });
+    $.validator.setDefaults({
+        highlight: function (element, errorClass, validClass) {
+            $(element.form).find("*[data-valmsg-for=" + element.id + "]")
+                .addClass(!$(element).data("dryvWarning") ? errorClass : this.settings.warningClass)
+                .removeClass(validClass);
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element.form).find("*[data-valmsg-for=" + element.id + "]")
+                .removeClass(errorClass)
+                .removeClass(this.settings.warningClass);
+        }
+    });
+    var proto = $.validator.prototype;
+    var originalShowErrors = proto.defaultShowErrors;
+    proto.defaultShowErrors = function () {
+        if (!this.settings.warningClass) {
+            this.settings.warningClass = "field-validation-warning";
+        }
+        var form = $(this.currentForm);
+        var successList = [];
+        var removeFromErrorList = [];
+        for (var _i = 0, _a = this.successList; _i < _a.length; _i++) {
+            var element = _a[_i];
+            var e = $(element);
+            var message = e.data("dryvWarning");
+            if (!message) {
+                successList.push(element);
+                continue;
+            }
+            var item = {
+                message: message,
+                element: element
+            };
+            this.errorList.push(item);
+            if (e.data("dryvWarningCanIgnore")) {
+                removeFromErrorList.push(item);
+            }
+            form.find("*[data-valmsg-for=" + element.id + "]")
+                .addClass(this.settings.warningClass)
+                .removeClass(this.settings.validClass);
+        }
+        this.successList = successList;
+        originalShowErrors.call(this);
+        for (var _b = 0, removeFromErrorList_1 = removeFromErrorList; _b < removeFromErrorList_1.length; _b++) {
+            var item = removeFromErrorList_1[_b];
+            this.errorList.splice(this.errorList.indexOf(item), 1);
+        }
+    };
 })();
