@@ -9,7 +9,7 @@ namespace Dryv.Validation
 {
     public class DryvClientValidationProvider : IDryvClientValidationProvider
     {
-        public DryvClientPropertyValidation GetValidationCodeForProperty(
+        public DryvClientPropertyValidation GetClientPropertyValidation(
             Type modelType,
             string modelPath,
             PropertyInfo property,
@@ -25,7 +25,7 @@ namespace Dryv.Validation
                         where rule.Rule.EvaluationLocation.HasFlag(DryvRuleLocation.Client)
                         select rule;
 
-            var translatedRules = rules.Translate(services, options, modelPath, modelType).ToList();
+            var translatedRules = DryvRuleTranslator.Translate(rules, services, options, modelPath, modelType).ToList();
             var key = $"v{Math.Abs((modelType.FullName + property.Name + modelPath).GetHashCode())}";
             var code = translatedRules.Any() ? $@"function(m) {{ return {string.Join("||", translatedRules.Select(f => $"({f})(m)"))}; }}" : null;
 

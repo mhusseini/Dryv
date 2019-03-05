@@ -127,25 +127,24 @@ namespace Dryv.Validation
                                       select RuleCompiler.ValidateAsync(modelRule.Value, modelRule.Key, services));
         }
 
-        private static IEnumerable<DryvRuleNode> FindRulesForProperty(object rootModel, PropertyInfo property, Func<Type, object> services, ModelTreeInfo treeInfo)
+        private static IEnumerable<DryvRuleTreeNode> FindRulesForProperty(Type rootModelType, PropertyInfo property, Func<Type, object> services, ModelTreeInfo treeInfo)
         {
-            var rootModelType = rootModel.GetType();
             var modelPath = treeInfo.ModelsByPath.Keys.OrderBy(k => k.Length).Last();
 
             return DryvReflectionRulesProvider.GetCompiledRulesForProperty(rootModelType, property, services, modelPath);
         }
 
-        private static IEnumerable<KeyValuePair<object, DryvRuleDefinition>> GetModelsAndRules(object currentModel, object rootModel, PropertyInfo property, Func<Type, object> services, IDictionary<object, object> cache, bool syncAllowed, bool asyncAllowed)
+        private static IEnumerable<KeyValuePair<object, DryvCompiledRule>> GetModelsAndRules(object currentModel, object rootModel, PropertyInfo property, Func<Type, object> services, IDictionary<object, object> cache, bool syncAllowed, bool asyncAllowed)
         {
             var treeInfo = GetTreeInfo(currentModel, rootModel, cache);
-            var ruleNodes = FindRulesForProperty(rootModel, property, services, treeInfo);
+            var ruleNodes = FindRulesForProperty(rootModel.GetType(), property, services, treeInfo);
 
             return from node in ruleNodes
                    where node.Rule.EvaluationLocation.HasFlag(DryvRuleLocation.Server)
                    let isAsync = typeof(Task).IsAssignableFrom(node.Rule.ValidationExpression.ReturnType)
                    where (asyncAllowed || !isAsync) && (!asyncAllowed || !syncAllowed || isAsync)
                    let model = treeInfo.FindModel(node.Rule.ModelPath, currentModel, cache)
-                   select new KeyValuePair<object, DryvRuleDefinition>(model, node.Rule);
+                   select new KeyValuePair<object, DryvCompiledRule>(model, node.Rule);
         }
 
         private static ModelTreeInfo GetTreeInfo(object model, object root, IDictionary<object, object> cache)

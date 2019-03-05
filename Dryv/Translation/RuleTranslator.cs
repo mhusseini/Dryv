@@ -8,21 +8,21 @@ using Dryv.Rules;
 
 namespace Dryv.Translation
 {
-    internal static class RuleTranslationExtensions
+    internal static class DryvRuleTranslator
     {
-        public static IEnumerable<string> Translate(this IEnumerable<DryvRuleNode> rules, Func<Type, object> objectProvider, DryvOptions options, string modelPath, Type modelType)
+        public static IEnumerable<string> Translate(IEnumerable<DryvRuleTreeNode> rules, Func<Type, object> objectProvider, DryvOptions options, string modelPath, Type modelType)
         {
             var translator = objectProvider(typeof(ITranslator)) as ITranslator;
 
             return (from r in rules
-                    let rule = r.Rule.Translate(translator, options)
+                    let rule = Translate(r.Rule, translator, options)
                     where rule.TranslationError == null
                     let path = string.IsNullOrWhiteSpace(r.Path) ? r.Path : $".{r.Path}"
                     let preevaluationOptions = new[] { path }.Union(rule.PreevaluationOptionTypes.Select(objectProvider)).ToArray()
                     select rule.TranslatedValidationExpression(preevaluationOptions)).ToList();
         }
 
-        private static DryvRuleDefinition Translate(this DryvRuleDefinition rule, ITranslator translator, DryvOptions options)
+        private static DryvCompiledRule Translate(DryvCompiledRule rule, ITranslator translator, DryvOptions options)
         {
             if (rule.TranslatedValidationExpression != null ||
                 rule.TranslationError != null)

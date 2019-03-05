@@ -11,11 +11,11 @@
 <body>
     <form method="post">
         <fieldset>
-            @*<div>
+            <div>
                 <label asp-for="Name"></label>
                 <input type="text" asp-for="Name" />
                 <span asp-validation-for="Name"></span>
-            </div>*@
+            </div>
             <div>
                 <label asp-for="Company"></label>
                 <input type="text" asp-for="Company" />
@@ -27,7 +27,7 @@
                 <span asp-validation-for="TaxId"></span>
             </div>
         </fieldset>
-        @*<fieldset>
+        <fieldset>
             <div>
                 <input type="checkbox" asp-for="IsAddressVisible" />
                 <label asp-for="IsAddressVisible"></label>
@@ -79,7 +79,7 @@
                     <label asp-for="@Model.SelectionB[i].IsSelected">@Model.SelectionB[i].Name</label>
                 }
             </div>
-        </fieldset>*@
+        </fieldset>
 
         <button type="submit">Absenden</button>
     </form>

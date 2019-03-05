@@ -6,23 +6,23 @@ using Dryv.Extensions;
 
 namespace Dryv.Rules
 {
-    public sealed class DryvRuleDefinition
+    public sealed class DryvCompiledRule
     {
-        public DryvRuleLocation EvaluationLocation { get; internal set; }
-        public Type ModelType { get; internal set; }
-        public PropertyInfo Property { get; internal set; }
-        public LambdaExpression ValidationExpression { get; internal set; }
-        internal Func<object[], bool> CompiledEnablingExpression { get; set; }
-        internal Func<object, object[], object> CompiledValidationExpression { get; set; }
-        internal LambdaExpression EnablingExpression { get; set; }
-        internal string ModelPath { get; set; }
-        internal Type[] PreevaluationOptionTypes { get; set; }
-        internal MemberExpression PropertyExpression { get; set; }
-        internal Func<object[], string> TranslatedValidationExpression { get; set; }
-        internal Exception TranslationError { get; set; }
         public string CodeTemplate { get; internal set; }
+        public Func<object[], bool> CompiledEnablingExpression { get; internal set; }
+        public Func<object, object[], object> CompiledValidationExpression { get; internal set; }
+        public DryvRuleLocation EvaluationLocation { get; internal set; }
+        public string ModelPath { get; internal set; }
+        public Type ModelType { get; internal set; }
+        public Type[] PreevaluationOptionTypes { get; internal set; }
+        public PropertyInfo Property { get; internal set; }
+        public Func<object[], string> TranslatedValidationExpression { get; internal set; }
+        public Exception TranslationError { get; internal set; }
+        internal LambdaExpression ValidationExpression { get; set; }
+        internal LambdaExpression EnablingExpression { get; set; }
+        internal MemberExpression PropertyExpression { get; set; }
 
-        public static DryvRuleDefinition Create<TModel, TProperty>(Expression<Func<TModel, TProperty>> property, LambdaExpression rule, LambdaExpression enabled, DryvRuleLocation ruleLocation)
+        public static DryvCompiledRule Create<TModel, TProperty>(Expression<Func<TModel, TProperty>> property, LambdaExpression rule, LambdaExpression enabled, DryvRuleLocation ruleLocation)
         {
             if (!(property.Body is MemberExpression memberExpression) ||
                 !(memberExpression.Member is PropertyInfo propertyInfo))
@@ -41,7 +41,7 @@ namespace Dryv.Rules
                 .Select(e => e.Member.Name.ToCamelCase())
                 .Reverse());
 
-            return new DryvRuleDefinition
+            return new DryvCompiledRule
             {
                 PropertyExpression = memberExpression,
                 Property = propertyInfo,

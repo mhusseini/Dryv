@@ -6,43 +6,136 @@
 <head>
 </head>
 <body>
-    <form method="post">
-        <div>
-            <label></label>
-            <input type="text" />
-        </div>
-        <div>
-            <label></label>
-            <input type="text" />
-        </div>
-        <div>
-            <label></label>
-            <input type="text" />
-        </div>
+    <div id="app">
+        <span v-show="errors.has('model')" style="color:red">{{ errors.first('model') }}</span>
+        <my-form v-validate="'model'" v-model="model" data-vv-name="model"></my-form>
+    </div>
+    <template id="my-form-template">
+        <form method="post">
+            <fieldset>
+                <div>
+                    <label>Name: </label>
+                    <input v-model="model.name" name="name" type="text" @@input="update">
+                </div>
+                <div>
+                    <label>Company: </label>
+                    <input v-model="model.company" name="company" type="text" @@input="update">
+                </div>
+                <div>
+                    <label>Tax ID:</label>
+                    <input v-model="model.taxId" name="taxId" type="text" @@input="update">
+                </div>
+            </fieldset>
+            <fieldset>
+                <div>
+                    <label>IsAddressVisible: </label>
+                    <input v-model="model.isAddressVisible" name="isAddressVisible" type="checkbox" @@input="update">
+                </div>
+                <div>
+                    <label>PostalCode: </label>
+                    <input v-model="model.postalCode" name="postalCode" type="text" @@input="update">
+                </div>
+                <div>
+                    <label>City: </label>
+                    <input v-model="model.city" name="city" type="text" @@input="update">
+                </div>
+            </fieldset>
+            <fieldset>
+                <div>
+                    <label>Child.Name2: </label>
+                    <input v-model="model.child.name2" name="child.name2" type="text" @@input="update">
+                </div>
+                <div>
+                    <label>Child.Child.Name3: </label>
+                    <input v-model="model.child.child.name3" name="child.child.name3" type="text" @@input="update">
+                </div>
+            </fieldset>
+            <fieldset>
+                <button type="submit">Absenden</button>
+            </fieldset>
+        </form>
+    </template>
 
-        <div>
-            <label></label>
-            <input type="checkbox" />
-        </div>
-
-        <div>
-            <label></label>
-            <input type="text" />
-        </div>
-        <div>
-            <label></label>
-            <input type="text" />
-        </div>
-
-        <button type="submit">Absenden</button>
-    </form>
-
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vee-validate"></script>
     <script>
-    var validation = {
-        @Html.Raw(string.Join(",\n", from val in Html.GetDryvClientValidation()
-                                     let field = val.Property.Name.ToCamelCase()
-                                     select  $"{field}: {val.ValidationFunction}"))
-    };
+        Vue.use(VeeValidate);
+        var modelValidator = {
+            inject: ['$validator'],
+            result: {},
+            getMessage(field, args) {
+                var msg = "";
+                Object.keys(this.result).forEach(function (f) {
+                    var r = this.result[f];
+
+                    if (r) {
+                        msg += f + ": ";
+                        if (r.type === "warning") {
+                            msg += " (WARNING) ";
+                        }
+
+                        msg += (r.message || r) + "\n";
+                    }
+                });
+                return msg;
+                //var result = this.result[field];
+                //return result && (result.message || result);
+            },
+            validate(model, args) {
+                if (!model) {
+                    return false;
+                }
+                var ajax = function() {
+                    console.log("ajax() called.");
+                };
+                this.result = {
+                    @Html.Raw(string.Join(",\n", from val in Html.GetDryvClientValidation()
+                        let field = val.Property.Name.ToCamelCase()
+                        select $"{field}: {val.ValidationFunction}(model)"))
+                };
+
+                var errors = Object.keys(this.result).filter(function (field) { return !!result[field] });
+
+                return errors.length === 0;
+            }
+        };
+
+        Vue.component("my-form",
+            {
+                props: ["value"],
+                template: "#my-form-template",
+                data() {
+                    return {
+                        model: this.value
+                    }
+                },
+                methods: {
+                    update() {
+                        this.$emit('input', Object.assign({}, this.model));
+                    }
+                }
+            });
+
+        var vue = new Vue({
+            el: "#app",
+            data: {
+                model: {
+                    @Html.Raw(string.Join(",\n", from property in Html.ViewData.ModelMetadata.Properties
+                                                 let field = property.PropertyName.ToCamelCase()
+                                                 where field != "child"
+                                                 select $"{field}: {(property.IsCollectionType ? "[]" : "null")}")),
+                    child: {
+                        name2: null,
+                        child: {
+                            name3: null
+                        }
+                    }
+                }
+            },
+            created() {
+                this.$validator.extend("model", modelValidator);
+            }
+        });
     </script>
 </body>
 </html>

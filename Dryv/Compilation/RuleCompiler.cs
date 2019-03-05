@@ -10,7 +10,7 @@ namespace Dryv.Compilation
 {
     internal static class RuleCompiler
     {
-        public static DryvRuleDefinition Compile(DryvRuleDefinition rule)
+        public static DryvCompiledRule Compile(DryvCompiledRule rule)
         {
             if (rule.CompiledValidationExpression != null)
             {
@@ -23,7 +23,7 @@ namespace Dryv.Compilation
             return rule;
         }
 
-        public static bool IsEnabled(DryvRuleDefinition rule, Func<Type, object> objectFactory)
+        public static bool IsEnabled(DryvCompiledRule rule, Func<Type, object> objectFactory)
         {
             Compile(rule);
             var options = GetPreevaluationOptions(rule, objectFactory);
@@ -31,7 +31,7 @@ namespace Dryv.Compilation
             return rule.CompiledEnablingExpression(options);
         }
 
-        public static DryvResultMessage Validate(DryvRuleDefinition rule, object model, Func<Type, object> objectFactory)
+        public static DryvResultMessage Validate(DryvCompiledRule rule, object model, Func<Type, object> objectFactory)
         {
             if (typeof(Task).IsAssignableFrom(rule.ValidationExpression.ReturnType))
             {
@@ -39,12 +39,13 @@ namespace Dryv.Compilation
             }
 
             Compile(rule);
+
             var options = GetPreevaluationOptions(rule, objectFactory);
 
             return (DryvResultMessage)rule.CompiledValidationExpression(model, options);
         }
 
-        public static Task<DryvResultMessage> ValidateAsync(DryvRuleDefinition rule, object model, Func<Type, object> objectFactory)
+        public static Task<DryvResultMessage> ValidateAsync(DryvCompiledRule rule, object model, Func<Type, object> objectFactory)
         {
             Compile(rule);
             var options = GetPreevaluationOptions(rule, objectFactory);
@@ -72,7 +73,7 @@ namespace Dryv.Compilation
                                      select Expression.Convert(arrayAccess, options.Type));
         }
 
-        private static Func<object[], bool> CompileEnablingExpression(DryvRuleDefinition rule)
+        private static Func<object[], bool> CompileEnablingExpression(DryvCompiledRule rule)
         {
             var lambdaExpression = rule.EnablingExpression;
             EnsurePreevaluationOptionTypes(rule);
@@ -94,7 +95,7 @@ namespace Dryv.Compilation
             return resultLambda.Compile();
         }
 
-        private static Func<object, object[], object> CompileValidationExpression(DryvRuleDefinition rule)
+        private static Func<object, object[], object> CompileValidationExpression(DryvCompiledRule rule)
         {
             var lambdaExpression = rule.ValidationExpression;
             EnsurePreevaluationOptionTypes(rule);
@@ -114,7 +115,7 @@ namespace Dryv.Compilation
             return resultLambda.Compile();
         }
 
-        private static void EnsurePreevaluationOptionTypes(DryvRuleDefinition rule)
+        private static void EnsurePreevaluationOptionTypes(DryvCompiledRule rule)
         {
             if (rule.PreevaluationOptionTypes?.Any() != true)
             {
@@ -123,7 +124,7 @@ namespace Dryv.Compilation
             }
         }
 
-        private static object[] GetPreevaluationOptions(DryvRuleDefinition rule, Func<Type, object> objectFactory)
+        private static object[] GetPreevaluationOptions(DryvCompiledRule rule, Func<Type, object> objectFactory)
         {
             return (from t in rule.PreevaluationOptionTypes
                     select objectFactory(t)).ToArray();

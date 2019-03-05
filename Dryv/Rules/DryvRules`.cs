@@ -16,7 +16,7 @@ namespace Dryv.Rules
             LambdaExpression enabled,
             DryvRuleLocation ruleLocation)
         {
-            var ruleDefinition = DryvRuleDefinition.Create(property, rule, enabled, ruleLocation);
+            var ruleDefinition = DryvCompiledRule.Create(property, rule, enabled, ruleLocation);
 
             this.PropertyRules.Add(ruleDefinition);
         }

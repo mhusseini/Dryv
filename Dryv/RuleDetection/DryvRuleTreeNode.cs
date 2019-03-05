@@ -3,9 +3,9 @@ using Dryv.Rules;
 
 namespace Dryv.RuleDetection
 {
-    internal class DryvRuleNode
+    internal class DryvRuleTreeNode
     {
-        public DryvRuleNode(string path, DryvRuleDefinition rule)
+        public DryvRuleTreeNode(string path, DryvCompiledRule rule)
         {
             this.Path = path ?? throw new ArgumentNullException(nameof(path));
             this.Rule = rule ?? throw new ArgumentNullException(nameof(rule));
@@ -13,6 +13,6 @@ namespace Dryv.RuleDetection
 
         public string Path { get; }
 
-        public DryvRuleDefinition Rule { get; }
+        public DryvCompiledRule Rule { get; }
     }
 }
