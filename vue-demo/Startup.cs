@@ -3,6 +3,8 @@ using DryvDemo.Controllers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace DryvDemo
 {
@@ -10,6 +12,8 @@ namespace DryvDemo
     {
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            JsonConvert.DefaultSettings = () => new JsonSerializerSettings { ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() } };
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

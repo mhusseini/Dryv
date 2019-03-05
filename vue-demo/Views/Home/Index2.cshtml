@@ -1,5 +1,6 @@
 ﻿@using Dryv
 @using Dryv.Extensions
+@using Newtonsoft.Json
 @model DryvDemo.ViewModels.HomeViewModel
 
 <html>
@@ -11,39 +12,34 @@
             <fieldset>
                 <div>
                     <label>Name: </label>
-                    <input v-model="model.name" name="name" type="text">
+                    <input v-model="name" name="name" type="text">
+                    <span>{{ errors.name }}</span>
                 </div>
                 <div>
                     <label>Company: </label>
-                    <input v-model="model.company" name="company" type="text">
+                    <input v-model="company" name="company" type="text">
+                    <span>{{ errors.company }}</span>
                 </div>
                 <div>
                     <label>Tax ID:</label>
-                    <input v-model="model.taxId" name="taxId" type="text">
+                    <input v-model="taxId" name="taxId" type="text">
+                    <span>{{ errors.taxId }}</span>
                 </div>
             </fieldset>
             <fieldset>
                 <div>
                     <label>IsAddressVisible: </label>
-                    <input v-model="model.isAddressVisible" name="isAddressVisible" type="checkbox">
+                    <input v-model="isAddressVisible" name="isAddressVisible" type="checkbox">
                 </div>
                 <div>
                     <label>PostalCode: </label>
-                    <input v-model="model.postalCode" name="postalCode" type="text">
+                    <input v-model="postalCode" name="postalCode" type="text">
+                    <span>{{ errors.postalCode }}</span>
                 </div>
                 <div>
                     <label>City: </label>
-                    <input v-model="model.city" name="city" type="text">
-                </div>
-            </fieldset>
-            <fieldset>
-                <div>
-                    <label>Child.Name2: </label>
-                    <input v-model="model.child.name2" name="child.name2" type="text">
-                </div>
-                <div>
-                    <label>Child.Child.Name3: </label>
-                    <input v-model="model.child.child.name3" name="child.child.name3" type="text">
+                    <input v-model="city" name="city" type="text">
+                    <span>{{ errors.city }}</span>
                 </div>
             </fieldset>
             <fieldset>
@@ -54,44 +50,31 @@
 
     <script src="/js/home.js"></script>
     <script>
-/*
-                    @Html.Raw(string.Join(",\n", from val in Html.GetDryvClientValidation()
-                        let field = val.Property.Name.ToCamelCase()
-                        select $"{field}: {val.ValidationFunction}(model)"))
-                        */
-        var vue = new Vue.default({
-            el: "#app",
-            data: {
-                model: {
-                    @Html.Raw(string.Join(",\n", from property in Html.ViewData.ModelMetadata.Properties
-                                                 let field = property.PropertyName.ToCamelCase()
-                                                 where field != "child"
-                                                 select $"{field}: {(property.IsCollectionType ? "[]" : "null")}")),
-                    child: {
-                        name2: null,
-                        child: {
-                            name3: null
-                        }
-                    }
-                }
+    var vue = new Vue.default({
+        el: "#app",
+        data: {
+            errors: {
+                @Html.Raw(string.Join(",\n", Html.ViewData.ModelMetadata.Properties.Select(p => $"{p.PropertyName.ToCamelCase()}: null")))
+            },
+            @Html.Raw(JsonConvert.SerializeObject(this.Model).TrimStart(' ', '{').TrimEnd(' ', '}'))
             },
             validations: {
                  @Html.Raw(string.Join(",\n", from val in Html.GetDryvClientValidation()
-                        let field = val.Property.Name.ToCamelCase()
-                        select $"{field}:  {{ function(_){{ return {val.ValidationFunction}(this); }} }}"))
-            }, 
+                                              let field = val.Property.Name.ToCamelCase()
+                                              select $@"{field}: {{ function(){{ return this.validate('{field}', {val.ValidationFunction}); }} }}"))
+            },
             methods: {
+                validate(field, func) {
+                    var v = func.call(this, this);
+                    return v && v.then ? v.then(r => !!(this.errors[field] = r)) : !!(this.errors[field] = v);
+                },
+                ajax(url, msg) {
+                    return this.$http.get(url).then(response => response.body === true ? null : msg);
+                },
                 submit() {
-                    console.log('submit!')
                     this.$v.$touch();
-                    if (this.$v.$invalid) {
-                        this.submitStatus = 'ERROR'
-                    } else {
-                        // do your submit logic here
-                        this.submitStatus = 'PENDING'
-                        setTimeout(() => {
-                        this.submitStatus = 'OK'
-                        }, 500)
+                    if (!this.$v.$invalid) {
+                        alert("Weeeee");
                     }
                 }
             }

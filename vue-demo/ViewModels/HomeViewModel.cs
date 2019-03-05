@@ -27,7 +27,7 @@ namespace DryvDemo.ViewModels
                         ? DryvResultMessage.Success
                         : "Die PLZ ist nicht gültig."))
             .ClientRule<IOptions<DemoValidationOptions>>(m => m.PostalCode,
-                (m, o) => DryvClientCode.Raw("ajax(") + $"Home/ValidateZip/{m.PostalCode}" + DryvClientCode.Raw(", 'Die PLZ ist nicht gültig.')"))
+                (m, o) => DryvClientCode.Raw("this.ajax(") + $"/Home/ValidateZip?zip={m.PostalCode}" + DryvClientCode.Raw(", 'Die PLZ ist nicht gültig.')"))
 
             .Rule<IOptions<DemoValidationOptions>, ZipCodeValidator>(m => m.City,
                 (m, options, validator) => !options.Value.IsAddressRequired && !m.IsAddressVisible || !string.IsNullOrWhiteSpace(m.City)

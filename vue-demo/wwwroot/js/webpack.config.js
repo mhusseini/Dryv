@@ -5,7 +5,9 @@ module.exports = {
     //devtool: 'inline-source-map',
     output: {
         path: path.resolve(__dirname, 'wwwroot/js'),
-        filename: 'home.js'
+        filename: 'home.js',
+        libraryTarget: 'var',
+        library: 'Vue'
     },
     module: {
         rules: [

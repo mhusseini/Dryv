@@ -1,12 +1,18 @@
 ﻿using System.Threading.Tasks;
-using Dryv;
-using Microsoft.AspNetCore.Mvc;
 using DryvDemo.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DryvDemo.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly ZipCodeValidator zipCodeValidator;
+
+        public HomeController(ZipCodeValidator zipCodeValidator)
+        {
+            this.zipCodeValidator = zipCodeValidator;
+        }
+
         public IActionResult Index()
         {
             return this.View(new HomeViewModel
@@ -23,15 +29,21 @@ namespace DryvDemo.Controllers
                 }
             });
         }
-        public IActionResult Index2()
-        {
-            return this.View(new HomeViewModel());
-        }
 
         [HttpPost]
         public async Task<IActionResult> Index(HomeViewModel model)
         {
             return this.View(model);
+        }
+
+        public IActionResult Index2()
+        {
+            return this.View(new HomeViewModel());
+        }
+
+        public async Task<IActionResult> ValidateZip(string zip)
+        {
+            return this.Json(await this.zipCodeValidator.ValidateZipCode(zip));
         }
     }
 }

@@ -27,7 +27,7 @@ namespace Dryv.Validation
 
             var translatedRules = DryvRuleTranslator.Translate(rules, services, options, modelPath, modelType).ToList();
             var key = $"v{Math.Abs((modelType.FullName + property.Name + modelPath).GetHashCode())}";
-            var code = translatedRules.Any() ? $@"function(m) {{ return {string.Join("||", translatedRules.Select(f => $"({f})(m)"))}; }}" : null;
+            var code = translatedRules.Any() ? $@"function(m) {{ return {string.Join("||", translatedRules.Select(f => $"({f}).call(this, m)"))}; }}" : null;
 
             return code == null ? null : new DryvClientPropertyValidation
             {

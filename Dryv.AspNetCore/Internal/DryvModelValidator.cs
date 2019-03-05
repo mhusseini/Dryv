@@ -11,6 +11,11 @@ namespace Dryv.Internal
     {
         public IEnumerable<ModelValidationResult> Validate(ModelValidationContext context)
         {
+            if (context.Container == null)
+            {
+                return Array.Empty<ModelValidationResult>();
+            }
+
             var validationResults = GetGroupedValidationResults(context);
             return CreateModelValidationResults(context, validationResults);
         }
