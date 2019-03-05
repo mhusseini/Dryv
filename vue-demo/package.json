@@ -11,9 +11,11 @@
   "dependencies": {
     "vee-validate": "^2.1.4",
     "vue": "^2.5.17",
-    "vue-dotnet-validator": "^0.3.12"
+    "vue-dotnet-validator": "^0.3.12",
+    "vuelidate": "^0.7.4"
   },
   "devDependencies": {
+    "@types/vuelidate": "^0.7.4",
     "ts-loader": "^5.3.1",
     "typescript": "^3.2.1",
     "webpack": "^4.27.1",

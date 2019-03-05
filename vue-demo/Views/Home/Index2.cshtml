@@ -7,116 +7,59 @@
 </head>
 <body>
     <div id="app">
-        <span v-show="errors.has('model')" style="color:red">{{ errors.first('model') }}</span>
-        <my-form v-validate="'model'" v-model="model" data-vv-name="model"></my-form>
-    </div>
-    <template id="my-form-template">
-        <form method="post">
+        <form method="post" @@submit.prevent="submit">
             <fieldset>
                 <div>
                     <label>Name: </label>
-                    <input v-model="model.name" name="name" type="text" @@input="update">
+                    <input v-model="model.name" name="name" type="text">
                 </div>
                 <div>
                     <label>Company: </label>
-                    <input v-model="model.company" name="company" type="text" @@input="update">
+                    <input v-model="model.company" name="company" type="text">
                 </div>
                 <div>
                     <label>Tax ID:</label>
-                    <input v-model="model.taxId" name="taxId" type="text" @@input="update">
+                    <input v-model="model.taxId" name="taxId" type="text">
                 </div>
             </fieldset>
             <fieldset>
                 <div>
                     <label>IsAddressVisible: </label>
-                    <input v-model="model.isAddressVisible" name="isAddressVisible" type="checkbox" @@input="update">
+                    <input v-model="model.isAddressVisible" name="isAddressVisible" type="checkbox">
                 </div>
                 <div>
                     <label>PostalCode: </label>
-                    <input v-model="model.postalCode" name="postalCode" type="text" @@input="update">
+                    <input v-model="model.postalCode" name="postalCode" type="text">
                 </div>
                 <div>
                     <label>City: </label>
-                    <input v-model="model.city" name="city" type="text" @@input="update">
+                    <input v-model="model.city" name="city" type="text">
                 </div>
             </fieldset>
             <fieldset>
                 <div>
                     <label>Child.Name2: </label>
-                    <input v-model="model.child.name2" name="child.name2" type="text" @@input="update">
+                    <input v-model="model.child.name2" name="child.name2" type="text">
                 </div>
                 <div>
                     <label>Child.Child.Name3: </label>
-                    <input v-model="model.child.child.name3" name="child.child.name3" type="text" @@input="update">
+                    <input v-model="model.child.child.name3" name="child.child.name3" type="text">
                 </div>
             </fieldset>
             <fieldset>
-                <button type="submit">Absenden</button>
+                <button type="button" @@click="submit">Absenden</button>
             </fieldset>
         </form>
-    </template>
+    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vee-validate"></script>
+    <script src="/js/home.js"></script>
     <script>
-        Vue.use(VeeValidate);
-        var modelValidator = {
-            inject: ['$validator'],
-            result: {},
-            getMessage(field, args) {
-                var msg = "";
-                Object.keys(this.result).forEach(function (f) {
-                    var r = this.result[f];
-
-                    if (r) {
-                        msg += f + ": ";
-                        if (r.type === "warning") {
-                            msg += " (WARNING) ";
-                        }
-
-                        msg += (r.message || r) + "\n";
-                    }
-                });
-                return msg;
-                //var result = this.result[field];
-                //return result && (result.message || result);
-            },
-            validate(model, args) {
-                if (!model) {
-                    return false;
-                }
-                var ajax = function() {
-                    console.log("ajax() called.");
-                };
-                this.result = {
+/*
                     @Html.Raw(string.Join(",\n", from val in Html.GetDryvClientValidation()
                         let field = val.Property.Name.ToCamelCase()
                         select $"{field}: {val.ValidationFunction}(model)"))
-                };
-
-                var errors = Object.keys(this.result).filter(function (field) { return !!result[field] });
-
-                return errors.length === 0;
-            }
-        };
-
-        Vue.component("my-form",
-            {
-                props: ["value"],
-                template: "#my-form-template",
-                data() {
-                    return {
-                        model: this.value
-                    }
-                },
-                methods: {
-                    update() {
-                        this.$emit('input', Object.assign({}, this.model));
-                    }
-                }
-            });
-
-        var vue = new Vue({
+                        */
+        var vue = new Vue.default({
             el: "#app",
             data: {
                 model: {
@@ -132,8 +75,25 @@
                     }
                 }
             },
-            created() {
-                this.$validator.extend("model", modelValidator);
+            validations: {
+                 @Html.Raw(string.Join(",\n", from val in Html.GetDryvClientValidation()
+                        let field = val.Property.Name.ToCamelCase()
+                        select $"{field}:  {{ function(_){{ return {val.ValidationFunction}(this); }} }}"))
+            }, 
+            methods: {
+                submit() {
+                    console.log('submit!')
+                    this.$v.$touch();
+                    if (this.$v.$invalid) {
+                        this.submitStatus = 'ERROR'
+                    } else {
+                        // do your submit logic here
+                        this.submitStatus = 'PENDING'
+                        setTimeout(() => {
+                        this.submitStatus = 'OK'
+                        }, 500)
+                    }
+                }
             }
         });
     </script>
