@@ -10,7 +10,7 @@ namespace Dryv.Extensions
 {
     internal static class ViewContextExtensions
     {
-        private static readonly IDictionary<string, DryvClientPropertyValidation> EmptyValidation = new ReadOnlyDictionary<string, DryvClientPropertyValidation>(new Dictionary<string, DryvClientPropertyValidation>());
+        private static readonly IDictionary<string, DryvClientValidationItem> EmptyValidation = new ReadOnlyDictionary<string, DryvClientValidationItem>(new Dictionary<string, DryvClientValidationItem>());
 
         public static DryvFeature GetDryvFeature(this HttpContext httpContext)
         {
@@ -24,12 +24,12 @@ namespace Dryv.Extensions
             return feature;
         }
 
-        public static IDictionary<string, DryvClientPropertyValidation> LoadValidationCode(this ViewContext viewContext)
+        public static IDictionary<string, DryvClientValidationItem> LoadValidationCode(this ViewContext viewContext)
         {
             return viewContext.HttpContext.Features.Get<DryvFeature>()?.PropertyValidations ?? EmptyValidation;
         }
 
-        public static IDictionary<string, DryvClientPropertyValidation> PopValidationCode(this ViewContext viewContext)
+        public static IDictionary<string, DryvClientValidationItem> PopValidationCode(this ViewContext viewContext)
         {
             var result = LoadValidationCode(viewContext);
             if (result != null)
@@ -41,7 +41,7 @@ namespace Dryv.Extensions
             return result;
         }
 
-        public static void StoreValidationCode(this ViewContext viewContext, string key, DryvClientPropertyValidation value)
+        public static void StoreValidationCode(this ViewContext viewContext, string key, DryvClientValidationItem value)
         {
             viewContext.HttpContext.GetDryvFeature().PropertyValidations[key] = value;
         }

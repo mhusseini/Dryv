@@ -38,7 +38,39 @@ namespace Dryv
             return new HtmlString(clientValidation.ValidationFunction);
         }
 
-        public static IEnumerable<DryvClientPropertyValidation> GetDryvClientValidation<TModel>(this IHtmlHelper<TModel> htmlHelper)
+        public static IEnumerable<DryvClientValidationNamedGroup> GetDryvClientGroupValidations<TModel>(this IHtmlHelper<TModel> htmlHelper)
+        {
+            var validationItems = EnumerateValidationItems(htmlHelper);
+
+            var l = from g in
+                        from v in validationItems
+                        where !string.IsNullOrWhiteSpace(v.GroupName)
+                        group v by v.GroupName
+                    where g.Count() > 1
+                    let first = g.First()
+                    select new DryvClientValidationNamedGroup
+                    {
+                        Properties = g.Select(x => x.Property).ToList(),
+                        GroupName = first.GroupName,
+                        Key = first.Key,
+                        ValidationFunction = first.ValidationFunction,
+                        ModelPath = first.ModelPath,
+                        ModelType = first.ModelType
+                    };
+
+            return l.ToList();
+        }
+
+        public static IEnumerable<DryvClientValidationItem> GetDryvClientPropertyValidations<TModel>(this IHtmlHelper<TModel> htmlHelper)
+        {
+            var l = from i in EnumerateValidationItems(htmlHelper)
+                    where i.GroupName == null
+                    select i;
+
+            return l.ToList();
+        }
+
+        private static IEnumerable<DryvClientValidationItem> EnumerateValidationItems<TModel>(IHtmlHelper<TModel> htmlHelper)
         {
             var services = htmlHelper.ViewContext.HttpContext.RequestServices;
             var options = services.GetService<IOptions<DryvOptions>>();
@@ -46,11 +78,11 @@ namespace Dryv
             var modelType = htmlHelper.ViewData.Model.GetType();
             var validator = services.GetService<IDryvClientValidationProvider>();
 
-            return CollectClientValidation(modelType, null, null, validator, new HashSet<Type>(), options.Value, services.GetService).ToList();
+            return CollectClientValidation(modelType, null, null, validator, new HashSet<Type>(), options.Value, services.GetService);
         }
 
 
-        internal static IEnumerable<DryvClientPropertyValidation> CollectClientValidation(Type modelType, Type rootModelType, string modelPath, IDryvClientValidationProvider validator, ISet<Type> processedTypes, DryvOptions options, Func<Type, object> services)
+        internal static IEnumerable<DryvClientValidationItem> CollectClientValidation(Type modelType, Type rootModelType, string modelPath, IDryvClientValidationProvider validator, ISet<Type> processedTypes, DryvOptions options, Func<Type, object> services)
         {
             if (rootModelType == null)
             {
@@ -66,8 +98,7 @@ namespace Dryv
             var properties = modelType.GetProperties();
 
             foreach (var validation in from property in properties
-                                       let clientValidation = validator.GetClientPropertyValidation(rootModelType, modelPath, property, services, options)
-                                       where clientValidation != null
+                                       from clientValidation in validator.GetClientPropertyValidationGroups(rootModelType, modelPath, property, services, options)
                                        select clientValidation)
             {
                 yield return validation;

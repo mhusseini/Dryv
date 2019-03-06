@@ -47,9 +47,13 @@
             </fieldset>
         </form>
     </div>
-
+    
     <script src="/js/home.js"></script>
-    <script>
+<script>
+    var groupValidations = {
+        @Html.Raw(string.Join(",\n", from val in Html.GetDryvClientGroupValidations()
+                                     select $@"{val.GroupName}: {{ function(){{ return this.validate('{val.GroupName}', {val.ValidationFunction}); }} }}"))
+    };
     var vue = new Vue.default({
         el: "#app",
         data: {
@@ -57,28 +61,28 @@
                 @Html.Raw(string.Join(",\n", Html.ViewData.ModelMetadata.Properties.Select(p => $"{p.PropertyName.ToCamelCase()}: null")))
             },
             @Html.Raw(JsonConvert.SerializeObject(this.Model).TrimStart(' ', '{').TrimEnd(' ', '}'))
-            },
-            validations: {
-                 @Html.Raw(string.Join(",\n", from val in Html.GetDryvClientValidation()
+        },
+        validations: {
+            @Html.Raw(string.Join(",\n", from val in Html.GetDryvClientPropertyValidations()
                                               let field = val.Property.Name.ToCamelCase()
                                               select $@"{field}: {{ function(){{ return this.validate('{field}', {val.ValidationFunction}); }} }}"))
+        },
+        methods: {
+            validate(field, func) {
+                var v = func.call(this, this);
+                return v && v.then ? v.then(r => !!(this.errors[field] = r)) : !!(this.errors[field] = v);
             },
-            methods: {
-                validate(field, func) {
-                    var v = func.call(this, this);
-                    return v && v.then ? v.then(r => !!(this.errors[field] = r)) : !!(this.errors[field] = v);
-                },
-                ajax(url, msg) {
-                    return this.$http.get(url).then(response => response.body === true ? null : msg);
-                },
-                submit() {
-                    this.$v.$touch();
-                    if (!this.$v.$invalid) {
-                        alert("Weeeee");
-                    }
+            ajax(url, msg) {
+                return this.$http.get(url).then(response => response.body === true ? null : msg);
+            },
+            submit() {
+                this.$v.$touch();
+                if (!this.$v.$invalid) {
+                    alert("Weeeee");
                 }
             }
-        });
-    </script>
+        }
+    });
+</script>
 </body>
 </html>

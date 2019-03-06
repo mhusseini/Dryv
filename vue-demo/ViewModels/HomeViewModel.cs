@@ -41,15 +41,24 @@ namespace DryvDemo.ViewModels
                 m => string.IsNullOrWhiteSpace(m.Company) || string.Equals(m.Child.Name2, m.Company)
                     ? DryvResultMessage.Success
                     : $"Der Name muss '{m.Company}' sein.");
+        //.Rule(m => m.Name, m => m.Name == "falsch" ? "Der Name darf nicht falsch sein." : null)
+
+        //.Rule(m => m.Company, m => m.Company == "falsch" ? "Die Firma darf nicht falsch sein." : null)
+
+        //.Rule("test", m => m.Name, m => m.Company,
+        //    m => string.IsNullOrWhiteSpace(m.Name) && string.IsNullOrWhiteSpace(m.Company)
+        //        ? "Entweder der Name oder die Firma müssen angegeben sein."
+        //        : null);
 
         [DryvRules]
         public string City { get; set; }
 
+        [DryvRules]
         public string Company { get; set; }
 
         public bool IsAddressVisible { get; set; }
 
-        [Required]
+        [DryvRules]
         public string Name { get; set; }
 
         [DryvRules]

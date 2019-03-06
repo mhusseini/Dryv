@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Dryv.Configuration;
-using Dryv.Internal;
 using Dryv.RuleDetection;
 using Dryv.Rules;
 
@@ -10,7 +9,7 @@ namespace Dryv.Translation
 {
     internal static class DryvRuleTranslator
     {
-        public static IEnumerable<string> Translate(IEnumerable<DryvRuleTreeNode> rules, Func<Type, object> objectProvider, DryvOptions options, string modelPath, Type modelType)
+        public static IDictionary<DryvRuleTreeNode, string> Translate(IEnumerable<DryvRuleTreeNode> rules, Func<Type, object> objectProvider, DryvOptions options, string modelPath, Type modelType)
         {
             var translator = objectProvider(typeof(ITranslator)) as ITranslator;
 
@@ -19,7 +18,8 @@ namespace Dryv.Translation
                     where rule.TranslationError == null
                     let path = string.IsNullOrWhiteSpace(r.Path) ? r.Path : $".{r.Path}"
                     let preevaluationOptions = new[] { path }.Union(rule.PreevaluationOptionTypes.Select(objectProvider)).ToArray()
-                    select rule.TranslatedValidationExpression(preevaluationOptions)).ToList();
+                    select new { Rule = r, Translation = rule.TranslatedValidationExpression(preevaluationOptions) })
+                .ToDictionary(x => x.Rule, x => x.Translation);
         }
 
         private static DryvCompiledRule Translate(DryvCompiledRule rule, ITranslator translator, DryvOptions options)

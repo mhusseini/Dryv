@@ -5,6 +5,6 @@ namespace Dryv.Translation
 {
     public interface IDryvScriptBlockGenerator
     {
-        string GetScriptBody(IDictionary<string, DryvClientPropertyValidation> validators);
+        string GetScriptBody(IDictionary<string, DryvClientValidationItem> validators);
     }
 }

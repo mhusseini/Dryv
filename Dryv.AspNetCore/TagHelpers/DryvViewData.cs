@@ -5,6 +5,6 @@ namespace Dryv.TagHelpers
 {
     internal class DryvViewData
     {
-        public IDictionary<string, DryvClientPropertyValidation> ValidationFunctions { get; set; } = new Dictionary<string, DryvClientPropertyValidation>();
+        public IDictionary<string, DryvClientValidationItem> ValidationFunctions { get; set; } = new Dictionary<string, DryvClientValidationItem>();
     }
 }

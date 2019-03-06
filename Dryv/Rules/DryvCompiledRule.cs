@@ -12,17 +12,18 @@ namespace Dryv.Rules
         public Func<object[], bool> CompiledEnablingExpression { get; internal set; }
         public Func<object, object[], object> CompiledValidationExpression { get; internal set; }
         public DryvRuleLocation EvaluationLocation { get; internal set; }
+        public string GroupName { get; set; }
         public string ModelPath { get; internal set; }
         public Type ModelType { get; internal set; }
         public Type[] PreevaluationOptionTypes { get; internal set; }
         public PropertyInfo Property { get; internal set; }
         public Func<object[], string> TranslatedValidationExpression { get; internal set; }
         public Exception TranslationError { get; internal set; }
-        internal LambdaExpression ValidationExpression { get; set; }
         internal LambdaExpression EnablingExpression { get; set; }
         internal MemberExpression PropertyExpression { get; set; }
+        internal LambdaExpression ValidationExpression { get; set; }
 
-        public static DryvCompiledRule Create<TModel, TProperty>(Expression<Func<TModel, TProperty>> property, LambdaExpression rule, LambdaExpression enabled, DryvRuleLocation ruleLocation)
+        public static DryvCompiledRule Create<TModel, TProperty>(Expression<Func<TModel, TProperty>> property, LambdaExpression rule, LambdaExpression enabled, DryvRuleLocation ruleLocation, string groupName)
         {
             if (!(property.Body is MemberExpression memberExpression) ||
                 !(memberExpression.Member is PropertyInfo propertyInfo))
@@ -43,13 +44,14 @@ namespace Dryv.Rules
 
             return new DryvCompiledRule
             {
-                PropertyExpression = memberExpression,
-                Property = propertyInfo,
+                EnablingExpression = enabled,
+                EvaluationLocation = ruleLocation,
+                GroupName = groupName,
                 ModelPath = modelPath,
                 ModelType = parameter.Type,
+                Property = propertyInfo,
+                PropertyExpression = memberExpression,
                 ValidationExpression = rule,
-                EnablingExpression = enabled,
-                EvaluationLocation = ruleLocation
             };
         }
     }

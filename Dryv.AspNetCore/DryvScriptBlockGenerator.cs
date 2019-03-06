@@ -7,7 +7,7 @@ namespace Dryv
 {
     public class DryvScriptBlockGenerator : IDryvScriptBlockGenerator
     {
-        public virtual string GetScriptBody(IDictionary<string, DryvClientPropertyValidation> validators)
+        public virtual string GetScriptBody(IDictionary<string, DryvClientValidationItem> validators)
         {
             return validators.Any()
                ? @"<script>
