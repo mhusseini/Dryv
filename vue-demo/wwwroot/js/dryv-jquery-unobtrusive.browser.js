@@ -1,9 +1,12 @@
 (function () {
     var convert = function (value, type) {
         switch (type) {
-            case "number": return Number(value);
-            case "boolean": value.toLowerCase() === "true" || !!value;
-            default: return value;
+            case "number":
+                return Number(value);
+            case "boolean":
+                value.toLowerCase() === "true" || !!value;
+            default:
+                return value;
         }
     };
     var getValue = function ($el) {
@@ -43,19 +46,16 @@
                     var idx = Number(index);
                     if (obj[idx]) {
                         obj = obj[idx];
-                    }
-                    else {
+                    } else {
                         obj = obj[idx] = {};
                     }
                 }
-            }
-            else if (index) {
+            } else if (index) {
                 if (!obj) {
                     obj = parent_1[field] = [];
                 }
                 obj[Number(index)] = getValue(el);
-            }
-            else {
+            } else {
                 parent_1[field] = getValue(el);
             }
         }
@@ -72,58 +72,61 @@
         obj.isNew = !existing;
         return obj;
     };
-    $.validator.addMethod("dryv", function (_, element, message) {
-        var func = window.dryv[message];
-        if (!func) {
-            throw "Cannot find Dryv validation function '" + message + "'.";
-        }
-        var obj = getObject($(this.currentForm));
-        if (!obj.isNew) {
-            updateField(element, obj);
-        }
-        var e = $(element);
-        var error = func(obj);
-        if (error) {
-            e.data("msgDryv", error.message || error);
-            if (error.type === "warning") {
-                var lastWarning = e.data("dryvWarning");
-                if (lastWarning === error.message) {
-                    e.data("dryvWarningCanIgnore", true);
-                    return true;
-                }
-                e.data("dryvWarning", error.message);
+    $.validator.addMethod("dryv",
+        function (_, element, message) {
+            var func = window.dryv[message];
+            if (!func) {
+                throw "Cannot find Dryv validation function '" + message + "'.";
             }
-            e.data("dryvWarningCanIgnore", null);
-            return false;
-        }
-        else {
-            e.data("dryvWarningCanIgnore", null);
-            e.data("dryvWarning", null);
-            e.data("msgDryv", null);
-        }
-        return true;
-    });
-    $.validator.unobtrusive.adapters.add("dryv", function (options) {
-        var form = options.form;
-        var $form = $(form);
-        if (!$form.data("dryv-init")) {
-            $form.data("dryv-init", true);
-            $form.bind("submit", function () { $(this).data("dryv-object", null); });
-            $("input:not([data-val-dryv]), textarea:not([data-val-dryv]), select:not([data-val-dryv]), datalist:not([data-val-dryv]), button:not([data-val-dryv])", $form)
-                .each(function (i, el) {
-                    if (el["type"] === "hidden" &&
-                        $("input[type=checkbox][name='" + el["name"] + "']", $form).length) {
-                        $(el).data("dryv-ignore", true);
-                        return;
+            var obj = getObject($(this.currentForm));
+            if (!obj.isNew) {
+                updateField(element, obj);
+            }
+            var e = $(element);
+            var error = func(obj);
+            if (error) {
+                e.data("msgDryv", error.message || error);
+                if (error.type === "warning") {
+                    var lastWarning = e.data("dryvWarning");
+                    if (lastWarning === error.message) {
+                        e.data("dryvWarningCanIgnore", true);
+                        return true;
                     }
-                    $(el).change(function () {
-                        var obj = getObject($form);
-                        updateField(this, obj);
+                    e.data("dryvWarning", error.message);
+                }
+                e.data("dryvWarningCanIgnore", null);
+                return false;
+            } else {
+                e.data("dryvWarningCanIgnore", null);
+                e.data("dryvWarning", null);
+                e.data("msgDryv", null);
+            }
+            return true;
+        });
+    $.validator.unobtrusive.adapters.add("dryv",
+        function (options) {
+            var form = options.form;
+            var $form = $(form);
+            if (!$form.data("dryv-init")) {
+                $form.data("dryv-init", true);
+                $form.bind("submit", function () { $(this).data("dryv-object", null); });
+                $(
+                    "input:not([data-val-dryv]), textarea:not([data-val-dryv]), select:not([data-val-dryv]), datalist:not([data-val-dryv]), button:not([data-val-dryv])",
+                    $form)
+                    .each(function (i, el) {
+                        if (el["type"] === "hidden" &&
+                            $("input[type=checkbox][name='" + el["name"] + "']", $form).length) {
+                            $(el).data("dryv-ignore", true);
+                            return;
+                        }
+                        $(el).change(function () {
+                            var obj = getObject($form);
+                            updateField(this, obj);
+                        });
                     });
-                });
-        }
-        options.rules["dryv"] = options.message;
-    });
+            }
+            options.rules["dryv"] = options.message;
+        });
     $.validator.setDefaults({
         highlight: function (element, errorClass, validClass) {
             $(element.form).find("*[data-valmsg-for=" + element.id + "]")
@@ -167,6 +170,7 @@
         }
         this.successList = successList;
         originalShowErrors.call(this);
+        
         for (var _b = 0, removeFromErrorList_1 = removeFromErrorList; _b < removeFromErrorList_1.length; _b++) {
             var item = removeFromErrorList_1[_b];
             this.errorList.splice(this.errorList.indexOf(item), 1);

@@ -50,10 +50,6 @@
     
     <script src="/js/home.js"></script>
 <script>
-    var groupValidations = {
-        @Html.Raw(string.Join(",\n", from val in Html.GetDryvClientGroupValidations()
-                                     select $@"{val.GroupName}: {{ function(){{ return this.validate('{val.GroupName}', {val.ValidationFunction}); }} }}"))
-    };
     var vue = new Vue.default({
         el: "#app",
         data: {
