@@ -17,7 +17,7 @@ namespace Dryv.Tests
         public void FindeRuleOnParentNode()
         {
             var property = typeof(Model9).GetProperty(nameof(Model9.Text));
-            var rules = DryvReflectionRulesProvider.GetRulesForProperty(typeof(Model9), property);
+            var rules = DryvReflectionRulesProvider.GetRulesForProperty(typeof(Model8), property);
 
             Assert.IsNotNull(rules);
             Assert.IsTrue(rules.Any());
