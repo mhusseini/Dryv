@@ -7,7 +7,7 @@ namespace Dryv.Translation
     public class TranslationContext
     {
         public Type ModelType { get; set; }
-        public IDictionary<int, LambdaExpression> OptionDelegates { get; set; }
+        public IDictionary<int, OptionDelegate> OptionDelegates { get; set; }
         public IList<Type> OptionsTypes { get; set; }
         public Expression PropertyExpression { get; set; }
 

@@ -1,4 +1,4 @@
-﻿$fn = "Rules``.g.cs"
+﻿$fn = "DryvRules``.g.cs"
 
 function WriteMethod($propCount, $optionCount, $methodPrefix)
 {
@@ -34,9 +34,33 @@ function WriteMethod($propCount, $optionCount, $methodPrefix)
 
 	@"
 		public DryvRules<TModel> $($methodPrefix)Rule$gen(
-$parameters			Expression<Func<TModel, $($gen2)DryvResult>> rule$ruleSwitch)
+$parameters			Expression<Func<TModel, $($gen2)DryvResultMessage>> rule$ruleSwitch)
         {
-			this.Add$($methodPrefix)(rule,
+			this.Add$($methodPrefix)(null, rule,
+				new[] { $properties},
+				$ruleSwitchArgument);
+			return this;
+        }
+		public DryvRules<TModel> $($methodPrefix)Rule$gen(string groupName,
+$parameters			Expression<Func<TModel, $($gen2)DryvResultMessage>> rule$ruleSwitch)
+        {
+			this.Add$($methodPrefix)(groupName, rule,
+				new[] { $properties},
+				$ruleSwitchArgument);
+			return this;
+        }
+		public DryvRules<TModel> $($methodPrefix)Rule$gen(
+$parameters			Expression<Func<TModel, $($gen2)Task<DryvResultMessage>>> rule$ruleSwitch)
+        {
+			this.Add$($methodPrefix)(null, rule,
+				new[] { $properties},
+				$ruleSwitchArgument);
+			return this;
+        }
+		public DryvRules<TModel> $($methodPrefix)Rule$gen(string groupName,
+$parameters			Expression<Func<TModel, $($gen2)Task<DryvResultMessage>>> rule$ruleSwitch)
+        {
+			this.Add$($methodPrefix)(groupName, rule,
 				new[] { $properties},
 				$ruleSwitchArgument);
 			return this;
@@ -46,10 +70,12 @@ $parameters			Expression<Func<TModel, $($gen2)DryvResult>> rule$ruleSwitch)
 
 'using System;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
+using Dryv.Validation;
 
-namespace Dryv
+namespace Dryv.Rules
 {
-    partial class Rules<TModel>
+    partial class DryvRules<TModel>
     {
 ' | Out-File $fn
 

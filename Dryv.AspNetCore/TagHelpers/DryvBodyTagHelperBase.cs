@@ -1,15 +1,16 @@
-﻿using Dryv.AspNetCore.Utils;
+﻿using Dryv.Extensions;
+using Dryv.Translation;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
-namespace Dryv.AspNetCore.TagHelpers
+namespace Dryv.TagHelpers
 {
-    public abstract class DryvBodyTagHelperBase : TagHelper
+    public class DryvBodyTagHelperBase : TagHelper
     {
         private readonly IDryvScriptBlockGenerator scriptBlockGenerator;
 
-        protected DryvBodyTagHelperBase(IDryvScriptBlockGenerator scriptBlockGenerator)
+        public DryvBodyTagHelperBase(IDryvScriptBlockGenerator scriptBlockGenerator)
         {
             this.scriptBlockGenerator = scriptBlockGenerator;
         }
@@ -18,9 +19,9 @@ namespace Dryv.AspNetCore.TagHelpers
         [ViewContext]
         public ViewContext ViewContext { get; set; }
 
-        protected string GetContent()
+        protected virtual string GetContent()
         {
-            var result = this.ViewContext.Load();
+            var result = this.ViewContext.PopValidationCode();
             return this.scriptBlockGenerator.GetScriptBody(result);
         }
     }

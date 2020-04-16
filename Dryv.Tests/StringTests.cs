@@ -1,5 +1,5 @@
 using System;
-using Dryv.Utils;
+using Dryv.Extensions;
 using Escape.Ast;
 using Jurassic;
 using Jurassic.Library;
@@ -27,7 +27,7 @@ namespace Dryv.Tests
             var expression = Expression(m =>
                 m.Text.CompareTo("Oscorp") == 0
                     ? "fail"
-                    : DryvResult.Success);
+                    : DryvResultMessage.Success);
 
             var jsProgram = GetTranslatedAst(expression);
             var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);
@@ -43,7 +43,7 @@ namespace Dryv.Tests
             var expression = Expression(m =>
                 m.Text.EndsWith("xy", StringComparison.OrdinalIgnoreCase)
                     ? "fail"
-                    : DryvResult.Success);
+                    : DryvResultMessage.Success);
 
             var translation = Translate(expression);
             var model = @"{text:'zzzzzzzXY'}";
@@ -60,7 +60,7 @@ namespace Dryv.Tests
             var expression = Expression(m =>
                 m.Text.EndsWith("xy")
                     ? "fail"
-                    : DryvResult.Success);
+                    : DryvResultMessage.Success);
 
             var translation = Translate(expression);
             var model = @"{text:'ab'}";
@@ -77,7 +77,7 @@ namespace Dryv.Tests
             var expression = Expression(m =>
                 m.Text.Equals("Oscorp", StringComparison.OrdinalIgnoreCase)
                     ? "fail"
-                    : DryvResult.Success);
+                    : DryvResultMessage.Success);
 
             var jsProgram = GetTranslatedAst(expression);
             var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);
@@ -96,7 +96,7 @@ namespace Dryv.Tests
             var expression = Expression(m =>
                 m.Text.IndexOf("Oscorp", StringComparison.OrdinalIgnoreCase) == 0
                     ? "fail"
-                    : DryvResult.Success);
+                    : DryvResultMessage.Success);
 
             var jsProgram = GetTranslatedAst(expression);
             var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);
@@ -115,7 +115,7 @@ namespace Dryv.Tests
             var expression = Expression(m =>
                 string.IsNullOrWhiteSpace(m.Text)
                     ? "fail"
-                    : DryvResult.Success);
+                    : DryvResultMessage.Success);
 
             var jsProgram = GetTranslatedAst(expression);
             var conditional = (dynamic)GetBodyExpression<ConditionalExpression>(jsProgram);
@@ -139,7 +139,7 @@ namespace Dryv.Tests
             var expression = Expression(m =>
                 m.Text.StartsWith("Oscorp", StringComparison.OrdinalIgnoreCase)
                     ? "fail"
-                    : DryvResult.Success);
+                    : DryvResultMessage.Success);
 
             var jsProgram = GetTranslatedAst(expression);
             var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);
@@ -158,7 +158,7 @@ namespace Dryv.Tests
             var expression = Expression(m =>
                 string.Compare(m.Text, "Oscorp", StringComparison.CurrentCulture) == 0
                     ? "fail"
-                    : DryvResult.Success);
+                    : DryvResultMessage.Success);
 
             var jsProgram = GetTranslatedAst(expression);
             var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);
@@ -174,7 +174,7 @@ namespace Dryv.Tests
             var expression = Expression(m =>
                 string.Compare(m.Text, "Oscorp", StringComparison.OrdinalIgnoreCase) == 0
                     ? "fail"
-                    : DryvResult.Success);
+                    : DryvResultMessage.Success);
 
             var jsProgram = GetTranslatedAst(expression);
             var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);

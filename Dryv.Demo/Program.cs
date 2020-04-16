@@ -1,5 +1,6 @@
 ﻿using System;
 using Dryv.Demo.Models;
+using Dryv.Validation;
 
 namespace Dryv.Demo
 {
@@ -21,8 +22,7 @@ namespace Dryv.Demo
                 }
             };
 
-            var validator = new DryvValidator();
-            var errors = validator.Validate(model);
+            var errors = DryvValidator.Validate(model);
 
             foreach (var error in errors)
             {

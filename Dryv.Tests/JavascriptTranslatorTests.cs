@@ -1,5 +1,6 @@
 using System;
 using System.Text.RegularExpressions;
+using Dryv.Translation;
 using Escape;
 using Escape.Ast;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -38,7 +39,7 @@ namespace Dryv.Tests
                 var translation = Translate(expression);
                 Assert.Fail();
             }
-            catch (ExpressionNotSupportedException)
+            catch (DryvExpressionNotSupportedException)
             {
             }
         }
@@ -49,7 +50,7 @@ namespace Dryv.Tests
             var expression = Expression(m =>
                 new Regex(this.patternField, RegexOptions.IgnoreCase | RegexOptions.Singleline).IsMatch(m.Text)
                     ? "fail"
-                    : DryvResult.Success);
+                    : DryvResultMessage.Success);
 
             var jsProgram = GetTranslatedAst(expression);
             var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);
@@ -65,7 +66,7 @@ namespace Dryv.Tests
             var expression = Expression(m =>
                 new Regex(this.patternField, RegexOptions.IgnoreCase | RegexOptions.Singleline).IsMatch(m.Text)
                     ? this.var2Field
-                    : DryvResult.Success);
+                    : DryvResultMessage.Success);
 
             var jsProgram = GetTranslatedAst(expression);
             var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);
@@ -81,7 +82,7 @@ namespace Dryv.Tests
             var expression = Expression(m =>
                 new Regex(this.PatternProperty, RegexOptions.IgnoreCase | RegexOptions.Singleline).IsMatch(m.Text)
                     ? "fail"
-                    : DryvResult.Success);
+                    : DryvResultMessage.Success);
 
             var jsProgram = GetTranslatedAst(expression);
             var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);
@@ -97,7 +98,7 @@ namespace Dryv.Tests
             var expression = Expression(m =>
                 new Regex(this.PatternProperty, RegexOptions.IgnoreCase | RegexOptions.Singleline).IsMatch(m.Text)
                     ? this.Var2Property
-                    : DryvResult.Success);
+                    : DryvResultMessage.Success);
 
             var jsProgram = GetTranslatedAst(expression);
             var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);
@@ -114,7 +115,7 @@ namespace Dryv.Tests
             var expression = Expression(m =>
                 new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.Singleline).IsMatch(m.Text)
                     ? "fail"
-                    : DryvResult.Success);
+                    : DryvResultMessage.Success);
 
             var jsProgram = GetTranslatedAst(expression);
             var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);
@@ -132,7 +133,7 @@ namespace Dryv.Tests
             var expression = Expression(m =>
                 new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.Singleline).IsMatch(m.Text)
                     ? var2
-                    : DryvResult.Success);
+                    : DryvResultMessage.Success);
 
             var jsProgram = GetTranslatedAst(expression);
             var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);
@@ -148,7 +149,7 @@ namespace Dryv.Tests
             var expression = Expression(m =>
                 this.regexField.IsMatch(m.Text)
                     ? "fail"
-                    : DryvResult.Success);
+                    : DryvResultMessage.Success);
 
             var jsProgram = GetTranslatedAst(expression);
             var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);
@@ -164,7 +165,7 @@ namespace Dryv.Tests
             var expression = Expression(m =>
                 this.regexField.IsMatch(m.Text)
                     ? this.var2Field
-                    : DryvResult.Success);
+                    : DryvResultMessage.Success);
 
             var jsProgram = GetTranslatedAst(expression);
             var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);
@@ -180,7 +181,7 @@ namespace Dryv.Tests
             var expression = Expression(m =>
                 this.RegexProperty.IsMatch(m.Text)
                     ? "fail"
-                    : DryvResult.Success);
+                    : DryvResultMessage.Success);
 
             var jsProgram = GetTranslatedAst(expression);
             var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);
@@ -196,7 +197,7 @@ namespace Dryv.Tests
             var expression = Expression(m =>
                 this.RegexProperty.IsMatch(m.Text)
                     ? this.Var2Property
-                    : DryvResult.Success);
+                    : DryvResultMessage.Success);
 
             var jsProgram = GetTranslatedAst(expression);
             var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);
@@ -214,7 +215,7 @@ namespace Dryv.Tests
             var expression = Expression(m =>
                  regex.IsMatch(m.Text)
                     ? "fail"
-                    : DryvResult.Success);
+                    : DryvResultMessage.Success);
 
             var jsProgram = GetTranslatedAst(expression);
             var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);
@@ -233,7 +234,7 @@ namespace Dryv.Tests
             var expression = Expression(m =>
                 regex.IsMatch(m.Text)
                     ? var2
-                    : DryvResult.Success);
+                    : DryvResultMessage.Success);
 
             var jsProgram = GetTranslatedAst(expression);
             var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);

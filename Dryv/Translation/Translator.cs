@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using Dryv.Reflection;
 
 namespace Dryv.Translation
@@ -19,8 +20,25 @@ namespace Dryv.Translation
 
         public virtual TranslationResult Translate(Expression expression, MemberExpression propertyExpression)
         {
+            EnsureValidState(expression);
             var result = this.GenerateJavaScriptCode(expression, propertyExpression);
             return this.translationCompiler.GenerateTranslationDelegate(result.Code, result.OptionDelegates, result.OptionTypes);
+        }
+
+        private static void EnsureValidState(Expression expression)
+        {
+            switch (expression)
+            {
+                case LambdaExpression lambdaExpression:
+                    {
+                        if (typeof(Task).IsAssignableFrom(lambdaExpression.ReturnType))
+                        {
+                            throw new DryvExpressionNotSupportedException(expression, "Asynchronous expressions cannot be translated to client code. Use the ServerRule<> method to add validation rules with asynchronous expression.");
+                        }
+
+                        break;
+                    }
+            }
         }
 
         public virtual void Translate(Expression expression, TranslationContext context, bool negated = false)
@@ -162,7 +180,7 @@ namespace Dryv.Translation
             // Find all option types used in the validation expression.
             var optionTypes = GetOptionTypes(expression);
             // Collect delegates that use options from withing the validation expression.
-            var optionDelegates = new Dictionary<int, LambdaExpression>();
+            var optionDelegates = new Dictionary<int, OptionDelegate>();
             var sb = new StringBuilder();
 
             using (var writer = new IndentingStringWriter(sb))
@@ -183,13 +201,13 @@ namespace Dryv.Translation
             (
                 sb.ToString(),
                 optionTypes,
-                optionDelegates
+                optionDelegates.Values.ToList()
             );
         }
 
         private struct GeneratedJavaScriptCode
         {
-            public GeneratedJavaScriptCode(string code, IList<Type> optionTypes, IDictionary<int, LambdaExpression> optionDelegates)
+            public GeneratedJavaScriptCode(string code, IList<Type> optionTypes, IList<OptionDelegate> optionDelegates)
             {
                 this.Code = code;
                 this.OptionTypes = optionTypes;
@@ -197,7 +215,7 @@ namespace Dryv.Translation
             }
 
             public string Code { get; }
-            public IDictionary<int, LambdaExpression> OptionDelegates { get; }
+            public IList<OptionDelegate> OptionDelegates { get; }
             public IList<Type> OptionTypes { get; }
         }
     }

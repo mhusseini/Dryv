@@ -9,7 +9,7 @@ namespace DryvDemo.ViewModels
             .Rule(m => m.TaxId,
                 m => !string.IsNullOrWhiteSpace(m.Company) && string.IsNullOrWhiteSpace(m.TaxId)
                     ? $"The tax ID for {m.Company} must be specified."
-                    : DryvResult.Success);
+                    : DryvResultMessage.Success);
 
         [Required]
         public string Name { get; set; }

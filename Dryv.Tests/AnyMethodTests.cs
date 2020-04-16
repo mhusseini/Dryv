@@ -1,8 +1,8 @@
 using System.Linq;
 using System.Text.RegularExpressions;
+using Dryv.Extensions;
 using Dryv.Translation;
 using Dryv.Translation.Translators;
-using Dryv.Utils;
 using Escape.Ast;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -17,7 +17,7 @@ namespace Dryv.Tests
             var expression = Expression(m =>
                 new TestModelHelper().DoSomething("a", "b")
                     ? "fail"
-                    : DryvResult.Success);
+                    : DryvResultMessage.Success);
 
             var jsProgram = GetTranslatedAst(expression, new object[] { new AllMethodCallTranslator() });
             var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);
@@ -37,7 +37,7 @@ namespace Dryv.Tests
             var expression = Expression(m =>
                 new TestModelHelper().DoSomething()
                     ? "fail"
-                    : DryvResult.Success);
+                    : DryvResultMessage.Success);
 
             var jsProgram = GetTranslatedAst(expression, new object[] { new AllMethodCallTranslator() });
             var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);
@@ -57,7 +57,7 @@ namespace Dryv.Tests
             var expression = Expression(m =>
                 new Regex(@"\d").Match(m.Text) == null
                     ? "fail"
-                    : DryvResult.Success);
+                    : DryvResultMessage.Success);
 
             var jsProgram = GetTranslatedAst(expression, new object[] { new AllMethodCallTranslator() });
             var conditional = GetBodyExpression<ConditionalExpression>(jsProgram);

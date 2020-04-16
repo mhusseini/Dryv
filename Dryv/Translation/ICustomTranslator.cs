@@ -13,5 +13,12 @@ namespace Dryv.Translation
         /// <param name="context">An object that contains the <see cref="Expression"/> to be translated as well as soem context information.</param>
         /// <returns><c>true</c>, if the expression could be translated; otherwise, <c>false</c>.</returns>
         bool TryTranslate(CustomTranslationContext context);
+
+        /// <summary>
+        /// Determines whether the calling translator may surround the translation of specified expression with round brackets "(" and ")".
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns>Must return <c>false</c> to disable surrounding brackets.</returns>
+        bool? AllowSurroundingBrackets(Expression expression);
     }
 }

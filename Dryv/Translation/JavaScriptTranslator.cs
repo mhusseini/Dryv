@@ -4,8 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Dryv.Extensions;
 using Dryv.Reflection;
-using Dryv.Utils;
 
 namespace Dryv.Translation
 {
@@ -111,7 +111,7 @@ namespace Dryv.Translation
 
         public override void Translate(Expression expression, TranslationContext context, bool negated = false)
         {
-            var needsBrackets = GetNeedsBrackets(expression);
+            var needsBrackets = this.GetNeedsBrackets(expression);
 
             if (needsBrackets)
             {
@@ -161,8 +161,8 @@ namespace Dryv.Translation
             if (!TryWriteTerminal(expression, context.Writer))
             {
                 throw expression.Method != null
-                    ? (Exception)new MethodNotSupportedException(expression)
-                    : new ExpressionNotSupportedException(expression);
+                    ? (Exception)new DryvMethodNotSupportedException(expression)
+                    : new DryvExpressionNotSupportedException(expression);
             }
 
             this.Translate(expression.Right, context);
@@ -236,7 +236,7 @@ namespace Dryv.Translation
         {
             if (expression.Expression is MemberExpression)
             {
-                throw new ExpressionNotSupportedException(expression);
+                throw new DryvExpressionNotSupportedException(expression);
             }
 
             this.Translate(expression.Expression, context);
@@ -335,12 +335,17 @@ namespace Dryv.Translation
                 return;
             }
 
-            throw new MethodNotSupportedException(expression);
+            throw new DryvMethodNotSupportedException(expression);
         }
 
         public override void Visit(NewArrayExpression expression, TranslationContext context, bool negated = false)
         {
-            context.Writer.Write("[]");
+            context.Writer.Write("[");
+            foreach (var child in expression.Expressions)
+            {
+                this.Translate(child, context);
+            }
+            context.Writer.Write("]");
         }
 
         public override void Visit(NewExpression expression, TranslationContext context, bool negated = false)
@@ -394,7 +399,7 @@ namespace Dryv.Translation
 
         public override void Visit(TypeBinaryExpression expression, TranslationContext context, bool negated = false)
         {
-            throw new ExpressionNotSupportedException(expression);
+            throw new DryvExpressionNotSupportedException(expression);
         }
 
         public override void Visit(UnaryExpression expression, TranslationContext context, bool negated = false)
@@ -408,7 +413,7 @@ namespace Dryv.Translation
             this.Translate(expression.Operand, context, negatedExpression);
         }
 
-        private static bool GetNeedsBrackets(Expression expression)
+        private bool GetNeedsBrackets(Expression expression)
         {
             switch (expression)
             {
@@ -420,20 +425,7 @@ namespace Dryv.Translation
                     return false;
             }
 
-            return true;
-        }
-
-        private static void PushInjectedExpression(Expression expression, TranslationContext context, ParameterExpression parameter)
-        {
-            var hash = expression.ToString().GetHashCode();
-
-            if (!context.OptionDelegates.ContainsKey(hash))
-            {
-                var func = Expression.Lambda(expression, parameter);
-                context.OptionDelegates.Add(hash, func);
-            }
-
-            context.Writer.Write($"$${hash}$$");
+            return this.translatorProvider.GenericTranslators.All(t => t.AllowSurroundingBrackets(expression) != false);
         }
 
         private static bool TryWriteInjectedExpression(Expression expression, TranslationContext context)
@@ -444,7 +436,7 @@ namespace Dryv.Translation
                 return false;
             }
 
-            PushInjectedExpression(expression, context, parameter);
+            context.InjectRuntimeExpression(expression, parameter);
 
             return true;
         }
@@ -487,7 +479,7 @@ namespace Dryv.Translation
                 return false;
             }
 
-            PushInjectedExpression(expression.Object ?? expression, context, parameter);
+            context.InjectRuntimeExpression(expression.Object ?? expression, parameter);
             return true;
         }
 
@@ -544,19 +536,19 @@ namespace Dryv.Translation
                     expression.Expression.ToString().Contains(context.PropertyExpression.ToString()))
                 {
                     var e = expression;
-                    while (e.Expression is MemberExpression mex)
-                    {
-                        e = mex;
-                    }
 
-                    if (e.Expression is ParameterExpression parameterExpression)
+                    switch (e.Expression)
                     {
-                        this.Visit(parameterExpression, context);
-                        context.Writer.Write("$$MODELPATH$$");
-                    }
-                    else
-                    {
-                        this.Translate(expression.Expression, context);
+                        case MemberExpression mex:
+                            this.Visit(mex, context);
+                            break;
+                        case ParameterExpression parameterExpression:
+                            this.Visit(parameterExpression, context);
+                            context.Writer.Write("$$MODELPATH$$");
+                            break;
+                        default:
+                            this.Translate(expression.Expression, context);
+                            break;
                     }
                 }
                 else

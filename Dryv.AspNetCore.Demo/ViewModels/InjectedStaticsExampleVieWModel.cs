@@ -10,7 +10,7 @@ namespace DryvDemo.ViewModels
                     ? InjectedStaticsExampleVieWModelStatics.CompanyError
                     : m.Company.Length < InjectedStaticsExampleVieWModelStatics.CompanyNameLength()
                         ? string.Format(InjectedStaticsExampleVieWModelStatics.CompanyLengthError, InjectedStaticsExampleVieWModelStatics.CompanyNameLength())
-                        : DryvResult.Success);
+                        : DryvResultMessage.Success);
 
         [DryvRules]
         public string Company { get; set; }

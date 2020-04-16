@@ -1,4 +1,4 @@
-﻿using Dryv.AspNetCore.Utils;
+﻿using Dryv.Translation;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace Dryv.AspNetCore.TagHelpers
@@ -20,8 +20,6 @@ namespace Dryv.AspNetCore.TagHelpers
                     .PostContent
                     .AppendHtml(content);
             }
-
-            this.ViewContext.TempData.Remove(ViewContextExtensions.ItemsKey);
         }
     }
 }

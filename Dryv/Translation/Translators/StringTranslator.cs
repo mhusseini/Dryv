@@ -76,7 +76,7 @@ namespace Dryv.Translation.Translators
              */
             if (context.Expression.Method.GetParameters().Any(p => p.ParameterType == typeof(int)))
             {
-                throw new MethodNotSupportedException(context.Expression, "Only override without any indexes can be translated to JavaScript");
+                throw new DryvMethodNotSupportedException(context.Expression, "Only override without any indexes can be translated to JavaScript");
             }
             var arguments = context.Expression.Arguments;
             context.Translator.Translate(arguments.FirstOrDefault(), context);
@@ -160,10 +160,24 @@ namespace Dryv.Translation.Translators
             /*
              √ public static bool Equals(String a, String b, StringComparison comparisonType);
              √ public static bool Equals(String a, String b);
+             √ public bool Equals(String b, StringComparison comparisonType);
+             √ public bool Equals(String b);
              */
-            context.Translator.Translate(context.Expression.Object, context);
+            Expression value1;
+            Expression value2;
 
-            var value = context.Expression.Arguments.First();
+            if (context.Expression.Method.IsStatic)
+            {
+                value1 = context.Expression.Arguments.First();
+                value2 = context.Expression.Arguments.Skip(1).First();
+            }
+            else
+            {
+                value1 = context.Expression.Object;
+                value2 = context.Expression.Arguments.First();
+            }
+
+            context.Translator.Translate(value1, context);
             var isCaseInsensitive = GetIsCaseInsensitive(context.Expression);
             if (isCaseInsensitive)
             {
@@ -171,7 +185,9 @@ namespace Dryv.Translation.Translators
             }
 
             context.Writer.Write(context.Negated ? "!==" : " === ");
-            WriteArguments(context.Translator, new[] { value }, context);
+
+
+            WriteArguments(context.Translator, new[] { value2 }, context);
             if (isCaseInsensitive)
             {
                 context.Writer.Write(".toLowerCase()");
@@ -192,17 +208,17 @@ namespace Dryv.Translation.Translators
              */
             if (!(context.Expression.Arguments.First() is ConstantExpression pattern))
             {
-                throw new ExpressionNotSupportedException(context.Expression, "Calls to string.Format with non-constant pattern strings are not supported.");
+                throw new DryvExpressionNotSupportedException(context.Expression, "Calls to string.Format with non-constant pattern strings are not supported.");
             }
 
             if (context.Expression.Method.GetParameters().First().ParameterType == typeof(IFormatProvider))
             {
-                throw new MethodNotSupportedException(context.Expression, "Only override with first parameter being a string can be translated to JavaScript");
+                throw new DryvMethodNotSupportedException(context.Expression, "Only override with first parameter being a string can be translated to JavaScript");
             }
 
             if (context.Expression.Arguments.OfType<NewArrayExpression>().Any())
             {
-                throw new ExpressionNotSupportedException(context.Expression, "Calls to string.Format with arguments being an array are not supported.");
+                throw new DryvExpressionNotSupportedException(context.Expression, "Calls to string.Format with arguments being an array are not supported.");
             }
 
             var arguments = context.Expression.Arguments.Skip(1).Cast<object>().ToArray();
@@ -250,7 +266,7 @@ namespace Dryv.Translation.Translators
              */
             if (context.Expression.Method.GetParameters().Any(p => p.ParameterType == typeof(int)))
             {
-                throw new MethodNotSupportedException(context.Expression, "Only override without any indexes can be translated to JavaScript");
+                throw new DryvMethodNotSupportedException(context.Expression, "Only override without any indexes can be translated to JavaScript");
             }
 
             var arguments = context.Expression.Arguments;
@@ -363,7 +379,7 @@ namespace Dryv.Translation.Translators
              */
             if (context.Expression.Arguments.Any())
             {
-                throw new MethodNotSupportedException(context.Expression, "Only override without any arguments can be translated to JavaScript");
+                throw new DryvMethodNotSupportedException(context.Expression, "Only override without any arguments can be translated to JavaScript");
             }
 
             context.Translator.Translate(context.Expression.Object, context);
@@ -379,7 +395,7 @@ namespace Dryv.Translation.Translators
              */
             if (context.Expression.Arguments.Any())
             {
-                throw new MethodNotSupportedException(context.Expression, "Only override without any arguments can be translated to JavaScript");
+                throw new DryvMethodNotSupportedException(context.Expression, "Only override without any arguments can be translated to JavaScript");
             }
 
             context.Translator.Translate(context.Expression.Object, context);
@@ -395,7 +411,7 @@ namespace Dryv.Translation.Translators
              */
             if (context.Expression.Arguments.Any())
             {
-                throw new MethodNotSupportedException(context.Expression, "Only override without any arguments can be translated to JavaScript");
+                throw new DryvMethodNotSupportedException(context.Expression, "Only override without any arguments can be translated to JavaScript");
             }
 
             context.Translator.Translate(context.Expression.Object, context);
