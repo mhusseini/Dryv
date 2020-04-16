@@ -1,4 +1,5 @@
-﻿using Dryv.Translation;
+﻿using Dryv.TagHelpers;
+using Dryv.Translation;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace Dryv.AspNetCore.TagHelpers
