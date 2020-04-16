@@ -536,19 +536,23 @@ namespace Dryv.Translation
                     expression.Expression.ToString().Contains(context.PropertyExpression.ToString()))
                 {
                     var e = expression;
-                    while (e.Expression is MemberExpression mex)
-                    {
-                        e = mex;
-                    }
+                    //while (e.Expression is MemberExpression mex)
+                    //{
+                    //    e = mex;
+                    //}
 
-                    if (e.Expression is ParameterExpression parameterExpression)
+                    switch (e.Expression)
                     {
-                        this.Visit(parameterExpression, context);
-                        context.Writer.Write("$$MODELPATH$$");
-                    }
-                    else
-                    {
-                        this.Translate(expression.Expression, context);
+                        case MemberExpression mex:
+                            this.Visit(mex, context);
+                            break;
+                        case ParameterExpression parameterExpression:
+                            this.Visit(parameterExpression, context);
+                            context.Writer.Write("$$MODELPATH$$");
+                            break;
+                        default:
+                            this.Translate(expression.Expression, context);
+                            break;
                     }
                 }
                 else
