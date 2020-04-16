@@ -1,8 +1,7 @@
-﻿using Dryv.TagHelpers;
-using Dryv.Translation;
+﻿using Dryv.Translation;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
-namespace Dryv.AspNetCore.TagHelpers
+namespace Dryv.TagHelpers
 {
     [HtmlTargetElement("body")]
     public class DryvBodyTagHelper : DryvBodyTagHelperBase

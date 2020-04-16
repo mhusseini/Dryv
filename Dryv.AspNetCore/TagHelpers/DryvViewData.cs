@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Dryv.Validation;
 
-namespace Dryv.AspNetCore.TagHelpers
+namespace Dryv.TagHelpers
 {
     internal class DryvViewData
     {

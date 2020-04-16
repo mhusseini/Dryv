@@ -3,7 +3,7 @@ using Dryv.Translation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Dryv.AspNetCore
+namespace Dryv
 {
     public static class ApplicationBuilderExtensions
     {

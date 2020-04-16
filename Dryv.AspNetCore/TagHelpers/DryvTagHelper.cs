@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Threading.Tasks;
 using Dryv.Configuration;
 using Dryv.Extensions;
@@ -10,7 +9,7 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Dryv.AspNetCore.TagHelpers
+namespace Dryv.TagHelpers
 {
     [HtmlTargetElement("input", Attributes = "dryv-for")]
     [HtmlTargetElement("input", Attributes = "asp-for")]
