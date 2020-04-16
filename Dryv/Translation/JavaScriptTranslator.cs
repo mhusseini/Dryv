@@ -536,10 +536,6 @@ namespace Dryv.Translation
                     expression.Expression.ToString().Contains(context.PropertyExpression.ToString()))
                 {
                     var e = expression;
-                    //while (e.Expression is MemberExpression mex)
-                    //{
-                    //    e = mex;
-                    //}
 
                     switch (e.Expression)
                     {
