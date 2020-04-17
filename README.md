@@ -1,5 +1,8 @@
 <img src="logo_slogan.svg" title="Dryv - DRY Validation for ASP.NET MVC and ASP.NET Core" width="300">
 
+<br/>
+<br/>
+
 [![NuGet version](https://badge.fury.io/nu/dryv.svg)](https://badge.fury.io/nu/dryv) 
 
 **Complex model validation for server and client made easy.**
