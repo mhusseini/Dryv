@@ -1,0 +1,155 @@
+﻿@page
+@using Dryv
+@using Dryv.Extensions
+@using Dryv.SampleVue.Pages
+
+@model IndexModel
+
+<html>
+<head>
+    <title>Form validation with VueJS and Dryv.</title>
+    <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+    <script>
+    (function(dryv) {
+        dryv.validators = {
+            @Html.Raw(string.Join(",\n", from val in Html.GetDryvClientPropertyValidations()
+                                                    let field = val.Property.Name.ToCamelCase()
+                                                    let sep = string.IsNullOrWhiteSpace(val.ModelPath) ? string.Empty : "."
+                                                    select $@"""{val.ModelPath}{sep}{field}"": {val.ValidationFunction}"))
+        };
+    })(window.dryv || (window.dryv = {}));
+    </script>
+
+    <div id="app">
+        <h1>Form validation with VueJS and Dryv.</h1>
+        <form v-on:submit="validateForm" method="post">
+
+            <div class="form-block">
+                <h3>Personal Data</h3>
+
+                <form-input name="person.firstName" label="First name" v-model="person.firstName"></form-input>
+                <form-input name="person.lastName" label="Last name" v-model="person.lastName"></form-input>
+            </div>
+
+            <div class="form-block">
+                <h3>Shipping Address</h3>
+
+                <form-input name="shippingAddress.zipCode" label="ZIP code" v-model="shippingAddress.zipCode"></form-input>
+                <form-input name="shippingAddress.city" label="City" v-model="shippingAddress.city"></form-input>
+            </div>
+
+            <div class="form-block">
+                <h3>Billing Address</h3>
+
+                <div class="form-item">
+                    <label for="billingAddress-deactivate">Billing address equals shipping address.</label>
+                    <input id="billingAddress-deactivate" type="checkbox" v-model="billingAddress.deactivated">
+                </div>
+
+                <div v-show="!billingAddress.deactivated">
+                    <form-input name="shippingAddress.zipCode" label="ZIP code" v-model="shippingAddress.zipCode"></form-input>
+                    <form-input name="shippingAddress.city" label="City" v-model="shippingAddress.city"></form-input>
+                </div>
+            </div>
+
+            <div class="form-block">
+                <input type="submit" value="Submit">
+
+                <div v-if="isValid === true" class="validation-feedback" style="background-color: lightgreen">
+                    Valid
+                </div>
+
+                <div v-if="isValid === false" class="validation-feedback" style="background-color: red">
+                    Invalid
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script type="text/x-template" id="form-input">
+        <div class="form-item">
+            <div>
+                <div class="form-input-label">
+                    <label :for="name">{{ label }}</label>
+                </div>
+                <div class="form-input-control">
+                    <input :id="name" v-bind:value="value" v-on:input="$emit('input', $event.target.value)">
+                </div>
+            </div>
+            <div class="form-item-error" v-if="error">{{ error }}</div>
+        </div>
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.11/vue.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js"></script>
+    <script>
+        Vue.component('form-input',
+            {
+                props: ['value', 'type', 'name', 'label'],
+                template: '#form-input',
+                data() {
+                    return {
+                        error: null
+                    }
+                },
+                created() {
+                    const validator = window.dryv.validators[this.name];
+                    if (!validator) return;
+
+                    const formValidators = this.$parent.formValidators || (this.$parent.formValidators = []);
+                    formValidators.push({
+                        validate: () => (this.error = validator(this.$parent)),
+                        setError: errors => this.error = errors[this.name]
+                    });
+                }
+            });
+
+        const app = new Vue({
+            el: '#app',
+            data: {
+                isValid: null,
+                person: {
+                    firstName: null,
+                    lastName: null
+                },
+                shippingAddress: {
+                    zipCode: null,
+                    city: null
+                },
+                billingAddress: {
+                    zipCode: null,
+                    city: null
+                }
+            },
+            methods: {
+                validateForm(e) {
+                    if (!this.formValidators) {
+                        return;
+                    }
+
+                    e.preventDefault();
+
+                    const errors = this.formValidators.map(v => v.validate());
+                    this.$data.isValid = errors.map(b => !b).reduce((a, b) => a && b);
+                    if (!this.$data.isValid) {
+                        return;
+                    }
+
+                    axios
+                        .post(window.location.href + "post", this.$data)
+                        .then(result => {
+                            const serverErrors = result.data.errors;
+                            this.$data.isValid = !Object.keys(serverErrors);
+
+                            if (!this.$data.isValid) {
+                                this.formValidators.forEach(v => v.setError(serverErrors));
+                            }
+                        });
+                }
+            }
+        });
+    </script>
+</body>
+</html>

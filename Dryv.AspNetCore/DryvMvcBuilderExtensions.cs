@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using Dryv.Cache;
+using Dryv.Compilation;
 using Dryv.Configuration;
 using Dryv.Internal;
+using Dryv.RuleDetection;
 using Dryv.Translation;
 using Dryv.Translation.Translators;
 using Dryv.Validation;
@@ -33,6 +37,10 @@ namespace Dryv
             services.TryAddSingleton(typeof(IDryvClientValidationProvider), options.ClientValidatorType ?? typeof(DryvClientValidationProvider));
             services.TryAddSingleton(typeof(IDryvScriptBlockGenerator), options.ClientBodyGeneratorType ?? typeof(DryvScriptBlockGenerator));
             services.AddSingleton<ITranslator, JavaScriptTranslator>();
+            services.AddSingleton<ICache, InMemoryCache>();
+            services.AddSingleton<DryvRulesFinder>();
+            services.AddSingleton<DryvValidator>();
+            services.AddSingleton<DryvServerRuleEvaluator>();
             services.AddSingleton<ITranslatorProvider, TranslatorProvider>();
             services.AddSingleton(Options.Create(options));
 

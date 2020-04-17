@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reflection;
 using Dryv.Configuration;
 
@@ -16,13 +15,6 @@ namespace Dryv.Validation
         /// <param name="property">The property for which the rules are created.</param>
         /// <param name="rules">The validation rules to be written to the client.</param>
         DryvClientValidationItem GetClientPropertyValidation(
-            Type modelType,
-            string modelPath,
-            PropertyInfo property,
-            Func<Type, object> services,
-            DryvOptions options);
-
-        IEnumerable<DryvClientValidationItem> GetClientPropertyValidationGroups(
             Type modelType,
             string modelPath,
             PropertyInfo property,

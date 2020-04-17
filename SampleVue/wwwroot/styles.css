@@ -1,0 +1,49 @@
+﻿#app {
+    padding: 1em;
+}
+
+input {
+    padding: 0.3em;
+}
+
+input[type='submit'] {
+    padding: 1em;
+}
+
+.form-item {
+    min-height: 3.1em;
+}
+
+.form-input-label {
+    width: 40%;
+    display: inline-block;
+}
+
+.form-input-control {
+    width: 58%;
+    display: inline-block;
+}
+
+.form-input-control input {
+    width: 100%;
+}
+
+.form-item-error {
+    color: red;
+    font-size: smaller;
+}
+
+form {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.form-block {
+    width: 500px;
+    margin-right: 1em;
+}
+
+.validation-feedback {
+    padding: 1em;
+    margin-left: 1em;
+    display: inline-block
