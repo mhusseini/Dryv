@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Dryv.Rules;
 
-namespace Dryv.SampleVue.Models
+namespace Dryv.SampleConsole.Models
 {
     public class Address
     {

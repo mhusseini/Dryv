@@ -38,7 +38,7 @@ namespace Dryv.SampleVue
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapRazorPages();
+                endpoints.MapControllers();
             });
 
             app.UseDryv();
@@ -47,8 +47,10 @@ namespace Dryv.SampleVue
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<ZipCodeValidator>();
             services
-                .AddRazorPages()
+                //.AddRazorPages()
+                .AddMvc(options => options.EnableEndpointRouting = true)
                 .AddDryv();
         }
     }

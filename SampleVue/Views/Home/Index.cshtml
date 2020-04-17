@@ -1,14 +1,14 @@
-﻿@page
-@using Dryv
+﻿@using Dryv
 @using Dryv.Extensions
-@using Dryv.SampleVue.Pages
+@using Dryv.SampleVue.Models
 
-@model IndexModel
+@model HomeModel
 
 <html>
 <head>
     <title>Form validation with VueJS and Dryv.</title>
-    <link rel="stylesheet" href="styles.css"/>
+    <link rel="stylesheet" href="styles.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@200;400;700&family=Roboto:wght@300&display=swap" rel="stylesheet">
 </head>
 <body>
     <script>
@@ -25,35 +25,35 @@
     <div id="app">
         <h1>Form validation with VueJS and Dryv.</h1>
         <form v-on:submit="validateForm" method="post">
+            <div class="form-content">
+                <div class="form-block">
+                    <h3>Personal Data</h3>
 
-            <div class="form-block">
-                <h3>Personal Data</h3>
-
-                <form-input name="person.firstName" label="First name" v-model="person.firstName"></form-input>
-                <form-input name="person.lastName" label="Last name" v-model="person.lastName"></form-input>
-            </div>
-
-            <div class="form-block">
-                <h3>Shipping Address</h3>
-
-                <form-input name="shippingAddress.zipCode" label="ZIP code" v-model="shippingAddress.zipCode"></form-input>
-                <form-input name="shippingAddress.city" label="City" v-model="shippingAddress.city"></form-input>
-            </div>
-
-            <div class="form-block">
-                <h3>Billing Address</h3>
-
-                <div class="form-item">
-                    <label for="billingAddress-deactivate">Billing address equals shipping address.</label>
-                    <input id="billingAddress-deactivate" type="checkbox" v-model="billingAddress.deactivated">
+                    <form-input name="person.firstName" label="First name" v-model="person.firstName"></form-input>
+                    <form-input name="person.lastName" label="Last name" v-model="person.lastName"></form-input>
                 </div>
 
-                <div v-show="!billingAddress.deactivated">
+                <div class="form-block">
+                    <h3>Shipping Address</h3>
+
                     <form-input name="shippingAddress.zipCode" label="ZIP code" v-model="shippingAddress.zipCode"></form-input>
                     <form-input name="shippingAddress.city" label="City" v-model="shippingAddress.city"></form-input>
                 </div>
-            </div>
 
+                <div class="form-block">
+                    <h3>Billing Address</h3>
+
+                    <div class="form-item">
+                        <label for="billingAddress-deactivate">Billing address equals shipping address.</label>
+                        <input id="billingAddress-deactivate" type="checkbox" v-model="billingAddress.deactivated">
+                    </div>
+
+                    <div v-show="!billingAddress.deactivated">
+                        <form-input name="billingAddress.zipCode" label="ZIP code" v-model="billingAddress.zipCode"></form-input>
+                        <form-input name="billingAddress.city" label="City" v-model="billingAddress.city"></form-input>
+                    </div>
+                </div>
+            </div>
             <div class="form-block">
                 <input type="submit" value="Submit">
 
@@ -61,7 +61,7 @@
                     Valid
                 </div>
 
-                <div v-if="isValid === false" class="validation-feedback" style="background-color: red">
+                <div v-if="isValid === false" class="validation-feedback" style="background-color: #F88C30">
                     Invalid
                 </div>
             </div>
@@ -120,31 +120,33 @@
                 },
                 billingAddress: {
                     zipCode: null,
-                    city: null
+                    city: null,
+                    deactivated: true
                 }
             },
             methods: {
                 validateForm(e) {
-                    if (!this.formValidators) {
-                        return;
-                    }
-
                     e.preventDefault();
 
-                    const errors = this.formValidators.map(v => v.validate());
-                    this.$data.isValid = errors.map(b => !b).reduce((a, b) => a && b);
-                    if (!this.$data.isValid) {
-                        return;
+                    if (this.formValidators) {
+                        const errors = this.formValidators.map(v => v.validate());
+                        this.$data.isValid = errors.map(b => !b).reduce((a, b) => a && b);
+                        if (!this.$data.isValid) {
+                            return;
+                        }
                     }
 
                     axios
-                        .post(window.location.href + "post", this.$data)
+                        .post(window.location.href, this.$data)
                         .then(result => {
-                            const serverErrors = result.data.errors;
-                            this.$data.isValid = !Object.keys(serverErrors);
+                            if (!this.formValidators) {
+                                return;
+                            }
+
+                            this.$data.isValid = result.data.success;
 
                             if (!this.$data.isValid) {
-                                this.formValidators.forEach(v => v.setError(serverErrors));
+                                this.formValidators.forEach(v => v.setError(result.data.errors));
                             }
                         });
                 }

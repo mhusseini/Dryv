@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
+using Dryv.Configuration;
 using Dryv.Extensions;
 using Dryv.Internal;
 using Dryv.Reflection;
@@ -13,7 +15,9 @@ namespace Dryv.Compilation
 {
     internal class DryvServerRuleCompiler
     {
-        private static readonly MethodInfo AddAsyncResultMethod = typeof(ICollection<DryvAsyncResult>).GetTypeInfo().GetDeclaredMethod(nameof(ICollection<Task<DryvAsyncResult>>.Add));
+        private static readonly PropertyInfo BreakOnFirstValidationErrorProperty = typeof(DryvOptions).GetTypeInfo().GetDeclaredProperty(nameof(DryvOptions.BreakOnFirstValidationError));
+        private static readonly MethodInfo AddAsyncResultMethod = typeof(ICollection<DryvAsyncResult>).GetTypeInfo().GetDeclaredMethod(nameof(ICollection<DryvAsyncResult>.Add));
+        private static readonly PropertyInfo CountProperty = typeof(ICollection).GetTypeInfo().GetDeclaredProperty(nameof(ICollection.Count));
         private static readonly MethodInfo AddResultMethod = typeof(ICollection<DryvResult>).GetTypeInfo().GetDeclaredMethod(nameof(ICollection<DryvResult>.Add));
         private static readonly ConstructorInfo AsyncValidationResultCtor = typeof(DryvAsyncResult).GetTypeInfo().DeclaredConstructors.First();
         private static readonly MethodInfo StringConcatMethod = typeof(string).GetTypeInfo().DeclaredMethods.First(m => m.Name == nameof(string.Concat) && m.GetParameters().Select(p => p.ParameterType).ToList().ElementsEqual(typeof(string), typeof(string)));
@@ -31,7 +35,9 @@ namespace Dryv.Compilation
             IList<DryvResult> result,
             ICollection<object> processed,
             Func<Type, object> services,
-            IDictionary<object, object> cache);
+            IDictionary<object, object> cache,
+            DryvOptions options
+            );
 
         internal delegate void ValidateAsyncAction(
             DryvValidator validator,
@@ -55,6 +61,7 @@ namespace Dryv.Compilation
             var parameterPath = Expression.Parameter(typeof(string), "path");
             var parameterAsyncOnly = Expression.Parameter(typeof(bool), "asyncOnly");
             var parameterValidator = Expression.Parameter(typeof(DryvValidator), "validator");
+            var parameterOptions = Expression.Parameter(typeof(DryvOptions), "options");
 
             var typedModel = Expression.Convert(parameterModel, type);
 
@@ -118,6 +125,7 @@ namespace Dryv.Compilation
             var parameterResult = Expression.Parameter(typeof(IList<DryvResult>), "result");
             var parameterPath = Expression.Parameter(typeof(string), "path");
             var parameterValidator = Expression.Parameter(typeof(DryvValidator), "validator");
+            var parameterOptions = Expression.Parameter(typeof(DryvOptions), "options");
             var typedModel = Expression.Convert(parameterModel, type);
             var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy);
 
@@ -126,8 +134,9 @@ namespace Dryv.Compilation
                                               && p.PropertyType != typeof(string)
                                         select p).ToList();
 
+            var returnTarget = Expression.Label();
             var propertyValidationExpressions = from property in properties
-                                                let errorVariable = Expression.Parameter(typeof(IReadOnlyCollection<DryvResultMessage>), "error")
+                                                let errorVariable = Expression.Parameter(typeof(IEnumerable<DryvResultMessage>), "error")
                                                 select (Expression)Expression.Block(
                                                     new[] { errorVariable },
                                                     Expression.Assign(
@@ -139,15 +148,22 @@ namespace Dryv.Compilation
                                                             parameterRootModel,
                                                             Expression.Constant(property),
                                                             parameterServices,
-                                                            parameterCache)),
+                                                            parameterCache,
+                                                            parameterOptions)),
                                                     Expression.IfThen(
                                                         Expression.Not(Expression.Equal(errorVariable, Expression.Constant(null))),
-                                                        Expression.Call(parameterResult, AddResultMethod,
-                                                            Expression.New(ValidationResultCtor,
-                                                                parameterModel,
-                                                                Expression.Constant(property),
-                                                                Expression.Call(StringConcatMethod, parameterPath, Expression.Constant(property.Name)),
-                                                                errorVariable))));
+                                                            //Expression.IfThenElse(
+                                                            //    Expression.And(
+                                                            //        Expression.Equal(Expression.Property(parameterOptions, BreakOnFirstValidationErrorProperty), Expression.Constant(true)),
+                                                            //        Expression.GreaterThanOrEqual(Expression.Property(Expression.Convert(parameterResult, typeof(ICollection)), CountProperty), Expression.Constant(1))),
+                                                            //    Expression.Return(returnTarget),
+                                                            Expression.Call(parameterResult, AddResultMethod,
+                                                                Expression.New(ValidationResultCtor,
+                                                                    parameterModel,
+                                                                    Expression.Constant(property),
+                                                                    Expression.Call(StringConcatMethod, parameterPath, Expression.Constant(property.Name)),
+                                                                    errorVariable)))/*)*/,
+                                                    Expression.Label(returnTarget));
 
             var navigationExpressions = from property in navigationProperties
                                         let childVariable = Expression.Parameter(property.PropertyType, "child")
@@ -160,7 +176,9 @@ namespace Dryv.Compilation
                                             parameterResult,
                                             parameterProcessed,
                                             parameterServices,
-                                            parameterCache);
+                                            parameterCache,
+                                            parameterOptions
+                                            );
 
             var lambda = Expression.Lambda<ValidateAction>(
                 Expression.Block(propertyValidationExpressions.Union(navigationExpressions)),
@@ -171,7 +189,9 @@ namespace Dryv.Compilation
                 parameterResult,
                 parameterProcessed,
                 parameterServices,
-                parameterCache);
+                parameterCache,
+                parameterOptions
+                );
 
             return lambda.Compile();
         }

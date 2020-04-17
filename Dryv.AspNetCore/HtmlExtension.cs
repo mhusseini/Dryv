@@ -33,15 +33,15 @@ namespace Dryv
 
         public static IEnumerable<DryvClientValidationItem> GetDryvClientPropertyValidations<TModel>(this IHtmlHelper<TModel> htmlHelper)
         {
+            var modelType = typeof(TModel);
             var services = htmlHelper.ViewContext.HttpContext.RequestServices;
             var options = services.GetService<IOptions<DryvOptions>>();
-            var modelType = htmlHelper.ViewData.Model.GetType();
             var validator = services.GetService<IDryvClientValidationProvider>();
 
-            return CollectClientValidation(modelType, modelType, string.Empty, validator, new HashSet<string>(), options.Value, services.GetService);
+            return CollectClientValidation(modelType, modelType, string.Empty, validator, new Stack<string>(), options.Value, services.GetService);
         }
 
-        internal static IEnumerable<DryvClientValidationItem> CollectClientValidation(Type modelType, Type rootModelType, string modelPath, IDryvClientValidationProvider validator, ISet<string> processedTypes, DryvOptions options, Func<Type, object> services)
+        internal static IEnumerable<DryvClientValidationItem> CollectClientValidation(Type modelType, Type rootModelType, string modelPath, IDryvClientValidationProvider validator, Stack<string> processedTypes, DryvOptions options, Func<Type, object> services)
         {
             if (modelType == typeof(Type) ||
                 modelType.Namespace?.StartsWith("System.Reflection") == true ||
@@ -51,7 +51,6 @@ namespace Dryv
                 return new DryvClientValidationItem[0];
             }
 
-            processedTypes.Add(modelType.FullName);
             var properties = modelType.GetProperties();
 
             var items = from property in properties
@@ -59,12 +58,16 @@ namespace Dryv
                         where item != null
                         select item;
 
+            processedTypes.Push(modelType.FullName);
+
             var childItems = from property in properties
                              let prefix = string.IsNullOrWhiteSpace(modelPath) ? string.Empty : $"{modelPath}."
                              let childPath = $"{prefix}{property.Name.ToCamelCase()}"
                              where !property.PropertyType.IsValueType && !property.PropertyType.HasElementType && property.PropertyType != typeof(string) && !processedTypes.Contains(childPath)
                              from item in CollectClientValidation(property.PropertyType, rootModelType, childPath, validator, processedTypes, options, services)
                              select item;
+
+            processedTypes.Pop();
 
             return items.Union(childItems);
         }

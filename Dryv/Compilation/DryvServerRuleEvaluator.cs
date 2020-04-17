@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Dryv.Exceptions;
 using Dryv.Reflection;
 using Dryv.Rules;
 
@@ -30,7 +31,14 @@ namespace Dryv.Compilation
 
             var options = GetPreevaluationOptions(rule, objectFactory);
 
-            return (DryvResultMessage)rule.CompiledValidationExpression(model, options);
+            try
+            {
+                return (DryvResultMessage)rule.CompiledValidationExpression(model, options);
+            }
+            catch (Exception ex)
+            {
+                throw new DryvValidationExecutionException(rule, ex);
+            }
         }
 
         public Task<DryvResultMessage> ValidateAsync(DryvCompiledRule rule, object model, Func<Type, object> objectFactory)
@@ -125,6 +133,14 @@ namespace Dryv.Compilation
 
         private static object[] GetPreevaluationOptions(DryvCompiledRule rule, Func<Type, object> objectFactory)
         {
+            foreach (var optionType in rule.PreevaluationOptionTypes)
+            {
+                var options = objectFactory(optionType);
+                if (options == null)
+                {
+                    throw new DryvPreevalutationResolvingException($"Could not resolve type '{optionType.FullName}' for rule pre-evaluation.");
+                }
+            }
             return (from t in rule.PreevaluationOptionTypes
                     select objectFactory(t)).ToArray();
         }

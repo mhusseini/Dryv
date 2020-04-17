@@ -35,29 +35,29 @@ namespace Dryv.RuleDetection
 
         public IDictionary<PropertyInfo, IEnumerable<DryvRuleTreeNode>> GetRulesDeclaredIn(Type rootModelType, string modelPath = null)
         {
-            return this.cache.GetOrAdd(rootModelType.FullName, () =>
-            {
-                var type = rootModelType.GetElementType() ?? rootModelType;
-                var types = new List<Type>();
-                var pathStack = new Queue<string>();
-                if (!string.IsNullOrWhiteSpace(modelPath))
-                {
-                    pathStack.Enqueue(modelPath);
-                }
-                var properties = this.TraverseTypeTreeForProperties(type, types, pathStack).ToDictionary(i => i.Key, i => i.Value);
-                var validationRules = this.FindValidationRulesOnTypes(types);
+            return this.cache.GetOrAdd($"{rootModelType.FullName}:{modelPath ?? string.Empty}", () =>
+              {
+                  var type = rootModelType.GetElementType() ?? rootModelType;
+                  var types = new List<Type>();
+                  var pathStack = new Queue<string>();
+                  if (!string.IsNullOrWhiteSpace(modelPath))
+                  {
+                      pathStack.Enqueue(modelPath);
+                  }
+                  var properties = this.TraverseTypeTreeForProperties(type, types, pathStack).ToDictionary(i => i.Key, i => i.Value);
+                  var validationRules = this.FindValidationRulesOnTypes(types);
 
-                var g = from item in properties
-                        let property = item.Key
-                        let path = item.Value
-                        from inheritedProperty in property.GetInheritedProperties()
-                        from rule in GetElementsFromDictionary(validationRules, inheritedProperty)
-                        where rule != null
-                        let node = new DryvRuleTreeNode(path, rule)
-                        group node by property;
+                  var g = from item in properties
+                          let property = item.Key
+                          let path = item.Value
+                          from inheritedProperty in property.GetInheritedProperties()
+                          from rule in GetElementsFromDictionary(validationRules, inheritedProperty)
+                          where rule != null
+                          let node = new DryvRuleTreeNode(path, rule)
+                          group node by property;
 
-                return g.ToDictionary(i => i.Key, i => i.AsEnumerable(), PropertyComparer.Default);
-            });
+                  return g.ToDictionary(i => i.Key, i => i.AsEnumerable(), PropertyComparer.Default);
+              });
         }
 
         public IEnumerable<DryvRuleTreeNode> GetRulesForProperty(Type rootModelType, PropertyInfo property, string modelPath = null)

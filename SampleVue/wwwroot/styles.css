@@ -1,4 +1,9 @@
-﻿#app {
+﻿body {
+    font-family: 'Dosis', sans-serif;
+    background-color: #07abfb;
+}
+
+#app {
     padding: 1em;
 }
 
@@ -6,12 +11,17 @@ input {
     padding: 0.3em;
 }
 
-input[type='submit'] {
-    padding: 1em;
-}
+    input[type='submit'] {
+        padding: 1em;
+    }
 
 .form-item {
     min-height: 3.1em;
+}
+
+lable, input, .validation-feedback {
+    font-family: 'Roboto', sans-serif;
+    font-size: smaller;
 }
 
 .form-input-label {
@@ -24,18 +34,18 @@ input[type='submit'] {
     display: inline-block;
 }
 
-.form-input-control input {
-    width: 100%;
-}
+    .form-input-control input {
+        width: 100%;
+    }
 
 .form-item-error {
-    color: red;
-    font-size: smaller;
+    color: #F88C30;
 }
 
-form {
+.form-content {
     display: flex;
     flex-wrap: wrap;
+    width: 100%;
 }
 
 .form-block {
@@ -46,4 +56,5 @@ form {
 .validation-feedback {
     padding: 1em;
     margin-left: 1em;
-    display: inline-block
+    display: inline-block;
+}

@@ -78,43 +78,31 @@ Install-Package Dryv
 ## Usage
 ### ASP.NET Core
 
-In the ASP.NET Core startup class, add Dryv in the ConfigureServices method using the AddDryv extension method:
+In the ASP.NET Core startup class, add Dryv in the Configure ConfigureServices methods:
 
 ```csharp
 using Dryv;
 
 public class Startup
 {
-    // ...
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+        app.UseDryv();
+    }
 
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddDryv()
-                .AddMvc();
+        services.AddMvc()
+                .AddDryv();
+        
+        // or
+
+        services.AddRazorPages()()
+                .AddDryv();
     }
 }
 ```
-Also in the startup class, use Dryv in the Configure method using the UseDryv extension method:
 
-```csharp
-using Dryv;
-
-public class Startup
-{
-    public void Configure(IApplicationBuilder app, IHostingEnvironment env)
-    {
-        app.UseDryv()
-           .UseMvc();
-    }
-
-    // ...
-}
-```
-
-Since version 2.0, Dryv uses TagHelper to add the client-side validation attributes. To activate the Dryv clienbt validation, register the Dryv TagHelpers, for example in *_ViewImports.cshtml*:
-```
-@addTagHelper *, Dryv.AspNetCore
-```
 ### Stand-alone
 Dryv can be used without ASP.NET. Using just the base package, Dryv can be used to validate models.
 ```csharp

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using Dryv.Translation;
 using Dryv.Validation;
 
@@ -21,5 +22,7 @@ namespace Dryv.Configuration
         {
             this.ClientBodyGeneratorType = typeof(T);
         }
+
+        public bool BreakOnFirstValidationError { get; set; } = true;
     }
 }
