@@ -4,6 +4,7 @@ using System.Linq;
 using Dryv.Extensions;
 using Dryv.Validation;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Dryv.Internal
 {
@@ -16,7 +17,8 @@ namespace Dryv.Internal
                 return Array.Empty<ModelValidationResult>();
             }
 
-            var validationResults = GetGroupedValidationResults(context);
+            var validator = context.ActionContext.HttpContext.RequestServices.GetService<DryvValidator>();
+            var validationResults = this.GetGroupedValidationResults(context, validator);
             return CreateModelValidationResults(context, validationResults);
         }
 
@@ -28,18 +30,22 @@ namespace Dryv.Internal
                where msg.IsError()
                select new ModelValidationResult(null, msg.Text)).ToList();
 
-        private static Dictionary<object, Dictionary<string, List<DryvResult>>> GetGroupedValidationResults(ModelValidationContext context)
-            => context.ActionContext.HttpContext.GetDryvFeature()
-            .CurrentValidationResults
-            .GetOrAdd(context.ActionContext, _ => ValidateCore(context)
-                .GroupBy(r => r.Model)
-                .ToDictionary(
-                    g => g.Key,
-                    g => g.GroupBy(i => i.Property.Name).ToDictionary(
-                        i2 => i2.Key,
-                        i2 => i2.ToList())));
+        private Dictionary<object, Dictionary<string, List<DryvResult>>> GetGroupedValidationResults(ModelValidationContext context, DryvValidator validator)
+        {
+            return context.ActionContext.HttpContext.GetDryvFeature()
+                .CurrentValidationResults
+                .GetOrAdd(context.ActionContext, _ => this.ValidateCore(context, validator)
+                    .GroupBy(r => r.Model)
+                    .ToDictionary(
+                        g => g.Key,
+                        g => g.GroupBy(i => i.Property.Name).ToDictionary(
+                            i2 => i2.Key,
+                            i2 => i2.ToList())));
+        }
 
-        private static IEnumerable<DryvResult> ValidateCore(ModelValidationContext context)
-            => DryvValidator.Validate(context.Container, context.ActionContext.HttpContext.RequestServices.GetService);
+        private IEnumerable<DryvResult> ValidateCore(ModelValidationContext context, DryvValidator validator)
+        {
+            return validator.Validate(context.Container, context.ActionContext.HttpContext.RequestServices.GetService);
+        }
     }
 }

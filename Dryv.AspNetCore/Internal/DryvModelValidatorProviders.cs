@@ -9,7 +9,7 @@ namespace Dryv.Internal
             context.Results.Add(new ValidatorItem
             {
                 IsReusable = true,
-                Validator = new DryvModelValidator()
+                Validator = new DryvModelValidator(),
             });
         }
     }

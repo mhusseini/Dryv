@@ -3,7 +3,7 @@ using Dryv.Rules;
 
 namespace Dryv.RuleDetection
 {
-    internal class DryvRuleTreeNode
+    public class DryvRuleTreeNode
     {
         public DryvRuleTreeNode(string path, DryvCompiledRule rule)
         {

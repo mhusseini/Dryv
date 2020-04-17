@@ -24,108 +24,49 @@ namespace Dryv
 
             var services = htmlHelper.ViewContext.HttpContext.RequestServices;
             var options = services.GetService<IOptions<DryvOptions>>();
-
-            var modelType = htmlHelper.ViewData.Model.GetType();
-            var modelPath = string.Empty;
-
-            var clientValidation = services.GetService<IDryvClientValidationProvider>().GetClientPropertyValidation(
-                modelType,
-                modelPath,
-                property,
-                services.GetService,
-                options.Value);
+            var clientValidation = services
+                .GetService<IDryvClientValidationProvider>()
+                .GetClientPropertyValidation(htmlHelper.ViewData.Model.GetType(), string.Empty, property, services.GetService, options.Value);
 
             return new HtmlString(clientValidation.ValidationFunction);
         }
 
-        public static IEnumerable<DryvClientValidationNamedGroup> GetDryvClientGroupValidations<TModel>(this IHtmlHelper<TModel> htmlHelper)
-        {
-            var validationItems = EnumerateValidationItems(htmlHelper);
-
-            var l = from g in
-                        from v in validationItems
-                        where !string.IsNullOrWhiteSpace(v.GroupName)
-                        group v by v.GroupName
-                    where g.Count() > 1
-                    let first = g.First()
-                    select new DryvClientValidationNamedGroup
-                    {
-                        Properties = g.Select(x => x.Property).ToList(),
-                        GroupName = first.GroupName,
-                        Key = first.Key,
-                        ValidationFunction = first.ValidationFunction,
-                        ModelPath = first.ModelPath,
-                        ModelType = first.ModelType
-                    };
-
-            return l.ToList();
-        }
-
         public static IEnumerable<DryvClientValidationItem> GetDryvClientPropertyValidations<TModel>(this IHtmlHelper<TModel> htmlHelper)
         {
-            var l = from i in EnumerateValidationItems(htmlHelper)
-                    where i.GroupName == null
-                    select i;
+            var services = htmlHelper.ViewContext.HttpContext.RequestServices;
+            var options = services.GetService<IOptions<DryvOptions>>();
+            var modelType = htmlHelper.ViewData.Model.GetType();
+            var validator = services.GetService<IDryvClientValidationProvider>();
 
-            return l.ToList();
+            return CollectClientValidation(modelType, modelType, string.Empty, validator, new HashSet<string>(), options.Value, services.GetService);
         }
 
         internal static IEnumerable<DryvClientValidationItem> CollectClientValidation(Type modelType, Type rootModelType, string modelPath, IDryvClientValidationProvider validator, ISet<string> processedTypes, DryvOptions options, Func<Type, object> services)
         {
-            if (rootModelType == null)
+            if (modelType == typeof(Type) ||
+                modelType.Namespace?.StartsWith("System.Reflection") == true ||
+                modelType.FullName == null ||
+                processedTypes.Contains(modelType.FullName))
             {
-                rootModelType = modelType;
+                return new DryvClientValidationItem[0];
             }
 
-            if (modelPath == null)
-            {
-                modelPath = string.Empty;
-            }
-
-            processedTypes.Add(modelPath);
+            processedTypes.Add(modelType.FullName);
             var properties = modelType.GetProperties();
 
-            foreach (var validation in GetGroupValidations(rootModelType, modelPath, validator, options, services, properties))
-            {
-                yield return validation;
-            }
+            var items = from property in properties
+                        let item = validator.GetClientPropertyValidation(modelType, modelPath, property, services, options)
+                        where item != null
+                        select item;
 
-            foreach (var validation in GetChildValidations(rootModelType, modelPath, validator, options, services, properties, processedTypes))
-            {
-                yield return validation;
-            }
-        }
+            var childItems = from property in properties
+                             let prefix = string.IsNullOrWhiteSpace(modelPath) ? string.Empty : $"{modelPath}."
+                             let childPath = $"{prefix}{property.Name.ToCamelCase()}"
+                             where !property.PropertyType.IsValueType && !property.PropertyType.HasElementType && property.PropertyType != typeof(string) && !processedTypes.Contains(childPath)
+                             from item in CollectClientValidation(property.PropertyType, rootModelType, childPath, validator, processedTypes, options, services)
+                             select item;
 
-        private static IEnumerable<DryvClientValidationItem> EnumerateValidationItems<TModel>(IHtmlHelper<TModel> htmlHelper)
-        {
-            var services = htmlHelper.ViewContext.HttpContext.RequestServices;
-            var options = services.GetService<IOptions<DryvOptions>>();
-
-            var modelType = htmlHelper.ViewData.Model.GetType();
-            var validator = services.GetService<IDryvClientValidationProvider>();
-
-            return CollectClientValidation(modelType, null, null, validator, new HashSet<string>(), options.Value, services.GetService);
-        }
-
-        private static IEnumerable<DryvClientValidationItem> GetChildValidations(Type rootModelType, string modelPath, IDryvClientValidationProvider validator, DryvOptions options, Func<Type, object> services, IEnumerable<PropertyInfo> properties, ISet<string> processedTypes)
-        {
-            return from p in properties
-                   let val = validator
-                   let opts = options
-                   let svc = services
-                   let root = rootModelType
-                   let prefix = string.IsNullOrWhiteSpace(modelPath) ? string.Empty : $"{modelPath}."
-                   let childPath = $"{prefix}{p.Name.ToCamelCase()}"
-                   where !p.PropertyType.IsValueType && !p.PropertyType.HasElementType && p.PropertyType != typeof(string) && !processedTypes.Contains(childPath)
-                   from v in CollectClientValidation(p.PropertyType, root, childPath, val, processedTypes, opts, svc)
-                   select v;
-        }
-
-        private static IEnumerable<DryvClientValidationItem> GetGroupValidations(Type rootModelType, string modelPath, IDryvClientValidationProvider validator, DryvOptions options, Func<Type, object> services, IEnumerable<PropertyInfo> properties)
-        {
-            return from property in properties
-                   from clientValidation in validator.GetClientPropertyValidationGroups(rootModelType, modelPath, property, services, options)
-                   select clientValidation;
+            return items.Union(childItems);
         }
     }
 }

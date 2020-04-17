@@ -42,7 +42,13 @@ namespace Dryv.Extensions
         internal static Type GetElementType(this PropertyInfo property)
         {
             var type = property.PropertyType;
+            return GetElementType(type);
+        }
+
+        internal static Type GetElementType(this Type type)
+        {
             var typeInfo = type.GetTypeInfo();
+
             while (type != typeof(string) && EnumerableTypeInfo.IsAssignableFrom(typeInfo) && typeInfo.IsGenericType)
             {
                 type = typeInfo.GenericTypeArguments.First();
