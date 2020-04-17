@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -9,14 +9,18 @@
     <Product>Dryv</Product>
     <Description>ASP.NET Core support for Dryv. Dryv provides complex model validation for server and client made easy. Write complex model validation rules in C# once. Dryv will generate JavaScript for client-side validation.</Description>
     <Copyright>2020 Munir Husseini</Copyright>
-    <PackageLicenseUrl>https://github.com/mhusseini/Dryv/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://dryv-lib.net</PackageProjectUrl>
-    <PackageIconUrl>https://github.com/mhusseini/Dryv/raw/master/logo.png</PackageIconUrl>
+    <PackageIcon>dryv.png</PackageIcon>
     <RepositoryUrl>https://github.com/mhusseini/Dryv.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>model-validation, JavaScript, C#, ASP.NET Core</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="dryv.png" Pack="true" PackagePath="\"/>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.0.3" />

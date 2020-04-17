@@ -15,6 +15,11 @@ namespace Dryv
 {
     public static class HtmlExtensions
     {
+        private static readonly HashSet<string> RestrictedBaseTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "Microsoft.AspNetCore.Mvc.RazorPages.PageModel"
+        };
+
         public static IHtmlContent DryvClientValidationFor<TModel>(this IHtmlHelper<TModel> htmlHelper, Expression<Func<TModel, object>> propertyExpression)
         {
             if (!(propertyExpression.Body is MemberExpression memberExpression) || !(memberExpression.Member is PropertyInfo property))
@@ -83,9 +88,11 @@ namespace Dryv
             }
 
             processedTypes.Add(modelPath);
-            var properties = modelType.GetProperties();
+            var properties = (from p in modelType.GetProperties()
+                              where p.DeclaringType != null && !RestrictedBaseTypes.Contains(p.DeclaringType.FullName)
+                              select p).ToList();
 
-            foreach (var validation in GetGroupValidations(rootModelType, modelPath, validator, options, services, properties))
+            foreach (var validation in GetPropertyValidations(rootModelType, modelPath, validator, options, services, properties))
             {
                 yield return validation;
             }
@@ -104,28 +111,32 @@ namespace Dryv
             var modelType = htmlHelper.ViewData.Model.GetType();
             var validator = services.GetService<IDryvClientValidationProvider>();
 
-            return CollectClientValidation(modelType, null, null, validator, new HashSet<string>(), options.Value, services.GetService);
+            return from i in CollectClientValidation(modelType, null, null, validator, new HashSet<string>(), options.Value, services.GetService)
+                   where i != null
+                   select i;
         }
 
         private static IEnumerable<DryvClientValidationItem> GetChildValidations(Type rootModelType, string modelPath, IDryvClientValidationProvider validator, DryvOptions options, Func<Type, object> services, IEnumerable<PropertyInfo> properties, ISet<string> processedTypes)
         {
             return from p in properties
-                   let val = validator
-                   let opts = options
-                   let svc = services
-                   let root = rootModelType
                    let prefix = string.IsNullOrWhiteSpace(modelPath) ? string.Empty : $"{modelPath}."
                    let childPath = $"{prefix}{p.Name.ToCamelCase()}"
                    where !p.PropertyType.IsValueType && !p.PropertyType.HasElementType && p.PropertyType != typeof(string) && !processedTypes.Contains(childPath)
-                   from v in CollectClientValidation(p.PropertyType, root, childPath, val, processedTypes, opts, svc)
+                   from v in CollectClientValidation(p.PropertyType, rootModelType, childPath, validator, processedTypes, options, services)
                    select v;
         }
 
-        private static IEnumerable<DryvClientValidationItem> GetGroupValidations(Type rootModelType, string modelPath, IDryvClientValidationProvider validator, DryvOptions options, Func<Type, object> services, IEnumerable<PropertyInfo> properties)
+        //private static IEnumerable<DryvClientValidationItem> GetGroupValidations(Type rootModelType, string modelPath, IDryvClientValidationProvider validator, DryvOptions options, Func<Type, object> services, IEnumerable<PropertyInfo> properties)
+        //{
+        //    return from property in properties
+        //           from clientValidation in validator.GetClientPropertyValidationGroups(rootModelType, modelPath, property, services, options)
+        //           select clientValidation;
+        //}
+
+        private static IEnumerable<DryvClientValidationItem> GetPropertyValidations(Type rootModelType, string modelPath, IDryvClientValidationProvider validator, DryvOptions options, Func<Type, object> services, IEnumerable<PropertyInfo> properties)
         {
             return from property in properties
-                   from clientValidation in validator.GetClientPropertyValidationGroups(rootModelType, modelPath, property, services, options)
-                   select clientValidation;
+                   select validator.GetClientPropertyValidation(rootModelType, modelPath, property, services, options);
         }
     }
 }

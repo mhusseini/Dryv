@@ -69,15 +69,12 @@ On the server, install the NuGet package:
 Install-Package Dryv.AspNetCore 
 ```
 
-### Client
-On the client, install the NPM package:
+### Stand-alone
+In stand-alone (e.g. console) apps:
 ```
-npm install --save dryv-jquery-unobtrusive 
+Install-Package Dryv
 ```
-... or download the browser-specific JS file directly [from here](https://raw.githubusercontent.com/mhusseini/dryv-jquery-unobtrusive/master/dist/dryv-jquery-unobtrusive.browser.min.js) into your project and reference it from your page:
-```
-<script src="js/dryv-jquery-unobtrusive.browser.min.js"></script>
-```
+
 ## Usage
 ### ASP.NET Core
 

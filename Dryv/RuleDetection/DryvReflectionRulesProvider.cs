@@ -73,7 +73,7 @@ namespace Dryv.RuleDetection
 
         private static IEnumerable<DryvRuleTreeNode> FindRulesForProperty(Type type, PropertyInfo property, string modelPath)
         {
-            var tuples = FindRulesForProperty(type, property, new List<RulePaths>(), new HashSet<Type>(), null, modelPath, new ConcurrentDictionary<Type, List<DryvCompiledRule>>()).ToList();
+            var tuples = FindRulesForProperty(type, property, new List<RulePaths>(), null, modelPath, new ConcurrentDictionary<Type, List<DryvCompiledRule>>(), new HashSet<Type>(), new HashSet<PropertyInfo>()).ToList();
 
             return (from tuple in tuples
                     select new DryvRuleTreeNode
@@ -83,14 +83,23 @@ namespace Dryv.RuleDetection
                     )).ToList();
         }
 
-        private static IEnumerable<DryvRuleTreeNode> FindRulesForProperty(Type type, PropertyInfo property, IList<RulePaths> propertiesToFind, ISet<Type> processed, string path, string modelPath, ConcurrentDictionary<Type, List<DryvCompiledRule>> deferredRules)
+        private static IEnumerable<DryvRuleTreeNode> FindRulesForProperty(Type type, PropertyInfo property, IList<RulePaths> propertiesToFind, string path, string modelPath, ConcurrentDictionary<Type, List<DryvCompiledRule>> deferredRules, ISet<Type> processedTypes, ISet<PropertyInfo> processedProperties)
         {
-            processed.Add(type);
+            if (processedProperties.Contains(property))
+            {
+                yield break;
+            }
+
+            processedProperties.Add(property);
+            processedTypes.Add(type);
 
             if (type.HasElementType && type != typeof(string))
             {
                 type = type.GetElementType();
-                processed.Add(type);
+                if (type != null)
+                {
+                    processedTypes.Add(type);
+                }
             }
 
             var pathPrefix = string.IsNullOrWhiteSpace(path) ? string.Empty : $"{path}.";
@@ -104,7 +113,7 @@ namespace Dryv.RuleDetection
             }
 
             foreach (var ruleNode in from childProperty in type.GetProperties(BindingFlagsForProperties)
-                                     from ruleNode in FindRulesForPropertyInChild(property, propertiesToFind, processed, modelPath, deferredRules, childProperty, pathPrefix)
+                                     from ruleNode in FindRulesForPropertyInChild(property, propertiesToFind, modelPath, deferredRules, childProperty, pathPrefix, processedTypes, processedProperties)
                                      select ruleNode)
             {
                 yield return ruleNode;
@@ -116,13 +125,13 @@ namespace Dryv.RuleDetection
         /// </summary>
         /// <param name="property">The property to find the rules for.</param>
         /// <param name="propertiesToFind">Paths to the specified property in relation to already found rules.</param>
-        /// <param name="processed">Types that are already processed and should be ignores.</param>
         /// <param name="modelPath">The base path to the model.</param>
         /// <param name="deferredRules">Rules that were found on non-matching types.</param>
         /// <param name="childProperty">A property that might contain a child object that has the property for which the rules should be found.</param>
         /// <param name="pathPrefix">The current property model path.</param>
+        /// <param name="processedTypes">Types that are already processedTypes and should be ignores.</param>
         /// <returns></returns>
-        private static IEnumerable<DryvRuleTreeNode> FindRulesForPropertyInChild(PropertyInfo property, IList<RulePaths> propertiesToFind, ISet<Type> processed, string modelPath, ConcurrentDictionary<Type, List<DryvCompiledRule>> deferredRules, PropertyInfo childProperty, string pathPrefix)
+        private static IEnumerable<DryvRuleTreeNode> FindRulesForPropertyInChild(PropertyInfo property, IList<RulePaths> propertiesToFind, string modelPath, ConcurrentDictionary<Type, List<DryvCompiledRule>> deferredRules, PropertyInfo childProperty, string pathPrefix, ISet<Type> processedTypes, ISet<PropertyInfo> processedProperties)
         {
             var childType = childProperty.GetElementType();
             var childPropertyName = childProperty.Name.ToCamelCase();
@@ -139,12 +148,12 @@ namespace Dryv.RuleDetection
 
             if (!childProperty.IsNavigationProperty() ||
                 pathToChildProperty.StartsWith(modelPath) && pathToChildProperty != modelPath &&
-                processed.Contains(childProperty.PropertyType) && !propertiesToFind.Any())
+                processedTypes.Contains(childProperty.PropertyType) && !propertiesToFind.Any())
             {
                 yield break;
             }
 
-            foreach (var node in FindRulesForProperty(childType, property, propertiesToFind, processed, pathToChildProperty, modelPath, deferredRules.Clone()))
+            foreach (var node in FindRulesForProperty(childType, property, propertiesToFind, pathToChildProperty, modelPath, deferredRules.Clone(), processedTypes, processedProperties))
             {
                 yield return node;
             }

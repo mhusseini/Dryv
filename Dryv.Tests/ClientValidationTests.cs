@@ -39,7 +39,7 @@ namespace Dryv.Tests
 
             var modelType = typeof(ParentModel);
             var validator = new DryvClientValidationProvider();
-            var processedTypes = new HashSet<Type>();
+            var processedTypes = new HashSet<string>();
             var results = HtmlExtensions.CollectClientValidation(modelType, null, null, validator, processedTypes, options, services);
 
             var l = results.ToList();

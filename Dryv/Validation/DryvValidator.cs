@@ -67,16 +67,17 @@ namespace Dryv.Validation
             }
         }
 
-        internal static async Task ValidatePathAsync(
+        internal static async Task<IList<DryvResult>> ValidatePathAsync(
             object input,
             object rootModel,
             string path,
-            IList<DryvAsyncResult> result,
             ICollection<object> processed,
             Func<Type, object> services,
             IDictionary<object, object> cache,
             bool asyncOnly)
         {
+            var result = new List<DryvAsyncResult>();
+
             if (input is IEnumerable items)
             {
                 string suffix;
@@ -100,6 +101,8 @@ namespace Dryv.Validation
             {
                 ValidateSingleItemAsync(input, rootModel, path, result, processed, services, cache, asyncOnly);
             }
+
+            return await Task.WhenAll(result.Select(r => r.Task));
         }
 
         internal static IReadOnlyCollection<DryvResultMessage> ValidateProperty(
@@ -172,10 +175,9 @@ namespace Dryv.Validation
 
         private static async Task<IList<DryvResult>> ValidateCoreAsync(object model, Func<Type, object> services, IDictionary<object, object> cache, bool asyncOnly)
         {
-            var result = new List<DryvResult>();
             if (model == null)
             {
-                return result;
+                return new DryvResult[0];
             }
 
             if (cache == null)
@@ -188,11 +190,7 @@ namespace Dryv.Validation
                 services = t => null;
             }
 
-            var asyncResults = new List<DryvAsyncResult>();
-            await ValidatePathAsync(model, model, string.Empty, asyncResults, new HashSet<object>(), services, cache, asyncOnly);
-            result.AddRange(await Task.WhenAll(asyncResults.Select(r => r.Task)));
-
-            return result;
+            return await ValidatePathAsync(model, model, string.Empty, new HashSet<object>(), services, cache, asyncOnly);
         }
 
         private static void ValidateSingleItem(

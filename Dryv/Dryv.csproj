@@ -1,26 +1,31 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard1.2</TargetFramework>
     <Version>3.0.0</Version>
     <Copyright>2020 Munir Husseini</Copyright>
-    <PackageProjectUrl>https://dryv-lib.net</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/mhusseini/Dryv/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/mhusseini/Dryv</PackageProjectUrl>
+    <PackageLicense>https://github.com/mhusseini/Dryv/blob/master/LICENSE</PackageLicense>
     <RepositoryUrl>https://github.com/mhusseini/Dryv.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>model-validation, JavaScript, C#</PackageTags>
     <Description>Base classes for Dryv. Dryv provides complex model validation for server and client made easy. Write complex model validation rules in C# once. Dryv will generate JavaScript for client-side validation.</Description>
     <Authors>Munir husseini</Authors>
     <Company>Munir husseini</Company>
-    <PackageIconUrl>https://github.com/mhusseini/Dryv/raw/master/logo.png</PackageIconUrl>
+    <PackageIcon>dryv.png</PackageIcon>
     <ApplicationIcon>dryv.ico</ApplicationIcon>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <WarningLevel>0</WarningLevel>
   </PropertyGroup>
-  
+
+  <ItemGroup>
+    <None Include="dryv.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
   <ItemGroup>
     <Content Include="tools\**\*">
       <Pack>true</Pack>
@@ -38,6 +43,9 @@
   <ItemGroup>
     <Reference Include="System.ComponentModel">
       <HintPath>..\..\..\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.6\System.ComponentModel.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Diagnostics.TraceSource">
+      <HintPath>..\..\..\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\3.1.0\ref\netcoreapp3.1\System.Diagnostics.TraceSource.dll</HintPath>
     </Reference>
   </ItemGroup>
 
