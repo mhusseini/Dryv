@@ -1,6 +1,6 @@
-<a href="https://dryv-lib.net" target="_new" title="Got to project website"><img src="logo_slogan.svg" title="Dryv - DRY Validation for ASP.NET MVC and ASP.NET Core" width="300"></a>
+<img src="logo_slogan.svg" title="Dryv - DRY Validation for ASP.NET MVC and ASP.NET Core" width="300">
 
-[![NuGet version](https://badge.fury.io/nu/dryv.svg)](https://badge.fury.io/nu/dryv) [![npm version](https://badge.fury.io/js/dryv-jquery-unobtrusive.svg)](https://badge.fury.io/js/dryv-jquery-unobtrusive)
+[![NuGet version](https://badge.fury.io/nu/dryv.svg)](https://badge.fury.io/nu/dryv) 
 
 **Complex model validation for server and client made easy.**
 
@@ -103,6 +103,25 @@ public class Startup
 }
 ```
 
+Afterwards, the validation results will be available via the [ASP.NET model state](https://docs.microsoft.com/en-us/aspnet/core/mvc/models/validation?view=aspnetcore-3.1).
+
+### Client-Side (JavaScript)
+In your Razore view, you can output the translated validation expressions to the client. The exact format depends on your client implementation. See the VueJS sample in this repository for more details.
+``` html
+@model HomeModel
+
+<script>
+(function(dryv) {
+    dryv.validators = {
+        @Html.Raw(string.Join(",\n", from val in Html.GetDryvClientPropertyValidations()
+                                     let field = val.Property.Name.ToCamelCase()
+                                     let sep = string.IsNullOrWhiteSpace(val.ModelPath) ? string.Empty : "."
+                                     select $@"""{val.ModelPath}{sep}{field}"": {val.ValidationFunction}"))
+    };
+})(window.dryv || (window.dryv = {}));
+</script>
+```
+
 ### Stand-alone
 Dryv can be used without ASP.NET. Using just the base package, Dryv can be used to validate models.
 ```csharp
@@ -115,21 +134,21 @@ namespace Demo
     {
         private static void Main()
         {
-            var model = new Model5
+            var model = new Model1
             {
                 Name = "Hello",
-                Child = new Model6
+                Child = new Model2
                 {
                     Name = "World",
-                    Child = new Model7()
+                    Child = new Model3()
                 },
                 Children = new[]
                 {
-                    new Model8()
+                    new Model4()
                 }
             };
 
-            var validator = new DryvValidator();
+            var validator = new DryvValidator(new DryvRulesFinder(new InMemoryCache()), new DryvServerRuleEvaluator());
             var errors = validator.Validate(model);
 
             foreach (var error in errors)
@@ -140,10 +159,6 @@ namespace Demo
     }
 }
 ```
-
-## Examples and Documentation
-For detailed information and usage examples, please visit the project website at [https://dryv-lib.net](https://dryv-lib.net).
-
 
 
 
