@@ -20,7 +20,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{16D7BA7D
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleVue", "SampleVue\SampleVue.csproj", "{553E1EC8-2819-49D6-B739-F6884BC8DFCB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleConsole", "SampleConsole\SampleConsole.csproj", "{D22ACF2C-28EB-40F2-9326-A9BD0D40E902}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleConsole", "SampleConsole\SampleConsole.csproj", "{D22ACF2C-28EB-40F2-9326-A9BD0D40E902}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
