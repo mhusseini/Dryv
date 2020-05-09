@@ -48,15 +48,12 @@ namespace Dryv.SampleVue
             app.UseDryv();
         }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<ZipCodeValidator>();
             services.AddSingleton<AsyncValidator>();
             services
-                //.AddRazorPages()
                 .AddMvc(options => options.EnableEndpointRouting = true)
-                .AddDryv(options => options.UseClientValidator<DryvAsyncAwaitClientValidationProvider>())
+                .AddDryv()
                 .AddTranslator<AsyncValidatorTranslator>();
         }
     }

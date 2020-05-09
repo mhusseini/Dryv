@@ -144,8 +144,7 @@
                         let errors = 0;
 
                         for (let v of this.formValidators) {
-                            const error = await v.validate();
-                            if (error) {
+                            if (await v.validate()) {
                                 errors++;
                             }
                         }
@@ -157,19 +156,17 @@
                         }
                     }
 
-                    axios
-                        .post(window.location.href, this.$data)
-                        .then(result => {
-                            if (!this.formValidators) {
-                                return;
-                            }
+                    const result = axios.post(window.location.href, this.$data);
 
-                            this.$data.isValid = result.data.success;
+                    if (!this.formValidators) {
+                        return;
+                    }
 
-                            if (!this.$data.isValid) {
-                                this.formValidators.forEach(v => v.setError(result.data.errors));
-                            }
-                        });
+                    this.$data.isValid = result.data.success;
+
+                    if (!this.$data.isValid) {
+                        this.formValidators.forEach(v => v.setError(result.data.errors));
+                    }
                 }
             }
         });
