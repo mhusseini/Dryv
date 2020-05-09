@@ -1,5 +1,6 @@
 ﻿@using Dryv
 @using Dryv.Extensions
+@using Dryv.SampleVue.Controllers
 @using Dryv.SampleVue.Models
 
 @model HomeModel
@@ -11,13 +12,24 @@
     <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@200;400;700&family=Roboto:wght@300&display=swap" rel="stylesheet">
 </head>
 <body>
+
     <script>
+    const Dryvue = {
+        async validateAsync(name, data) {
+            const params = Object.keys(data).map(k => `${k}=${encodeURIComponent(data[k])}`);
+            const url = `/Validation/${name}?${params.join('&')}`;
+
+            const response = await axios.get(url);
+
+            return response.data && response.data.text;
+        }
+    };
     (function(dryv) {
         dryv.validators = {
             @Html.Raw(string.Join(",\n", from val in Html.GetDryvClientPropertyValidations()
-                                                    let field = val.Property.Name.ToCamelCase()
-                                                    let sep = string.IsNullOrWhiteSpace(val.ModelPath) ? string.Empty : "."
-                                                    select $@"""{val.ModelPath}{sep}{field}"": {val.ValidationFunction}"))
+                let field = val.Property.Name.ToCamelCase()
+                let sep = string.IsNullOrWhiteSpace(val.ModelPath) ? string.Empty : "."
+                select $@"""{val.ModelPath}{sep}{field}"": {val.ValidationFunction}"))
         };
     })(window.dryv || (window.dryv = {}));
     </script>
@@ -100,7 +112,7 @@
 
                     const formValidators = this.$parent.formValidators || (this.$parent.formValidators = []);
                     formValidators.push({
-                        validate: () => (this.error = validator(this.$parent)),
+                        validate: async () => (this.error = await validator(this.$parent)),
                         setError: errors => this.error = errors[this.name]
                     });
                 }
@@ -125,12 +137,21 @@
                 }
             },
             methods: {
-                validateForm(e) {
+                async validateForm(e) {
                     e.preventDefault();
 
                     if (this.formValidators) {
-                        const errors = this.formValidators.map(v => v.validate());
-                        this.$data.isValid = errors.map(b => !b).reduce((a, b) => a && b);
+                        let errors = 0;
+
+                        for (let v of this.formValidators) {
+                            const error = await v.validate();
+                            if (error) {
+                                errors++;
+                            }
+                        }
+
+                        this.$data.isValid = !errors;
+
                         if (!this.$data.isValid) {
                             return;
                         }

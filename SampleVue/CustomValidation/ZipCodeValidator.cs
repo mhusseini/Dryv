@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Dryv.SampleVue
+namespace Dryv.SampleVue.CustomValidation
 {
     public class ZipCodeValidator
     {

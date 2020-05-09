@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Dryv.Cache;
@@ -30,16 +31,21 @@ namespace Dryv.Validation
 
             var translatedRules = DryvRuleTranslator.Translate(rules, services, options, modelPath, modelType);
             var key = $"v{Math.Abs((modelType.FullName + property.Name + modelPath).GetHashCode())}";
-            var code = translatedRules.Any() ? $@"function(m) {{ return {string.Join("||", translatedRules.Values.Select(f => $"({f}).call(this, m)"))}; }}" : null;
+            var validationFunction = translatedRules.Any() ? this.GetValidationFunction(translatedRules) : null;
 
-            return code == null ? null : new DryvClientValidationItem
+            return string.IsNullOrWhiteSpace(validationFunction) ? null : new DryvClientValidationItem
             {
-                ValidationFunction = code,
+                ValidationFunction = validationFunction,
                 Key = key,
                 ModelType = modelType,
                 Property = property,
                 ModelPath = modelPath,
             };
+        }
+
+        protected virtual string GetValidationFunction(IDictionary<DryvRuleTreeNode, string> translatedRules)
+        {
+            return $@"function(m) {{ return {string.Join("||", translatedRules.Values.Select(f => $"({f}).call(this, m)"))}; }}";
         }
     }
 }

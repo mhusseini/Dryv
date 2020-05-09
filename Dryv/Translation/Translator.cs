@@ -4,7 +4,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using Dryv.Reflection;
 
 namespace Dryv.Translation
@@ -20,25 +19,8 @@ namespace Dryv.Translation
 
         public virtual TranslationResult Translate(Expression expression, MemberExpression propertyExpression)
         {
-            EnsureValidState(expression);
             var result = this.GenerateJavaScriptCode(expression, propertyExpression);
             return this.translationCompiler.GenerateTranslationDelegate(result.Code, result.OptionDelegates, result.OptionTypes);
-        }
-
-        private static void EnsureValidState(Expression expression)
-        {
-            switch (expression)
-            {
-                case LambdaExpression lambdaExpression:
-                    {
-                        if (typeof(Task).IsAssignableFrom(lambdaExpression.ReturnType))
-                        {
-                            throw new DryvExpressionNotSupportedException(expression, "Asynchronous expressions cannot be translated to client code. Use the ServerRule<> method to add validation rules with asynchronous expression.");
-                        }
-
-                        break;
-                    }
-            }
         }
 
         public virtual void Translate(Expression expression, TranslationContext context, bool negated = false)

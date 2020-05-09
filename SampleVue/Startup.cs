@@ -1,3 +1,7 @@
+using Dryv.SampleVue.CustomValidation;
+using Dryv.SampleVue.Translation;
+using Dryv.Translation.Translators;
+using Dryv.Validation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -48,10 +52,12 @@ namespace Dryv.SampleVue
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<ZipCodeValidator>();
+            services.AddSingleton<AsyncValidator>();
             services
                 //.AddRazorPages()
                 .AddMvc(options => options.EnableEndpointRouting = true)
-                .AddDryv();
+                .AddDryv(options => options.UseClientValidator<DryvAsyncAwaitClientValidationProvider>())
+                .AddTranslator<AsyncValidatorTranslator>();
         }
     }
 }

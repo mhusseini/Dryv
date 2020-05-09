@@ -16,7 +16,7 @@ namespace Dryv.Translation
         }
 
         public DryvMethodNotSupportedException(MethodInfo method, string message = null)
-            : base($"Calls to the method {method.Name} are not supported. {message ?? string.Empty}")
+            : base($"Calls to method {method.DeclaringType.Name}.{method.Name} are not supported. {message ?? string.Empty} Are you missing a custom translator? Implement {nameof(IMethodCallTranslator)} or {nameof(ICustomTranslator)} to add custom translators.")
         {
         }
     }

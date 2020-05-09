@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Dryv.Cache;
 using Dryv.Compilation;
 using Dryv.Configuration;
@@ -23,7 +22,7 @@ namespace Dryv
 
             mvcBuilder.AddMvcOptions(opts =>
             {
-                // As long as mvc validation is not async, we'll 
+                // As long as mvc validation is not async, we'll
                 // run the async validation from an action attribute.
                 opts.Filters.Add<DryvValidationFilterAttribute>();
                 opts.ModelValidatorProviders.Add(new DryvModelValidatorProvider());
