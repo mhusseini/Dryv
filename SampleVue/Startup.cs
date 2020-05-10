@@ -53,7 +53,7 @@ namespace Dryv.SampleVue
             services.AddSingleton<AsyncValidator>();
             services
                 .AddMvc(options => options.EnableEndpointRouting = true)
-                .AddDryv()
+                .AddDryv(options=>options.UseClientValidator<DryvAsyncAwaitClientValidationProvider>())
                 .AddTranslator<AsyncValidatorTranslator>();
         }
     }
