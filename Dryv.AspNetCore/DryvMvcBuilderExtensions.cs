@@ -1,9 +1,9 @@
 ﻿using System;
+using Dryv.AspNetCore.DynamicControllers;
+using Dryv.AspNetCore.Internal;
 using Dryv.Cache;
 using Dryv.Compilation;
 using Dryv.Configuration;
-using Dryv.DynamicControllers;
-using Dryv.Internal;
 using Dryv.RuleDetection;
 using Dryv.Translation;
 using Dryv.Translation.Translators;
@@ -12,7 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
-namespace Dryv
+namespace Dryv.AspNetCore
 {
     public static class DryvMvcBuilderExtensions
     {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Routing;
 
-namespace Dryv.DynamicControllers
+namespace Dryv.AspNetCore.DynamicControllers
 {
     internal class DryvEndpointRouteBuilderProvider
     {

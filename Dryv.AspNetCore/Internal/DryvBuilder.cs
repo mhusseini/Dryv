@@ -3,7 +3,7 @@ using Dryv.Configuration;
 using Dryv.Translation;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Dryv.Internal
+namespace Dryv.AspNetCore.Internal
 {
     internal class DryvBuilder : IDryvBuilder
     {

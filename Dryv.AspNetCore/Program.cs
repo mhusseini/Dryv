@@ -1,4 +1,4 @@
-namespace Dryv
+namespace Dryv.AspNetCore
 {
     public class Program
     {

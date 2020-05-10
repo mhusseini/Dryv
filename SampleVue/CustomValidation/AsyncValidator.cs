@@ -7,7 +7,8 @@ namespace Dryv.SampleVue.CustomValidation
     {
         public async Task<DryvResultMessage> ValidateZipCode(string zipCode, string city)
         {
-            await Task.Delay(10);
+            if (string.IsNullOrWhiteSpace(zipCode)) return "ZIP code cannot be empty.";
+            if (string.IsNullOrWhiteSpace(city)) return "City cannot be empty.";
             return new Regex("^[2468]+$").IsMatch(zipCode) ? null : "The ZIP code must only contain even numbers.";
         }
     }

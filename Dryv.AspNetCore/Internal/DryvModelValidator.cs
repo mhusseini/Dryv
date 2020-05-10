@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Dryv.AspNetCore.Extensions;
 using Dryv.Configuration;
 using Dryv.Extensions;
 using Dryv.Validation;
@@ -8,7 +9,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Dryv.Internal
+namespace Dryv.AspNetCore.Internal
 {
     internal class DryvModelValidator : IModelValidator
     {

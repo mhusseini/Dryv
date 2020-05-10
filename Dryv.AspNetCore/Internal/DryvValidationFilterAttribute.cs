@@ -7,7 +7,7 @@ using Dryv.Validation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace Dryv.Internal
+namespace Dryv.AspNetCore.Internal
 {
     /// <inheritdoc />
     /// <summary>

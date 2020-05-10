@@ -10,28 +10,19 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Dryv.SampleVue.Controllers
 {
-    //[Route("/")]
+    public class TestController : Controller
+    {
+        [HttpPost]
+        public Task<DryvResultMessage> Run(Address model)
+        {
+            return Task.FromResult(DryvResultMessage.Success);
+        }
+    }
+
     public class HomeController : Controller
     {
-        //private readonly DryvDynamicDelegatingControllerFactory codeGenerator;
-        //private readonly DryvDynamicControllerRegistration controllerRegistration;
-
-        //public HomeController(DryvDynamicControllerRegistration controllerRegistration, DryvDynamicDelegatingControllerFactory codeGenerator)
-        //{
-        //    this.controllerRegistration = controllerRegistration;
-        //    this.codeGenerator = codeGenerator;
-        //}
-
-        //[HttpGet]
         public IActionResult Index()
         {
-            //var v = new AsyncValidator();
-            //Expression<Func<Address, Task<DryvResultMessage>>> e = a => v.ValidateZipCode(a.ZipCode, a.City);
-
-            //var ass = this.codeGenerator.CreateControllerAssembly((MethodCallExpression)e.Body);
-
-            //this.controllerRegistration.Register(ass);
-
             return this.View();
         }
 

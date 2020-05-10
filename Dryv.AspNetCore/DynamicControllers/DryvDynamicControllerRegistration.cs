@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.Options;
 
-namespace Dryv.DynamicControllers
+namespace Dryv.AspNetCore.DynamicControllers
 {
     internal class DryvDynamicControllerRegistration
     {
@@ -43,7 +43,9 @@ namespace Dryv.DynamicControllers
 
         private void MapEndpoint(Type controllerTyp)
         {
-            var m = controllerTyp.GetMethods(BindingFlags.Instance | BindingFlags.Public).FirstOrDefault();
+            var m = controllerTyp
+                .GetMethods(BindingFlags.Instance | BindingFlags.Public & ~BindingFlags.FlattenHierarchy & ~BindingFlags.GetProperty & ~BindingFlags.SetProperty)
+                .FirstOrDefault(m => (m.Attributes & MethodAttributes.HideBySig) == 0);
             this.options.Value.MapEndpoint(this.routeBuilderProvider.RouteBuilder, controllerTyp, m);
         }
     }

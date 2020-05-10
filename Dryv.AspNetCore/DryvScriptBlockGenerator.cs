@@ -1,9 +1,9 @@
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using Dryv.Translation;
 using Dryv.Validation;
 
-namespace Dryv
+namespace Dryv.AspNetCore
 {
     public class DryvScriptBlockGenerator : IDryvScriptBlockGenerator
     {

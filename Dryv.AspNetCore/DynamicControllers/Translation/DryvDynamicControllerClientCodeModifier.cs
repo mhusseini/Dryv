@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 
-namespace Dryv.DynamicControllers.Translation
+namespace Dryv.AspNetCore.DynamicControllers.Translation
 {
     internal class DryvDynamicControllerClientCodeModifier : IDryvClientCodeModifier
     {

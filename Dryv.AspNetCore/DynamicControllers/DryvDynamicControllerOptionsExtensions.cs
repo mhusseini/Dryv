@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Dryv.DynamicControllers.Translation;
+using Dryv.AspNetCore.DynamicControllers.Translation;
 using Microsoft.AspNetCore.Routing;
 
-namespace Dryv.DynamicControllers
+namespace Dryv.AspNetCore.DynamicControllers
 {
     public static class DryvDynamicControllerOptionsExtensions
     {

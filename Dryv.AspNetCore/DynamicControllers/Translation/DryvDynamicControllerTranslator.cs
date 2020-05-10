@@ -3,20 +3,23 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Dryv.Translation;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
-namespace Dryv.DynamicControllers.Translation
+namespace Dryv.AspNetCore.DynamicControllers.Translation
 {
     internal class DryvDynamicControllerTranslator : ICustomTranslator
     {
         private readonly DryvDynamicDelegatingControllerGenerator codeGenerator;
         private readonly IDryvDynamicControllerCallWriter controllerCallWriter;
+        private readonly IOptions<DryvDynamicControllerOptions> options;
         private readonly DryvDynamicControllerRegistration controllerRegistration;
 
-        public DryvDynamicControllerTranslator(DryvDynamicControllerRegistration controllerRegistration, DryvDynamicDelegatingControllerGenerator codeGenerator, IDryvDynamicControllerCallWriter controllerCallWriter)
+        public DryvDynamicControllerTranslator(DryvDynamicControllerRegistration controllerRegistration, DryvDynamicDelegatingControllerGenerator codeGenerator, IDryvDynamicControllerCallWriter controllerCallWriter, IOptions<DryvDynamicControllerOptions> options)
         {
             this.controllerRegistration = controllerRegistration;
             this.codeGenerator = codeGenerator;
             this.controllerCallWriter = controllerCallWriter;
+            this.options = options;
         }
 
         public bool? AllowSurroundingBrackets(Expression expression)
@@ -49,8 +52,9 @@ namespace Dryv.DynamicControllers.Translation
 
             context.ClientCodeModifiers.Add(typeof(DryvDynamicControllerClientCodeModifier));
             var urlPlaceHolder = $"##route:{route}##";
+            var httpMethod = this.options.Value.HttpMethod.ToString().ToUpper();
 
-            this.controllerCallWriter.Write(context, urlPlaceHolder, parameters);
+            this.controllerCallWriter.Write(context, urlPlaceHolder, httpMethod, parameters);
 
             return true;
         }

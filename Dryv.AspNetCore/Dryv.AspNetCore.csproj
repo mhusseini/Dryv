@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RootNamespace>Dryv</RootNamespace>
-    <Version>3.0.2</Version>
+    <RootNamespace>Dryv.AspNetCore</RootNamespace>
+    <Version>4.0.0</Version>
     <Authors>Munir husseini</Authors>
     <Company>Munir husseini</Company>
     <Product>Dryv</Product>

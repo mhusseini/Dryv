@@ -3,14 +3,16 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Dryv.Translation;
 
-namespace Dryv.DynamicControllers.Translation
+namespace Dryv.AspNetCore.DynamicControllers.Translation
 {
     internal class DefaultDryvDynamicControllerCallWriter : IDryvDynamicControllerCallWriter
     {
-        public void Write(CustomTranslationContext context, string urlPlaceHolder, Dictionary<ParameterInfo, Expression> parameters)
+        public void Write(CustomTranslationContext context, string url, string httpMethod, Dictionary<ParameterInfo, Expression> parameters)
         {
             context.Writer.Write("Dryvue.validateAsync('");
-            context.Writer.Write(urlPlaceHolder);
+            context.Writer.Write(url);
+            context.Writer.Write("', '");
+            context.Writer.Write(httpMethod);
             context.Writer.Write("', {");
 
             var sep = string.Empty;

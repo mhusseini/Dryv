@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Dryv.Internal;
+using Dryv.AspNetCore.Internal;
 using Dryv.Validation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace Dryv.Extensions
+namespace Dryv.AspNetCore.Extensions
 {
     internal static class ViewContextExtensions
     {

@@ -1,4 +1,5 @@
 ﻿@using Dryv
+@using Dryv.AspNetCore
 @using Dryv.Extensions
 @using Dryv.SampleVue.Controllers
 @using Dryv.SampleVue.Models
@@ -15,11 +16,11 @@
 
     <script>
     const Dryvue = {
-        async validateAsync(baseUrl, data) {
+        async validateAsync(baseUrl, method, data) {
+            const isGet = method === 'GET';
             const params = Object.keys(data).map(k => `${k}=${encodeURIComponent(data[k])}`);
-            const url = `${baseUrl}?${params.join('&')}`;
-
-            const response = await axios.get(url);
+            const url = isGet ? `${baseUrl}?${params.join('&')}` : baseUrl;
+            const response = isGet ? await axios.get(url) : await axios.post(url, data);
 
             return response.data && response.data.text;
         }
