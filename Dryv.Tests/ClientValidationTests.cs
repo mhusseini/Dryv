@@ -22,7 +22,7 @@ namespace Dryv.Tests
             translatorMock.Setup(m => m.Translate(It.IsAny<Expression>(), It.IsAny<MemberExpression>()))
                 .Returns(() => new TranslationResult
                 {
-                    Factory = _ => "nop",
+                    Factory = (_, __) => "nop",
                     CodeTemplate = "nothing",
                     OptionTypes = new Type[0]
                 });

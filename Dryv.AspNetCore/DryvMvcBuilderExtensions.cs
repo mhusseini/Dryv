@@ -2,6 +2,7 @@
 using Dryv.Cache;
 using Dryv.Compilation;
 using Dryv.Configuration;
+using Dryv.DynamicControllers;
 using Dryv.Internal;
 using Dryv.RuleDetection;
 using Dryv.Translation;
@@ -33,8 +34,9 @@ namespace Dryv
 
         private static IDryvBuilder RegsterServices(this IServiceCollection services, DryvOptions options)
         {
-            services.TryAddSingleton(typeof(IDryvClientValidationProvider), options.ClientValidatorType ?? typeof(DryvClientValidationProvider));
-            services.TryAddSingleton(typeof(IDryvScriptBlockGenerator), options.ClientBodyGeneratorType ?? typeof(DryvScriptBlockGenerator));
+            services.AddSingleton<DryvEndpointRouteBuilderProvider>();
+            services.TryAddSingleton<IDryvClientValidationProvider, DryvClientValidationProvider>();
+            services.TryAddSingleton<IDryvScriptBlockGenerator, DryvScriptBlockGenerator>();
             services.AddSingleton<ITranslator, JavaScriptTranslator>();
             services.AddSingleton<ICache, InMemoryCache>();
             services.AddSingleton<DryvRulesFinder>();

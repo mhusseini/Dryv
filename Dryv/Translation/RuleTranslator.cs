@@ -12,13 +12,12 @@ namespace Dryv.Translation
         public static IDictionary<DryvRuleTreeNode, string> Translate(IEnumerable<DryvRuleTreeNode> rules, Func<Type, object> objectProvider, DryvOptions options, string modelPath, Type modelType)
         {
             var translator = objectProvider(typeof(ITranslator)) as ITranslator;
-
             return (from r in rules
                     let rule = Translate(r.Rule, translator, options)
                     where rule.TranslationError == null
                     let path = string.IsNullOrWhiteSpace(r.Path) ? r.Path : $".{r.Path}"
                     let preevaluationOptions = new[] { path }.Union(rule.PreevaluationOptionTypes.Select(objectProvider)).ToArray()
-                    select new { Rule = r, Translation = rule.TranslatedValidationExpression(preevaluationOptions) })
+                    select new { Rule = r, Translation = rule.TranslatedValidationExpression(objectProvider, preevaluationOptions) })
                 .ToDictionary(x => x.Rule, x => x.Translation);
         }
 

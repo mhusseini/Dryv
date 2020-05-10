@@ -1,6 +1,4 @@
 ﻿using System;
-using Dryv.Translation;
-using Dryv.Validation;
 
 namespace Dryv.Configuration
 {
@@ -8,19 +6,9 @@ namespace Dryv.Configuration
     {
         public TranslationErrorBehavior TranslationErrorBehavior { get; set; }
 
-        public Type ClientValidatorType { get; private set; }
+        public Type ClientValidatorType { get; internal set; }
 
-        public void UseClientValidator<T>() where T : IDryvClientValidationProvider
-        {
-            this.ClientValidatorType = typeof(T);
-        }
-
-        public Type ClientBodyGeneratorType { get; private set; }
-
-        public void UseClientBodyGenerator<T>() where T : IDryvScriptBlockGenerator
-        {
-            this.ClientBodyGeneratorType = typeof(T);
-        }
+        public Type ClientBodyGeneratorType { get; internal set; }
 
         public bool BreakOnFirstValidationError { get; set; } = true;
     }

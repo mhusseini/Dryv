@@ -15,9 +15,9 @@
 
     <script>
     const Dryvue = {
-        async validateAsync(name, data) {
+        async validateAsync(baseUrl, data) {
             const params = Object.keys(data).map(k => `${k}=${encodeURIComponent(data[k])}`);
-            const url = `/Validation/${name}?${params.join('&')}`;
+            const url = `${baseUrl}?${params.join('&')}`;
 
             const response = await axios.get(url);
 

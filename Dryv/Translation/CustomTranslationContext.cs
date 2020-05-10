@@ -1,4 +1,6 @@
-﻿using System.Linq.Expressions;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 
 namespace Dryv.Translation
 {
@@ -15,6 +17,7 @@ namespace Dryv.Translation
             this.OptionDelegates = context.OptionDelegates;
             this.ModelType = context.ModelType;
             this.PropertyExpression = context.PropertyExpression;
+            this.ClientCodeModifiers = context.ClientCodeModifiers;
         }
 
         public Expression Expression { get; set; }

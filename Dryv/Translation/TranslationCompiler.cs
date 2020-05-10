@@ -13,6 +13,9 @@ namespace Dryv.Translation
         private static readonly MethodInfo FormatMethod = typeof(string).GetMethod(nameof(string.Format), typeof(string), typeof(object[]));
 
         private static readonly MethodInfo TranslateValueMethod = typeof(Translator).GetMethod(nameof(Translator.TranslateValue));
+
+        private static readonly MethodInfo ModifierTransformMethod = typeof(IDryvClientCodeModifier).GetMethod(nameof(IDryvClientCodeModifier.Transform));
+
         private readonly object translator;
 
         public TranslationCompiler(object translator)
@@ -20,14 +23,14 @@ namespace Dryv.Translation
             this.translator = translator;
         }
 
-        public TranslationResult GenerateTranslationDelegate(string code, IEnumerable<OptionDelegate> optionDelegates, IList<Type> optionTypes)
+        public TranslationResult GenerateTranslationDelegate(string code, IEnumerable<OptionDelegate> optionDelegates, IList<Type> optionTypes, IList<Type> clientCodeModifiers)
         {
             // Escape curly braces for usage within string.Format().
             code = code
                 .Replace("{", "{{")
                 .Replace("}", "}}");
 
-            // We will produce a delegate that has a single parameter:
+            var servicesParameter = Expression.Parameter(typeof(Func<Type, object>));
             var parameter = Expression.Parameter(typeof(object[]));
 
             // Create an array that will be used as parameters for string.Format().
@@ -36,8 +39,24 @@ namespace Dryv.Translation
             // create the following code: string.Format("...", new[]{ ... })
             var pattern = Expression.Constant(code);
             var arguments = Expression.NewArrayInit(typeof(object), arrayItems);
+            var blockExpressions = new List<Expression>();
+            var resultVariable = Expression.Variable(typeof(string));
+
             var format = Expression.Call(null, FormatMethod, pattern, arguments);
-            var result = Expression.Lambda<Func<object[], string>>(format, parameter);
+            blockExpressions.Add(Expression.Assign(resultVariable, format));
+
+            if (clientCodeModifiers != null)
+            {
+                blockExpressions.AddRange(from clientCodeModifier in clientCodeModifiers
+                                          select Expression.Assign(resultVariable,
+                                              Expression.Call(
+                                                  Expression.Convert(Expression.Invoke(servicesParameter, Expression.Constant(clientCodeModifier)), typeof(IDryvClientCodeModifier)),
+                                                  ModifierTransformMethod,
+                                                  resultVariable)));
+            }
+
+            var block = Expression.Block(new[] { resultVariable }, blockExpressions);
+            var result = Expression.Lambda<Func<Func<Type, object>, object[], string>>(block, servicesParameter, parameter);
 
             return new TranslationResult
             {
