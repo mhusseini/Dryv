@@ -1,3 +1,5 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Dryv.AspNetCore;
 using Dryv.Configuration;
 using Dryv.SampleVue.CustomValidation;
@@ -58,6 +60,7 @@ namespace Dryv.SampleVue
                     options.EnableEndpointRouting = true;
                     options.Filters.Add<TestFilterAttribute>();
                 })
+                .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)))
                 .AddDryv(options => options.UseClientValidator<DryvAsyncAwaitClientValidationProvider>())
                 .AddDryvDynamicControllers(/*options => options.UseControllerCallWriter<DefaultDryvDynamicControllerCallWriter>()*/)
                 .AddDryvPreloading()
