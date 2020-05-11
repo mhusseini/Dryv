@@ -56,9 +56,11 @@ namespace Dryv.SampleVue
                 .AddMvc(options =>
                 {
                     options.EnableEndpointRouting = true;
+                    options.Filters.Add<TestFilterAttribute>();
                 })
-                .AddDryvDynamicControllers(/*options => options.UseControllerCallWriter<DefaultDryvDynamicControllerCallWriter>()*/)
                 .AddDryv(options => options.UseClientValidator<DryvAsyncAwaitClientValidationProvider>())
+                .AddDryvDynamicControllers(/*options => options.UseControllerCallWriter<DefaultDryvDynamicControllerCallWriter>()*/)
+                .AddDryvPreloading()
                 //.AddTranslator<AsyncValidatorTranslator>()
                 ;
 

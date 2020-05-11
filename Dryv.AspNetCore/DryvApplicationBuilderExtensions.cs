@@ -1,4 +1,5 @@
 ﻿using Dryv.AspNetCore.DynamicControllers;
+using Dryv.AspNetCore.Internal;
 using Dryv.Extensions;
 using Dryv.Translation;
 using Microsoft.AspNetCore.Builder;
@@ -17,6 +18,11 @@ namespace Dryv.AspNetCore
 
             translatorProvider.MethodCallTranslators.AddRange(app.ApplicationServices.GetServices<IMethodCallTranslator>());
             translatorProvider.GenericTranslators.AddRange(app.ApplicationServices.GetServices<ICustomTranslator>());
+
+            foreach (var initializer in app.ApplicationServices.GetServices<DryvMvcInitializer>())
+            {
+                initializer.Run(app.ApplicationServices);
+            }
 
             return app;
         }

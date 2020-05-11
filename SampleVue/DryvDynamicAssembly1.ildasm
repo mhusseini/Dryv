@@ -42,7 +42,7 @@
 }
 
 .module 'DryvDynamicAssembly1.dll'
-// MVID: {160b4586-845d-4c66-b090-b4e698ed926a}
+// MVID: {8dff9030-9a55-4ad5-b065-d315f2791808}
 .imagebase 0x00400000
 .file alignment 0x00000200
 .stackreserve 0x00100000

@@ -6,10 +6,12 @@ using Dryv.Extensions;
 using Dryv.Internal;
 using Dryv.SampleVue.CustomValidation;
 using Dryv.SampleVue.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dryv.SampleVue.Controllers
 {
+    [Authorize]
     public class TestController : Controller
     {
         [HttpPost]

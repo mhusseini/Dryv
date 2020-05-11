@@ -26,8 +26,8 @@ namespace Dryv.AspNetCore.DynamicControllers
         public Assembly CreateControllerAssembly(MethodCallExpression methodExpression)
         {
             var methodInfo = methodExpression.Method;
-
             var key = GetCacheKey(methodInfo);
+
             return Cache.GetOrAdd(key, _ =>
             {
                 var assemblyIndex = ++assemblyCount;

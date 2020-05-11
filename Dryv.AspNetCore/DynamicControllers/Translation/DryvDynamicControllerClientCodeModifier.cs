@@ -1,29 +1,22 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
 using Dryv.Translation;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.Routing;
 
 namespace Dryv.AspNetCore.DynamicControllers.Translation
 {
     internal class DryvDynamicControllerClientCodeModifier : IDryvClientCodeModifier
     {
         private static readonly Regex RegexPlaceHolder = new Regex("##route:(.+?)##", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        private readonly IActionContextAccessor actionContextAccessor;
-        private readonly IUrlHelperFactory urlHelperFactory;
+        private readonly LinkGenerator linkGenerator;
 
-        public DryvDynamicControllerClientCodeModifier(IActionContextAccessor actionContextAccessor, IUrlHelperFactory urlHelperFactory)
+        public DryvDynamicControllerClientCodeModifier(LinkGenerator linkGenerator)
         {
-            this.actionContextAccessor = actionContextAccessor;
-            this.urlHelperFactory = urlHelperFactory;
+            this.linkGenerator = linkGenerator;
         }
 
         public string Transform(string code)
         {
-            var actionContext = this.actionContextAccessor.ActionContext;
-            var urlHelper = this.urlHelperFactory.GetUrlHelper(actionContext);
-
             var index = 0;
             var sb = new StringBuilder();
 
@@ -31,7 +24,7 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
             {
                 sb.Append(code.Substring(index, m.Index));
                 var route = m.Groups[1].Value;
-                var url = urlHelper.RouteUrl(route);
+                var url = this.linkGenerator.GetPathByName(route, null);
                 sb.Append(url);
                 index = m.Index + m.Length;
             }

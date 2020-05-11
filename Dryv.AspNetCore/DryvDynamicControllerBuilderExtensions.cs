@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using Dryv.AspNetCore.DynamicControllers;
 using Dryv.AspNetCore.DynamicControllers.Translation;
+using Dryv.AspNetCore.Internal;
 using Dryv.Translation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
@@ -14,11 +15,11 @@ using Microsoft.Extensions.Options;
 
 namespace Dryv.AspNetCore
 {
-    public static class DryvDynamicControllerMvcBuilderExtensions
+    public static class DryvDynamicControllerBuilderExtensions
     {
-        public static IMvcBuilder AddDryvDynamicControllers(this IMvcBuilder mvcBuilder, Action<DryvDynamicControllerOptions> setupAction = null)
+        public static IDryvMvcBuilder AddDryvDynamicControllers(this IDryvMvcBuilder dryvBuilder, Action<DryvDynamicControllerOptions> setupAction = null)
         {
-            var services = mvcBuilder.Services;
+            var services = dryvBuilder.Services;
             var options = new DryvDynamicControllerOptions();
 
             setupAction?.Invoke(options);
@@ -43,9 +44,9 @@ namespace Dryv.AspNetCore
             services.AddSingleton<IActionDescriptorChangeProvider>(actionDescriptorChangeProvider);
             services.AddSingleton(actionDescriptorChangeProvider);
 
-            SetupEndpointMApping(services);
+            SetupEndpointMapping(services);
 
-            return mvcBuilder;
+            return dryvBuilder;
         }
 
         private static void DefaultEndpointMapping(IEndpointRouteBuilder builder, Type type, MethodInfo method)
@@ -59,7 +60,7 @@ namespace Dryv.AspNetCore
             return $"validation/{controller.Replace("Controller", string.Empty)}/{action}";
         }
 
-        private static void SetupEndpointMApping(IServiceCollection serviceCollection)
+        private static void SetupEndpointMapping(IServiceCollection serviceCollection)
         {
             var serviceProvider = serviceCollection.BuildServiceProvider();
             var mvcOptions = serviceProvider.GetService<IOptions<MvcOptions>>().Value;

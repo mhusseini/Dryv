@@ -5,9 +5,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Dryv.AspNetCore.Internal
 {
-    internal class DryvBuilder : IDryvBuilder
+    internal class DryvMvcBuilder : IDryvMvcBuilder
     {
-        public DryvBuilder(IServiceCollection services)
+        public DryvMvcBuilder(IServiceCollection services)
         {
             this.Services = services;
         }
