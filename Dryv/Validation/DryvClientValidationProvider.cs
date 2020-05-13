@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Dryv.Cache;
 using Dryv.Configuration;
 using Dryv.RuleDetection;
 using Dryv.Translation;
@@ -11,7 +10,7 @@ namespace Dryv.Validation
 {
     public class DryvClientValidationProvider : IDryvClientValidationProvider
     {
-        private readonly DryvRulesFinder rulesFinder = new DryvRulesFinder(new InMemoryCache());
+        private readonly DryvRulesFinder rulesFinder = new DryvRulesFinder();
 
         public DryvClientValidationItem GetClientPropertyValidation(
             Type modelType,

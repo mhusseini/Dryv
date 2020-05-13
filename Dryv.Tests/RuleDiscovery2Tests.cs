@@ -1,6 +1,4 @@
 using System.Linq;
-using Dryv.Cache;
-using Dryv.Internal;
 using Dryv.RuleDetection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -9,7 +7,7 @@ namespace Dryv.Tests
     [TestClass]
     public class RuleDiscovery2Tests
     {
-        private DryvRulesFinder sut = new DryvRulesFinder(new InMemoryCache());
+        private DryvRulesFinder sut = new DryvRulesFinder();
 
         private interface IModel
         {

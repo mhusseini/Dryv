@@ -1,7 +1,6 @@
 ﻿using System;
 using Dryv.AspNetCore.DynamicControllers;
 using Dryv.AspNetCore.Internal;
-using Dryv.Cache;
 using Dryv.Compilation;
 using Dryv.Configuration;
 using Dryv.RuleDetection;
@@ -39,7 +38,6 @@ namespace Dryv.AspNetCore
             services.TryAddSingleton<IDryvClientValidationProvider, DryvClientValidationProvider>();
             services.TryAddSingleton<IDryvScriptBlockGenerator, DryvScriptBlockGenerator>();
             services.TryAddSingleton<ITranslator, JavaScriptTranslator>();
-            services.TryAddSingleton<ICache, InMemoryCache>();
             services.TryAddSingleton<DryvRulesFinder>();
             services.TryAddSingleton<DryvValidator>();
             services.TryAddSingleton<DryvServerRuleEvaluator>();

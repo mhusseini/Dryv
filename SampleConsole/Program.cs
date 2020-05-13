@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Dryv.Cache;
 using Dryv.Compilation;
 using Dryv.Configuration;
 using Dryv.RuleDetection;
@@ -20,7 +19,7 @@ namespace Dryv.SampleConsole
                 BillingAddress = new Address { Deactivated = true },
             };
 
-            var validator = new DryvValidator(new DryvRulesFinder(new InMemoryCache()), new DryvServerRuleEvaluator());
+            var validator = new DryvValidator(new DryvRulesFinder(), new DryvServerRuleEvaluator());
             var errors = validator.Validate(model, new DryvOptions{BreakOnFirstValidationError = false}, Activator.CreateInstance);
 
             foreach (var error in from e in errors
