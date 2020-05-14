@@ -58,7 +58,6 @@ namespace Dryv.SampleVue
                 .AddMvc(options =>
                 {
                     options.EnableEndpointRouting = true;
-                    options.Filters.Add<TestFilterAttribute>();
                 })
                 .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)))
                 .AddDryv(options => options.UseClientValidator<DryvAsyncAwaitClientValidationProvider>())
