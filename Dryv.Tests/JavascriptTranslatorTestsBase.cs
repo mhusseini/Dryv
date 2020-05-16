@@ -49,7 +49,7 @@ namespace Dryv.Tests
 
             var args = new object[] { "" }.Union(validationOptions).ToArray();
             var translator = CreateTranslator(translators);
-            var translation = translator.Translate(expression, (System.Linq.Expressions.MemberExpression)null).Factory(args);
+            var translation = translator.Translate(expression, (System.Linq.Expressions.MemberExpression)null).Factory(null, args);
             return translation;
         }
 

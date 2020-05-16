@@ -1,9 +1,10 @@
 ﻿using System.Linq;
 using System.Reflection;
+using Dryv.Extensions;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
-namespace Dryv.Extensions
+namespace Dryv.AspNetCore.Extensions
 {
     internal static class ModelPathExtensions
     {

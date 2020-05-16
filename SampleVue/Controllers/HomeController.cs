@@ -1,14 +1,28 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Dryv.Extensions;
+using Dryv.Internal;
+using Dryv.SampleVue.CustomValidation;
 using Dryv.SampleVue.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dryv.SampleVue.Controllers
 {
-    [Route("/")]
+    [Authorize]
+    public class TestController : Controller
+    {
+        [HttpPost]
+        public Task<DryvResultMessage> Run(Address model)
+        {
+            return Task.FromResult(DryvResultMessage.Success);
+        }
+    }
+
     public class HomeController : Controller
     {
-        [HttpGet]
         public IActionResult Index()
         {
             return this.View();

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
-using Dryv.Reflection;
 
 namespace Dryv.Translation
 {
@@ -20,7 +19,7 @@ namespace Dryv.Translation
         public virtual TranslationResult Translate(Expression expression, MemberExpression propertyExpression)
         {
             var result = this.GenerateJavaScriptCode(expression, propertyExpression);
-            return this.translationCompiler.GenerateTranslationDelegate(result.Code, result.OptionDelegates, result.OptionTypes);
+            return this.translationCompiler.GenerateTranslationDelegate(result.Code, result.OptionDelegates, result.OptionTypes, result.ClientCodeModifiers);
         }
 
         public virtual void Translate(Expression expression, TranslationContext context, bool negated = false)
@@ -145,57 +144,48 @@ namespace Dryv.Translation
             return type.GetTypeInfo().IsValueType ? Activator.CreateInstance(type) : null;
         }
 
-        private static List<Type> GetOptionTypes(Expression expression)
-        {
-            var lambda = (LambdaExpression)expression;
-            var genericArguments = lambda.Type.GetGenericArguments();
-            return genericArguments
-                .Skip(1)
-                .Take(genericArguments.Count - 2)
-                .ToList();
-        }
-
         private GeneratedJavaScriptCode GenerateJavaScriptCode(
             Expression expression,
             MemberExpression propertyExpression)
         {
             // Find all option types used in the validation expression.
-            var optionTypes = GetOptionTypes(expression);
+            var optionTypes = ((LambdaExpression)expression).GetOptionTypes();
             // Collect delegates that use options from withing the validation expression.
             var optionDelegates = new Dictionary<int, OptionDelegate>();
             var sb = new StringBuilder();
 
-            using (var writer = new IndentingStringWriter(sb))
+            using var writer = new IndentingStringWriter(sb);
+            var context = new TranslationContext
             {
-                var context = new TranslationContext
-                {
-                    OptionsTypes = optionTypes,
-                    Writer = writer,
-                    OptionDelegates = optionDelegates,
-                    ModelType = propertyExpression?.Expression.GetExpressionType(),
-                    PropertyExpression = propertyExpression?.Expression
-                };
+                OptionsTypes = optionTypes,
+                Writer = writer,
+                OptionDelegates = optionDelegates,
+                ModelType = propertyExpression?.Expression.GetExpressionType(),
+                PropertyExpression = propertyExpression?.Expression
+            };
 
-                this.Translate(expression, context);
-            }
+            this.Translate(expression, context);
 
             return new GeneratedJavaScriptCode
             (
                 sb.ToString(),
                 optionTypes,
-                optionDelegates.Values.ToList()
+                context.OptionDelegates.Values.ToList(),
+                context.ClientCodeModifiers
             );
         }
 
         private struct GeneratedJavaScriptCode
         {
-            public GeneratedJavaScriptCode(string code, IList<Type> optionTypes, IList<OptionDelegate> optionDelegates)
+            public GeneratedJavaScriptCode(string code, IList<Type> optionTypes, IList<OptionDelegate> optionDelegates, List<Type> clientCodeModifiers)
             {
                 this.Code = code;
                 this.OptionTypes = optionTypes;
                 this.OptionDelegates = optionDelegates;
+                this.ClientCodeModifiers = clientCodeModifiers;
             }
 
+            public List<Type> ClientCodeModifiers { get; }
             public string Code { get; }
             public IList<OptionDelegate> OptionDelegates { get; }
             public IList<Type> OptionTypes { get; }

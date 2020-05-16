@@ -8,7 +8,7 @@ namespace Dryv.Rules
         {
             throw new InvalidOperationException("This method is not intended to be called.");
         }
-        public static TResult Eaw<TResult>(string script)
+        public static TResult Raw<TResult>(string script)
         {
             throw new InvalidOperationException("This method is not intended to be called.");
         }

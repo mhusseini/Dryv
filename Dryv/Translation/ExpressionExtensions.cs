@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -64,6 +65,15 @@ namespace Dryv.Translation
                 default:
                     return typeof(object);
             }
+        }
+
+        public static List<Type> GetOptionTypes(this LambdaExpression expression)
+        {
+            var genericArguments = expression.Type.GetGenericArguments();
+            return genericArguments
+                .Skip(1)
+                .Take(genericArguments.Count - 2)
+                .ToList();
         }
 
         public static T GetOuterExpression<T>(this Expression expression)

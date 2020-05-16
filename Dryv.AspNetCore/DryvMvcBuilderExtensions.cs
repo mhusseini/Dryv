@@ -1,8 +1,8 @@
 ﻿using System;
-using Dryv.Cache;
+using Dryv.AspNetCore.DynamicControllers;
+using Dryv.AspNetCore.Internal;
 using Dryv.Compilation;
 using Dryv.Configuration;
-using Dryv.Internal;
 using Dryv.RuleDetection;
 using Dryv.Translation;
 using Dryv.Translation.Translators;
@@ -11,11 +11,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
-namespace Dryv
+namespace Dryv.AspNetCore
 {
     public static class DryvMvcBuilderExtensions
     {
-        public static IDryvBuilder AddDryv(this IMvcBuilder mvcBuilder, Action<DryvOptions> setupAction = null)
+        public static IDryvMvcBuilder AddDryv(this IMvcBuilder mvcBuilder, Action<DryvOptions> setupAction = null)
         {
             var options = new DryvOptions();
             setupAction?.Invoke(options);
@@ -31,25 +31,28 @@ namespace Dryv
             return RegsterServices(mvcBuilder.Services, options);
         }
 
-        private static IDryvBuilder RegsterServices(this IServiceCollection services, DryvOptions options)
+        private static IDryvMvcBuilder RegsterServices(this IServiceCollection services, DryvOptions options)
         {
-            services.TryAddSingleton(typeof(IDryvClientValidationProvider), options.ClientValidatorType ?? typeof(DryvClientValidationProvider));
-            services.TryAddSingleton(typeof(IDryvScriptBlockGenerator), options.ClientBodyGeneratorType ?? typeof(DryvScriptBlockGenerator));
-            services.AddSingleton<ITranslator, JavaScriptTranslator>();
-            services.AddSingleton<ICache, InMemoryCache>();
-            services.AddSingleton<DryvRulesFinder>();
-            services.AddSingleton<DryvValidator>();
-            services.AddSingleton<DryvServerRuleEvaluator>();
-            services.AddSingleton<ITranslatorProvider, TranslatorProvider>();
+            services.TryAddSingleton<DryvClientValidationLoader>();
+            services.TryAddSingleton<DryvEndpointRouteBuilderProvider>();
+            services.TryAddSingleton(typeof(IDryvClientValidationFunctionWriter), options.ClientFunctionWriterType);
+            services.TryAddSingleton<ITranslator, JavaScriptTranslator>();
+            services.TryAddSingleton<DryvRulesFinder>();
+            services.TryAddSingleton<DryvValidator>();
+            services.TryAddSingleton<DryvServerRuleEvaluator>();
+            services.TryAddSingleton<ITranslatorProvider, TranslatorProvider>();
             services.AddSingleton(Options.Create(options));
 
-            return new DryvBuilder(services)
-                .AddTranslator<ObjectTranslator>()
-                .AddTranslator<DryvResultTranslator>()
-                .AddTranslator<StringTranslator>()
-                .AddTranslator<EnumerableTranslator>()
-                .AddTranslator<RegexTranslator>()
-                .AddTranslator<CustomCodeTranslator>();
+            var builder = new DryvMvcBuilder(services);
+            builder
+            .AddTranslator<ObjectTranslator>()
+            .AddTranslator<DryvResultTranslator>()
+            .AddTranslator<StringTranslator>()
+            .AddTranslator<EnumerableTranslator>()
+            .AddTranslator<RegexTranslator>()
+            .AddTranslator<CustomCodeTranslator>();
+
+            return builder;
         }
     }
 }

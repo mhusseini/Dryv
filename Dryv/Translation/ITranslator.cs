@@ -8,7 +8,7 @@ namespace Dryv.Translation
     public interface ITranslator
     {
         /// <summary>
-        /// Translates the specified expreeion.
+        /// Translates the specified expression.
         /// </summary>
         TranslationResult Translate(Expression expression, MemberExpression propertyExpression);
 

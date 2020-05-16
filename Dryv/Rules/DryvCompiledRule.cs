@@ -17,7 +17,7 @@ namespace Dryv.Rules
         public Type ModelType { get; internal set; }
         public Type[] PreevaluationOptionTypes { get; internal set; }
         public PropertyInfo Property { get; internal set; }
-        public Func<object[], string> TranslatedValidationExpression { get; internal set; }
+        public Func<Func<Type, object>, object[], string> TranslatedValidationExpression { get; internal set; }
         public Exception TranslationError { get; internal set; }
         internal LambdaExpression EnablingExpression { get; set; }
         internal MemberExpression PropertyExpression { get; set; }

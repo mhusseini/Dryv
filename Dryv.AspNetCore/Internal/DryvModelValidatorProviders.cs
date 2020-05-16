@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
-namespace Dryv.Internal
+namespace Dryv.AspNetCore.Internal
 {
     internal class DryvModelValidatorProvider : IModelValidatorProvider
     {

@@ -1,6 +1,8 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Dryv.AspNetCore;
+using Dryv.Configuration;
 using Dryv.SampleVue.CustomValidation;
-using Dryv.SampleVue.Translation;
-using Dryv.Translation.Translators;
 using Dryv.Validation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -19,7 +21,6 @@ namespace Dryv.SampleVue
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -29,7 +30,6 @@ namespace Dryv.SampleVue
             else
             {
                 app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
@@ -42,22 +42,31 @@ namespace Dryv.SampleVue
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
+                endpoints.MapControllerRoute(
+                    "home",
+                    "/",
+                    new { controller = "Home", action = "Index" });
             });
 
             app.UseDryv();
         }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<ZipCodeValidator>();
             services.AddSingleton<AsyncValidator>();
             services
-                //.AddRazorPages()
-                .AddMvc(options => options.EnableEndpointRouting = true)
-                .AddDryv(options => options.UseClientValidator<DryvAsyncAwaitClientValidationProvider>())
-                .AddTranslator<AsyncValidatorTranslator>();
+                .AddMvc(options =>
+                {
+                    options.EnableEndpointRouting = true;
+                })
+                .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)))
+                .AddDryv(options => options.UseClientFunctionWriter<DryvAsyncClientValidationFunctionWriter>())
+                .AddDryvDynamicControllers(/*options => options.UseControllerCallWriter<DefaultDryvDynamicControllerCallWriter>()*/)
+                .AddDryvPreloading()
+                //.AddTranslator<AsyncValidatorTranslator>()
+                ;
+
+            services.AddRouting();
         }
     }
 }

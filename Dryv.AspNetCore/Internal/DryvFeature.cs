@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Dryv.Validation;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Dryv.Internal
+namespace Dryv.AspNetCore.Internal
 {
     internal sealed class DryvFeature
     {

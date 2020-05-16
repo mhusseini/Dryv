@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Dryv.Cache;
 using Dryv.Extensions;
 using Dryv.Reflection;
 using Dryv.Rules;
@@ -21,21 +21,18 @@ namespace Dryv.RuleDetection
                                                           BindingFlags.NonPublic |
                                                           BindingFlags.FlattenHierarchy;
 
-        private readonly ICache cache;
-
-        public DryvRulesFinder(ICache cache)
-        {
-            this.cache = cache;
-        }
 
         public IDictionary<PropertyInfo, IEnumerable<DryvRuleTreeNode>> FindValidationRules<T>(string modelPath = null)
         {
             return this.GetRulesDeclaredIn(typeof(T), modelPath);
         }
 
+        private static readonly ConcurrentDictionary<string, IDictionary<PropertyInfo, IEnumerable<DryvRuleTreeNode>>> RuleTreeNodeCache = new ConcurrentDictionary<string, IDictionary<PropertyInfo, IEnumerable<DryvRuleTreeNode>>>();
+        private static readonly ConcurrentDictionary<string, IEnumerable<DryvCompiledRule>> CompiledRuleCache = new ConcurrentDictionary<string, IEnumerable<DryvCompiledRule>>();
+
         public IDictionary<PropertyInfo, IEnumerable<DryvRuleTreeNode>> GetRulesDeclaredIn(Type rootModelType, string modelPath = null)
         {
-            return this.cache.GetOrAdd($"{rootModelType.FullName}:{modelPath ?? string.Empty}", () =>
+            return RuleTreeNodeCache.GetOrAdd($"{rootModelType.FullName}:{modelPath ?? string.Empty}", _ =>
               {
                   var type = rootModelType.GetElementType() ?? rootModelType;
                   var types = new List<Type>();
@@ -76,7 +73,7 @@ namespace Dryv.RuleDetection
 
         private IEnumerable<DryvCompiledRule> FindValidationRulesOnType(Type type)
         {
-            return this.cache.GetOrAdd(type.FullName, () =>
+            return CompiledRuleCache.GetOrAdd(type.FullName, _ =>
             {
                 var typeInfo = type.GetTypeInfo();
 

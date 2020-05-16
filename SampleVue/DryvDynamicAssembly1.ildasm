@@ -1,0 +1,150 @@
+
+.assembly extern Microsoft.AspNetCore.Mvc.ViewFeatures
+{
+  .publickeytoken = ( AD B9 79 38 29 DD AE 60 ) // ..y8.?.
+  .ver 3:1:0:1
+}
+
+.assembly extern SampleVue
+{
+  .publickeytoken = (  ) // 
+  .ver 1:0:0:0
+}
+
+.assembly extern System.Private.CoreLib
+{
+  .publickeytoken = ( 7C EC 85 D7 BE A7 79 8E ) // ....y.
+  .ver 4:0:0:0
+}
+
+.assembly extern Dryv
+{
+  .publickeytoken = (  ) // 
+  .ver 3:2:0:0
+}
+
+.assembly extern Microsoft.AspNetCore.Mvc.Core
+{
+  .publickeytoken = ( AD B9 79 38 29 DD AE 60 ) // ..y8.?.
+  .ver 3:1:0:1
+}
+
+.assembly extern System.Runtime
+{
+  .publickeytoken = ( B0 3F 5F 7F 11 D5 0A 3A ) // .._.....
+  .ver 4:2:0:2
+}
+
+.assembly 'DryvDynamicAssembly1'
+{
+  .hash algorithm 0x00008004
+  .ver 0:0:0:0
+}
+
+.module 'DryvDynamicAssembly1.dll'
+// MVID: {8dff9030-9a55-4ad5-b065-d315f2791808}
+.imagebase 0x00400000
+.file alignment 0x00000200
+.stackreserve 0x00100000
+.subsystem 0x0003  // WindowsCui
+.corflags 0x00000001  // ILOnly
+
+.class public auto ansi Dryv.Dynamic.DryvDynamic1Controller extends [Microsoft.AspNetCore.Mvc.ViewFeatures]Microsoft.AspNetCore.Mvc.Controller implements Microsoft.AspNetCore.Mvc.Filters.IActionFilter, Microsoft.AspNetCore.Mvc.Filters.IFilterMetadata, Microsoft.AspNetCore.Mvc.Filters.IAsyncActionFilter, [System.Runtime]System.IDisposable
+{
+  .field private class [SampleVue]Dryv.SampleVue.CustomValidation.AsyncValidator inner
+  .method public specialname rtspecialname instance default void .ctor(class [SampleVue]Dryv.SampleVue.CustomValidation.AsyncValidator ) cil managed
+  {
+    // Method begins at Relative Virtual Address (RVA) 0x2050
+    // Code size 16 (0x10)
+    .maxstack 8
+    IL_0000: ldarg.0
+    IL_0001: call instance void class [Microsoft.AspNetCore.Mvc.ViewFeatures]Microsoft.AspNetCore.Mvc.Controller::.ctor()
+    IL_0006: nop
+    IL_0007: nop
+    IL_0008: ldarg.0
+    IL_0009: ldarg.1
+    IL_000a: stfld class [SampleVue]Dryv.SampleVue.CustomValidation.AsyncValidator Dryv.Dynamic.DryvDynamic1Controller::inner
+    IL_000f: ret
+  } // End of method System.Void Dryv.Dynamic.DryvDynamic1Controller::.ctor(Dryv.SampleVue.CustomValidation.AsyncValidator)
+  .method public instance default [System.Runtime]System.Threading.Tasks.Task`1<Dryv.DryvResultMessage> ValidateZipCode(class Dryv.Dynamic.DryvDynamic1Dto model) cil managed
+  {
+    .custom instance void class [Microsoft.AspNetCore.Mvc.Core]Microsoft.AspNetCore.Mvc.HttpPostAttribute::.ctor() = ( 01 00 00 00 ) // ....
+    .param [1]
+    .custom instance void class [Microsoft.AspNetCore.Mvc.Core]Microsoft.AspNetCore.Mvc.FromBodyAttribute::.ctor() = ( 01 00 00 00 ) // ....
+    // Method begins at Relative Virtual Address (RVA) 0x2061
+    // Code size 25 (0x19)
+    .maxstack 8
+    IL_0000: nop
+    IL_0001: ldarg.0
+    IL_0002: ldfld class [SampleVue]Dryv.SampleVue.CustomValidation.AsyncValidator Dryv.Dynamic.DryvDynamic1Controller::inner
+    IL_0007: ldarg.1
+    IL_0008: callvirt instance string class Dryv.Dynamic.DryvDynamic1Dto::get_zipCode()
+    IL_000d: ldarg.1
+    IL_000e: callvirt instance string class Dryv.Dynamic.DryvDynamic1Dto::get_city()
+    IL_0013: callvirt instance [System.Runtime]System.Threading.Tasks.Task`1<Dryv.DryvResultMessage> class [SampleVue]Dryv.SampleVue.CustomValidation.AsyncValidator::ValidateZipCode(string, string)
+    IL_0018: ret
+  } // End of method System.Threading.Tasks.Task`1<Dryv.DryvResultMessage> Dryv.Dynamic.DryvDynamic1Controller::ValidateZipCode(Dryv.Dynamic.DryvDynamic1Dto)
+} // End of class Dryv.Dynamic.DryvDynamic1Controller
+
+.class public auto ansi Dryv.Dynamic.DryvDynamic1Dto extends [System.Runtime]System.Object
+{
+  .field private string _zipCode
+  .field private string _city
+  .method public specialname rtspecialname instance default void .ctor() cil managed
+  {
+    // Method begins at Relative Virtual Address (RVA) 0x207B
+    // Code size 7 (0x7)
+    .maxstack 8
+    IL_0000: ldarg.0
+    IL_0001: call instance void class [System.Runtime]System.Object::.ctor()
+    IL_0006: ret
+  } // End of method System.Void Dryv.Dynamic.DryvDynamic1Dto::.ctor()
+  .method public hidebysig specialname instance default string get_zipCode() cil managed
+  {
+    // Method begins at Relative Virtual Address (RVA) 0x2083
+    // Code size 7 (0x7)
+    .maxstack 8
+    IL_0000: ldarg.0
+    IL_0001: ldfld string Dryv.Dynamic.DryvDynamic1Dto::_zipCode
+    IL_0006: ret
+  } // End of method System.String Dryv.Dynamic.DryvDynamic1Dto::get_zipCode()
+  .method public hidebysig specialname instance default void set_zipCode(string ) cil managed
+  {
+    // Method begins at Relative Virtual Address (RVA) 0x208B
+    // Code size 8 (0x8)
+    .maxstack 8
+    IL_0000: ldarg.0
+    IL_0001: ldarg.1
+    IL_0002: stfld string Dryv.Dynamic.DryvDynamic1Dto::_zipCode
+    IL_0007: ret
+  } // End of method System.Void Dryv.Dynamic.DryvDynamic1Dto::set_zipCode(System.String)
+  .method public hidebysig specialname instance default string get_city() cil managed
+  {
+    // Method begins at Relative Virtual Address (RVA) 0x2094
+    // Code size 7 (0x7)
+    .maxstack 8
+    IL_0000: ldarg.0
+    IL_0001: ldfld string Dryv.Dynamic.DryvDynamic1Dto::_city
+    IL_0006: ret
+  } // End of method System.String Dryv.Dynamic.DryvDynamic1Dto::get_city()
+  .method public hidebysig specialname instance default void set_city(string ) cil managed
+  {
+    // Method begins at Relative Virtual Address (RVA) 0x209C
+    // Code size 8 (0x8)
+    .maxstack 8
+    IL_0000: ldarg.0
+    IL_0001: ldarg.1
+    IL_0002: stfld string Dryv.Dynamic.DryvDynamic1Dto::_city
+    IL_0007: ret
+  } // End of method System.Void Dryv.Dynamic.DryvDynamic1Dto::set_city(System.String)
+  .property instance string zipCode ()
+  {
+    .get instance default string Dryv.Dynamic.DryvDynamic1Dto::get_zipCode ()
+    .set instance default void Dryv.Dynamic.DryvDynamic1Dto::set_zipCode (string 'value')
+  } // End of property System.String Dryv.Dynamic.DryvDynamic1Dto::zipCode()
+  .property instance string city ()
+  {
+    .get instance default string Dryv.Dynamic.DryvDynamic1Dto::get_city ()
+    .set instance default void Dryv.Dynamic.DryvDynamic1Dto::set_city (string 'value')
+  } // End of property System.String Dryv.Dynamic.DryvDynamic1Dto::city()
+} // End of class Dryv.Dynamic.DryvDynamic1Dto

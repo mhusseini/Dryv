@@ -1,6 +1,5 @@
-﻿@using Dryv
+﻿@using Dryv.AspNetCore
 @using Dryv.Extensions
-@using Dryv.SampleVue.Controllers
 @using Dryv.SampleVue.Models
 
 @model HomeModel
@@ -14,16 +13,18 @@
 <body>
 
     <script>
-    const Dryvue = {
-        async validateAsync(name, data) {
-            const params = Object.keys(data).map(k => `${k}=${encodeURIComponent(data[k])}`);
-            const url = `/Validation/${name}?${params.join('&')}`;
+    if (!window.dryv) {
+        window.dryv = {
+            async validateAsync(baseUrl, method, data) {
+                const isGet = method === 'GET';
+                const url = isGet ? baseUrl + "?" + Object.keys(data).map(k => `${k}=${encodeURIComponent(data[k])}`).join('&') : baseUrl;
+                const response = isGet ? await axios.get(url) : await axios.post(url, data);
 
-            const response = await axios.get(url);
+                return response.data && response.data.text;
+            }
+        };
+    }
 
-            return response.data && response.data.text;
-        }
-    };
     (function(dryv) {
         dryv.validators = {
             @Html.Raw(string.Join(",\n", from val in Html.GetDryvClientPropertyValidations()
@@ -31,7 +32,7 @@
                 let sep = string.IsNullOrWhiteSpace(val.ModelPath) ? string.Empty : "."
                 select $@"""{val.ModelPath}{sep}{field}"": {val.ValidationFunction}"))
         };
-    })(window.dryv || (window.dryv = {}));
+    })(window.dryv);
     </script>
 
     <div id="app">
@@ -144,8 +145,7 @@
                         let errors = 0;
 
                         for (let v of this.formValidators) {
-                            const error = await v.validate();
-                            if (error) {
+                            if (await v.validate()) {
                                 errors++;
                             }
                         }
@@ -157,19 +157,17 @@
                         }
                     }
 
-                    axios
-                        .post(window.location.href, this.$data)
-                        .then(result => {
-                            if (!this.formValidators) {
-                                return;
-                            }
+                    const result = axios.post(window.location.href, this.$data);
 
-                            this.$data.isValid = result.data.success;
+                    if (!this.formValidators) {
+                        return;
+                    }
 
-                            if (!this.$data.isValid) {
-                                this.formValidators.forEach(v => v.setError(result.data.errors));
-                            }
-                        });
+                    this.$data.isValid = result.data.success;
+
+                    if (!this.$data.isValid) {
+                        this.formValidators.forEach(v => v.setError(result.data.errors));
+                    }
                 }
             }
         });
