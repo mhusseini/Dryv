@@ -10,11 +10,11 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
     internal class DryvDynamicControllerTranslator : ICustomTranslator
     {
         private readonly DryvDynamicDelegatingControllerGenerator codeGenerator;
-        private readonly IDryvDynamicControllerCallWriter controllerCallWriter;
+        private readonly IDryvClientServerCallWriter controllerCallWriter;
         private readonly IOptions<DryvDynamicControllerOptions> options;
         private readonly DryvDynamicControllerRegistration controllerRegistration;
 
-        public DryvDynamicControllerTranslator(DryvDynamicControllerRegistration controllerRegistration, DryvDynamicDelegatingControllerGenerator codeGenerator, IDryvDynamicControllerCallWriter controllerCallWriter, IOptions<DryvDynamicControllerOptions> options)
+        public DryvDynamicControllerTranslator(DryvDynamicControllerRegistration controllerRegistration, DryvDynamicDelegatingControllerGenerator codeGenerator, IDryvClientServerCallWriter controllerCallWriter, IOptions<DryvDynamicControllerOptions> options)
         {
             this.controllerRegistration = controllerRegistration;
             this.codeGenerator = codeGenerator;

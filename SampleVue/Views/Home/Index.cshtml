@@ -1,7 +1,5 @@
-﻿@using Dryv
-@using Dryv.AspNetCore
+﻿@using Dryv.AspNetCore
 @using Dryv.Extensions
-@using Dryv.SampleVue.Controllers
 @using Dryv.SampleVue.Models
 
 @model HomeModel
@@ -15,16 +13,18 @@
 <body>
 
     <script>
-    const Dryvue = {
-        async validateAsync(baseUrl, method, data) {
-            const isGet = method === 'GET';
-            const params = Object.keys(data).map(k => `${k}=${encodeURIComponent(data[k])}`);
-            const url = isGet ? `${baseUrl}?${params.join('&')}` : baseUrl;
-            const response = isGet ? await axios.get(url) : await axios.post(url, data);
+    if (!window.dryv) {
+        window.dryv = {
+            async validateAsync(baseUrl, method, data) {
+                const isGet = method === 'GET';
+                const url = isGet ? baseUrl + "?" + Object.keys(data).map(k => `${k}=${encodeURIComponent(data[k])}`).join('&') : baseUrl;
+                const response = isGet ? await axios.get(url) : await axios.post(url, data);
 
-            return response.data && response.data.text;
-        }
-    };
+                return response.data && response.data.text;
+            }
+        };
+    }
+
     (function(dryv) {
         dryv.validators = {
             @Html.Raw(string.Join(",\n", from val in Html.GetDryvClientPropertyValidations()
@@ -32,7 +32,7 @@
                 let sep = string.IsNullOrWhiteSpace(val.ModelPath) ? string.Empty : "."
                 select $@"""{val.ModelPath}{sep}{field}"": {val.ValidationFunction}"))
         };
-    })(window.dryv || (window.dryv = {}));
+    })(window.dryv);
     </script>
 
     <div id="app">

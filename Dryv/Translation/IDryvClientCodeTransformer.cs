@@ -2,7 +2,7 @@
 
 namespace Dryv.Translation
 {
-    public interface IDryvClientCodeModifier
+    public interface IDryvClientCodeTransformer
     {
         string Transform(string code);
     }

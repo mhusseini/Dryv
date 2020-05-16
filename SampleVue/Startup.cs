@@ -60,7 +60,7 @@ namespace Dryv.SampleVue
                     options.EnableEndpointRouting = true;
                 })
                 .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)))
-                .AddDryv(options => options.UseClientValidator<DryvAsyncAwaitClientValidationProvider>())
+                .AddDryv(options => options.UseClientFunctionWriter<DryvAsyncClientValidationFunctionWriter>())
                 .AddDryvDynamicControllers(/*options => options.UseControllerCallWriter<DefaultDryvDynamicControllerCallWriter>()*/)
                 .AddDryvPreloading()
                 //.AddTranslator<AsyncValidatorTranslator>()

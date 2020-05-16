@@ -5,11 +5,11 @@ using Dryv.Translation;
 
 namespace Dryv.AspNetCore.DynamicControllers.Translation
 {
-    internal class DefaultDryvDynamicControllerCallWriter : IDryvDynamicControllerCallWriter
+    internal class DefaultDryvDynamicControllerCallWriter : IDryvClientServerCallWriter
     {
         public void Write(CustomTranslationContext context, string url, string httpMethod, Dictionary<ParameterInfo, Expression> parameters)
         {
-            context.Writer.Write("Dryvue.validateAsync('");
+            context.Writer.Write("dryv.validateAsync('");
             context.Writer.Write(url);
             context.Writer.Write("', '");
             context.Writer.Write(httpMethod);

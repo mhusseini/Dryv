@@ -14,7 +14,7 @@ namespace Dryv.Translation
 
         private static readonly MethodInfo TranslateValueMethod = typeof(Translator).GetMethod(nameof(Translator.TranslateValue));
 
-        private static readonly MethodInfo ModifierTransformMethod = typeof(IDryvClientCodeModifier).GetMethod(nameof(IDryvClientCodeModifier.Transform));
+        private static readonly MethodInfo ModifierTransformMethod = typeof(IDryvClientCodeTransformer).GetMethod(nameof(IDryvClientCodeTransformer.Transform));
 
         private readonly object translator;
 
@@ -50,7 +50,7 @@ namespace Dryv.Translation
                 blockExpressions.AddRange(from clientCodeModifier in clientCodeModifiers
                                           select Expression.Assign(resultVariable,
                                               Expression.Call(
-                                                  Expression.Convert(Expression.Invoke(servicesParameter, Expression.Constant(clientCodeModifier)), typeof(IDryvClientCodeModifier)),
+                                                  Expression.Convert(Expression.Invoke(servicesParameter, Expression.Constant(clientCodeModifier)), typeof(IDryvClientCodeTransformer)),
                                                   ModifierTransformMethod,
                                                   resultVariable)));
             }

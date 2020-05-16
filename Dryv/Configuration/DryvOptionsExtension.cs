@@ -5,14 +5,9 @@ namespace Dryv.Configuration
 {
     public static class DryvOptionsExtension
     {
-        public static void UseClientValidator<T>(this DryvOptions options) where T : IDryvClientValidationProvider
+        public static void UseClientFunctionWriter<T>(this DryvOptions options) where T : IDryvClientValidationFunctionWriter
         {
-            options.ClientValidatorType = typeof(T);
-        }
-
-        public static void UseClientBodyGenerator<T>(this DryvOptions options) where T : IDryvScriptBlockGenerator
-        {
-            options.ClientBodyGeneratorType = typeof(T);
+            options.ClientFunctionWriterType = typeof(T);
         }
     }
 }

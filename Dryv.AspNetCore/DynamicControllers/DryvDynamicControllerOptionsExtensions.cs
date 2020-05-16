@@ -22,7 +22,7 @@ namespace Dryv.AspNetCore.DynamicControllers
         {
             options.DefaultAttributes[typeof(T)] = arguments;
         }
-        public static void UseControllerCallWriter<T>(this DryvDynamicControllerOptions options) where T : IDryvDynamicControllerCallWriter
+        public static void UseControllerCallWriter<T>(this DryvDynamicControllerOptions options) where T : IDryvClientServerCallWriter
         {
             options.DynamicControllerCallWriterType = typeof(T);
         }

@@ -5,6 +5,8 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Dryv.Configuration;
 using Dryv.Extensions;
+using Dryv.RuleDetection;
+using Dryv.Translation;
 using Dryv.Validation;
 using Microsoft.Extensions.Options;
 
@@ -12,15 +14,16 @@ namespace Dryv.AspNetCore
 {
     public class DryvClientValidationLoader
     {
-        private readonly IDryvClientValidationProvider clientValidationProvider;
-        private readonly IOptions<DryvOptions> options;
-        private readonly IServiceProvider serviceProvider;
+        private readonly IDryvClientValidationFunctionWriter clientValidationFunctionWriter;
 
-        public DryvClientValidationLoader(IDryvClientValidationProvider clientValidationProvider, IOptions<DryvOptions> options, IServiceProvider serviceProvider)
+        private readonly DryvRulesFinder rulesFinder = new DryvRulesFinder();
+
+        private readonly DryvRuleTranslator translator;
+
+        public DryvClientValidationLoader(IDryvClientValidationFunctionWriter clientValidationFunctionWriter, IOptions<DryvOptions> options, IServiceProvider serviceProvider)
         {
-            this.clientValidationProvider = clientValidationProvider;
-            this.options = options;
-            this.serviceProvider = serviceProvider;
+            this.clientValidationFunctionWriter = clientValidationFunctionWriter;
+            this.translator = new DryvRuleTranslator(options.Value, serviceProvider.GetService);
         }
 
         public DryvClientValidationItem GetDryvClientValidation<TModel>(Expression<Func<TModel, object>> propertyExpression)
@@ -30,12 +33,12 @@ namespace Dryv.AspNetCore
                 throw new ArgumentException($"The parameter '{nameof(propertyExpression)}' must be a property.");
             }
 
-            return this.clientValidationProvider.GetClientPropertyValidation(typeof(TModel), string.Empty, property, this.serviceProvider.GetService, this.options.Value);
+            return this.GetDryvClientValidation(typeof(TModel), property);
         }
 
         public DryvClientValidationItem GetDryvClientValidation(Type modelType, PropertyInfo property)
         {
-            return this.clientValidationProvider.GetClientPropertyValidation(modelType, string.Empty, property, this.serviceProvider.GetService, this.options.Value);
+            return this.GetClientPropertyValidation(modelType, string.Empty, property);
         }
 
         public IList<DryvClientValidationItem> GetDryvClientValidation<TModel>()
@@ -61,7 +64,7 @@ namespace Dryv.AspNetCore
             var properties = modelType.GetProperties();
 
             var items = from property in properties
-                        let item = this.clientValidationProvider.GetClientPropertyValidation(modelType, modelPath, property, this.serviceProvider.GetService, this.options.Value)
+                        let item = this.GetClientPropertyValidation(modelType, modelPath, property)
                         where item != null
                         select item;
 
@@ -71,12 +74,40 @@ namespace Dryv.AspNetCore
                              let prefix = string.IsNullOrWhiteSpace(modelPath) ? string.Empty : $"{modelPath}."
                              let childPath = $"{prefix}{property.Name.ToCamelCase()}"
                              where !property.PropertyType.IsValueType && !property.PropertyType.HasElementType && property.PropertyType != typeof(string) && !processedTypes.Contains(childPath)
-                             from item in CollectClientValidation(property.PropertyType, rootModelType, childPath, processedTypes)
+                             from item in this.CollectClientValidation(property.PropertyType, rootModelType, childPath, processedTypes)
                              select item;
 
             processedTypes.Pop();
 
             return items.Union(childItems).ToList();
+        }
+
+        private DryvClientValidationItem GetClientPropertyValidation(
+                                    Type modelType,
+            string modelPath,
+            PropertyInfo property)
+        {
+            if (modelPath == null)
+            {
+                modelPath = string.Empty;
+            }
+
+            var rules = from rule in this.rulesFinder.GetRulesForProperty(modelType, property, modelPath)
+                        where rule.Rule.EvaluationLocation.HasFlag(DryvRuleLocation.Client)
+                        select rule;
+
+            var translatedRules = this.translator.Translate(rules, modelPath, modelType);
+            var key = $"v{Math.Abs((modelType.FullName + property.Name + modelPath).GetHashCode())}";
+            var validationFunction = translatedRules.Any() ? this.clientValidationFunctionWriter.GetValidationFunction(translatedRules) : null;
+
+            return string.IsNullOrWhiteSpace(validationFunction) ? null : new DryvClientValidationItem
+            {
+                ValidationFunction = validationFunction,
+                Key = key,
+                ModelType = modelType,
+                Property = property,
+                ModelPath = modelPath,
+            };
         }
     }
 }

@@ -7,21 +7,30 @@ using Dryv.Rules;
 
 namespace Dryv.Translation
 {
-    internal static class DryvRuleTranslator
+    public sealed class DryvRuleTranslator
     {
-        public static IDictionary<DryvRuleTreeNode, string> Translate(IEnumerable<DryvRuleTreeNode> rules, Func<Type, object> objectProvider, DryvOptions options, string modelPath, Type modelType)
+        private readonly DryvOptions options;
+        private readonly Func<Type, object> serviceProvider;
+
+        public DryvRuleTranslator(DryvOptions options, Func<Type, object> serviceProvider)
         {
-            var translator = objectProvider(typeof(ITranslator)) as ITranslator;
+            this.options = options;
+            this.serviceProvider = serviceProvider;
+        }
+
+        public IDictionary<DryvRuleTreeNode, string> Translate(IEnumerable<DryvRuleTreeNode> rules, string modelPath, Type modelType)
+        {
+            var translator = this.serviceProvider(typeof(ITranslator)) as ITranslator;
             return (from r in rules
-                    let rule = Translate(r.Rule, translator, options)
+                    let rule = this.Translate(r.Rule, translator)
                     where rule.TranslationError == null
                     let path = string.IsNullOrWhiteSpace(r.Path) ? r.Path : $".{r.Path}"
-                    let preevaluationOptions = new[] { path }.Union(rule.PreevaluationOptionTypes.Select(objectProvider)).ToArray()
-                    select new { Rule = r, Translation = rule.TranslatedValidationExpression(objectProvider, preevaluationOptions) })
+                    let preevaluationOptions = new[] { path }.Union(rule.PreevaluationOptionTypes.Select(this.serviceProvider)).ToArray()
+                    select new { Rule = r, Translation = rule.TranslatedValidationExpression(this.serviceProvider, preevaluationOptions) })
                 .ToDictionary(x => x.Rule, x => x.Translation);
         }
 
-        private static DryvCompiledRule Translate(DryvCompiledRule rule, ITranslator translator, DryvOptions options)
+        private DryvCompiledRule Translate(DryvCompiledRule rule, ITranslator translator)
         {
             if (rule.TranslatedValidationExpression != null ||
                 rule.TranslationError != null)
@@ -39,7 +48,7 @@ namespace Dryv.Translation
             }
             catch (DryvException ex)
             {
-                switch (options.TranslationErrorBehavior)
+                switch (this.options.TranslationErrorBehavior)
                 {
                     case TranslationErrorBehavior.ValidateOnServer:
                         rule.TranslatedValidationExpression = null;

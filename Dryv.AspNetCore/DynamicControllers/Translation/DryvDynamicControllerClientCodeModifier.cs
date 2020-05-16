@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Routing;
 
 namespace Dryv.AspNetCore.DynamicControllers.Translation
 {
-    internal class DryvDynamicControllerClientCodeModifier : IDryvClientCodeModifier
+    internal class DryvDynamicControllerClientCodeModifier : IDryvClientCodeTransformer
     {
         private static readonly Regex RegexPlaceHolder = new Regex("##route:(.+?)##", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private readonly LinkGenerator linkGenerator;

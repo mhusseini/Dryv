@@ -33,11 +33,11 @@ namespace Dryv.AspNetCore
 
             if (options.DynamicControllerCallWriterType != null)
             {
-                services.TryAddSingleton(typeof(IDryvDynamicControllerCallWriter), options.DynamicControllerCallWriterType);
+                services.TryAddSingleton(typeof(IDryvClientServerCallWriter), options.DynamicControllerCallWriterType);
             }
             else
             {
-                services.TryAddSingleton<IDryvDynamicControllerCallWriter, DefaultDryvDynamicControllerCallWriter>();
+                services.TryAddSingleton<IDryvClientServerCallWriter, DefaultDryvDynamicControllerCallWriter>();
             }
 
             var actionDescriptorChangeProvider = new DryvDynamicActionDescriptorChangeProvider();

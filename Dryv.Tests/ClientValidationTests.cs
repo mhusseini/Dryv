@@ -30,7 +30,7 @@ namespace Dryv.Tests
                 .Setup(p => p.GetService(It.Is<Type>(t => t == typeof(ITranslator))))
                 .Returns(translatorMock.Object);
 
-            var validator = new DryvClientValidationProvider();
+            var validator = new DryvClientValidationFunctionWriter();
             var loader = new DryvClientValidationLoader(validator, Options.Create(new DryvOptions()), serviceProvider.Object);
             var results = loader.GetDryvClientValidation<ParentModel>();
             var l = results.ToList();
