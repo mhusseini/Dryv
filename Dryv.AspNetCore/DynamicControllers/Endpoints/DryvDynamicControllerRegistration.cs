@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.Options;
 
-namespace Dryv.AspNetCore.DynamicControllers
+namespace Dryv.AspNetCore.DynamicControllers.Endpoints
 {
     internal class DryvDynamicControllerRegistration
     {
@@ -22,7 +22,7 @@ namespace Dryv.AspNetCore.DynamicControllers
             this.options = options;
         }
 
-        public void Register(Assembly assembly)
+        public void Register(Assembly assembly, MethodInfo method)
         {
             var assemblyPart = new AssemblyPart(assembly);
             this.partManager.ApplicationParts.Add(assemblyPart);
@@ -33,7 +33,7 @@ namespace Dryv.AspNetCore.DynamicControllers
                                      where typeof(Controller).IsAssignableFrom(t)
                                      select t)
                 {
-                    this.MapEndpoint(type);
+                    this.MapEndpoint(type, method);
                 }
             }
 
@@ -41,12 +41,10 @@ namespace Dryv.AspNetCore.DynamicControllers
             this.actionDescriptorChangeProvider.TokenSource.Cancel();
         }
 
-        private void MapEndpoint(Type controllerTyp)
+        private void MapEndpoint(Type controllerTyp, MethodInfo method)
         {
-            var m = controllerTyp
-                .GetMethods(BindingFlags.Instance | BindingFlags.Public & ~BindingFlags.FlattenHierarchy & ~BindingFlags.GetProperty & ~BindingFlags.SetProperty)
-                .FirstOrDefault(m => (m.Attributes & MethodAttributes.HideBySig) == 0);
-            this.options.Value.MapEndpoint(this.routeBuilderProvider.RouteBuilder, controllerTyp, m);
+            var context = new DryvControllerGenerationContext(controllerTyp, method);
+            this.options.Value.MapEndpoint(context, this.routeBuilderProvider.RouteBuilder);
         }
     }
 }

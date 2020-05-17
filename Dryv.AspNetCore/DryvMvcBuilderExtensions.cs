@@ -1,5 +1,6 @@
 ﻿using System;
 using Dryv.AspNetCore.DynamicControllers;
+using Dryv.AspNetCore.DynamicControllers.Endpoints;
 using Dryv.AspNetCore.Internal;
 using Dryv.Compilation;
 using Dryv.Configuration;

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Primitives;
 
-namespace Dryv.AspNetCore.DynamicControllers
+namespace Dryv.AspNetCore.DynamicControllers.Endpoints
 {
     internal class DryvDynamicActionDescriptorChangeProvider : IActionDescriptorChangeProvider
     {

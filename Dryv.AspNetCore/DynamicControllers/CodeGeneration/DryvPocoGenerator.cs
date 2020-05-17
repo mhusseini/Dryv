@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace Dryv.AspNetCore.DynamicControllers
+namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
 {
     internal class DryvPocoGenerator
     {

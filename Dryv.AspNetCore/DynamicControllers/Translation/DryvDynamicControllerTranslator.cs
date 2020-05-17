@@ -1,6 +1,8 @@
 ﻿using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Dryv.AspNetCore.DynamicControllers.CodeGeneration;
+using Dryv.AspNetCore.DynamicControllers.Endpoints;
 using Dryv.Translation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -9,12 +11,12 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
 {
     internal class DryvDynamicControllerTranslator : ICustomTranslator
     {
-        private readonly DryvDynamicDelegatingControllerGenerator codeGenerator;
+        private readonly ControllerGenerator codeGenerator;
         private readonly IDryvClientServerCallWriter controllerCallWriter;
         private readonly IOptions<DryvDynamicControllerOptions> options;
         private readonly DryvDynamicControllerRegistration controllerRegistration;
 
-        public DryvDynamicControllerTranslator(DryvDynamicControllerRegistration controllerRegistration, DryvDynamicDelegatingControllerGenerator codeGenerator, IDryvClientServerCallWriter controllerCallWriter, IOptions<DryvDynamicControllerOptions> options)
+        public DryvDynamicControllerTranslator(DryvDynamicControllerRegistration controllerRegistration, ControllerGenerator codeGenerator, IDryvClientServerCallWriter controllerCallWriter, IOptions<DryvDynamicControllerOptions> options)
         {
             this.controllerRegistration = controllerRegistration;
             this.codeGenerator = codeGenerator;
@@ -38,9 +40,9 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
             {
                 return false;
             }
-
+            
             var ass = this.codeGenerator.CreateControllerAssembly(methodCallExpression);
-            this.controllerRegistration.Register(ass);
+            this.controllerRegistration.Register(ass, methodCallExpression.Method);
             var c = ass.DefinedTypes.FirstOrDefault(t => typeof(Controller).IsAssignableFrom(t));
 
             var method = methodCallExpression.Method;

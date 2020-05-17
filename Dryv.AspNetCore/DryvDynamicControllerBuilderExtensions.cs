@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
 using Dryv.AspNetCore.DynamicControllers;
+using Dryv.AspNetCore.DynamicControllers.CodeGeneration;
+using Dryv.AspNetCore.DynamicControllers.Endpoints;
 using Dryv.AspNetCore.DynamicControllers.Translation;
 using Dryv.AspNetCore.Internal;
 using Dryv.Translation;
@@ -25,7 +25,7 @@ namespace Dryv.AspNetCore
             setupAction?.Invoke(options);
 
             services.AddSingleton(Options.Create(options));
-            services.AddSingleton<DryvDynamicDelegatingControllerGenerator>();
+            services.AddSingleton<ControllerGenerator>();
             services.AddSingleton<DryvDynamicControllerRegistration>();
             services.AddSingleton<DryvDynamicControllerClientCodeModifier>();
             services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
@@ -49,15 +49,17 @@ namespace Dryv.AspNetCore
             return dryvBuilder;
         }
 
-        private static void DefaultEndpointMapping(IEndpointRouteBuilder builder, Type type, MethodInfo method)
+        private static void DefaultEndpointMapping(DryvControllerGenerationContext context, IEndpointRouteBuilder builder)
         {
-            var controller = type.Name.Replace("Controller", string.Empty);
-            builder.MapControllerRoute(type.FullName, $"validation/{controller}/{method.Name}", new { controller, action = method.Name });
+            builder.MapControllerRoute(
+                context.ControllerFullName,
+                $"validation/{context.Controller}/{context.Action}",
+                new { context.Controller, context.Action });
         }
 
-        private static string DefaultTemplateMapping(string controller, string action, IDictionary<string, Type> arg3)
+        private static string DefaultTemplateMapping(DryvControllerGenerationContext context)
         {
-            return $"validation/{controller.Replace("Controller", string.Empty)}/{action}";
+            return $"validation/{context.Controller}/{context.Action}";
         }
 
         private static void SetupEndpointMapping(IServiceCollection serviceCollection)
@@ -66,23 +68,23 @@ namespace Dryv.AspNetCore
             var mvcOptions = serviceProvider.GetService<IOptions<MvcOptions>>().Value;
             var dynamicControllerOptions = serviceProvider.GetService<IOptions<DryvDynamicControllerOptions>>().Value;
 
-            if (mvcOptions.EnableEndpointRouting && dynamicControllerOptions.MapEndpoint == null && dynamicControllerOptions.MapTemplate != null)
+            if (mvcOptions.EnableEndpointRouting && dynamicControllerOptions.MapEndpoint == null && dynamicControllerOptions.MapRouteTemplate != null)
             {
-                throw new DryvConfigurationException("When MvcOptions.EnableEndpointRouting is true, DryvDynamicControllerOptions.MapTemplate cannot be used. Instead, please specify DryvDynamicControllerOptions.MapEndpoint or leave DryvDynamicControllerOptions.MapTemplate and DryvDynamicControllerOptions.MapEndpoint empty for default values.");
+                throw new DryvConfigurationException("When MvcOptions.EnableEndpointRouting is true, DryvDynamicControllerOptions.MapRouteTemplate cannot be used. Instead, please specify DryvDynamicControllerOptions.MapEndpoint or leave DryvDynamicControllerOptions.MapTemplate and DryvDynamicControllerOptions.MapEndpoint empty for default values.");
             }
 
-            if (!mvcOptions.EnableEndpointRouting && dynamicControllerOptions.MapEndpoint != null && dynamicControllerOptions.MapTemplate == null)
+            if (!mvcOptions.EnableEndpointRouting && dynamicControllerOptions.MapEndpoint != null && dynamicControllerOptions.MapRouteTemplate == null)
             {
-                throw new DryvConfigurationException("When MvcOptions.EnableEndpointRouting is false, DryvDynamicControllerOptions.MapEndpoint cannot be used. Instead, please specify DryvDynamicControllerOptions.MapTemplate or leave DryvDynamicControllerOptions.MapTemplate and DryvDynamicControllerOptions.MapEndpoint empty for default values.");
+                throw new DryvConfigurationException("When MvcOptions.EnableEndpointRouting is false, DryvDynamicControllerOptions.MapEndpoint cannot be used. Instead, please specify DryvDynamicControllerOptions.MapRouteTemplate or leave DryvDynamicControllerOptions.MapTemplate and DryvDynamicControllerOptions.MapEndpoint empty for default values.");
             }
 
             if (mvcOptions.EnableEndpointRouting && dynamicControllerOptions.MapEndpoint == null)
             {
                 dynamicControllerOptions.MapEndpoint = DefaultEndpointMapping;
             }
-            else if (!mvcOptions.EnableEndpointRouting && dynamicControllerOptions.MapTemplate == null)
+            else if (!mvcOptions.EnableEndpointRouting && dynamicControllerOptions.MapRouteTemplate == null)
             {
-                dynamicControllerOptions.MapTemplate = DefaultTemplateMapping;
+                dynamicControllerOptions.MapRouteTemplate = DefaultTemplateMapping;
             }
         }
     }

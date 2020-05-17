@@ -11,16 +11,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Dryv.SampleVue.Controllers
 {
-    [Authorize]
-    public class TestController : Controller
-    {
-        [HttpPost]
-        public Task<DryvResultMessage> Run(Address model)
-        {
-            return Task.FromResult(DryvResultMessage.Success);
-        }
-    }
-
     public class HomeController : Controller
     {
         public IActionResult Index()

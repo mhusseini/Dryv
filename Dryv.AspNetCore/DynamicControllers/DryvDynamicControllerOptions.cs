@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
+using System.Linq.Expressions;
 using Microsoft.AspNetCore.Routing;
 
 namespace Dryv.AspNetCore.DynamicControllers
@@ -9,10 +9,8 @@ namespace Dryv.AspNetCore.DynamicControllers
     {
         public Type DynamicControllerCallWriterType { get; set; }
         public DryvDynamicControllerMethods HttpMethod { get; set; } = DryvDynamicControllerMethods.Post;
-        internal Func<string, string, IDictionary<string, Type>, bool> AntiForgeryToken { get; set; }
-        internal Func<string, string, IDictionary<string, Type>, bool> Authorize { get; set; }
-        internal Dictionary<Type, object[]> DefaultAttributes { get; } = new Dictionary<Type, object[]>();
-        internal Action<IEndpointRouteBuilder, Type, MethodInfo> MapEndpoint { get; set; }
-        internal Func<string, string, IDictionary<string, Type>, string> MapTemplate { get; set; }
+        internal Action<DryvControllerGenerationContext, IEndpointRouteBuilder> MapEndpoint { get; set; }
+        internal Func<DryvControllerGenerationContext, IEnumerable<Expression<Func<Attribute>>>> MapFilters { get; set; }
+        internal Func<DryvControllerGenerationContext, string> MapRouteTemplate { get; set; }
     }
 }
