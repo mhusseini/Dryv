@@ -22,6 +22,29 @@ namespace Dryv.Rules
             this.PropertyRules.Add(ruleDefinition);
         }
 
+        private void Disable<TProperty>(
+            Expression<Func<TModel, TProperty>> property,
+            LambdaExpression rule,
+            LambdaExpression enabled,
+            DryvRuleLocation ruleLocation)
+        {
+            var ruleDefinition = DryvCompiledRule.Create(property, rule, enabled, ruleLocation, null);
+            ruleDefinition.IsDisablingRule = true;
+
+            this.DisablingRules.Add(ruleDefinition);
+        }
+
+        private void Disable<TProperty>(
+            LambdaExpression rule,
+            IEnumerable<Expression<Func<TModel, TProperty>>> properties,
+            LambdaExpression ruleSwitch)
+        {
+            foreach (var property in properties)
+            {
+                this.Disable(property, rule, ruleSwitch, DryvRuleLocation.Server | DryvRuleLocation.Client);
+            }
+        }
+
         private void Add<TProperty>(
             string groupName,
             LambdaExpression rule,

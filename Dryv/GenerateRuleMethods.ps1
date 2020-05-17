@@ -32,6 +32,28 @@ function WriteMethod($propCount, $optionCount, $methodPrefix)
 		$ruleSwitchArgument = "null";
 	}
 
+	if(-Not($methodPrefix)){
+		@"
+		public DryvRules<TModel> DisableRules$gen(
+$parameters			Expression<Func<TModel, $($gen2)bool>> rule$ruleSwitch)
+        {
+			this.Disable(rule,
+				new[] { $properties},
+				$ruleSwitchArgument);
+			return this;
+        }
+		
+		public DryvRules<TModel> DisableRules$gen(
+$parameters			Expression<Func<TModel, $($gen2)Task<bool>>> rule$ruleSwitch)
+        {
+			this.Disable(rule,
+				new[] { $properties},
+				$ruleSwitchArgument);
+			return this;
+        }
+"@ | Add-Content $fn
+	}
+
 	@"
 		public DryvRules<TModel> $($methodPrefix)Rule$gen(
 $parameters			Expression<Func<TModel, $($gen2)DryvResultMessage>> rule$ruleSwitch)

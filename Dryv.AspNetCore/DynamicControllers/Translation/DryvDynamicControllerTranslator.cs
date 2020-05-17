@@ -48,6 +48,19 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
                 return false;
             }
 
+            if (typeof(Task).IsAssignableFrom(methodCallExpression.Method.DeclaringType))
+            {
+                if (methodCallExpression.Method.Name == nameof(Task.FromResult))
+                {
+                    context.Translator.Translate(methodCallExpression.Arguments.First(), context);
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
             var controller = this.GenerateController(methodCallExpression);
 
             var method = methodCallExpression.Method;
@@ -55,7 +68,6 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
             var parameters = methodCallExpression.Arguments
                 .Select((e, i) => (e, i))
                 .ToDictionary(x => methodParameters[x.i], x => x.e);
-            var route = controller.FullName;
 
             var url = this.linkGenerator.GetPathByRouteValues(controller.Name, null);
             var httpMethod = this.options.Value.HttpMethod.ToString().ToUpper();

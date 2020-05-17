@@ -6,6 +6,7 @@ namespace Dryv
     public abstract class DryvRules
     {
         internal List<DryvCompiledRule> PropertyRules { get; } = new List<DryvCompiledRule>();
+        internal List<DryvCompiledRule> DisablingRules { get; } = new List<DryvCompiledRule>();
 
         public static DryvRules<TModel> For<TModel>() => new DryvRules<TModel>();
     }

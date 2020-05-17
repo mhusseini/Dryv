@@ -67,7 +67,7 @@ namespace Dryv.SampleVue
                 .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)))
                 .AddDryv(options => options.UseClientFunctionWriter<DryvAsyncClientValidationFunctionWriter>())
                 .AddDryvDynamicControllers()
-                .AddDryvPreloading()
+                //.AddDryvPreloading()
                 //.AddTranslator<AsyncValidatorTranslator>()
                 ;
 

@@ -27,9 +27,17 @@
         (function(dryv) {
             dryv.validators = {
                 @Html.Raw(string.Join(",\n", from val in Html.GetDryvClientPropertyValidations()
-                    let field = val.Property.Name.ToCamelCase()
-                    let sep = string.IsNullOrWhiteSpace(val.ModelPath) ? string.Empty : "."
-                    select $@"""{val.ModelPath}{sep}{field}"": {val.ValidationFunction}"))
+                                                         where !string.IsNullOrWhiteSpace(val.ValidationFunction)
+                                                        let field = val.Property.Name.ToCamelCase()
+                                                        let sep = string.IsNullOrWhiteSpace(val.ModelPath) ? string.Empty : "."
+                                                        select $@"""{val.ModelPath}{sep}{field}"": {val.ValidationFunction}"))
+            };
+            dryv.disablers = {
+                @Html.Raw(string.Join(",\n", from val in Html.GetDryvClientPropertyValidations()
+                                                         where !string.IsNullOrWhiteSpace(val.DisablingFunction)
+                                                         let field = val.Property.Name.ToCamelCase()
+                                                         let sep = string.IsNullOrWhiteSpace(val.ModelPath) ? string.Empty : "."
+                                                         select $@"""{val.ModelPath}{sep}{field}"": {val.DisablingFunction}"))
             };
         })(window.dryv);
     </script>
@@ -57,10 +65,10 @@
 
                     <div class="form-item">
                         <label for="billingAddress-deactivate">Billing address equals shipping address.</label>
-                        <input id="billingAddress-deactivate" type="checkbox" v-model="billingAddress.deactivated">
+                        <input id="billingAddress-deactivate" type="checkbox" v-model="billingEqualsShipping">
                     </div>
 
-                    <div v-show="!billingAddress.deactivated">
+                    <div v-show="!billingEqualsShipping">
                         <form-input name="billingAddress.zipCode" label="ZIP code" v-model="billingAddress.zipCode"></form-input>
                         <form-input name="billingAddress.city" label="City" v-model="billingAddress.city"></form-input>
                     </div>
@@ -111,9 +119,12 @@
                     if (!validator) return;
 
                     const formValidators = this.$parent.formValidators || (this.$parent.formValidators = []);
+                    const name = this.name;
                     formValidators.push({
-                        validate: async () => (this.error = await validator(this.$parent)),
-                        setError: errors => this.error = errors[this.name]
+                        validate: async (disabledFields) =>
+                            this.error = (!disabledFields || disabledFields.filter(f => name.indexOf(f + ".") >= 0).length === 0) &&
+                            await validator(this.$parent),
+                        setError: errors => this.error = errors[name]
                     });
                 }
             });
@@ -122,6 +133,7 @@
             el: '#app',
             data: {
                 isValid: null,
+                billingEqualsShipping: true,
                 person: {
                     firstName: null,
                     lastName: null
@@ -132,19 +144,28 @@
                 },
                 billingAddress: {
                     zipCode: null,
-                    city: null,
-                    deactivated: true
+                    city: null
                 }
             },
             methods: {
                 async validateForm(e) {
                     e.preventDefault();
+                    const disablers = dryv.disablers;
+                    const disabledFields = [];
+                    if (dryv.disablers) {
+                        for (let field of Object.keys(disablers)) {
+                            const disabler = disablers[field];
+                            if (disabler && await disabler(this.$data)) {
+                                disabledFields.push(field);
+                            }
+                        }
+                    }
 
                     if (this.formValidators) {
                         let errors = 0;
 
                         for (let v of this.formValidators) {
-                            if (await v.validate()) {
+                            if (await v.validate(disabledFields)) {
                                 errors++;
                             }
                         }

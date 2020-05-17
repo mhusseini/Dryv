@@ -24,7 +24,8 @@ namespace Dryv.Translation
             return (from r in rules
                     let rule = this.Translate(r.Rule, translator)
                     where rule.TranslationError == null
-                    let path = string.IsNullOrWhiteSpace(r.Path) ? r.Path : $".{r.Path}"
+                    let p1 = string.IsNullOrWhiteSpace(r.Path) ? r.Path : $".{r.Path}"
+                    let path = rule.IsDisablingRule && p1.Contains(".") ? p1.Substring(0, p1.LastIndexOf(".", StringComparison.Ordinal)) : p1
                     let preevaluationOptions = new[] { path }.Union(rule.PreevaluationOptionTypes.Select(this.serviceProvider)).ToArray()
                     select new { Rule = r, Translation = rule.TranslatedValidationExpression(this.serviceProvider, preevaluationOptions) })
                 .ToDictionary(x => x.Rule, x => x.Translation);

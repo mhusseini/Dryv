@@ -8,6 +8,7 @@ namespace Dryv.Rules
 {
     public sealed class DryvCompiledRule
     {
+        public bool IsDisablingRule { get; internal set; }   
         public string CodeTemplate { get; internal set; }
         public Func<object[], bool> CompiledEnablingExpression { get; internal set; }
         public Func<object, object[], object> CompiledValidationExpression { get; internal set; }

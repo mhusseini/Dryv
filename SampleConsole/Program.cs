@@ -20,7 +20,7 @@ namespace Dryv.SampleConsole
             };
 
             var validator = new DryvValidator(new DryvRulesFinder(), new DryvServerRuleEvaluator());
-            var errors = validator.Validate(model, new DryvOptions{BreakOnFirstValidationError = false}, Activator.CreateInstance);
+            var errors = validator.Validate(model, new DryvOptions{BreakOnFirstValidationError = false}, Activator.CreateInstance).Result;
 
             foreach (var error in from e in errors
                                   from m in e.Message

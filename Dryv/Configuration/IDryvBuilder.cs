@@ -5,7 +5,7 @@ namespace Dryv.Configuration
     /// <summary>
     /// An interface for configuring Dryv services.
     /// </summary>
-    public interface IDryvBuilder
+    public interface IDryvBuilder<out TBuilder> where TBuilder : IDryvBuilder<TBuilder>
     {
         /// <summary>
         /// Registers a translator type.
@@ -13,7 +13,7 @@ namespace Dryv.Configuration
         /// <typeparam name="T">The type of the translator to register.</typeparam>
         /// <returns>The registered translator may implement <see cref="IMethodCallTranslator"/> 
         /// or <see cref="ICustomTranslator"/>.</returns>
-        IDryvBuilder AddTranslator<T>();
+        TBuilder AddTranslator<T>();
 
         /// <summary>
         /// Registers a translator object.
@@ -21,6 +21,6 @@ namespace Dryv.Configuration
         /// <param name="translator">The type of the translator to register.</param>
         /// <returns>The registered translator may implement <see cref="IMethodCallTranslator"/> 
         /// or <see cref="ICustomTranslator"/>.</returns>
-        IDryvBuilder AddTranslator(object translator);
+        TBuilder AddTranslator(object translator);
     }
 }

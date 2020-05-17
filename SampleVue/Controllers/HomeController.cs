@@ -19,7 +19,7 @@ namespace Dryv.SampleVue.Controllers
         }
 
         [HttpPost]
-        public IActionResult Post([FromBody]HomeModel _)
+        public IActionResult Index([FromBody]HomeModel _)
         {
             return this.ModelState.IsValid
                 ? this.Json(new { success = true })

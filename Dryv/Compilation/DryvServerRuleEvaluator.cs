@@ -41,6 +41,43 @@ namespace Dryv.Compilation
             }
         }
 
+
+        public Task<bool> IsDisabledAsync(DryvCompiledRule rule, object model, Func<Type, object> objectFactory)
+        {
+            Compile(rule);
+
+            var options = GetPreevaluationOptions(rule, objectFactory);
+            var result = rule.CompiledValidationExpression(model, options);
+
+            switch (result)
+            {
+                case bool dryvResult: return Task.FromResult(dryvResult);
+                case Task<bool> task: return task;
+                default: throw new InvalidOperationException($"Compiled disabling expression for property {rule.Property.DeclaringType.FullName}.{rule.Property.Name} should return '{result.GetType().FullName}'. Only bool and Task<bool> are allowed.");
+            }
+        }
+
+        public bool IsDisabled(DryvCompiledRule rule, object model, Func<Type, object> objectFactory)
+        {
+            if (rule.ValidationExpression.ReturnType != typeof(bool))
+            {
+                return false;
+            }
+
+            Compile(rule);
+
+            var options = GetPreevaluationOptions(rule, objectFactory);
+
+            try
+            {
+                return (bool)rule.CompiledValidationExpression(model, options);
+            }
+            catch (Exception ex)
+            {
+                throw new DryvValidationExecutionException(rule, ex);
+            }
+        }
+
         public Task<DryvResultMessage> ValidateAsync(DryvCompiledRule rule, object model, Func<Type, object> objectFactory)
         {
             Compile(rule);
@@ -117,7 +154,9 @@ namespace Dryv.Compilation
             AddOptionParameters(invokeArguments, lambdaExpression, optionsParameter, 1);
 
             var invokeExpression = Expression.Invoke(lambdaExpression, invokeArguments);
-            var resultLambda = Expression.Lambda<Func<object, object[], object>>(invokeExpression, modelParameter, optionsParameter);
+            var resultLambda = rule.IsDisablingRule
+                ? Expression.Lambda<Func<object, object[], object>>(Expression.Convert(invokeExpression, typeof(object)), modelParameter, optionsParameter)
+                : Expression.Lambda<Func<object, object[], object>>(invokeExpression, modelParameter, optionsParameter);
 
             return resultLambda.Compile();
         }
