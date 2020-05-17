@@ -27,17 +27,17 @@
         (function(dryv) {
             dryv.validators = {
                 @Html.Raw(string.Join(",\n", from val in Html.GetDryvClientPropertyValidations()
-                                                         where !string.IsNullOrWhiteSpace(val.ValidationFunction)
-                                                        let field = val.Property.Name.ToCamelCase()
-                                                        let sep = string.IsNullOrWhiteSpace(val.ModelPath) ? string.Empty : "."
-                                                        select $@"""{val.ModelPath}{sep}{field}"": {val.ValidationFunction}"))
+                                                      where !string.IsNullOrWhiteSpace(val.ValidationFunction)
+                                                      let field = val.Property.Name.ToCamelCase()
+                                                      let sep = string.IsNullOrWhiteSpace(val.ModelPath) ? string.Empty : "."
+                                                      select $@"""{val.ModelPath}{sep}{field}"": {val.ValidationFunction}"))
             };
             dryv.disablers = {
                 @Html.Raw(string.Join(",\n", from val in Html.GetDryvClientPropertyValidations()
-                                                         where !string.IsNullOrWhiteSpace(val.DisablingFunction)
-                                                         let field = val.Property.Name.ToCamelCase()
-                                                         let sep = string.IsNullOrWhiteSpace(val.ModelPath) ? string.Empty : "."
-                                                         select $@"""{val.ModelPath}{sep}{field}"": {val.DisablingFunction}"))
+                                                      where !string.IsNullOrWhiteSpace(val.DisablingFunction)
+                                                      let field = val.Property.Name.ToCamelCase()
+                                                      let sep = string.IsNullOrWhiteSpace(val.ModelPath) ? string.Empty : "."
+                                                      select $@"""{val.ModelPath}{sep}{field}"": {val.DisablingFunction}"))
             };
         })(window.dryv);
     </script>
@@ -122,7 +122,7 @@
                     const name = this.name;
                     formValidators.push({
                         validate: async (disabledFields) =>
-                            this.error = (!disabledFields || disabledFields.filter(f => name.indexOf(f + ".") >= 0).length === 0) &&
+                            this.error = (!disabledFields || disabledFields.filter(f => name.indexOf(f) >= 0).length === 0) &&
                             await validator(this.$parent),
                         setError: errors => this.error = errors[name]
                     });
@@ -156,7 +156,7 @@
                         for (let field of Object.keys(disablers)) {
                             const disabler = disablers[field];
                             if (disabler && await disabler(this.$data)) {
-                                disabledFields.push(field);
+                                disabledFields.push(field + ".");
                             }
                         }
                     }
