@@ -13,24 +13,25 @@
 <body>
 
     <script>
-    var dryv = window.dryv || (window.dryv = {});
-    if (!dryv.validateAsync) {
-        dryv.validateAsync = async function(baseUrl, method, data) {
-            const isGet = method === 'GET';
-            const url = isGet ? baseUrl + "?" + Object.keys(data).map(k => `${k}=${encodeURIComponent(data[k])}`).join('&') : baseUrl;
-            const response = isGet ? await axios.get(url) : await axios.post(url, data);
+        var dryv = window.dryv || (window.dryv = {});
+        if (!dryv.validateAsync) {
+            dryv.validateAsync = async function(baseUrl, method, data) {
+                const isGet = method === 'GET';
+                const url = isGet ? baseUrl + "?" + Object.keys(data).map(k => `${k}=${encodeURIComponent(data[k])}`).join('&') : baseUrl;
+                const response = isGet ? await axios.get(url) : await axios.post(url, data);
 
-            return response.data && response.data.text;
-    }
+                return response.data && response.data.text;
+            }
+        }
 
-    (function(dryv) {
-        dryv.validators = {
-            @Html.Raw(string.Join(",\n", from val in Html.GetDryvClientPropertyValidations()
-                let field = val.Property.Name.ToCamelCase()
-                let sep = string.IsNullOrWhiteSpace(val.ModelPath) ? string.Empty : "."
-                select $@"""{val.ModelPath}{sep}{field}"": {val.ValidationFunction}"))
-        };
-    })(window.dryv);
+        (function(dryv) {
+            dryv.validators = {
+                @Html.Raw(string.Join(",\n", from val in Html.GetDryvClientPropertyValidations()
+                    let field = val.Property.Name.ToCamelCase()
+                    let sep = string.IsNullOrWhiteSpace(val.ModelPath) ? string.Empty : "."
+                    select $@"""{val.ModelPath}{sep}{field}"": {val.ValidationFunction}"))
+            };
+        })(window.dryv);
     </script>
 
     <div id="app">

@@ -16,11 +16,18 @@ namespace Dryv.AspNetCore.DynamicControllers
             options.MapEndpoint = mapper;
         }
 
-        public static void MapFilters(this DryvDynamicControllerOptions options, Func<DryvControllerGenerationContext, IEnumerable<Expression<Func<Attribute>>>> filters)
+        public static void MapControllerFilters(this DryvDynamicControllerOptions options, Func<DryvControllerGenerationContext, IEnumerable<Expression<Func<Attribute>>>> filters)
         {
             FilterExpressionValidator.ValidateFilterExpressions(filters);
 
-            options.MapFilters = filters;
+            options.MapControllerFilters = filters;
+        }
+
+        public static void MapActionFilters(this DryvDynamicControllerOptions options, Func<DryvControllerGenerationContext, IEnumerable<Expression<Func<Attribute>>>> filters)
+        {
+            FilterExpressionValidator.ValidateFilterExpressions(filters);
+
+            options.MapActionFilters = filters;
         }
 
         public static void MapRouteTemplate(this DryvDynamicControllerOptions options, Func<DryvControllerGenerationContext, string> template)
@@ -28,7 +35,7 @@ namespace Dryv.AspNetCore.DynamicControllers
             options.MapRouteTemplate = template;
         }
 
-        public static void UseControllerCallWriter<T>(this DryvDynamicControllerOptions options) where T : IDryvClientServerCallWriter
+        public static void UseServerCallWriter<T>(this DryvDynamicControllerOptions options) where T : IDryvClientServerCallWriter
         {
             options.DynamicControllerCallWriterType = typeof(T);
         }

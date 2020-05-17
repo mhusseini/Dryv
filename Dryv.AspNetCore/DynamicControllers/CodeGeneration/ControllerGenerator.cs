@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
@@ -44,7 +45,8 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
                 var moduleBuilder = assemblyBuilder.DefineDynamicModule(assemblyName.Name);
                 var typeBuilder = moduleBuilder.DefineType($"{NameSpace}.{typeNameBase}Controller", TypeAttributes.Class | TypeAttributes.Public, baseType);
 
-                this.AddCustomAttributes(typeBuilder, methodInfo);
+                var context = new DryvControllerGenerationContext(typeBuilder, methodInfo);
+                AddCustomAttributes(context, this.options.Value.MapControllerFilters, typeBuilder.SetCustomAttribute);
 
                 var innerFieldBuilder = innerType == null ? null : typeBuilder.DefineField("inner", innerType, FieldAttributes.Private);
 
@@ -56,17 +58,17 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
                     var pocoGenerator = new DryvPocoGenerator();
                     var dtoType = pocoGenerator.GenerateType(moduleBuilder, NameSpace, $"{typeNameBase}Dto", properties);
 
-                    this.GenerateWrapperMethodPost(methodInfo, typeBuilder, innerFieldBuilder, dtoType);
+                    this.GenerateWrapperMethodPost(methodInfo, typeBuilder, innerFieldBuilder, dtoType, context);
                 }
                 else
                 {
-                    this.GenerateWrapperMethodGet(methodInfo, typeBuilder, innerFieldBuilder);
+                    this.GenerateWrapperMethodGet(methodInfo, typeBuilder, innerFieldBuilder, context);
                 }
 
                 typeBuilder.CreateType();
 
-                var generator = new Lokad.ILPack.AssemblyGenerator();
-                generator.GenerateAssembly(assemblyBuilder, $"{assemblyName}.dll");
+                //var generator = new Lokad.ILPack.AssemblyGenerator();
+                //generator.GenerateAssembly(assemblyBuilder, $"{assemblyName}.dll");
                 //Process.Start(new ProcessStartInfo
                 //{
                 //    UseShellExecute = true,
@@ -77,36 +79,6 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
 
                 return assemblyBuilder;
             });
-        }
-
-        private void AddCustomAttributes(TypeBuilder typeBuilder, MethodInfo methodInfo)
-        {
-            if (this.options.Value.MapFilters == null)
-            {
-                return;
-            }
-
-            var context = new DryvControllerGenerationContext(typeBuilder, methodInfo);
-            var expressions = this.options.Value.MapFilters(context);
-
-            if (expressions == null)
-            {
-                return;
-            }
-
-            foreach (var expression in from expression in expressions
-                                       where expression != null
-                                       select expression)
-            {
-                var (ctor, args, properties, fields, values) = ControllerFilterHelper.GetAttributeBuilderArgs(expression);
-                var attributeBuilder = values == null
-                    ? new CustomAttributeBuilder(ctor, args)
-                    : fields == null
-                    ? new CustomAttributeBuilder(ctor, args, properties, values)
-                    : new CustomAttributeBuilder(ctor, args, fields, values);
-
-                typeBuilder.SetCustomAttribute(attributeBuilder);
-            }
         }
 
         private static CustomAttributeBuilder CreateAttributeBuilder<T>(params object[] args) where T : Attribute
@@ -151,27 +123,59 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
             methodBuilder.SetCustomAttribute(attributeBuilder);
         }
 
-        private void AddRoutingAttribute(MemberInfo methodInfo, MemberInfo typeBuilder, MethodBuilder methodBuilder)
+        private static void AddCustomAttributes(DryvControllerGenerationContext context, Func<DryvControllerGenerationContext, IEnumerable<Expression<Func<Attribute>>>> get, Action<CustomAttributeBuilder> set)
+        {
+            var expressions = get?.Invoke(context);
+
+            if (expressions == null)
+            {
+                return;
+            }
+
+            foreach (var expression in from expression in expressions
+                                       where expression != null
+                                       select expression)
+            {
+                var (ctor, args, properties, fields, values) = ControllerFilterHelper.GetAttributeBuilderArgs(expression);
+                var attributeBuilder = values == null
+                    ? new CustomAttributeBuilder(ctor, args)
+                    : fields == null
+                    ? new CustomAttributeBuilder(ctor, args, properties, values)
+                    : new CustomAttributeBuilder(ctor, args, fields, values);
+
+                set(attributeBuilder);
+            }
+        }
+
+        private void AddRoutingAttribute(MethodBuilder methodBuilder, DryvControllerGenerationContext context)
         {
             if (this.options.Value.MapRouteTemplate == null)
             {
                 return;
             }
 
-            var context = new DryvControllerGenerationContext(typeBuilder, methodInfo);
             var template = this.options.Value.MapRouteTemplate(context);
 
             SetAttribute<RouteAttribute>(methodBuilder, template);
         }
 
-        private void GenerateWrapperMethodGet(MethodInfo methodInfo, TypeBuilder typeBuilder, FieldInfo innerFieldBuilder)
+        private MethodBuilder CreateMethodBuilder(TypeBuilder typeBuilder, MethodInfo methodInfo, Type[] parameterTypes, DryvControllerGenerationContext context)
+        {
+            var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, MethodAttributes.Public, methodInfo.ReturnType, parameterTypes);
+
+            AddCustomAttributes(context, this.options.Value.MapActionFilters, methodBuilder.SetCustomAttribute);
+
+            return methodBuilder;
+        }
+
+        private void GenerateWrapperMethodGet(MethodInfo methodInfo, TypeBuilder typeBuilder, FieldInfo innerFieldBuilder, DryvControllerGenerationContext context)
         {
             var parameters = methodInfo.GetParameters();
             var parameterTypes = parameters.Select(p => p.ParameterType).ToArray();
-            var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, MethodAttributes.Public, methodInfo.ReturnType, parameterTypes);
+            var methodBuilder = this.CreateMethodBuilder(typeBuilder, methodInfo, parameterTypes, context);
 
             SetAttribute<HttpGetAttribute>(methodBuilder);
-            this.AddRoutingAttribute(methodInfo, typeBuilder, methodBuilder);
+            this.AddRoutingAttribute(methodBuilder, context);
 
             var il = methodBuilder.GetILGenerator();
 
@@ -192,15 +196,14 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
             il.Emit(OpCodes.Ret); // Return
         }
 
-        private void GenerateWrapperMethodPost(MethodInfo methodInfo, TypeBuilder typeBuilder, FieldInfo innerFieldBuilder, Type dtoType)
+        private void GenerateWrapperMethodPost(MethodInfo methodInfo, TypeBuilder typeBuilder, FieldInfo innerFieldBuilder, Type dtoType, DryvControllerGenerationContext context)
         {
-            var parameters = methodInfo.GetParameters();
-            var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, MethodAttributes.Public, methodInfo.ReturnType, new Type[] { dtoType });
+            var methodBuilder = this.CreateMethodBuilder(typeBuilder, methodInfo, new[] { dtoType }, context);
             var parameterBuilder = methodBuilder.DefineParameter(1, ParameterAttributes.None, "model");
             parameterBuilder.SetCustomAttribute(CreateAttributeBuilder<FromBodyAttribute>());
 
             SetAttribute<HttpPostAttribute>(methodBuilder);
-            this.AddRoutingAttribute(methodInfo, typeBuilder, methodBuilder);
+            this.AddRoutingAttribute(methodBuilder, context);
 
             var il = methodBuilder.GetILGenerator();
 

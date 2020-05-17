@@ -29,7 +29,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\tmp\ILPack\src\Lokad.ILPack.csproj" />
     <ProjectReference Include="..\Dryv\Dryv.csproj" />
   </ItemGroup>
 

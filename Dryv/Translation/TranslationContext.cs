@@ -12,6 +12,5 @@ namespace Dryv.Translation
         public Expression PropertyExpression { get; set; }
 
         public IndentingStringWriter Writer { get; set; }
-        public List<Type> ClientCodeModifiers { get; set; } = new List<Type>();
     }
 }

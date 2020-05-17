@@ -10,7 +10,8 @@ namespace Dryv.AspNetCore.DynamicControllers
         public Type DynamicControllerCallWriterType { get; set; }
         public DryvDynamicControllerMethods HttpMethod { get; set; } = DryvDynamicControllerMethods.Post;
         internal Action<DryvControllerGenerationContext, IEndpointRouteBuilder> MapEndpoint { get; set; }
-        internal Func<DryvControllerGenerationContext, IEnumerable<Expression<Func<Attribute>>>> MapFilters { get; set; }
+        internal Func<DryvControllerGenerationContext, IEnumerable<Expression<Func<Attribute>>>> MapControllerFilters { get; set; }
+        internal Func<DryvControllerGenerationContext, IEnumerable<Expression<Func<Attribute>>>> MapActionFilters { get; set; }
         internal Func<DryvControllerGenerationContext, string> MapRouteTemplate { get; set; }
     }
 }

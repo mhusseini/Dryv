@@ -66,27 +66,7 @@ namespace Dryv.SampleVue
                 })
                 .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)))
                 .AddDryv(options => options.UseClientFunctionWriter<DryvAsyncClientValidationFunctionWriter>())
-                .AddDryvDynamicControllers(options =>
-                {
-                    var a = new ValidateAntiForgeryTokenAttribute();
-                    options.MapFilters(context => new[]
-                    {
-                        () => new ValidateAntiForgeryTokenAttribute(),
-                        () => new AuthorizeAttribute("myPolicy")
-                        {
-                            Roles = context.Action.Contains("user") ? "administrator" : "everyone"
-                        },
-                        context.Action.Contains("bank")
-                            ? () => new AreaAttribute("banking")
-                            : default(Expression<Func<Attribute>>),
-                    });
-                    // options.UseControllerCallWriter<ControllerCall>()
-                    options.MapRouteTemplate(context => $"validation/{context.Controller}/{context.Action}");
-                    options.MapEndpoint((context, builder) =>
-                    {
-                        builder.MapControllerRoute(context.ControllerFullName, $"validation/{context.Controller}/{context.Action}");
-                    });
-                })
+                .AddDryvDynamicControllers()
                 .AddDryvPreloading()
                 //.AddTranslator<AsyncValidatorTranslator>()
                 ;

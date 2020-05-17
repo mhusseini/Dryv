@@ -27,18 +27,9 @@ namespace Dryv.AspNetCore
             services.AddSingleton(Options.Create(options));
             services.AddSingleton<ControllerGenerator>();
             services.AddSingleton<DryvDynamicControllerRegistration>();
-            services.AddSingleton<DryvDynamicControllerClientCodeModifier>();
-            services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddSingleton<ICustomTranslator, DryvDynamicControllerTranslator>();
-
-            if (options.DynamicControllerCallWriterType != null)
-            {
-                services.TryAddSingleton(typeof(IDryvClientServerCallWriter), options.DynamicControllerCallWriterType);
-            }
-            else
-            {
-                services.TryAddSingleton<IDryvClientServerCallWriter, DefaultDryvDynamicControllerCallWriter>();
-            }
+            services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
+            services.TryAddSingleton(typeof(IDryvClientServerCallWriter), options.DynamicControllerCallWriterType ?? typeof(DryvClientServerCallWriter));
 
             var actionDescriptorChangeProvider = new DryvDynamicActionDescriptorChangeProvider();
             services.AddSingleton<IActionDescriptorChangeProvider>(actionDescriptorChangeProvider);
@@ -54,7 +45,7 @@ namespace Dryv.AspNetCore
             builder.MapControllerRoute(
                 context.ControllerFullName,
                 $"validation/{context.Controller}/{context.Action}",
-                new { context.Controller, context.Action });
+                new { controller = context.Controller, action = context.Action });
         }
 
         private static string DefaultTemplateMapping(DryvControllerGenerationContext context)
