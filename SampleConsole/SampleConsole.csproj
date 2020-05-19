@@ -7,7 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Dryv.AspNetCore\Dryv.AspNetCore.csproj" />
     <ProjectReference Include="..\Dryv\Dryv.csproj" />
+    <ProjectReference Include="..\SampleVue\SampleVue.csproj" />
   </ItemGroup>
 
 </Project>

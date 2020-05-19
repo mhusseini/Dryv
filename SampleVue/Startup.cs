@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 
 namespace Dryv.SampleVue
 {
@@ -59,6 +60,8 @@ namespace Dryv.SampleVue
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<AsyncValidator>();
+            services.AddSingleton(new SampleOptions());
+
             services
                 .AddMvc(options =>
                 {
@@ -66,8 +69,8 @@ namespace Dryv.SampleVue
                 })
                 .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)))
                 .AddDryv(options => options.UseClientFunctionWriter<DryvAsyncClientValidationFunctionWriter>())
-                .AddDryvDynamicControllers()
-                //.AddDryvPreloading()
+                .AddDryvDynamicControllers(options=>options.HttpMethod = DryvDynamicControllerMethods.Get)
+                .AddDryvPreloading()
                 //.AddTranslator<AsyncValidatorTranslator>()
                 ;
 

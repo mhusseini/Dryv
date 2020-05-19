@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -19,8 +20,8 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
         private readonly ControllerGenerator codeGenerator;
         private readonly IDryvClientServerCallWriter controllerCallWriter;
         private readonly DryvDynamicControllerRegistration controllerRegistration;
-        private readonly IOptions<DryvDynamicControllerOptions> options;
         private readonly LinkGenerator linkGenerator;
+        private readonly IOptions<DryvDynamicControllerOptions> options;
 
         public DryvDynamicControllerTranslator(DryvDynamicControllerRegistration controllerRegistration, ControllerGenerator codeGenerator, IDryvClientServerCallWriter controllerCallWriter, IOptions<DryvDynamicControllerOptions> options, LinkGenerator linkGenerator)
         {
@@ -50,41 +51,48 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
 
             if (typeof(Task).IsAssignableFrom(methodCallExpression.Method.DeclaringType))
             {
-                if (methodCallExpression.Method.Name == nameof(Task.FromResult))
-                {
-                    context.Translator.Translate(methodCallExpression.Arguments.First(), context);
-                    return true;
-                }
-                else
+                if (methodCallExpression.Method.Name != nameof(Task.FromResult))
                 {
                     return false;
                 }
+
+                context.Translator.Translate(methodCallExpression.Arguments.First(), context);
+                return true;
             }
 
-            var controller = this.GenerateController(methodCallExpression);
-
-            var method = methodCallExpression.Method;
-            var methodParameters = method.GetParameters();
-            var parameters = methodCallExpression.Arguments
-                .Select((e, i) => (e, i))
-                .ToDictionary(x => methodParameters[x.i], x => x.e);
-
+            var controller = this.GenerateController(methodCallExpression, context);
             var url = this.linkGenerator.GetPathByRouteValues(controller.Name, null);
             var httpMethod = this.options.Value.HttpMethod.ToString().ToUpper();
+            var usedProperties = FindModelPropertiesInExpression(context, methodCallExpression);
 
-            this.controllerCallWriter.Write(context, url, httpMethod, parameters);
+            this.controllerCallWriter.Write(context, url, httpMethod, usedProperties);
 
             return true;
         }
 
-        private TypeInfo GenerateController(MethodCallExpression methodCallExpression)
+        private static List<MemberExpression> FindModelPropertiesInExpression(CustomTranslationContext context, MethodCallExpression methodCallExpression)
+        {
+            var f = new ControllerGenerator.ChildFinder<MemberExpression>();
+
+            foreach (var argument in methodCallExpression.Arguments)
+            {
+                f.Visit(argument);
+            }
+
+            return f.FoundChildren
+                .Where(e => e.Member is PropertyInfo)
+                .Where(e => e.Member.DeclaringType == context.ModelType)
+                .ToList();
+        }
+
+        private TypeInfo GenerateController(MethodCallExpression methodCallExpression, TranslationContext context)
         {
             var m = methodCallExpression.Method;
             var key = $"{m.DeclaringType?.FullName}|{m.Name}|{string.Join("|", m.GetParameters().Select(p => p.ParameterType.FullName))}";
 
             return Controllers.GetOrAdd(key, _ => new Lazy<TypeInfo>(() =>
             {
-                var assembly = this.codeGenerator.CreateControllerAssembly(methodCallExpression);
+                var assembly = this.codeGenerator.CreateControllerAssembly(methodCallExpression, context.ModelType);
                 this.controllerRegistration.Register(assembly, methodCallExpression.Method);
 
                 return assembly.DefinedTypes.FirstOrDefault(typeof(Controller).IsAssignableFrom);

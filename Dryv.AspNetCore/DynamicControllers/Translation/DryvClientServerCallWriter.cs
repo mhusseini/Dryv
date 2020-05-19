@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Reflection;
 using Dryv.Extensions;
 using Dryv.Translation;
 
@@ -8,7 +7,7 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
 {
     internal class DryvClientServerCallWriter : IDryvClientServerCallWriter
     {
-        public void Write(CustomTranslationContext context, string url, string httpMethod, Dictionary<ParameterInfo, Expression> parameters)
+        public void Write(CustomTranslationContext context, string url, string httpMethod, IList<MemberExpression> members)
         {
             var w = context.Writer;
 
@@ -20,13 +19,13 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
 
             var sep = string.Empty;
 
-            foreach (var (parameter, expression) in parameters)
+            foreach (var memberExpression in members)
             {
                 w.Write(sep);
-                w.Write(parameter.Name.ToCamelCase());
+                w.Write(memberExpression.Member.Name.ToCamelCase());
                 w.Write(": ");
 
-                context.Translator.Translate(expression, context);
+                context.Translator.Translate(memberExpression, context);
 
                 sep = ",\n";
             }

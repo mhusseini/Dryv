@@ -5,11 +5,6 @@ namespace Dryv.SampleVue.CustomValidation
 {
     public class AsyncValidator
     {
-        public int GetLength(string text)
-        {
-            return text?.Length ?? 0;
-        }
-
         public async Task<DryvResultMessage> ValidateZipCode(string zipCode, string city, int zipCodeLength)
         {
             return zipCode.Length > zipCodeLength
