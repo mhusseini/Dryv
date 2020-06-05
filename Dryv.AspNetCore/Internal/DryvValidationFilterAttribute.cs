@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Dryv.Configuration;
 using Dryv.Validation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Options;
 
 namespace Dryv.AspNetCore.Internal
 {
@@ -17,10 +19,12 @@ namespace Dryv.AspNetCore.Internal
     internal class DryvValidationFilterAttribute : IAsyncActionFilter
     {
         private readonly DryvValidator validator;
+        private readonly IOptions<DryvOptions> options;
 
-        public DryvValidationFilterAttribute(DryvValidator validator)
+        public DryvValidationFilterAttribute(DryvValidator validator, IOptions<DryvOptions> options)
         {
             this.validator = validator;
+            this.options = options;
         }
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -29,6 +33,7 @@ namespace Dryv.AspNetCore.Internal
 
             if (model != null)
             {
+                await this.ValidateSync((Controller)context.Controller, model);
                 await this.ValidateAsync((Controller)context.Controller, model, true);
             }
 
@@ -44,6 +49,28 @@ namespace Dryv.AspNetCore.Internal
         {
             var result = true;
             var errors = await this.validator.ValidateAsync(model, asyncOnly, controller.HttpContext.RequestServices.GetService);
+
+            foreach (var x in from error in errors
+                              from message in error.Message
+                              where message.Type == DryvResultType.Error
+                              select new { error, message })
+            {
+                result = false;
+                controller.ModelState.AddModelError(x.error.Path, x.message.Text);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Validates the model and sets the model state on the controller accordingly.
+        /// </summary>
+        /// <param name="asyncOnly">Set to true to only validate async rules which otherwise can't (and won't) be run
+        /// inside the synchronous validation infrastructure in ASP.NET core.</param>
+        public async Task<bool> ValidateSync<TModel>(Controller controller, TModel model)
+        {
+            var result = true;
+            var errors = await this.validator.Validate(model, this.options.Value, controller.HttpContext.RequestServices.GetService);
 
             foreach (var x in from error in errors
                               from message in error.Message

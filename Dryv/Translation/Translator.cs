@@ -19,7 +19,7 @@ namespace Dryv.Translation
         public virtual TranslationResult Translate(Expression expression, MemberExpression propertyExpression)
         {
             var result = this.GenerateJavaScriptCode(expression, propertyExpression);
-            return this.translationCompiler.GenerateTranslationDelegate(result.Code, result.OptionDelegates, result.OptionTypes, result.ClientCodeModifiers);
+            return this.translationCompiler.GenerateTranslationDelegate(result.Code, result.OptionDelegates, result.OptionTypes);
         }
 
         public virtual void Translate(Expression expression, TranslationContext context, bool negated = false)
@@ -170,22 +170,19 @@ namespace Dryv.Translation
             (
                 sb.ToString(),
                 optionTypes,
-                context.OptionDelegates.Values.ToList(),
-                context.ClientCodeModifiers
+                context.OptionDelegates.Values.ToList()
             );
         }
 
         private struct GeneratedJavaScriptCode
         {
-            public GeneratedJavaScriptCode(string code, IList<Type> optionTypes, IList<OptionDelegate> optionDelegates, List<Type> clientCodeModifiers)
+            public GeneratedJavaScriptCode(string code, IList<Type> optionTypes, IList<OptionDelegate> optionDelegates)
             {
                 this.Code = code;
                 this.OptionTypes = optionTypes;
                 this.OptionDelegates = optionDelegates;
-                this.ClientCodeModifiers = clientCodeModifiers;
             }
 
-            public List<Type> ClientCodeModifiers { get; }
             public string Code { get; }
             public IList<OptionDelegate> OptionDelegates { get; }
             public IList<Type> OptionTypes { get; }

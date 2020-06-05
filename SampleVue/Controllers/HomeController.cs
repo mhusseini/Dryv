@@ -11,16 +11,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Dryv.SampleVue.Controllers
 {
-    [Authorize]
-    public class TestController : Controller
-    {
-        [HttpPost]
-        public Task<DryvResultMessage> Run(Address model)
-        {
-            return Task.FromResult(DryvResultMessage.Success);
-        }
-    }
-
     public class HomeController : Controller
     {
         public IActionResult Index()
@@ -29,7 +19,7 @@ namespace Dryv.SampleVue.Controllers
         }
 
         [HttpPost]
-        public IActionResult Post([FromBody]HomeModel _)
+        public IActionResult Index([FromBody]HomeModel _)
         {
             return this.ModelState.IsValid
                 ? this.Json(new { success = true })

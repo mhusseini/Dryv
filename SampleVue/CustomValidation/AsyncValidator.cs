@@ -5,11 +5,27 @@ namespace Dryv.SampleVue.CustomValidation
 {
     public class AsyncValidator
     {
+        public int GetLength(string text)
+        {
+            return text?.Length ?? 0;
+        }
+
+        public async Task<DryvResultMessage> ValidateZipCode(string zipCode, string city, int zipCodeLength)
+        {
+            return zipCode.Length > zipCodeLength
+                ? $"The ZIP code cannot be longer than {zipCodeLength} characters."
+                : await this.ValidateZipCode(zipCode, city);
+        }
+
         public async Task<DryvResultMessage> ValidateZipCode(string zipCode, string city)
         {
-            if (string.IsNullOrWhiteSpace(zipCode)) return "ZIP code cannot be empty.";
-            if (string.IsNullOrWhiteSpace(city)) return "City cannot be empty.";
-            return new Regex("^[2468]+$").IsMatch(zipCode) ? null : "The ZIP code must only contain even numbers.";
+            return string.IsNullOrWhiteSpace(zipCode)
+                ? "ZIP code cannot be empty."
+                : string.IsNullOrWhiteSpace(city)
+                    ? "City cannot be empty."
+                    : new Regex("^[02468]+$").IsMatch(zipCode)
+                        ? null
+                        : "The ZIP code must only contain even numbers and zero.";
         }
     }
 }

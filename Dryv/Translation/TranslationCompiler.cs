@@ -14,8 +14,6 @@ namespace Dryv.Translation
 
         private static readonly MethodInfo TranslateValueMethod = typeof(Translator).GetMethod(nameof(Translator.TranslateValue));
 
-        private static readonly MethodInfo ModifierTransformMethod = typeof(IDryvClientCodeTransformer).GetMethod(nameof(IDryvClientCodeTransformer.Transform));
-
         private readonly object translator;
 
         public TranslationCompiler(object translator)
@@ -23,7 +21,7 @@ namespace Dryv.Translation
             this.translator = translator;
         }
 
-        public TranslationResult GenerateTranslationDelegate(string code, IEnumerable<OptionDelegate> optionDelegates, IList<Type> optionTypes, IList<Type> clientCodeModifiers)
+        public TranslationResult GenerateTranslationDelegate(string code, IEnumerable<OptionDelegate> optionDelegates, IList<Type> optionTypes)
         {
             // Escape curly braces for usage within string.Format().
             code = code
@@ -44,16 +42,6 @@ namespace Dryv.Translation
 
             var format = Expression.Call(null, FormatMethod, pattern, arguments);
             blockExpressions.Add(Expression.Assign(resultVariable, format));
-
-            if (clientCodeModifiers != null)
-            {
-                blockExpressions.AddRange(from clientCodeModifier in clientCodeModifiers
-                                          select Expression.Assign(resultVariable,
-                                              Expression.Call(
-                                                  Expression.Convert(Expression.Invoke(servicesParameter, Expression.Constant(clientCodeModifier)), typeof(IDryvClientCodeTransformer)),
-                                                  ModifierTransformMethod,
-                                                  resultVariable)));
-            }
 
             var block = Expression.Block(new[] { resultVariable }, blockExpressions);
             var result = Expression.Lambda<Func<Func<Type, object>, object[], string>>(block, servicesParameter, parameter);

@@ -103,5 +103,26 @@ namespace Dryv.Translation
                 }
             }
         }
+
+
+        /// <summary>
+        /// Returns the constant value or compiles and runs the expression and returns the result.
+        /// </summary>
+        public static object GetValue(this Expression expression)
+        {
+            return expression switch
+            {
+                ConstantExpression constantExpression => constantExpression.Value,
+                LambdaExpression lambdaExpression => lambdaExpression.Parameters.Count == 0
+                    ? CompileAndRun(expression)
+                    : throw new ArgumentException("Lambda expression cannot have parameters."),
+                _ => CompileAndRun(expression)
+            };
+        }
+
+        private static object CompileAndRun(Expression expression)
+        {
+            return Expression.Lambda<Func<object>>(Expression.Convert(expression, typeof(object))).Compile()();
+        }
     }
 }

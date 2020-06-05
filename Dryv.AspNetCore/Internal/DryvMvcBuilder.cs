@@ -1,5 +1,4 @@
 ﻿using System;
-using Dryv.Configuration;
 using Dryv.Translation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,7 +13,7 @@ namespace Dryv.AspNetCore.Internal
 
         public IServiceCollection Services { get; }
 
-        public IDryvBuilder AddTranslator<T>()
+        public IDryvMvcBuilder AddTranslator<T>()
         {
             var type = typeof(T);
             var used = false;
@@ -39,7 +38,7 @@ namespace Dryv.AspNetCore.Internal
             return this;
         }
 
-        public IDryvBuilder AddTranslator(object translator)
+        public IDryvMvcBuilder AddTranslator(object translator)
         {
             var used = false;
 

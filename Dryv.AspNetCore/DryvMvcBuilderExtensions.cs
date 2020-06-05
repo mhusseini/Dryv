@@ -1,5 +1,5 @@
 ﻿using System;
-using Dryv.AspNetCore.DynamicControllers;
+using Dryv.AspNetCore.DynamicControllers.Endpoints;
 using Dryv.AspNetCore.Internal;
 using Dryv.Compilation;
 using Dryv.Configuration;
@@ -20,13 +20,9 @@ namespace Dryv.AspNetCore
             var options = new DryvOptions();
             setupAction?.Invoke(options);
 
-            mvcBuilder.AddMvcOptions(opts =>
-            {
-                // As long as mvc validation is not async, we'll
-                // run the async validation from an action attribute.
-                opts.Filters.Add<DryvValidationFilterAttribute>();
-                opts.ModelValidatorProviders.Add(new DryvModelValidatorProvider());
-            });
+            // As long as mvc validation is not async, we'll
+            // run the async validation from an action attribute.
+            mvcBuilder.AddMvcOptions(opts => opts.Filters.Add<DryvValidationFilterAttribute>());
 
             return RegsterServices(mvcBuilder.Services, options);
         }
@@ -43,16 +39,13 @@ namespace Dryv.AspNetCore
             services.TryAddSingleton<ITranslatorProvider, TranslatorProvider>();
             services.AddSingleton(Options.Create(options));
 
-            var builder = new DryvMvcBuilder(services);
-            builder
-            .AddTranslator<ObjectTranslator>()
-            .AddTranslator<DryvResultTranslator>()
-            .AddTranslator<StringTranslator>()
-            .AddTranslator<EnumerableTranslator>()
-            .AddTranslator<RegexTranslator>()
-            .AddTranslator<CustomCodeTranslator>();
-
-            return builder;
+            return new DryvMvcBuilder(services)
+                .AddTranslator<ObjectTranslator>()
+                .AddTranslator<DryvResultTranslator>()
+                .AddTranslator<StringTranslator>()
+                .AddTranslator<EnumerableTranslator>()
+                .AddTranslator<RegexTranslator>()
+                .AddTranslator<CustomCodeTranslator>();
         }
     }
 }

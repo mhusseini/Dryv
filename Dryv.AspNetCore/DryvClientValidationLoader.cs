@@ -92,22 +92,35 @@ namespace Dryv.AspNetCore
                 modelPath = string.Empty;
             }
 
-            var rules = from rule in this.rulesFinder.GetRulesForProperty(modelType, property, modelPath)
+            var rules = from rule in this.rulesFinder.GetRulesForProperty(modelType, property, RuleType.Default, modelPath)
                         where rule.Rule.EvaluationLocation.HasFlag(DryvRuleLocation.Client)
                         select rule;
 
-            var translatedRules = this.translator.Translate(rules, modelPath, modelType);
-            var key = $"v{Math.Abs((modelType.FullName + property.Name + modelPath).GetHashCode())}";
-            var validationFunction = translatedRules.Any() ? this.clientValidationFunctionWriter.GetValidationFunction(translatedRules) : null;
+            var disablingRules = from rule in this.rulesFinder.GetRulesForProperty(modelType, property, RuleType.Disabling, modelPath)
+                                 where rule.Rule.EvaluationLocation.HasFlag(DryvRuleLocation.Client)
+                                 select rule;
 
-            return string.IsNullOrWhiteSpace(validationFunction) ? null : new DryvClientValidationItem
+            var validationFunction = this.TranslateRules(modelType, modelPath, rules);
+            var disablingFunction = this.TranslateRules(modelType, modelPath, disablingRules);
+
+            var key = $"v{Math.Abs((modelType.FullName + property.Name + modelPath).GetHashCode())}";
+
+            return string.IsNullOrWhiteSpace(validationFunction) && string.IsNullOrWhiteSpace(disablingFunction) ? null : new DryvClientValidationItem
             {
                 ValidationFunction = validationFunction,
+                DisablingFunction = disablingFunction,
                 Key = key,
                 ModelType = modelType,
                 Property = property,
                 ModelPath = modelPath,
             };
+        }
+
+        private string TranslateRules(Type modelType, string modelPath, IEnumerable<DryvRuleTreeNode> rules)
+        {
+            var translatedRules = this.translator.Translate(rules, modelPath, modelType);
+            var validationFunction = translatedRules.Any() ? this.clientValidationFunctionWriter.GetValidationFunction(translatedRules) : null;
+            return validationFunction;
         }
     }
 }

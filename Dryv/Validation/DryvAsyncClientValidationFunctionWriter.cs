@@ -11,16 +11,18 @@ namespace Dryv.Validation
             var sb = new StringBuilder();
 
             sb.AppendLine("function(m, context) { return [");
-            var sep = string.Empty;
+            var index = 0;
             foreach (var rule in translatedRules)
             {
-                sb.AppendLine(sep);
                 sb.Append(rule.Value);
-                sep = ", ";
+                if (++index > 0)
+                {
+                    sb.AppendLine(",");
+                }
             }
             sb.AppendLine(@"].reduce(function(promiseChain, currentTask){
                 return promiseChain.then(function(error){
-                    return typeof error === ""string"" && error ? error : currentTask(m ,context);
+                    return error || currentTask(m ,context);
                 });
             }, Promise.resolve());}");
 

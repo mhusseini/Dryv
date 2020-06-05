@@ -1,5 +1,5 @@
-﻿@using Dryv.AspNetCore
-@using Dryv.Extensions
+﻿@using System.Linq
+@using Dryv.AspNetCore
 @using Dryv.SampleVue.Models
 
 @model HomeModel
@@ -13,44 +13,35 @@
 <body>
 
     <script>
-    if (!window.dryv) {
-        window.dryv = {
-            async validateAsync(baseUrl, method, data) {
-                const isGet = method === 'GET';
-                const url = isGet ? baseUrl + "?" + Object.keys(data).map(k => `${k}=${encodeURIComponent(data[k])}`).join('&') : baseUrl;
-                const response = isGet ? await axios.get(url) : await axios.post(url, data);
-
-                return response.data && response.data.text;
-            }
-        };
-    }
-
-    (function(dryv) {
-        dryv.validators = {
-            @Html.Raw(string.Join(",\n", from val in Html.GetDryvClientPropertyValidations()
-                let field = val.Property.Name.ToCamelCase()
-                let sep = string.IsNullOrWhiteSpace(val.ModelPath) ? string.Empty : "."
-                select $@"""{val.ModelPath}{sep}{field}"": {val.ValidationFunction}"))
-        };
-    })(window.dryv);
+        (function(dryv) {
+            dryv.validators = {
+                @Html.Raw(string.Join(",\n", from val in Html.GetDryvClientValidationFunctions()
+                                                      select $@"""{val.Key}"": {val.Value}"))
+            };
+            dryv.disablers = {
+                @Html.Raw(string.Join(",\n", from val in Html.GetDryvClientDisablingFunctions()
+                                                      select $@"""{val.Key}"": {val.Value}"))
+            };
+        })(window.dryv || (window.dryv = {}));
     </script>
 
-    <div id="app">
+    <div id="app" v-dryv>
         <h1>Form validation with VueJS and Dryv.</h1>
         <form v-on:submit="validateForm" method="post">
             <div class="form-content">
+                @*<input v-model="person.firstName" v-dryv="person.firstName"/>*@
                 <div class="form-block">
                     <h3>Personal Data</h3>
 
-                    <form-input name="person.firstName" label="First name" v-model="person.firstName"></form-input>
-                    <form-input name="person.lastName" label="Last name" v-model="person.lastName"></form-input>
+                    <form-input label="First name" v-model="person.firstName"></form-input>
+                    <form-input label="Last name" v-model="person.lastName"></form-input>
                 </div>
 
                 <div class="form-block">
                     <h3>Shipping Address</h3>
 
-                    <form-input name="shippingAddress.zipCode" label="ZIP code" v-model="shippingAddress.zipCode"></form-input>
-                    <form-input name="shippingAddress.city" label="City" v-model="shippingAddress.city"></form-input>
+                    <form-input label="ZIP code" v-model="shippingAddress.zipCode"></form-input>
+                    <form-input label="City" v-model="shippingAddress.city"></form-input>
                 </div>
 
                 <div class="form-block">
@@ -58,12 +49,12 @@
 
                     <div class="form-item">
                         <label for="billingAddress-deactivate">Billing address equals shipping address.</label>
-                        <input id="billingAddress-deactivate" type="checkbox" v-model="billingAddress.deactivated">
+                        <input id="billingAddress-deactivate" type="checkbox" v-model="billingEqualsShipping">
                     </div>
 
-                    <div v-show="!billingAddress.deactivated">
-                        <form-input name="billingAddress.zipCode" label="ZIP code" v-model="billingAddress.zipCode"></form-input>
-                        <form-input name="billingAddress.city" label="City" v-model="billingAddress.city"></form-input>
+                    <div v-show="!billingEqualsShipping">
+                        <form-input label="ZIP code" v-model="billingAddress.zipCode"></form-input>
+                        <form-input label="City" v-model="billingAddress.city"></form-input>
                     </div>
                 </div>
             </div>
@@ -82,13 +73,13 @@
     </div>
 
     <script type="text/x-template" id="form-input">
-        <div class="form-item">
+        <div class="form-item" v-dryv-field>
             <div>
                 <div class="form-input-label">
-                    <label :for="name">{{ label }}</label>
+                    <label>{{ label }}</label>
                 </div>
                 <div class="form-input-control">
-                    <input :id="name" v-bind:value="value" v-on:input="$emit('input', $event.target.value)">
+                    <input v-bind:value="value" v-on:input="$emit('input', $event.target.value)">
                 </div>
             </div>
             <div class="form-item-error" v-if="error">{{ error }}</div>
@@ -97,80 +88,56 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.11/vue.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js"></script>
-    <script>
-        Vue.component('form-input',
-            {
-                props: ['value', 'type', 'name', 'label'],
-                template: '#form-input',
-                data() {
-                    return {
-                        error: null
-                    }
-                },
-                created() {
-                    const validator = window.dryv.validators[this.name];
-                    if (!validator) return;
+    <script src="demo.js"></script>
+<script>
+    Vue.use(Dryv,
+        {
+            get: axios.get,
+            post: axios.post
+        });
 
-                    const formValidators = this.$parent.formValidators || (this.$parent.formValidators = []);
-                    formValidators.push({
-                        validate: async () => (this.error = await validator(this.$parent)),
-                        setError: errors => this.error = errors[this.name]
-                    });
-                }
-            });
+    Vue.component('form-input',
+        {
+            props: ['value', 'type', 'name', 'label'],
+            template: '#form-input',
+            data() {
+                return {
+                    error: null
+                };
+            }
+        });
 
-        const app = new Vue({
-            el: '#app',
-            data: {
-                isValid: null,
-                person: {
-                    firstName: null,
-                    lastName: null
-                },
-                shippingAddress: {
-                    zipCode: null,
-                    city: null
-                },
-                billingAddress: {
-                    zipCode: null,
-                    city: null,
-                    deactivated: true
-                }
+    const app = new Vue({
+        el: '#app',
+        data: {
+            isValid: null,
+            billingEqualsShipping: true,
+            person: {
+                firstName: null,
+                lastName: null
             },
-            methods: {
-                async validateForm(e) {
-                    e.preventDefault();
+            shippingAddress: {
+                zipCode: null,
+                city: null
+            },
+            billingAddress: {
+                zipCode: null,
+                city: null
+            }
+        },
+        methods: {
+            async validateForm(e) {
+                e.preventDefault();
 
-                    if (this.formValidators) {
-                        let errors = 0;
-
-                        for (let v of this.formValidators) {
-                            if (await v.validate()) {
-                                errors++;
-                            }
-                        }
-
-                        this.$data.isValid = !errors;
-
-                        if (!this.$data.isValid) {
-                            return;
-                        }
-                    }
-
-                    const result = axios.post(window.location.href, this.$data);
-
-                    if (!this.formValidators) {
-                        return;
-                    }
-
-                    this.$data.isValid = result.data.success;
-
-                    if (!this.$data.isValid) {
-                        this.formValidators.forEach(v => v.setError(result.data.errors));
+                if (await this.$dryv.validate()) {
+                    const result = axios.post(e.currentTarget.action, this.$data);
+                    if (result.data) {
+                        this.$dryv.setValidationResult(result.data.errors);
                     }
                 }
             }
-        });
-    </script>
+        }
+    });
+</script>
 </body>
 </html>

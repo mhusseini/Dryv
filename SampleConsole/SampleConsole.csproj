@@ -1,13 +1,15 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Dryv.SampleConsole</RootNamespace>
   </PropertyGroup>
-
   <ItemGroup>
+    <ProjectReference Include="..\Dryv.AspNetCore\Dryv.AspNetCore.csproj" />
     <ProjectReference Include="..\Dryv\Dryv.csproj" />
+    <ProjectReference Include="..\SampleVue\SampleVue.csproj" />
   </ItemGroup>
-
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Options" Version="3.1.4" />
+  </ItemGroup>
 </Project>
