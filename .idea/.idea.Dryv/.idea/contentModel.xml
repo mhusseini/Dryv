@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ContentModelStore">
+    <e p="C:\projects\Dryv" t="IncludeFlat">
+      <e p=".gitignore" t="Include" />
+      <e p="Dryv" t="IncludeRecursive">
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="Compilation" t="Include">
+          <e p="DryvServerRuleCompiler.cs" t="Include" />
+          <e p="DryvServerRuleEvaluator.cs" t="Include" />
+        </e>
+        <e p="Configuration" t="Include">
+          <e p="DryvOptions.cs" t="Include" />
+          <e p="DryvOptionsExtension.cs" t="Include" />
+          <e p="IDryvBuilder.cs" t="Include" />
+          <e p="TranslationErrorBehavior.cs" t="Include" />
+        </e>
+        <e p="Dryv.csproj" t="IncludeRecursive" />
+        <e p="dryv.ico" t="Include" />
+        <e p="dryv.png" t="Include" />
+        <e p="DryvException.cs" t="Include" />
+        <e p="DryvResultMessage.cs" t="Include" />
+        <e p="DryvResultType.cs" t="Include" />
+        <e p="DryvRuleLocation.cs" t="Include" />
+        <e p="DryvRules.cs" t="Include" />
+        <e p="DryvRules`.g.cs" t="Include" />
+        <e p="DryvRulesAttribute.cs" t="Include" />
+        <e p="Exceptions" t="Include">
+          <e p="DryvPreevalutationResolvingException.cs" t="Include" />
+          <e p="DryvValidationExecutionException.cs" t="Include" />
+        </e>
+        <e p="Extensions" t="Include">
+          <e p="CollectionExtensions.cs" t="Include" />
+          <e p="DictionaryExtensions.cs" t="Include" />
+          <e p="IterationExtensions.cs" t="Include" />
+          <e p="ModelTreeInfoExtensions.cs" t="Include" />
+          <e p="ResultExtensions.cs" t="Include" />
+          <e p="ServiceProviderExtensions.cs" t="Include" />
+          <e p="StringExtensions.cs" t="Include" />
+          <e p="TypeExtensions.cs" t="Include" />
+          <e p="ValidationContextExtensions.cs" t="Include" />
+        </e>
+        <e p="GenerateRuleMethods.ps1" t="Include" />
+        <e p="Internal" t="Include">
+          <e p="DryvAsyncResult.cs" t="Include" />
+        </e>
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netstandard1.2" t="Include">
+              <e p="Dryv.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+        <e p="Properties" t="Include">
+          <e p="AssemblyInfo.cs" t="Include" />
+        </e>
+        <e p="Reflection" t="Include">
+          <e p="BindingFlags.cs" t="Include" />
+          <e p="TypeExtensions.cs" t="Include" />
+        </e>
+        <e p="RuleDetection" t="Include">
+          <e p="DryvRulesFinder.cs" t="Include" />
+          <e p="DryvRuleTreeNode.cs" t="Include" />
+          <e p="ModelTreeInfo.cs" t="Include" />
+          <e p="PropertyComparer.cs" t="Include" />
+          <e p="RuleType.cs" t="Include" />
+        </e>
+        <e p="Rules" t="Include">
+          <e p="DryvClientCode.cs" t="Include" />
+          <e p="DryvCompiledRule.cs" t="Include" />
+          <e p="DryvRules`.cs" t="Include" />
+        </e>
+        <e p="tools" t="Include">
+          <e p="install.ps1" t="Include" />
+        </e>
+        <e p="Translation" t="Include">
+          <e p="CustomTranslationContext.cs" t="Include" />
+          <e p="DryvConfigurationException.cs" t="Include" />
+          <e p="DryvExpressionNotSupportedException.cs" t="Include" />
+          <e p="DryvMethodNotSupportedException.cs" t="Include" />
+          <e p="DryvTranslationException.cs" t="Include" />
+          <e p="ExpressionExtensions.cs" t="Include" />
+          <e p="ICustomTranslator.cs" t="Include" />
+          <e p="IMethodCallTranslator.cs" t="Include" />
+          <e p="IndentingStringWriter.cs" t="Include" />
+          <e p="ITranslator.cs" t="Include" />
+          <e p="ITranslatorProvider.cs" t="Include" />
+          <e p="JavaScriptTranslator.cs" t="Include" />
+          <e p="MethodCallTranslator.cs" t="Include" />
+          <e p="MethodTranslationContext.cs" t="Include" />
+          <e p="OptionDelegate.cs" t="Include" />
+          <e p="RuleTranslator.cs" t="Include" />
+          <e p="TranslationCompiler.cs" t="Include" />
+          <e p="TranslationContext.cs" t="Include" />
+          <e p="TranslationContextExtensions.cs" t="Include" />
+          <e p="TranslationResult.cs" t="Include" />
+          <e p="Translator.cs" t="Include" />
+          <e p="TranslatorProvider.cs" t="Include" />
+          <e p="Translators" t="Include">
+            <e p="AllMethodCallTranslator.cs" t="Include" />
+            <e p="CustomCodeTranslator.cs" t="Include" />
+            <e p="DryvResultTranslator.cs" t="Include" />
+            <e p="EnumerableTranslator.cs" t="Include" />
+            <e p="ObjectTranslator.cs" t="Include" />
+            <e p="RegexTranslator.cs" t="Include" />
+            <e p="StringFormatDissector.cs" t="Include" />
+            <e p="StringTranslator.cs" t="Include" />
+          </e>
+        </e>
+        <e p="Validation" t="Include">
+          <e p="DryvAsyncClientValidationFunctionWriter.cs" t="Include" />
+          <e p="DryvClientValidationFunctionWriter.cs" t="Include" />
+          <e p="DryvClientValidationItem.cs" t="Include" />
+          <e p="DryvResult.cs" t="Include" />
+          <e p="DryvValidator.cs" t="Include" />
+          <e p="IDryvClientValidationFunctionWriter.cs" t="Include" />
+        </e>
+      </e>
+      <e p="Dryv.AspNetCore" t="IncludeRecursive">
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="Dryv.AspNetCore.csproj" t="IncludeRecursive" />
+        <e p="dryv.png" t="Include" />
+        <e p="DryvApplicationBuilderExtensions.cs" t="Include" />
+        <e p="DryvClientValidationLoader.cs" t="Include" />
+        <e p="DryvDynamicControllerBuilderExtensions.cs" t="Include" />
+        <e p="DryvMvcBuilderExtensions.cs" t="Include" />
+        <e p="DryvPreloaderBuilderExtensions.cs" t="Include" />
+        <e p="DynamicControllers" t="Include">
+          <e p="CodeGeneration" t="Include">
+            <e p="ControllerAttributeGenerator.cs" t="Include" />
+            <e p="ControllerCtorGenerator.cs" t="Include" />
+            <e p="ControllerFilterHelper.cs" t="Include" />
+            <e p="ControllerGenerator.cs" t="Include" />
+            <e p="ControllerMethodGenerator.cs" t="Include" />
+            <e p="DryvPocoGenerator.cs" t="Include" />
+          </e>
+          <e p="DryvControllerGenerationContext.cs" t="Include" />
+          <e p="DryvDynamicControllerMethods.cs" t="Include" />
+          <e p="DryvDynamicControllerOptions.cs" t="Include" />
+          <e p="DryvDynamicControllerOptionsExtensions.cs" t="Include" />
+          <e p="Endpoints" t="Include">
+            <e p="DryvDynamicActionDescriptorChangeProvider.cs" t="Include" />
+            <e p="DryvDynamicControllerRegistration.cs" t="Include" />
+            <e p="DryvEndpointRouteBuilderProvider.cs" t="Include" />
+          </e>
+          <e p="FilterExpressionValidator.cs" t="Include" />
+          <e p="Translation" t="Include">
+            <e p="DryvClientServerCallWriter.cs" t="Include" />
+            <e p="DryvDynamicControllerTranslator.cs" t="Include" />
+            <e p="IDryvClientServerCallWriter.cs" t="Include" />
+          </e>
+        </e>
+        <e p="Extensions" t="Include">
+          <e p="ModelPathExtensions.cs" t="Include" />
+          <e p="ViewContextExtensions.cs" t="Include" />
+        </e>
+        <e p="HtmlExtension.cs" t="Include" />
+        <e p="Internal" t="Include">
+          <e p="DryvFeature.cs" t="Include" />
+          <e p="DryvMvcBuilder.cs" t="Include" />
+          <e p="DryvMvcInitializer.cs" t="Include" />
+          <e p="DryvValidationFilterAttribute.cs" t="Include" />
+          <e p="IDryvMvcBuilder.cs" t="Include" />
+        </e>
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netcoreapp3.1" t="Include">
+              <e p="Dryv.AspNetCore.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+        <e p="PreLoading" t="Include">
+          <e p="DryvPreloader.cs" t="Include" />
+          <e p="DryvPreloaderOptions.cs" t="Include" />
+        </e>
+        <e p="Program.cs" t="Include" />
+        <e p="Properties" t="Include">
+          <e p="AssemblyInfo.cs" t="Include" />
+          <e p="launchSettings.json" t="Include" />
+        </e>
+      </e>
+      <e p="Dryv.sln" t="IncludeFlat" />
+      <e p="Dryv.Tests" t="IncludeRecursive">
+        <e p="AnyMethodTests.cs" t="Include" />
+        <e p="AsyncTests.cs" t="Include" />
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="ClientValidationTests.cs" t="Include" />
+        <e p="Dryv.Tests.csproj" t="IncludeRecursive" />
+        <e p="DryvResultTranslatorTests.cs" t="Include" />
+        <e p="EnumerbaleTests.cs" t="Include" />
+        <e p="JavascriptTranslatorTests.cs" t="Include" />
+        <e p="JavascriptTranslatorTestsBase.cs" t="Include" />
+        <e p="LocalizationTests.cs" t="Include" />
+        <e p="LocalizedStrings.Designer.cs" t="Include" />
+        <e p="LocalizedStrings.resx" t="Include" />
+        <e p="ModelTreeTests.cs" t="Include" />
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netcoreapp3.1" t="Include">
+              <e p="Dryv.Tests.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+        <e p="OptionsTranslationTests.cs" t="Include" />
+        <e p="ReflectionTests.cs" t="Include" />
+        <e p="RegularExpressionTests.cs" t="Include" />
+        <e p="RuleDiscovery2Tests.cs" t="Include" />
+        <e p="RuleDiscoveryTests.cs" t="Include" />
+        <e p="StringFormatDissectorTests.cs" t="Include" />
+        <e p="StringTests.cs" t="Include" />
+      </e>
+      <e p="LICENSE" t="Include" />
+      <e p="packages" t="ExcludeRecursive" />
+      <e p="README.md" t="Include" />
+      <e p="SampleConsole" t="IncludeRecursive">
+        <e p="AsyncValidator.cs" t="Include" />
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="Models" t="Include">
+          <e p="Address.cs" t="Include" />
+          <e p="HomeModel.cs" t="Include" />
+          <e p="Person.cs" t="Include" />
+        </e>
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netcoreapp3.1" t="Include">
+              <e p="SampleConsole.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+        <e p="Program.cs" t="Include" />
+        <e p="SampleConsole.csproj" t="IncludeRecursive" />
+        <e p="SampleOptions.cs" t="Include" />
+        <e p="ZipCodeValidator.cs" t="Include" />
+      </e>
+      <e p="SampleVue" t="IncludeRecursive">
+        <e p="appsettings.Development.json" t="Include" />
+        <e p="appsettings.json" t="Include" />
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="Controllers" t="Include">
+          <e p="HomeController.cs" t="Include" />
+          <e p="ValidationController.cs" t="Include" />
+        </e>
+        <e p="CustomValidation" t="Include">
+          <e p="AsyncValidator.cs" t="Include" />
+          <e p="ZipCodeValidator.cs" t="Include" />
+        </e>
+        <e p="DryvDynamicAssembly1.dll" t="Include" />
+        <e p="DryvDynamicAssembly1.ildasm" t="Include" />
+        <e p="Models" t="Include">
+          <e p="Address.cs" t="Include" />
+          <e p="HomeModel.cs" t="Include" />
+          <e p="Person.cs" t="Include" />
+        </e>
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netcoreapp3.1" t="Include">
+              <e p="SampleVue.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+        <e p="Program.cs" t="Include" />
+        <e p="Properties" t="Include">
+          <e p="launchSettings.json" t="Include" />
+        </e>
+        <e p="SampleOptions.cs" t="Include" />
+        <e p="SampleVue.csproj" t="IncludeRecursive" />
+        <e p="Startup.cs" t="Include" />
+        <e p="Translation" t="Include">
+          <e p="AsyncValidatorTranslator.cs" t="Include" />
+        </e>
+        <e p="Views" t="Include">
+          <e p="Home" t="Include">
+            <e p="Index.cshtml" t="Include" />
+          </e>
+        </e>
+        <e p="wwwroot" t="Include">
+          <e p="demo.js" t="Include" />
+          <e p="favicon.ico" t="Include" />
+          <e p="styles.css" t="Include" />
+        </e>
+      </e>
+      <e p="Solution Items" t="Include" />
+      <e p="Tests" t="Include" />
+    </e>
+    <e p="C:\Users\mhuss\.nuget\packages\microsoft.net.test.sdk\16.6.1\build\netcoreapp2.1" t="Include">
+      <e p="Microsoft.NET.Test.Sdk.Program.cs" t="Include" />
+    </e>
+    <e p="C:\Users\mhuss\.nuget\packages\microsoft.testplatform.testhost\16.6.1\build\netcoreapp2.1\x64\testhost.dll" t="Include" />
+    <e p="C:\Users\mhuss\.nuget\packages\microsoft.testplatform.testhost\16.6.1\build\netcoreapp2.1\x64\testhost.exe" t="Include" />
+    <e p="C:\Users\mhuss\.nuget\packages\mstest.testadapter\2.1.1\build\_common\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll" t="Include" />
+    <e p="C:\Users\mhuss\.nuget\packages\mstest.testadapter\2.1.1\build\_common\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll" t="Include" />
+    <e p="C:\Users\mhuss\.nuget\packages\mstest.testadapter\2.1.1\build\netcoreapp1.0\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll" t="Include" />
+    <e p="C:\Users\mhuss\.Rider2018.1\system\resharper-host\local\Transient\ReSharperHost\v12\SolutionCaches\_Dryv.1666257459.00" t="ExcludeRecursive" />
+  </component>
+</project>
