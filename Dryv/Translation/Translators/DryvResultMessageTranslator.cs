@@ -5,11 +5,11 @@ using Dryv.Reflection;
 
 namespace Dryv.Translation.Translators
 {
-    public class DryvResultTranslator : MethodCallTranslator, ICustomTranslator
+    public class DryvResultMessageTranslator : MethodCallTranslator, ICustomTranslator
     {
         private static readonly MemberInfo SuccessMember = typeof(DryvResultMessage).GetMember("Success");
 
-        public DryvResultTranslator()
+        public DryvResultMessageTranslator()
         {
             this.Supports<DryvResultMessage>();
             this.AddMethodTranslator(nameof(DryvResultMessage.Error), Error);
@@ -22,7 +22,7 @@ namespace Dryv.Translation.Translators
         public bool TryTranslate(CustomTranslationContext context)
         {
             if (!(context.Expression is MemberExpression memberExpression)
-                || memberExpression.Member != SuccessMember)
+                || !Equals(memberExpression.Member, SuccessMember))
             {
                 return false;
             }
@@ -33,7 +33,7 @@ namespace Dryv.Translation.Translators
 
         private static void Error(MethodTranslationContext context)
         {
-            context.Writer.Write("{ type:\"error\", message:");
+            context.Writer.Write("{ type:\"error\", text:");
             context.Translator.Translate(context.Expression.Arguments.First(), context);
             context.Writer.Write(" }");
         }
@@ -45,7 +45,7 @@ namespace Dryv.Translation.Translators
 
         private static void Warning(MethodTranslationContext context)
         {
-            context.Writer.Write("{ type:\"warning\", message:");
+            context.Writer.Write("{ type:\"warning\", text:");
             context.Translator.Translate(context.Expression.Arguments.First(), context);
             context.Writer.Write(" }");
         }

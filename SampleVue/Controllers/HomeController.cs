@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Dryv.AspNetCore.Extensions;
 using Dryv.Extensions;
 using Dryv.Internal;
 using Dryv.SampleVue.CustomValidation;
@@ -21,15 +22,17 @@ namespace Dryv.SampleVue.Controllers
         [HttpPost]
         public IActionResult Index([FromBody]HomeModel _)
         {
-            return this.ModelState.IsValid
-                ? this.Json(new { success = true })
-                : this.Json(new
-                {
-                    success = false,
-                    errors = this.ModelState.ToDictionary(
-                        s => string.Join('.', s.Key.Split('.').Select(v => v.ToCamelCase())),
-                        s => s.Value.Errors.Select(e => e.ErrorMessage).First())
-                });
+            return this.DryvValidationActionResult();
+
+            //return this.ModelState.IsValid
+            //    ? this.Json(new { success = true })
+            //    : this.Json(new
+            //    {
+            //        success = false,
+            //        results = this.ModelState.ToDictionary(
+            //            s => string.Join('.', s.Key.Split('.').Select(v => v.ToCamelCase())),
+            //            s => s.Value.Errors.Select(e => e.ErrorMessage).First())
+            //    });
         }
     }
 }

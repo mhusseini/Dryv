@@ -26,7 +26,7 @@ namespace Dryv.Tests
         protected static (Expression Object, string Name) GetMethod(Expression expression)
         {
             var member = (expression as CallExpression)?.Callee as MemberExpression;
-            return (Object: member?.Object, Name: (member?.Property as Identifier)?.Name);
+            return (member?.Object, (member?.Property as Identifier)?.Name);
         }
 
         protected static FunctionExpression GetTranslatedAst(
@@ -49,7 +49,7 @@ namespace Dryv.Tests
 
             var args = new object[] { "" }.Union(validationOptions).ToArray();
             var translator = CreateTranslator(translators);
-            var translation = translator.Translate(expression, (System.Linq.Expressions.MemberExpression)null).Factory(null, args);
+            var translation = translator.Translate(expression, null).Factory(null, args);
             return translation;
         }
 
@@ -58,11 +58,11 @@ namespace Dryv.Tests
             var translatorProvider = new TranslatorProvider();
 
             translatorProvider.MethodCallTranslators.Add(new RegexTranslator());
-            translatorProvider.MethodCallTranslators.Add(new DryvResultTranslator());
+            translatorProvider.MethodCallTranslators.Add(new DryvResultMessageTranslator());
             translatorProvider.MethodCallTranslators.Add(new StringTranslator());
             translatorProvider.MethodCallTranslators.Add(new EnumerableTranslator());
             translatorProvider.GenericTranslators.Add(new RegexTranslator());
-            translatorProvider.GenericTranslators.Add(new DryvResultTranslator());
+            translatorProvider.GenericTranslators.Add(new DryvResultMessageTranslator());
             translatorProvider.GenericTranslators.Add(new ObjectTranslator());
 
             if (translators != null)

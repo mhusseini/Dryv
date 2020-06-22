@@ -1,5 +1,15 @@
 ﻿const dryv = window.dryv || (window.dryv = {});
 
+function hashCode(text) {
+    var hash = 0, i, chr;
+    for (i = 0; i < text.length; i++) {
+        chr = text.charCodeAt(i);
+        hash = ((hash << 5) - hash) + chr;
+        hash |= 0; // Convert to 32bit integer
+    }
+    return hash;
+}
+
 async function validate(component, dryv) {
     const formValidators = component.$dryv.formValidators;
     if (!formValidators) {
@@ -18,23 +28,46 @@ async function validate(component, dryv) {
         }
     }
 
-    let errors = 0;
+    let errors = "";
+    let warnings = "";
 
     for (let v of formValidators) {
-        if (await v.validate(disabledFields)) {
-            errors++;
+        const result = await v.validate(disabledFields);
+        if (!result) {
+            continue;
+        }
+
+        switch (typeof result) {
+            case "object":
+                switch (result.type) {
+                    case "error":
+                        errors += `${v.path}=${result.text};`;
+                        break;
+                    case "warning":
+                        warnings += `${v.path}=${result.text};`;
+                        break;
+                }
+                break;
+            case "string":
+                errors += `${v.path}=${result};`;
+                break;
         }
     }
 
-    return !errors;
+    return {
+        hasErrors: errors.length > 0,
+        errorHash: hashCode(errors),
+        hasWarnings: warnings.length > 0,
+        warningHash: hashCode(warnings)
+    };
 }
 
-function setValidationResult(component, errors) {
+function setValidationResult(component, results) {
     if (component.$dryv.formValidators) {
-        component.$dryv.formValidators.forEach(v => v.setError(errors));
+        component.$dryv.formValidators.forEach(v => v.setResults(results));
     }
 
-    return !errors;
+    return !results || results.length === 0;
 }
 
 function findFormComponent(vnode) {
@@ -95,12 +128,53 @@ function initializeFormComponent(component, name, options) {
     }
 }
 
+function handleValidationResult(Vue, component, result, errorField, warningField) {
+    let error;
+    let warning;
+
+    if (result) {
+        switch (typeof result) {
+            case "object":
+                switch (result.type) {
+                    case "error":
+                        error = result.text;
+                        warning = null;
+                        break;
+                    case "warning":
+                        error = null;
+                        warning = result.text;
+                        break;
+                    default:
+                        error = null;
+                        warning = null;
+                }
+                break;
+            case "string":
+                error = result;
+                warning = null;
+                break;
+            default:
+                error = null;
+                warning = null;
+        }
+    } else {
+        error = null;
+        warning = null;
+    }
+
+    Vue.set(component, errorField, error);
+    Vue.set(component, warningField, warning);
+
+    return result;
+}
+
 const Dryvue = {
     install(Vue, options) {
         if (!options) options = {};
         if (!options.get) options.get = axios.get;
         if (!options.post) options.post = axios.post;
         if (!options.errorField) options.errorField = "error";
+        if (!options.warningField) options.warningField = "warning";
         if (!options.dryv) options.dryv = window.dryv;
 
         dryv.validateAsync = async function (baseUrl, method, data) {
@@ -110,7 +184,7 @@ const Dryvue = {
                 ? await options.get(url)
                 : await options.post(url, data);
 
-            return response.data && response.data.text;
+            return response.data;
         };
 
         Vue.directive('dryv-field',
@@ -129,10 +203,12 @@ const Dryvue = {
 
                     let path;
                     let errorField = options.errorField;
+                    let warningField = options.warningField;
 
                     switch (typeof binding.value) {
                         case "object":
                             errorField = binding.value.errorField || options.errorField;
+                            warningField = binding.value.warningField || options.warningField;
                             path = binding.value.path;
                             break;
                         case "string":
@@ -145,13 +221,8 @@ const Dryvue = {
                     }
 
                     if (!path) {
-                        throw "Property path is missing. Please specify a value for the 'v-dryv-field' attribute or use the 'v-drvy-field' directive in combination with 'v-model'. Example value: 'firstName' or 'child.firstName'.";
+                        throw "The property path is missing. Please specify a value for the 'v-dryv-field' attribute or use the 'v-drvy-field' directive in combination with 'v-model'. Example value: 'firstName' or 'child.firstName'.";
                     }
-
-                    //const validator = options.dryv.validators[path];
-                    //if (!validator) {
-                    //    return;
-                    //}
 
                     let validator = undefined;
 
@@ -164,24 +235,25 @@ const Dryvue = {
                     }
 
                     formComponent.$dryv.formValidators.push({
+                        path,
                         validate: async (disabledFields) => {
                             if (validator === undefined) {
                                 validator = formComponent.$dryv.v.validators[path];
                             }
+
                             if (!validator) {
                                 return null;
                             }
-                            const error = (!disabledFields || disabledFields.filter(f => name.indexOf(f) >= 0).length === 0) && await validator(formComponent.$data);
-                            Vue.set(component, errorField, error);
-                            return error;
+
+                            const result = (!disabledFields || disabledFields.filter(f => path.indexOf(f) >= 0).length === 0) && await validator(formComponent.$data);
+                            return handleValidationResult(Vue, component, result, errorField, warningField);
                         },
-                        setError: errors => {
+                        setResults: results => {
                             if (!validator) {
                                 return null;
                             }
-                            const error = errors && errors[name];
-                            Vue.set(component, errorField, error);
-                            return error;
+                            const result = results && results[path];
+                            return handleValidationResult(Vue, component, result, errorField, warningField);
                         }
                     });
                 }
@@ -202,6 +274,8 @@ const Dryvue = {
                     case "string":
                         name = binding.value;
                         break;
+                    default:
+                        name = null;
                 }
 
                 if (!name) {

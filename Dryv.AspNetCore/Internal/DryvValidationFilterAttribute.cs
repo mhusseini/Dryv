@@ -30,7 +30,7 @@ namespace Dryv.AspNetCore.Internal
             if (model != null)
             {
                 //await this.ValidateSync((Controller)context.Controller, model);
-                await this.ValidateAsync((Controller)context.Controller, model);
+                await this.ValidateAsync(context, model);
             }
 
             await next();
@@ -39,20 +39,29 @@ namespace Dryv.AspNetCore.Internal
         /// <summary>
         /// Validates the model and sets the model state on the controller accordingly.
         /// </summary>
-        /// inside the synchronous validation infrastructure in ASP.NET core.</param>
-        public async Task<bool> ValidateAsync<TModel>(Controller controller, TModel model)
+        public async Task<bool> ValidateAsync<TModel>(ActionExecutingContext context, TModel model)
         {
+            var controller = (Controller)context.Controller;
             var result = true;
             var errors = await this.validator.Validate(model, controller.HttpContext.RequestServices.GetService);
+            var resultDictionary = new Dictionary<string, DryvResultMessage>();
 
             foreach (var x in from error in errors
                               from message in error.Message
-                              where message.Type == DryvResultType.Error
                               select new { error, message })
             {
+                resultDictionary.Add(x.error.Path, x.message);
+
+                if (x.message.Type != DryvResultType.Error)
+                {
+                    continue;
+                }
+
                 result = false;
                 controller.ModelState.AddModelError(x.error.Path, x.message.Text);
             }
+
+            context.HttpContext.Items.Add(typeof(Dictionary<string, DryvResultMessage>), resultDictionary);
 
             return result;
         }

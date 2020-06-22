@@ -77,19 +77,19 @@
         </form>
     </div>
 
-<script type="text/x-template" id="form-input">
-    <div class="form-item" v-dryv-field>
-        <div>
-            <div class="form-input-label">
-                <label>{{ label }}</label>
+    <script type="text/x-template" id="form-input">
+        <div class="form-item" v-dryv-field>
+            <div>
+                <div class="form-input-label">
+                    <label>{{ label }}</label>
+                </div>
+                <div class="form-input-control">
+                    <input v-bind:value="value" v-on:input="$emit('input', $event.target.value)">
+                </div>
             </div>
-            <div class="form-input-control">
-                <input v-bind:value="value" v-on:input="$emit('input', $event.target.value)">
-            </div>
+            <div class="form-item-warning" v-if="warning">{{ warning }}</div>
+            <div class="form-item-error" v-if="error">{{ error }}</div>
         </div>
-        <div class="form-item-warning" v-if="warning">{{ warning }}</div>
-        <div class="form-item-error" v-if="error">{{ error }}</div>
-    </div>
     </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.11/vue.min.js"></script>
@@ -118,6 +118,7 @@
             el: '#app',
             data: {
                 isValid: null,
+                lastValidationWarning: null,
                 billingEqualsShipping: true,
                 person: {
                     firstName: null,
@@ -136,15 +137,15 @@
                 async validateForm(e) {
                     e.preventDefault();
                     this.isValid = true;
+                    const validation = await this.$dryv.validate();
 
-                    if (await this.$dryv.validate()) {
-                        const result = await axios.post(e.currentTarget.action, this.$data);
-                        this.isValid = !result.data || result.data.length > 0;
-                        if (!this.isValid) {
-                            this.$dryv.setValidationResult(result.data.errors);
-                        }
+                    if (!validation.hasErrors && (!validation.hasWarnings || validation.warningHash === this.lastValidationWarning)) {
+                        const result = await axios.post(e.srcElement.action, this.$data);
+                        this.isValid = this.$dryv.setValidationResult(result.data.messages);
+                        this.lastValidationWarning = null;
                     } else {
-                        this.isValid = true;
+                        this.isValid = false;
+                        this.lastValidationWarning = validation.warningHash;
                     }
                 }
             }

@@ -1,9 +1,7 @@
 ﻿using System;
 using Dryv.AspNetCore.DynamicControllers.Endpoints;
 using Dryv.AspNetCore.Internal;
-using Dryv.Compilation;
 using Dryv.Configuration;
-using Dryv.RuleDetection;
 using Dryv.Translation;
 using Dryv.Translation.Translators;
 using Dryv.Validation;
@@ -39,7 +37,7 @@ namespace Dryv.AspNetCore
 
             return new DryvMvcBuilder(services)
                 .AddTranslator<ObjectTranslator>()
-                .AddTranslator<DryvResultTranslator>()
+                .AddTranslator<DryvResultMessageTranslator>()
                 .AddTranslator<StringTranslator>()
                 .AddTranslator<EnumerableTranslator>()
                 .AddTranslator<RegexTranslator>()
