@@ -33,9 +33,7 @@ namespace Dryv.AspNetCore
             services.TryAddSingleton<DryvEndpointRouteBuilderProvider>();
             services.TryAddSingleton(typeof(IDryvClientValidationFunctionWriter), options.ClientFunctionWriterType);
             services.TryAddSingleton<ITranslator, JavaScriptTranslator>();
-            services.TryAddSingleton<DryvRulesFinder>();
             services.TryAddSingleton<DryvValidator>();
-            services.TryAddSingleton<DryvServerRuleEvaluator>();
             services.TryAddSingleton<ITranslatorProvider, TranslatorProvider>();
             services.AddSingleton(Options.Create(options));
 

@@ -15,9 +15,9 @@ namespace Dryv.Tests
         [TestMethod]
         public async Task Asnyc_Validation_Correctly_Run()
         {
-            var validator = new DryvValidator(new DryvRulesFinder(), new DryvServerRuleEvaluator());
+            var validator = new DryvValidator();
             var model = new Model();
-            var errors = await validator.ValidateAsync(model);
+            var errors = await validator.Validate(model);
 
             Assert.IsTrue(errors.Any(e => e.Message.Any(vr => vr.IsError())));
         }

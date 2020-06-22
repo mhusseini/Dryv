@@ -1,38 +1,32 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
 using System.Threading.Tasks;
-using Dryv.AspNetCore.DynamicControllers;
-using Dryv.AspNetCore.DynamicControllers.CodeGeneration;
 using Dryv.Compilation;
 using Dryv.Configuration;
 using Dryv.RuleDetection;
-using Dryv.SampleConsole.Models;
-using Dryv.SampleVue;
-using Dryv.SampleVue.CustomValidation;
 using Dryv.Validation;
-using Microsoft.Extensions.Options;
+using Dryv.SampleConsole.Models;
 
-namespace Dryv.SampleConsole
+internal class Program
 {
-    class Program
+    private static async Task Main()
     {
-        static void Main()
+        var model = new HomeModel
         {
-            Expression<Func<Address, AsyncValidator, SampleOptions, Task<DryvResultMessage>>> f = (a, v, o) => v.ValidateZipCode(a.ZipCode, a.City, o.ZipCodeLength + 1);
+            Person = new Person(),
+            ShippingAddress = new Address(),
+            BillingAddress = new Address { Deactivated = true },
+        };
 
-            var g = new ControllerGenerator(new OptionsWrapper<DryvDynamicControllerOptions>(new DryvDynamicControllerOptions
-            {
-                HttpMethod = DryvDynamicControllerMethods.Get
-            }));
+        var validator = new DryvValidator();
+        var errors = await validator.Validate(model, Activator.CreateInstance);
 
-            var ass = g.CreateControllerAssembly(f.Body as MethodCallExpression, typeof(Address));
-            var t = ass.GetTypes().First();
-            var c = Activator.CreateInstance(t, new AsyncValidator(), new SampleOptions());
-            var m = c.GetType().GetMethods().First(m => !m.Attributes.HasFlag(MethodAttributes.HideBySig));
-
-            //var x = m.Invoke(c, new object[] { "1234", "Doooomcity" });
+        foreach (var error in from e in errors
+                              from m in e.Message
+                              select m.Type + " " + e.Path + ": " + m.Text)
+        {
+            Console.WriteLine(error);
         }
     }
 }

@@ -13,23 +13,28 @@
 <body>
 
     <script>
-        (function(dryv) {
-            dryv.validators = {
-                @Html.Raw(string.Join(",\n", from val in Html.GetDryvClientValidationFunctions()
-                                                      select $@"""{val.Key}"": {val.Value}"))
+        (function(dryv, viewName) {
+            if (!dryv.v) {
+                dryv.v = {};
+            }
+
+            dryv.v[viewName] = {
+                validators: {
+                    @Html.Raw(string.Join(",\n", from val in Html.GetDryvClientValidationFunctions()
+                                                          select $@"""{val.Key}"": {val.Value}"))
+                },
+                disablers: {
+                    @Html.Raw(string.Join(",\n", from val in Html.GetDryvClientDisablingFunctions()
+                                                          select $@"""{val.Key}"": {val.Value}"))
+                }
             };
-            dryv.disablers = {
-                @Html.Raw(string.Join(",\n", from val in Html.GetDryvClientDisablingFunctions()
-                                                      select $@"""{val.Key}"": {val.Value}"))
-            };
-        })(window.dryv || (window.dryv = {}));
+        })(window.dryv || (window.dryv = {}), "demo-form");
     </script>
 
-    <div id="app" v-dryv>
-        <h1>Form validation with VueJS and Dryv.</h1>
+    <div id="app" v-dryv="'demo-form'">
+        <h1>Form validation with Vue.js and Dryv.</h1>
         <form v-on:submit="validateForm" method="post">
             <div class="form-content">
-                @*<input v-model="person.firstName" v-dryv="person.firstName"/>*@
                 <div class="form-block">
                     <h3>Personal Data</h3>
 
@@ -72,72 +77,78 @@
         </form>
     </div>
 
-    <script type="text/x-template" id="form-input">
-        <div class="form-item" v-dryv-field>
-            <div>
-                <div class="form-input-label">
-                    <label>{{ label }}</label>
-                </div>
-                <div class="form-input-control">
-                    <input v-bind:value="value" v-on:input="$emit('input', $event.target.value)">
-                </div>
+<script type="text/x-template" id="form-input">
+    <div class="form-item" v-dryv-field>
+        <div>
+            <div class="form-input-label">
+                <label>{{ label }}</label>
             </div>
-            <div class="form-item-error" v-if="error">{{ error }}</div>
+            <div class="form-input-control">
+                <input v-bind:value="value" v-on:input="$emit('input', $event.target.value)">
+            </div>
         </div>
+        <div class="form-item-warning" v-if="warning">{{ warning }}</div>
+        <div class="form-item-error" v-if="error">{{ error }}</div>
+    </div>
     </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.11/vue.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js"></script>
-    <script src="demo.js"></script>
-<script>
-    Vue.use(Dryv,
-        {
-            get: axios.get,
-            post: axios.post
-        });
+    <script src="dryvue.js"></script>
+    <script>
+        Vue.use(Dryvue,
+            {
+                get: axios.get,
+                post: axios.post
+            });
 
-    Vue.component('form-input',
-        {
-            props: ['value', 'type', 'name', 'label'],
-            template: '#form-input',
-            data() {
-                return {
-                    error: null
-                };
-            }
-        });
+        Vue.component('form-input',
+            {
+                props: ['value', 'type', 'name', 'label'],
+                template: '#form-input',
+                data() {
+                    return {
+                        error: null,
+                        warning: null
+                    };
+                }
+            });
 
-    const app = new Vue({
-        el: '#app',
-        data: {
-            isValid: null,
-            billingEqualsShipping: true,
-            person: {
-                firstName: null,
-                lastName: null
+        const app = new Vue({
+            el: '#app',
+            data: {
+                isValid: null,
+                billingEqualsShipping: true,
+                person: {
+                    firstName: null,
+                    lastName: null
+                },
+                shippingAddress: {
+                    zipCode: null,
+                    city: null
+                },
+                billingAddress: {
+                    zipCode: null,
+                    city: null
+                }
             },
-            shippingAddress: {
-                zipCode: null,
-                city: null
-            },
-            billingAddress: {
-                zipCode: null,
-                city: null
-            }
-        },
-        methods: {
-            async validateForm(e) {
-                e.preventDefault();
+            methods: {
+                async validateForm(e) {
+                    e.preventDefault();
+                    this.isValid = true;
 
-                if (await this.$dryv.validate()) {
-                    const result = axios.post(e.currentTarget.action, this.$data);
-                    if (result.data) {
-                        this.$dryv.setValidationResult(result.data.errors);
+                    if (await this.$dryv.validate()) {
+                        const result = await axios.post(e.currentTarget.action, this.$data);
+                        this.isValid = !result.data || result.data.length > 0;
+                        if (!this.isValid) {
+                            this.$dryv.setValidationResult(result.data.errors);
+                        }
+                    } else {
+                        this.isValid = true;
                     }
                 }
             }
-        }
-    });
-</script>
+        });
+    </script>
 </body>
 </html>

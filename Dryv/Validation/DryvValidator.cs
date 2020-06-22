@@ -18,80 +18,24 @@ namespace Dryv.Validation
     public class DryvValidator
     {
         private static readonly ConcurrentDictionary<Type, DryvServerRuleCompiler.ValidateAsyncAction> ValidateAsyncMethods = new ConcurrentDictionary<Type, DryvServerRuleCompiler.ValidateAsyncAction>();
-        private static readonly ConcurrentDictionary<Type, DryvServerRuleCompiler.ValidateAction> ValidateMethods = new ConcurrentDictionary<Type, DryvServerRuleCompiler.ValidateAction>();
 
         private readonly DryvServerRuleCompiler ruleCompiler;
         private readonly DryvServerRuleEvaluator ruleEvaluator;
         private readonly DryvRulesFinder ruleFinder;
 
-        public DryvValidator(DryvRulesFinder ruleFinder, DryvServerRuleEvaluator ruleEvaluator)
+        public DryvValidator()
         {
-            this.ruleFinder = ruleFinder;
-            this.ruleEvaluator = ruleEvaluator;
+            this.ruleFinder = new DryvRulesFinder();
+            this.ruleEvaluator = new DryvServerRuleEvaluator();
             this.ruleCompiler = new DryvServerRuleCompiler();
         }
 
-        public async Task<IList<DryvResult>> Validate(object model, DryvOptions options, Func<Type, object> services = null)
-        {
-            var results = await this.ValidateCore(model, services ?? (t => null), new Dictionary<object, object>(), options);
-            return results.Where(r => r.Message.Any(vr => !vr.IsSuccess())).Take(1).ToList();
-        }
-
-        public async Task<List<DryvResult>> ValidateAsync(
+        public async Task<List<DryvResult>> Validate(
             object model,
-            bool asyncOnly = false,
             Func<Type, object> services = null)
         {
-            var result = await this.ValidateCoreAsync(model, services ?? (t => null), new Dictionary<object, object>(), asyncOnly);
+            var result = await this.ValidateCoreAsync(model, services ?? (t => null), new Dictionary<object, object>());
             return result.Where(r => r.Message.Any(vr => !vr.IsSuccess())).ToList();
-        }
-
-        internal async Task ValidatePath(
-            object input,
-            object rootModel,
-            PropertyInfo property,
-            object parentModel,
-            string path,
-            IList<DryvResult> result,
-            ICollection<object> processed,
-            Func<Type, object> services,
-            IDictionary<object, object> cache,
-            DryvOptions options)
-        {
-            if (parentModel != null && property != null)
-            {
-                var disablingRules = this.GetModelsAndRules(parentModel, rootModel, property, services, cache, true, true, RuleType.Disabling);
-                var disabled = await Task.WhenAll(from modelRule in disablingRules
-                                                  select this.ruleEvaluator.IsDisabledAsync(modelRule.Value, modelRule.Key, services));
-                if (disabled.Any(v => v))
-                {
-                    return;
-                }
-            }
-
-            if (input is IEnumerable items)
-            {
-                string suffix;
-                if (path.EndsWith("."))
-                {
-                    path = path.TrimEnd('.');
-                    suffix = ".";
-                }
-                else
-                {
-                    suffix = string.Empty;
-                }
-
-                var i = 0;
-                foreach (var model in items.OfType<object>())
-                {
-                    this.ValidateSingleItem(model, rootModel, $"{path}[{i++}]{suffix}", result, processed, services, cache, options);
-                }
-            }
-            else
-            {
-                this.ValidateSingleItem(input, rootModel, path, result, processed, services, cache, options);
-            }
         }
 
         internal async Task ValidatePathAsync(
@@ -103,8 +47,7 @@ namespace Dryv.Validation
             IList<DryvAsyncResult> result,
             ICollection<object> processed,
             Func<Type, object> services,
-            IDictionary<object, object> cache,
-            bool asyncOnly)
+            IDictionary<object, object> cache)
         {
             if (parentModel != null && property != null)
             {
@@ -133,12 +76,12 @@ namespace Dryv.Validation
                 var i = 0;
                 foreach (var model in items.OfType<object>())
                 {
-                    this.ValidateSingleItemAsync(model, rootModel, $"{path}[{i++}]{suffix}", result, processed, services, cache, asyncOnly);
+                    this.ValidateSingleItemAsync(model, rootModel, $"{path}[{i++}]{suffix}", result, processed, services, cache);
                 }
             }
             else
             {
-                this.ValidateSingleItemAsync(input, rootModel, path, result, processed, services, cache, asyncOnly);
+                this.ValidateSingleItemAsync(input, rootModel, path, result, processed, services, cache);
             }
         }
 
@@ -214,25 +157,12 @@ namespace Dryv.Validation
             return (from node in ruleNodes
                     where node.Rule.EvaluationLocation.HasFlag(DryvRuleLocation.Server)
                     let isAsync = typeof(Task).IsAssignableFrom(node.Rule.ValidationExpression.ReturnType)
-                    where (asyncAllowed || !isAsync) && (!asyncAllowed || !syncAllowed || isAsync)
+                    where (asyncAllowed && isAsync) || (syncAllowed && !isAsync)
                     let model = treeInfo.FindModel(node.Rule.ModelPath, currentModel, cache)
                     select new KeyValuePair<object, DryvCompiledRule>(model, node.Rule)).ToList();
         }
 
-        private async Task<IEnumerable<DryvResult>> ValidateCore(object model, Func<Type, object> services, IDictionary<object, object> cache, DryvOptions options)
-        {
-            var result = new List<DryvResult>();
-            if (model == null)
-            {
-                return result;
-            }
-
-            await this.ValidatePath(model, model, null, null, string.Empty, result, new HashSet<object>(), services, cache, options);
-
-            return result;
-        }
-
-        private async Task<IList<DryvResult>> ValidateCoreAsync(object model, Func<Type, object> services, IDictionary<object, object> cache, bool asyncOnly)
+        private async Task<IList<DryvResult>> ValidateCoreAsync(object model, Func<Type, object> services, IDictionary<object, object> cache)
         {
             var result = new List<DryvResult>();
             if (model == null)
@@ -251,38 +181,10 @@ namespace Dryv.Validation
             }
 
             var asyncResults = new List<DryvAsyncResult>();
-            await this.ValidatePathAsync(model, model, null, null, string.Empty, asyncResults, new HashSet<object>(), services, cache, asyncOnly);
+            await this.ValidatePathAsync(model, model, null, null, string.Empty, asyncResults, new HashSet<object>(), services, cache);
             result.AddRange(await Task.WhenAll(asyncResults.Select(r => r.Task)));
 
             return result;
-        }
-
-        private void ValidateSingleItem(
-            object model,
-            object rootModel,
-            string path,
-            IList<DryvResult> result,
-            ICollection<object> processed,
-            Func<Type, object> services,
-            IDictionary<object, object> cache,
-            DryvOptions options)
-        {
-            if (model == null || processed.Contains(model))
-            {
-                return;
-            }
-
-            processed.Add(model);
-            ValidateMethods.GetOrAdd(model.GetType(), this.ruleCompiler.CreateValidateMethods)(
-                this,
-                model,
-                rootModel,
-                path,
-                result,
-                processed,
-                services,
-                cache,
-                options);
         }
 
         private void ValidateSingleItemAsync(object model,
@@ -291,8 +193,7 @@ namespace Dryv.Validation
             IList<DryvAsyncResult> result,
             ICollection<object> processed,
             Func<Type, object> services,
-            IDictionary<object, object> cache,
-            bool asyncOnly)
+            IDictionary<object, object> cache)
         {
             if (model == null || processed.Contains(model))
             {
@@ -310,7 +211,7 @@ namespace Dryv.Validation
                 processed,
                 services,
                 cache,
-                asyncOnly);
+                false);
         }
     }
 }

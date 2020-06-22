@@ -9,7 +9,7 @@ using Dryv.Rules;
 
 namespace Dryv.Compilation
 {
-    public class DryvServerRuleEvaluator
+    internal class DryvServerRuleEvaluator
     {
         public bool IsEnabled(DryvCompiledRule rule, Func<Type, object> objectFactory)
         {

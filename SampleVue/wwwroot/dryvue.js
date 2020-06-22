@@ -43,7 +43,7 @@ function findFormComponent(vnode) {
     while (component) {
         if (component._vnode && component._vnode.data &&
             component._vnode.data.directives &&
-            component._vnode.data.directives.filter(dryv => dryv.name === "dryv-form").length > 0) {
+            component._vnode.data.directives.filter(dryv => dryv.name === "dryv").length > 0) {
             return component;
         }
 
@@ -66,19 +66,36 @@ function findeModelExpression(vnode) {
     return null;
 }
 
-function initializeFormComponent(component, options) {
-    if (component.$dryv) {
-        return;
+function initializeFormComponent(component, name, options) {
+    if (!component.$dryv) {
+        component.$dryv = {};
     }
 
-    component.$dryv = {
-        formValidators: [],
-        validate: validate.bind(component, component, options.dryv),
-        setValidationResult: setValidationResult.bind(component, component)
-    };
+    const d = component.$dryv;
+
+    if (!d.v) {
+        const validationSet = options.dryv.v[name];
+        if (!validationSet) {
+            throw `No validation set with name '${name}' was found on the Dryv object supplied with the options.`;
+        }
+
+        d.v = validationSet;
+    }
+
+    if (!d.formValidators) {
+        d.formValidators = [];
+    }
+
+    if (!d.validate) {
+        d.validate = validate.bind(component, component, d.v);
+    }
+
+    if (!d.setValidationResult) {
+        d.setValidationResult = setValidationResult.bind(component, component);
+    }
 }
 
-const Dryv = {
+const Dryvue = {
     install(Vue, options) {
         if (!options) options = {};
         if (!options.get) options.get = axios.get;
@@ -95,7 +112,7 @@ const Dryv = {
 
             return response.data && response.data.text;
         };
-        
+
         Vue.directive('dryv-field',
             {
                 inserted: function (el, binding, vnode) {
@@ -109,8 +126,6 @@ const Dryv = {
                         Vue.util.warn("No component found with a 'v-dryv' directive.");
                         return;
                     }
-
-                    initializeFormComponent(formComponent, options);
 
                     let path;
                     let errorField = options.errorField;
@@ -133,20 +148,37 @@ const Dryv = {
                         throw "Property path is missing. Please specify a value for the 'v-dryv-field' attribute or use the 'v-drvy-field' directive in combination with 'v-model'. Example value: 'firstName' or 'child.firstName'.";
                     }
 
-                    const validator = options.dryv.validators[path];
-                    if (!validator) {
-                        return;
-                    }
+                    //const validator = options.dryv.validators[path];
+                    //if (!validator) {
+                    //    return;
+                    //}
+
+                    let validator = undefined;
 
                     Vue.set(component, errorField, null);
 
+                    if (!formComponent.$dryv) {
+                        formComponent.$dryv = {
+                            formValidators: []
+                        };
+                    }
+
                     formComponent.$dryv.formValidators.push({
                         validate: async (disabledFields) => {
+                            if (validator === undefined) {
+                                validator = formComponent.$dryv.v.validators[path];
+                            }
+                            if (!validator) {
+                                return null;
+                            }
                             const error = (!disabledFields || disabledFields.filter(f => name.indexOf(f) >= 0).length === 0) && await validator(formComponent.$data);
                             Vue.set(component, errorField, error);
                             return error;
                         },
                         setError: errors => {
+                            if (!validator) {
+                                return null;
+                            }
                             const error = errors && errors[name];
                             Vue.set(component, errorField, error);
                             return error;
@@ -155,6 +187,29 @@ const Dryv = {
                 }
             });
 
-        Vue.directive('dryv-form', {});
+        Vue.directive('dryv', {
+            inserted: function (el, binding, vnode) {
+                const component = vnode.context;
+                if (!component) {
+                    throw "The 'v-dryv' directive can only be applied to components.";
+                }
+
+                let name;
+                switch (typeof binding.value) {
+                    case "object":
+                        name = binding.value.name;
+                        break;
+                    case "string":
+                        name = binding.value;
+                        break;
+                }
+
+                if (!name) {
+                    throw "Form name is missing. Please specify a value for the 'v-dryv' attribute.";
+                }
+
+                initializeFormComponent(component, name, options);
+            }
+        });
     }
 };
