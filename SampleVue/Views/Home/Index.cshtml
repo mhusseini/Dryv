@@ -1,6 +1,7 @@
 ﻿@using System.Linq
 @using Dryv.AspNetCore
 @using Dryv.SampleVue.Models
+@namespace Dryv.SampleVue
 
 @model HomeModel
 
@@ -21,11 +22,11 @@
             dryv.v[viewName] = {
                 validators: {
                     @Html.Raw(string.Join(",\n", from val in Html.GetDryvClientValidationFunctions()
-                                                          select $@"""{val.Key}"": {val.Value}"))
+                                                          select $@"""{val.Key}"": {val.Value.GetString()}"))
                 },
                 disablers: {
                     @Html.Raw(string.Join(",\n", from val in Html.GetDryvClientDisablingFunctions()
-                                                          select $@"""{val.Key}"": {val.Value}"))
+                                                          select $@"""{val.Key}"": {val.Value.GetString()}"))
                 }
             };
         })(window.dryv || (window.dryv = {}), "demo-form");

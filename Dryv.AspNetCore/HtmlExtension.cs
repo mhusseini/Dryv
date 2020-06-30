@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using Dryv.Extensions;
@@ -14,7 +15,17 @@ namespace Dryv.AspNetCore
         public static DryvClientValidationItem DryvClientValidationFor<TModel>(this IHtmlHelper<TModel> htmlHelper, Expression<Func<TModel, object>> propertyExpression)
         {
             var loader = htmlHelper.ViewContext.HttpContext.RequestServices.GetService<DryvClientValidationLoader>();
-            return loader.GetDryvClientValidation<TModel>(propertyExpression);
+            return loader.GetDryvClientValidation(propertyExpression);
+        }
+
+        public static IDictionary<string, Action<TextWriter>> GetDryvClientDisablingFunctions<TModel>(this IHtmlHelper<TModel> htmlHelper)
+        {
+            return (from val in htmlHelper.GetDryvClientValidationForModel()
+                    where val.DisablingFunction != null
+                    select val)
+                .ToDictionary(
+                    val => val.ModelPath + (string.IsNullOrWhiteSpace(val.ModelPath) ? string.Empty : ".") + val.Property.Name.ToCamelCase(),
+                    val => val.DisablingFunction);
         }
 
         public static IEnumerable<DryvClientValidationItem> GetDryvClientValidationForModel<TModel>(this IHtmlHelper<TModel> htmlHelper)
@@ -23,24 +34,14 @@ namespace Dryv.AspNetCore
             return loader.GetDryvClientValidation(typeof(TModel));
         }
 
-        public static IDictionary<string, string> GetDryvClientValidationFunctions<TModel>(this IHtmlHelper<TModel> htmlHelper)
+        public static IDictionary<string, Action<TextWriter>> GetDryvClientValidationFunctions<TModel>(this IHtmlHelper<TModel> htmlHelper)
         {
             return (from val in htmlHelper.GetDryvClientValidationForModel()
-                    where !string.IsNullOrWhiteSpace(val.ValidationFunction)
+                    where val.ValidationFunction != null
                     select val)
                 .ToDictionary(
                     val => val.ModelPath + (string.IsNullOrWhiteSpace(val.ModelPath) ? string.Empty : ".") + val.Property.Name.ToCamelCase(),
                     val => val.ValidationFunction);
-        }
-
-        public static IDictionary<string, string> GetDryvClientDisablingFunctions<TModel>(this IHtmlHelper<TModel> htmlHelper)
-        {
-            return (from val in htmlHelper.GetDryvClientValidationForModel()
-                    where !string.IsNullOrWhiteSpace(val.DisablingFunction)
-                    select val)
-                .ToDictionary(
-                    val => val.ModelPath + (string.IsNullOrWhiteSpace(val.ModelPath) ? string.Empty : ".") + val.Property.Name.ToCamelCase(),
-                    val => val.DisablingFunction);
         }
     }
 }

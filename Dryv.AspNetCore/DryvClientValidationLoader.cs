@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -105,7 +106,7 @@ namespace Dryv.AspNetCore
 
             var key = $"v{Math.Abs((modelType.FullName + property.Name + modelPath).GetHashCode())}";
 
-            return string.IsNullOrWhiteSpace(validationFunction) && string.IsNullOrWhiteSpace(disablingFunction) ? null : new DryvClientValidationItem
+            return validationFunction == null && disablingFunction == null ? null : new DryvClientValidationItem
             {
                 ValidationFunction = validationFunction,
                 DisablingFunction = disablingFunction,
@@ -116,7 +117,7 @@ namespace Dryv.AspNetCore
             };
         }
 
-        private string TranslateRules(Type modelType, string modelPath, IEnumerable<DryvRuleTreeNode> rules)
+        private Action<TextWriter> TranslateRules(Type modelType, string modelPath, IEnumerable<DryvRuleTreeNode> rules)
         {
             var translatedRules = this.translator.Translate(rules, modelPath, modelType);
             var validationFunction = translatedRules.Any() ? this.clientValidationFunctionWriter.GetValidationFunction(translatedRules) : null;

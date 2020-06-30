@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using Dryv.RuleDetection;
 
@@ -6,27 +8,21 @@ namespace Dryv.Validation
 {
     public class DryvAsyncClientValidationFunctionWriter : IDryvClientValidationFunctionWriter
     {
-        public string GetValidationFunction(IDictionary<DryvRuleTreeNode, string> translatedRules)
-        {
-            var sb = new StringBuilder();
-
-            sb.AppendLine("function(m, context) { return [");
-            var index = 0;
-            foreach (var rule in translatedRules)
+        public Action<TextWriter> GetValidationFunction(IDictionary<DryvRuleTreeNode, string> translatedRules) => writer =>
             {
-                sb.Append(rule.Value);
-                if (++index > 0)
-                {
-                    sb.AppendLine(",");
-                }
-            }
-            sb.AppendLine(@"].reduce(function(promiseChain, currentTask){
-                return promiseChain.then(function(error){
-                    return error || currentTask(m ,context);
-                });
-            }, Promise.resolve());}");
+                writer.Write("function(m, context) { return [");
+                var index = 0;
 
-            return sb.ToString();
-        }
+                foreach (var rule in translatedRules)
+                {
+                    writer.Write(rule.Value);
+                    if (++index > 0)
+                    {
+                        writer.Write(",");
+                    }
+                }
+
+                writer.Write(@"].reduce(function(promiseChain, currentTask){ return promiseChain.then(function(error){ return error || currentTask(m, context); }); }, Promise.resolve());}");
+            };
     }
 }

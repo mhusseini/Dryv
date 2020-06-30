@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Dryv.RuleDetection;
 
@@ -6,9 +8,9 @@ namespace Dryv.Validation
 {
     public class DryvClientValidationFunctionWriter : IDryvClientValidationFunctionWriter
     {
-        public string GetValidationFunction(IDictionary<DryvRuleTreeNode, string> translatedRules)
+        public Action<TextWriter> GetValidationFunction(IDictionary<DryvRuleTreeNode, string> translatedRules)
         {
-            return $@"function(m) {{ return {string.Join("||", translatedRules.Values.Select(f => $"({f}).call(this, m)"))}; }}";
+            return writer => writer.Write($@"function(m) {{ return {string.Join("||", translatedRules.Values.Select(f => $"({f}).call(this, m)"))}; }}");
         }
     }
 }
