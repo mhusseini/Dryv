@@ -70,13 +70,16 @@ function setValidationResult(component, results) {
     return !results || results.length === 0;
 }
 
+const dryvSetDirective = "dryv-set";
+const dryvFieldDirective = "dryv";
+
 function findFormComponent(vnode) {
     let component = vnode.context;
 
     while (component) {
         if (component._vnode && component._vnode.data &&
             component._vnode.data.directives &&
-            component._vnode.data.directives.filter(dryv => dryv.name === "dryv").length > 0) {
+            component._vnode.data.directives.filter(dryv => dryv.name === dryvSetDirective).length > 0) {
             return component;
         }
 
@@ -178,7 +181,7 @@ const Dryvue = {
         if (!options.dryv) options.dryv = window.dryv;
 
         dryv.validateAsync = async function (baseUrl, method, data) {
-            const isGet = method === 'GET';
+            const isGet = method === "GET";
             const url = isGet ? baseUrl + "?" + Object.keys(data).map(k => `${k}=${encodeURIComponent(data[k])}`).join('&') : baseUrl;
             const response = isGet
                 ? await options.get(url)
@@ -187,17 +190,33 @@ const Dryvue = {
             return response.data;
         };
 
-        Vue.directive('dryv-field',
+        Vue.component("dryv-group",
+            {
+                props: ['groups'],
+                data() {
+                    return {};
+                },
+                created() {
+                    debugger;
+                    const groups = this.groups;
+                    for (let group in groups) {
+                        const field = groups[group];
+                        Vue.set(this, field, null);
+                    }
+                }
+            });
+
+        Vue.directive(dryvFieldDirective,
             {
                 inserted: function (el, binding, vnode) {
                     const component = vnode.context;
                     if (!component) {
-                        throw "The 'v-dryv-field' directive can only be applied to components.";
+                        throw `The '${dryvFieldDirective}' directive can only be applied to components.`;
                     }
 
                     const formComponent = findFormComponent(vnode);
                     if (!formComponent) {
-                        Vue.util.warn("No component found with a 'v-dryv' directive.");
+                        Vue.util.warn(`No component found with a ${dryvSetDirective} directive.`);
                         return;
                     }
 
@@ -221,7 +240,7 @@ const Dryvue = {
                     }
 
                     if (!path) {
-                        throw "The property path is missing. Please specify a value for the 'v-dryv-field' attribute or use the 'v-drvy-field' directive in combination with 'v-model'. Example value: 'firstName' or 'child.firstName'.";
+                        throw `The property path is missing. Please specify a value for the ${dryvFieldDirective} attribute or use the ${dryvFieldDirective} directive in combination with 'v-model'. Example value: 'firstName' or 'child.firstName'.`;
                     }
 
                     let validator = undefined;
@@ -259,11 +278,11 @@ const Dryvue = {
                 }
             });
 
-        Vue.directive('dryv', {
+        Vue.directive(dryvSetDirective, {
             inserted: function (el, binding, vnode) {
                 const component = vnode.context;
                 if (!component) {
-                    throw "The 'v-dryv' directive can only be applied to components.";
+                    throw `The ${dryvSetDirective} directive can only be applied to components.`;
                 }
 
                 let name;
@@ -279,7 +298,7 @@ const Dryvue = {
                 }
 
                 if (!name) {
-                    throw "Form name is missing. Please specify a value for the 'v-dryv' attribute.";
+                    throw `Form name is missing. Please specify a value for the ${dryvSetDirective} attribute.`;
                 }
 
                 initializeFormComponent(component, name, options);

@@ -5,10 +5,11 @@ namespace Dryv.Configuration
 {
     public class DryvOptions
     {
-        public TranslationErrorBehavior TranslationErrorBehavior { get; set; }
-
-        public Type ClientFunctionWriterType { get; internal set; } = typeof(DryvClientValidationFunctionWriter);
-
+        public static readonly Type DefaultClientFunctionWriterType = typeof(DryvAsyncClientValidationFunctionWriter);
+        public static readonly Type DefaultClientValidationSetWriterType = typeof(DryvClientValidationSetWriter);
         public bool BreakOnFirstValidationError { get; set; } = true;
+        public Type ClientFunctionWriterType { get; internal set; } = DefaultClientFunctionWriterType;
+        public Type ClientValidationSetWriterType { get; internal set; } = DefaultClientValidationSetWriterType;
+        public TranslationErrorBehavior TranslationErrorBehavior { get; set; }
     }
 }

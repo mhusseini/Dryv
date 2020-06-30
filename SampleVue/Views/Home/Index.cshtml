@@ -1,6 +1,4 @@
-﻿@using System.Linq
-@using Dryv.AspNetCore
-@using Dryv.SampleVue.Models
+﻿@using Dryv.SampleVue.Models
 
 @model HomeModel
 
@@ -8,38 +6,23 @@
 <head>
     <title>Form validation with VueJS and Dryv.</title>
     <link rel="stylesheet" href="styles.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@200;400;700&family=Roboto:wght@300&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@200;400;700&family=Roboto:wght@300&display=swap" rel="stylesheet" />
 </head>
 <body>
-
-    <script>
-        (function(dryv, viewName) {
-            if (!dryv.v) {
-                dryv.v = {};
-            }
-
-            dryv.v[viewName] = {
-                validators: {
-                    @Html.Raw(string.Join(",\n", from val in Html.GetDryvClientValidationFunctions()
-                                                          select $@"""{val.Key}"": {val.Value}"))
-                },
-                disablers: {
-                    @Html.Raw(string.Join(",\n", from val in Html.GetDryvClientDisablingFunctions()
-                                                          select $@"""{val.Key}"": {val.Value}"))
-                }
-            };
-        })(window.dryv || (window.dryv = {}), "demo-form");
-    </script>
-
-    <div id="app" v-dryv="'demo-form'">
+    <dryv-client-rules for="@Model" name="demo-form"></dryv-client-rules>
+    <div id="app" dryv-set="demo-form">
         <h1>Form validation with Vue.js and Dryv.</h1>
         <form v-on:submit="validateForm" method="post">
             <div class="form-content">
                 <div class="form-block">
                     <h3>Personal Data</h3>
 
+                    @*<dryv-group v-groups='{"name": "nameError"}'>*@
                     <form-input label="First name" v-model="person.firstName"></form-input>
                     <form-input label="Last name" v-model="person.lastName"></form-input>
+
+                    @*{{ nameError }}
+                        </dryv-group>*@
                 </div>
 
                 <div class="form-block">
@@ -53,8 +36,8 @@
                     <h3>Billing Address</h3>
 
                     <div class="form-item">
-                        <label for="billingAddress-deactivate">Billing address equals shipping address.</label>
-                        <input id="billingAddress-deactivate" type="checkbox" v-model="billingEqualsShipping">
+                        <label !for="billingAddress-deactivate">Billing address equals shipping address.</label>
+                        <input id="billingAddress-deactivate" type="checkbox" v-model="billingEqualsShipping" />
                     </div>
 
                     <div v-show="!billingEqualsShipping">
@@ -64,7 +47,7 @@
                 </div>
             </div>
             <div class="form-block">
-                <input type="submit" value="Submit">
+                <input type="submit" value="Submit" />
 
                 <div v-if="isValid === true" class="validation-feedback" style="background-color: lightgreen">
                     Valid
@@ -78,7 +61,7 @@
     </div>
 
     <script type="text/x-template" id="form-input">
-        <div class="form-item" v-dryv-field>
+        <div class="form-item" v-dryv>
             <div>
                 <div class="form-input-label">
                     <label>{{ label }}</label>

@@ -19,7 +19,7 @@ namespace Dryv.AspNetCore
             setupAction?.Invoke(options);
 
             // As long as mvc validation is not async, we'll
-            // run the async validation from an action attribute.
+            // run the async validation from an action filter.
             mvcBuilder.AddMvcOptions(opts => opts.Filters.Add<DryvValidationFilterAttribute>());
 
             return RegsterServices(mvcBuilder.Services, options);
@@ -29,9 +29,11 @@ namespace Dryv.AspNetCore
         {
             services.TryAddSingleton<DryvClientValidationLoader>();
             services.TryAddSingleton<DryvEndpointRouteBuilderProvider>();
-            services.TryAddSingleton(typeof(IDryvClientValidationFunctionWriter), options.ClientFunctionWriterType);
+            services.TryAddSingleton(typeof(IDryvClientValidationFunctionWriter), options.ClientFunctionWriterType ?? DryvOptions.DefaultClientFunctionWriterType);
+            services.TryAddSingleton(typeof(IDryvClientValidationSetWriter), options.ClientValidationSetWriterType ?? DryvOptions.DefaultClientValidationSetWriterType);
             services.TryAddSingleton<ITranslator, JavaScriptTranslator>();
             services.TryAddSingleton<DryvValidator>();
+            services.TryAddSingleton<DryvClientWriter>();
             services.TryAddSingleton<ITranslatorProvider, TranslatorProvider>();
             services.AddSingleton(Options.Create(options));
 

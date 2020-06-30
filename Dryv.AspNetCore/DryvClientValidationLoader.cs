@@ -26,6 +26,18 @@ namespace Dryv.AspNetCore
             this.translator = new DryvRuleTranslator(options.Value, serviceProvider.GetService);
         }
 
+        public IDictionary<string, string> GetDryvClientDisablingFunctions<TModel>() => GetDryvClientDisablingFunctions(typeof(TModel));
+
+        public IDictionary<string, string> GetDryvClientDisablingFunctions(Type modelType)
+        {
+            return (from val in this.GetDryvClientValidation(modelType)
+                    where !string.IsNullOrWhiteSpace(val.DisablingFunction)
+                    select val)
+                .ToDictionary(
+                    val => val.ModelPath + (string.IsNullOrWhiteSpace(val.ModelPath) ? string.Empty : ".") + val.Property.Name.ToCamelCase(),
+                    val => val.DisablingFunction);
+        }
+
         public DryvClientValidationItem GetDryvClientValidation<TModel>(Expression<Func<TModel, object>> propertyExpression)
         {
             if (!(propertyExpression.Body is MemberExpression memberExpression) || !(memberExpression.Member is PropertyInfo property))
@@ -49,6 +61,18 @@ namespace Dryv.AspNetCore
         public IList<DryvClientValidationItem> GetDryvClientValidation(Type modelType)
         {
             return this.CollectClientValidation(modelType, modelType, string.Empty, new Stack<string>());
+        }
+
+        public IDictionary<string, string> GetDryvClientValidationFunctions<TModel>() => this.GetDryvClientValidationFunctions(typeof(TModel));
+
+        public IDictionary<string, string> GetDryvClientValidationFunctions(Type modelType)
+        {
+            return (from val in this.GetDryvClientValidation(modelType)
+                    where !string.IsNullOrWhiteSpace(val.ValidationFunction)
+                    select val)
+                .ToDictionary(
+                    val => val.ModelPath + (string.IsNullOrWhiteSpace(val.ModelPath) ? string.Empty : ".") + val.Property.Name.ToCamelCase(),
+                    val => val.ValidationFunction);
         }
 
         internal IList<DryvClientValidationItem> CollectClientValidation(Type modelType, Type rootModelType, string modelPath, Stack<string> processedTypes)
