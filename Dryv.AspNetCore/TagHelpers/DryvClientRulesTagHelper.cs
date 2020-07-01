@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using Dryv.Extensions;
-using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace Dryv.AspNetCore.TagHelpers
 {
-    [HtmlTargetElement(TagStructure = TagStructure.NormalOrSelfClosing)]
+    [HtmlTargetElement("dryv-client-rules", TagStructure = TagStructure.NormalOrSelfClosing)]
     public class DryvClientRulesTagHelper : TagHelper
     {
         private readonly DryvClientWriter clientWriter;

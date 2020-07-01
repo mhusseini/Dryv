@@ -8,7 +8,7 @@ namespace Dryv.Validation
     {
         public virtual void WriteBegin(TextWriter writer)
         {
-            writer.Write("(function(dryv, viewName) { if (!dryv.v) { dryv.v = {}; }");
+            writer.Write("(function(dryv) { if (!dryv.v) { dryv.v = {}; }");
         }
 
         public virtual void WriteEnd(TextWriter writer)
@@ -18,7 +18,9 @@ namespace Dryv.Validation
 
         public virtual void WriteValidationSet(TextWriter writer, string validationSetName, IDictionary<string, string> validators, IDictionary<string, string> disablers)
         {
-            writer.Write("dryv.v[viewName] = { validators: {");
+            writer.Write(@"dryv.v[""");
+            writer.Write(validationSetName);
+            writer.Write(@"""] = { validators: {");
             writer.Write(WriteObject(validators));
             writer.Write("}, disablers: {");
             writer.Write(WriteObject(disablers));

@@ -79,7 +79,7 @@ function findFormComponent(vnode) {
     while (component) {
         if (component._vnode && component._vnode.data &&
             component._vnode.data.directives &&
-            component._vnode.data.directives.filter(dryv => dryv.name === dryvSetDirective).length > 0) {
+            component._vnode.data.directives.filter(d => d.name === dryvSetDirective).length > 0) {
             return component;
         }
 
