@@ -24,21 +24,10 @@ namespace Dryv.SampleVue
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Error");
-                app.UseHsts();
-            }
-
+            app.UseDeveloperExceptionPage();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
             app.UseRouting();
-
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
@@ -54,22 +43,20 @@ namespace Dryv.SampleVue
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<AsyncValidator>();
-            services.AddSingleton(new SampleOptions());
-
+            services.AddRouting();
             services
                 .AddMvc(options =>
                 {
                     options.EnableEndpointRouting = true;
                 })
+                .AddRazorRuntimeCompilation()
                 .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)))
-                .AddDryv(options => options.UseClientFunctionWriter<DryvAsyncClientValidationFunctionWriter>())
-                .AddDryvDynamicControllers(options => options.HttpMethod = DryvDynamicControllerMethods.Get)
-                .AddDryvPreloading()
-                //.AddTranslator<AsyncValidatorTranslator>()
-                ;
+                .AddDryv()
+                .AddDryvDynamicControllers()
+                .AddDryvPreloading();
 
-            services.AddRouting();
+            services.AddSingleton<AsyncValidator>();
+            services.AddSingleton(new SampleOptions());
         }
     }
 }
