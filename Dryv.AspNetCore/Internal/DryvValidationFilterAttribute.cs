@@ -29,7 +29,6 @@ namespace Dryv.AspNetCore.Internal
 
             if (model != null)
             {
-                //await this.ValidateSync((Controller)context.Controller, model);
                 await this.ValidateAsync(context, model);
             }
 

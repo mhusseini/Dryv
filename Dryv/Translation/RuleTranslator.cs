@@ -83,7 +83,7 @@ namespace Dryv.Translation
 
             try
             {
-                var translatedRule = translator.Translate(rule.ValidationExpression, rule.PropertyExpression);
+                var translatedRule = translator.Translate(rule.ValidationExpression, rule.PropertyExpression, rule.GroupName);
 
                 rule.TranslatedValidationExpression = translatedRule.Factory;
                 rule.PreevaluationOptionTypes = translatedRule.OptionTypes;

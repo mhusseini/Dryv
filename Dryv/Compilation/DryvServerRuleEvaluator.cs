@@ -87,8 +87,8 @@ namespace Dryv.Compilation
 
             switch (result)
             {
-                case DryvResultMessage dryvResult: return Task.FromResult(dryvResult);
-                case Task<DryvResultMessage> task: return task;
+                case DryvResultMessage dryvResult: return Task.FromResult(new DryvResultMessage(dryvResult.Text, dryvResult.Type, rule.GroupName));
+                case Task<DryvResultMessage> task: return task.ContinueWith(t => new DryvResultMessage(t.Result.Text, t.Result.Type, rule.GroupName));
                 default: throw new InvalidOperationException($"Compiled validation expression for property {rule.Property.DeclaringType.FullName}.{rule.Property.Name} should return '{result.GetType().FullName}'. Only DryvResultMessage and Task<DryvResultMessage> are allowed.");
             }
         }

@@ -19,12 +19,22 @@
                 <div class="form-block">
                     <h3>Personal Data</h3>
 
-                    @*<dryv-group v-groups='{"name": "nameError"}'>*@
-                    <form-input label="First name" v-model="person.firstName"></form-input>
-                    <form-input label="Last name" v-model="person.lastName"></form-input>
+                    <dryv-group>
+                        <div slot-scope="{allErrors, allWanings, errors, warnings}">
+                            <form-input label="First name" v-model="person.firstName"></form-input>
+                            <form-input label="Last name" v-model="person.lastName"></form-input>
 
-                    @*{{ nameError }}
-                        </dryv-group>*@
+                            <div v-for="text in allErrors" :key="text" class="form-item-error">{{text}}</div>
+                            <div v-for="text in allWanings" :key="text" class="form-item-warning">{{text}}</div>
+
+                            @*<div v-if="errors['name']">
+                                <div v-for="text in errors['name']" :key="text" class="form-item-error">{{text}}</div>
+                            </div>
+                            <div v-if="warnings['name']">
+                                <div v-for="text in warnings['name']" :key="text" class="form-item-warning">#{{text}}#</div>
+                            </div>*@
+                        </div>
+                    </dryv-group>
                 </div>
 
                 <div class="form-block">

@@ -13,9 +13,9 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
 
             w.Write("dryv.validateAsync('");
             w.Write(url);
-            w.Write("', '");
+            w.Write("','");
             w.Write(httpMethod);
-            w.Write("', {");
+            w.Write("',{");
 
             var sep = string.Empty;
 
@@ -23,11 +23,11 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
             {
                 w.Write(sep);
                 w.Write(memberExpression.Member.Name.ToCamelCase());
-                w.Write(": ");
+                w.Write(":");
 
                 context.Translator.Translate(memberExpression, context);
 
-                sep = ",\n";
+                sep = ",";
             }
 
             w.Write("})");

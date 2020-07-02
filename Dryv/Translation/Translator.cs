@@ -16,9 +16,9 @@ namespace Dryv.Translation
             this.translationCompiler = new TranslationCompiler(this);
         }
 
-        public virtual TranslationResult Translate(Expression expression, MemberExpression propertyExpression)
+        public virtual TranslationResult Translate(Expression expression, MemberExpression propertyExpression, string groupName)
         {
-            var result = this.GenerateJavaScriptCode(expression, propertyExpression);
+            var result = this.GenerateJavaScriptCode(expression, propertyExpression, groupName);
             return this.translationCompiler.GenerateTranslationDelegate(result.Code, result.OptionDelegates, result.OptionTypes);
         }
 
@@ -146,7 +146,8 @@ namespace Dryv.Translation
 
         private GeneratedJavaScriptCode GenerateJavaScriptCode(
             Expression expression,
-            MemberExpression propertyExpression)
+            MemberExpression propertyExpression,
+            string groupName)
         {
             // Find all option types used in the validation expression.
             var optionTypes = ((LambdaExpression)expression).GetOptionTypes();
@@ -161,7 +162,8 @@ namespace Dryv.Translation
                 Writer = writer,
                 OptionDelegates = optionDelegates,
                 ModelType = propertyExpression?.Expression.GetExpressionType(),
-                PropertyExpression = propertyExpression?.Expression
+                PropertyExpression = propertyExpression?.Expression,
+                GroupName = groupName
             };
 
             this.Translate(expression, context);

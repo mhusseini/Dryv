@@ -78,7 +78,7 @@ namespace Dryv.Extensions
         internal static bool IsNavigationProperty(this PropertyInfo property)
         {
             var type = property.GetElementType();
-            return type.IsClass() && type.Namespace != "System";
+            return (type.IsClass() || type.IsInterface()) && type.Namespace != "System";
         }
     }
 }

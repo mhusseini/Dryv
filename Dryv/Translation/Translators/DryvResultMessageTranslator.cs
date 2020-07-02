@@ -35,6 +35,11 @@ namespace Dryv.Translation.Translators
         {
             context.Writer.Write("{ type:\"error\", text:");
             context.Translator.Translate(context.Expression.Arguments.First(), context);
+            if (!string.IsNullOrWhiteSpace(context.GroupName))
+            {
+                context.Writer.Write(", groupName: ");
+                context.Writer.Write(QuoteValue(context.GroupName));
+            }
             context.Writer.Write(" }");
         }
 
@@ -47,6 +52,11 @@ namespace Dryv.Translation.Translators
         {
             context.Writer.Write("{ type:\"warning\", text:");
             context.Translator.Translate(context.Expression.Arguments.First(), context);
+            if (!string.IsNullOrWhiteSpace(context.GroupName))
+            {
+                context.Writer.Write(", groupName: ");
+                context.Writer.Write(QuoteValue(context.GroupName));
+            }
             context.Writer.Write(" }");
         }
     }

@@ -123,9 +123,9 @@ namespace Dryv.Validation
             PropertyInfo property,
             Func<Type, object> services,
             IDictionary<object, object> cache,
-            bool syncAllowed)
+            bool asyncOnly)
         {
-            var modelRules = this.GetModelsAndRules(currentModel, rootModel, property, services, cache, syncAllowed, true, RuleType.Default);
+            var modelRules = this.GetModelsAndRules(currentModel, rootModel, property, services, cache, !asyncOnly, true, RuleType.Default);
             return await Task.WhenAll(from modelRule in modelRules
                                       select this.ruleEvaluator.ValidateAsync(modelRule.Value, modelRule.Key, services));
         }

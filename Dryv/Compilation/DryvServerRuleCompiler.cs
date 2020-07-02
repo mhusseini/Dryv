@@ -44,12 +44,13 @@ namespace Dryv.Compilation
             var typedModel = Expression.Convert(parameterModel, type);
 
             var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy);
+
             var navigationProperties = (from p in properties
-                                        where (p.PropertyType.IsClass() || p.PropertyType.IsInterface())
-                                              && p.PropertyType != typeof(string)
+                                        where p.IsNavigationProperty()
                                         select p).ToList();
 
             var propertyValidationExpressions = from property in properties
+                                                where !property.IsNavigationProperty() && property.GetCustomAttribute<DryvRulesAttribute>() != null
                                                 select Expression.Call(parameterResult, AddAsyncResultMethod,
                                                     Expression.New(AsyncValidationResultCtor,
                                                         parameterModel,
@@ -90,7 +91,7 @@ namespace Dryv.Compilation
                 parameterServices,
                 parameterCache,
                 parameterAsyncOnly);
-            
+
             return lambda.Compile();
         }
     }

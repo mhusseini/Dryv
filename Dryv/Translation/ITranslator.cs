@@ -10,7 +10,7 @@ namespace Dryv.Translation
         /// <summary>
         /// Translates the specified expression.
         /// </summary>
-        TranslationResult Translate(Expression expression, MemberExpression propertyExpression);
+        TranslationResult Translate(Expression expression, MemberExpression propertyExpression, string ruleGroupName);
 
         void Translate(Expression expression, TranslationContext context, bool negated = false);
 

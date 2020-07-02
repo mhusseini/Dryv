@@ -10,18 +10,16 @@ namespace Dryv.Validation
         public Action<TextWriter> GetValidationFunction(IDictionary<DryvRuleTreeNode, string> translatedRules) => writer =>
             {
                 writer.Write("function(m, context) { return [");
-                var index = 0;
+                var sep = string.Empty;
 
                 foreach (var rule in translatedRules)
                 {
+                    writer.Write(sep);
                     writer.Write(rule.Value);
-                    if (++index > 0)
-                    {
-                        writer.Write(",");
-                    }
+                    sep = ",";
                 }
 
-                writer.Write(@"].reduce(function(promiseChain, currentTask){ return promiseChain.then(function(error){ return error || currentTask(m, context); }); }, Promise.resolve());}");
+                writer.Write(@"].reduce(function(promiseChain, currentTask){ return promiseChain.then(function(r){ return r||currentTask(m, context); }); }, Promise.resolve());}");
             };
     }
 }

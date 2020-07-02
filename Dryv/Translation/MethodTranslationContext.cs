@@ -10,11 +10,12 @@ namespace Dryv.Translation
 
         public MethodTranslationContext(TranslationContext context)
         {
-            this.OptionsTypes = context.OptionsTypes;
-            this.Writer = context.Writer;
-            this.OptionDelegates = context.OptionDelegates;
+            this.GroupName = context.GroupName;
             this.ModelType = context.ModelType;
+            this.OptionDelegates = context.OptionDelegates;
+            this.OptionsTypes = context.OptionsTypes;
             this.PropertyExpression = context.PropertyExpression;
+            this.Writer = context.Writer;
         }
 
         public MethodCallExpression Expression { get; set; }

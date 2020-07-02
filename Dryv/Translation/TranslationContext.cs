@@ -6,6 +6,7 @@ namespace Dryv.Translation
 {
     public class TranslationContext
     {
+        public string GroupName { get; set; }
         public Type ModelType { get; set; }
         public IDictionary<int, OptionDelegate> OptionDelegates { get; set; }
         public IList<Type> OptionsTypes { get; set; }

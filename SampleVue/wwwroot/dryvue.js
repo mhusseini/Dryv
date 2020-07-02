@@ -11,9 +11,14 @@ function hashCode(text) {
 }
 
 async function validate(component, dryv) {
-    const formValidators = component.$dryv.formValidators;
+    const $dryv = component.$dryv;
+    const formValidators = $dryv.formValidators;
     if (!formValidators) {
         return true;
+    }
+
+    if ($dryv.groupComponents) {
+        $dryv.groupComponents.forEach(c => c.clear());
     }
 
     const disablers = dryv.disablers;
@@ -70,23 +75,34 @@ function setValidationResult(component, results) {
     return !results || results.length === 0;
 }
 
+const dryvGroupTag = "dryv-group";
 const dryvSetDirective = "dryv-set";
 const dryvFieldDirective = "dryv";
 
 function findFormComponent(vnode) {
     let component = vnode.context;
+    let formComponent = null;
+    let groupComponent = null;
 
     while (component) {
-        if (component._vnode && component._vnode.data &&
+        if (!formComponent &&
+            component._vnode && component._vnode.data &&
             component._vnode.data.directives &&
             component._vnode.data.directives.filter(d => d.name === dryvSetDirective).length > 0) {
-            return component;
+            formComponent = component;
+        }
+        else if (!groupComponent && component.$vnode && component.$vnode.componentOptions.tag === dryvGroupTag) {
+            groupComponent = component;
+        }
+
+        if (groupComponent && formComponent) {
+            break;
         }
 
         component = component.$parent;
     }
 
-    return null;
+    return { groupComponent, formComponent };
 }
 
 function findeModelExpression(vnode) {
@@ -131,44 +147,39 @@ function initializeFormComponent(component, name, options) {
     }
 }
 
-function handleValidationResult(Vue, component, result, errorField, warningField) {
-    let error;
-    let warning;
+function handleValidationResult(Vue, component, result, errorField, warningField, groupComponent) {
+    let type = null;
+    let groupName = null;
+    let text = null;
 
     if (result) {
         switch (typeof result) {
             case "object":
-                switch (result.type) {
-                    case "error":
-                        error = result.text;
-                        warning = null;
-                        break;
-                    case "warning":
-                        error = null;
-                        warning = result.text;
-                        break;
-                    default:
-                        error = null;
-                        warning = null;
-                }
+                type = result.type;
+                groupName = result.groupName;
+                text = result.text;
                 break;
             case "string":
-                error = result;
-                warning = null;
+                type = "error";
+                text = result;
                 break;
-            default:
-                error = null;
-                warning = null;
         }
-    } else {
-        error = null;
-        warning = null;
     }
 
-    Vue.set(component, errorField, error);
-    Vue.set(component, warningField, warning);
+    const error = type === "error" && text;
+    const warning = type === "warning" && text;
 
-    return result;
+    if (groupName && groupComponent) {
+        error && groupComponent.addError(error, groupName);
+        warning && groupComponent.addWarning(warning, groupName);
+        Vue.set(component, errorField, null);
+        Vue.set(component, warningField, null);
+    } else {
+        Vue.set(component, errorField, error);
+        Vue.set(component, warningField, warning);
+    }
+
+    return text && { type, text, groupName };
 }
 
 const Dryvue = {
@@ -190,20 +201,55 @@ const Dryvue = {
             return response.data;
         };
 
-        Vue.component("dryv-group",
+        function addResultItem(items, text, groupName) {
+            if (!items[groupName]) {
+                Vue.set(items, groupName, []);
+            }
+
+            const texts = items[groupName];
+            if (texts.indexOf(text) < 0) {
+                texts.push(text);
+                // Vue.set(texts, texts.length, text);
+            }
+        }
+
+        function flattenItems(items) {
+            return [].concat.apply([], Object.keys(items).map(g => items[g]));
+        }
+
+        function clearItems(items) {
+            Object.keys(items).map(g => items[g]).forEach(l => l.splice(0));
+        }
+
+        Vue.component(dryvGroupTag,
             {
-                props: ['groups'],
                 data() {
-                    return {};
+                    return {
+                        errors: {},
+                        warnings: {}
+                    };
                 },
-                created() {
-                    debugger;
-                    const groups = this.groups;
-                    for (let group in groups) {
-                        const field = groups[group];
-                        Vue.set(this, field, null);
+                computed: {
+                    allErrors() {
+                        return flattenItems(this.errors);
+                    },
+                    allWarnings() {
+                        return flattenItems(this.warnings);
                     }
-                }
+                },
+                methods: {
+                    clear() {
+                        clearItems(this.errors);
+                        clearItems(this.warnings);
+                    },
+                    addError(text, groupName) {
+                        addResultItem(this.errors, text, groupName);
+                    },
+                    addWarning(text, groupName) {
+                        addResultItem(this.warnings, text, groupName);
+                    }
+                },
+                template: "<slot :errors='errors' :warnings='warnings' :allErrors='allErrors' :allWarnings='allWarnings'></slot>"
             });
 
         Vue.directive(dryvFieldDirective,
@@ -214,13 +260,33 @@ const Dryvue = {
                         throw `The '${dryvFieldDirective}' directive can only be applied to components.`;
                     }
 
-                    const formComponent = findFormComponent(vnode);
+                    const components = findFormComponent(vnode);
+                    const formComponent = components.formComponent;
+
                     if (!formComponent) {
                         Vue.util.warn(`No component found with a ${dryvSetDirective} directive.`);
                         return;
                     }
 
-                    let path;
+                    if (!formComponent.$dryv) {
+                        formComponent.$dryv = {
+                            formValidators: []
+                        };
+                    }
+
+                    const $dryv = formComponent.$dryv;
+
+                    const groupComponent = components.groupComponent;
+                    if (groupComponent) {
+                        if (!$dryv.groupComponents) {
+                            $dryv.groupComponents = [];
+                        }
+                        if ($dryv.groupComponents.indexOf(groupComponent) < 0) {
+                            $dryv.groupComponents.push(groupComponent);
+                        }
+                    }
+
+                    let path = null;
                     let errorField = options.errorField;
                     let warningField = options.warningField;
 
@@ -246,18 +312,13 @@ const Dryvue = {
                     let validator = undefined;
 
                     Vue.set(component, errorField, null);
+                    Vue.set(component, warningField, null);
 
-                    if (!formComponent.$dryv) {
-                        formComponent.$dryv = {
-                            formValidators: []
-                        };
-                    }
-
-                    formComponent.$dryv.formValidators.push({
+                    $dryv.formValidators.push({
                         path,
                         validate: async (disabledFields) => {
                             if (validator === undefined) {
-                                validator = formComponent.$dryv.v.validators[path];
+                                validator = $dryv.v.validators[path];
                             }
 
                             if (!validator) {
@@ -265,14 +326,11 @@ const Dryvue = {
                             }
 
                             const result = (!disabledFields || disabledFields.filter(f => path.indexOf(f) >= 0).length === 0) && await validator(formComponent.$data);
-                            return handleValidationResult(Vue, component, result, errorField, warningField);
+                            return handleValidationResult(Vue, component, result, errorField, warningField, groupComponent);
                         },
                         setResults: results => {
-                            if (!validator) {
-                                return null;
-                            }
                             const result = results && results[path];
-                            return handleValidationResult(Vue, component, result, errorField, warningField);
+                            return handleValidationResult(Vue, component, result, errorField, warningField, groupComponent);
                         }
                     });
                 }

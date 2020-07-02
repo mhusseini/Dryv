@@ -100,6 +100,7 @@ namespace Dryv.Translation
             [ExpressionType.IsFalse] = "!== false",
         };
 
+        private static MethodInfo DryvResultMessageImplicitConvert = typeof(DryvResultMessage).GetMethod("op_Implicit");
         private readonly ITranslatorProvider translatorProvider;
 
         public JavaScriptTranslator(ITranslatorProvider translatorProvider)
@@ -404,28 +405,35 @@ namespace Dryv.Translation
 
         public override void Visit(UnaryExpression expression, TranslationContext context, bool negated = false)
         {
-            var negatedExpression = expression.NodeType == ExpressionType.Not;
+            var negatedExpression = false;
+
+            switch (expression.NodeType)
+            {
+                case ExpressionType.Not:
+                    negatedExpression = true;
+                    break;
+
+                case ExpressionType.Convert:
+                    if (string.IsNullOrWhiteSpace(context.GroupName) || !Equals(expression.Method, DryvResultMessageImplicitConvert))
+                    {
+                        break;
+                    }
+
+                    // TODO: Code smell! This class is too low level for this code. Move code to an interface.
+                    context.Writer.Write("{ type:\"error\", text:");
+                    this.Translate(expression.Operand, context);
+                    context.Writer.Write(", groupName: ");
+                    context.Writer.Write(MethodCallTranslator.QuoteValue(context.GroupName));
+                    context.Writer.Write("}");
+                    return;
+            }
+
             if (!negatedExpression)
             {
                 TryWriteTerminal(expression, context.Writer);
             }
 
             this.Translate(expression.Operand, context, negatedExpression);
-        }
-
-        private bool GetNeedsBrackets(Expression expression)
-        {
-            switch (expression)
-            {
-                case ConstantExpression _:
-                case MethodCallExpression _:
-                case MemberExpression _:
-                case UnaryExpression _:
-                case LambdaExpression _:
-                    return false;
-            }
-
-            return this.translatorProvider.GenericTranslators.All(t => t.AllowSurroundingBrackets(expression) != false);
         }
 
         private static bool TryWriteInjectedExpression(Expression expression, TranslationContext context)
@@ -503,6 +511,21 @@ namespace Dryv.Translation
                 : name;
         }
 
+        private bool GetNeedsBrackets(Expression expression)
+        {
+            switch (expression)
+            {
+                case ConstantExpression _:
+                case MethodCallExpression _:
+                case MemberExpression _:
+                case UnaryExpression _:
+                case LambdaExpression _:
+                    return false;
+            }
+
+            return this.translatorProvider.GenericTranslators.All(t => t.AllowSurroundingBrackets(expression) != false);
+        }
+
         private void WriteMember(MemberExpression expression, TranslationContext context)
         {
             if (TryWriteInjectedExpression(expression, context))
@@ -542,10 +565,12 @@ namespace Dryv.Translation
                         case MemberExpression mex:
                             this.Visit(mex, context);
                             break;
+
                         case ParameterExpression parameterExpression:
                             this.Visit(parameterExpression, context);
                             context.Writer.Write("$$MODELPATH$$");
                             break;
+
                         default:
                             this.Translate(expression.Expression, context);
                             break;
