@@ -12,7 +12,7 @@ namespace Dryv.SampleConsole
             ["00001"] = "here",
         };
 
-        public async Task<DryvResultMessage> ValidateZipCode(string zipCode, string city)
+        public async Task<DryvValidationResult> ValidateZipCode(string zipCode, string city)
         {
             await Task.Delay(100);
 
@@ -20,7 +20,7 @@ namespace Dryv.SampleConsole
                 ? "The ZIP code is unknown."
                 : city?.Contains(location, StringComparison.OrdinalIgnoreCase) != true
                     ? "The ZIP code does not match the city."
-                    : DryvResultMessage.Success;
+                    : DryvValidationResult.Success;
         }
     }
 }

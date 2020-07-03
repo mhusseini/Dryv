@@ -10,7 +10,7 @@ namespace Dryv.Validation
     [DebuggerDisplay("{Path}.{Property.Name}")]
     public struct DryvResult
     {
-        public DryvResult(object model, PropertyInfo property, string path, IEnumerable<DryvResultMessage> messages)
+        public DryvResult(object model, PropertyInfo property, string path, IEnumerable<DryvValidationResult> messages)
         {
             this.Model = model ?? throw new ArgumentNullException(nameof(model));
             this.Property = property ?? throw new ArgumentNullException(nameof(property));
@@ -18,7 +18,7 @@ namespace Dryv.Validation
             this.Path = path ?? string.Empty;
         }
 
-        public IReadOnlyCollection<DryvResultMessage> Message { get; }
+        public IReadOnlyCollection<DryvValidationResult> Message { get; }
         public object Model { get; }
         public string Path { get; }
         public PropertyInfo Property { get; }

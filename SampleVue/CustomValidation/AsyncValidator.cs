@@ -10,7 +10,7 @@ namespace Dryv.SampleVue.CustomValidation
             return text?.Length ?? 0;
         }
 
-        public async Task<DryvResultMessage> ValidateZipCode(string zipCode, string city, int zipCodeLength)
+        public async Task<DryvValidationResult> ValidateZipCode(string zipCode, string city, int zipCodeLength)
         {
             return string.IsNullOrWhiteSpace(zipCode)
             ? "The ZIP code cannot be empty."
@@ -19,7 +19,7 @@ namespace Dryv.SampleVue.CustomValidation
                 : await this.ValidateZipCode(zipCode, city);
         }
 
-        public async Task<DryvResultMessage> ValidateZipCode(string zipCode, string city)
+        public async Task<DryvValidationResult> ValidateZipCode(string zipCode, string city)
         {
             return string.IsNullOrWhiteSpace(zipCode)
                 ? "ZIP code cannot be empty."
@@ -27,7 +27,7 @@ namespace Dryv.SampleVue.CustomValidation
                     ? "City cannot be empty."
                     : new Regex("^[02468]+$").IsMatch(zipCode)
                         ? null
-                        : DryvResultMessage.Warning("The ZIP code should contain only zeros and even numbers. Are you sure you want to use it?");
+                        : DryvValidationResult.Warning("The ZIP code should contain only zeros and even numbers. Are you sure you want to use it?");
         }
     }
 }

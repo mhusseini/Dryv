@@ -113,8 +113,8 @@
 //                .For<IModel>()
 //                .Rule(m => m.Text,
 //                    m => m.Text != null
-//                        ? DryvResultMessage.Success
-//                        : DryvResultMessage.Error("error"));
+//                        ? DryvValidationResult.Success
+//                        : DryvValidationResult.Error("error"));
 //        }
 
 //        private class Model : IModel
@@ -123,8 +123,8 @@
 //                .For<IModel>()
 //                .Rule(m => m.Text,
 //                    m => m.Text != null
-//                        ? DryvResultMessage.Success
-//                        : DryvResultMessage.Error("error"));
+//                        ? DryvValidationResult.Success
+//                        : DryvValidationResult.Error("error"));
 
 //            [DryvRules]
 //            public string Text { get; set; }
@@ -169,8 +169,8 @@
 //                .For<ModelBase>()
 //                .Rule(m => m.Text,
 //                    m => m.Text != null
-//                        ? DryvResultMessage.Success
-//                        : DryvResultMessage.Error("error"));
+//                        ? DryvValidationResult.Success
+//                        : DryvValidationResult.Error("error"));
 
 //            [DryvRules]
 //            public override string Text { get; set; }
@@ -182,8 +182,8 @@
 //                .For<Model5>()
 //                .Rule(m => m.Text,
 //                    m => m.Text != null
-//                        ? DryvResultMessage.Success
-//                        : DryvResultMessage.Error("error"));
+//                        ? DryvValidationResult.Success
+//                        : DryvValidationResult.Error("error"));
 //        }
 
 //        private class Model6
@@ -192,8 +192,8 @@
 //                .For<Model6>()
 //                .Rule(m => m.Child.Child.Text,
 //                    m => m.Child.Child.Text != null
-//                        ? DryvResultMessage.Success
-//                        : DryvResultMessage.Error("error"));
+//                        ? DryvValidationResult.Success
+//                        : DryvValidationResult.Error("error"));
 
 //            [DryvRules]
 //            public Model7 Child { get; set; }
@@ -205,8 +205,8 @@
 //                .For<Model7>()
 //                .Rule(m => m.Text,
 //                    m => m.Text != null
-//                        ? DryvResultMessage.Success
-//                        : DryvResultMessage.Error("error"));
+//                        ? DryvValidationResult.Success
+//                        : DryvValidationResult.Error("error"));
 
 //            public Model7 Child { get; set; }
 

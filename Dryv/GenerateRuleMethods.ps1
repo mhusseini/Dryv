@@ -56,7 +56,7 @@ $parameters			Expression<Func<TModel, $($gen2)Task<bool>>> rule$ruleSwitch)
 
 	@"
 		public DryvRules<TModel> $($methodPrefix)Rule$gen(
-$parameters			Expression<Func<TModel, $($gen2)DryvResultMessage>> rule$ruleSwitch)
+$parameters			Expression<Func<TModel, $($gen2)DryvValidationResult>> rule$ruleSwitch)
         {
 			this.Add$($methodPrefix)(null, rule,
 				new[] { $properties},
@@ -64,7 +64,7 @@ $parameters			Expression<Func<TModel, $($gen2)DryvResultMessage>> rule$ruleSwitc
 			return this;
         }
 		public DryvRules<TModel> $($methodPrefix)Rule$gen(string groupName,
-$parameters			Expression<Func<TModel, $($gen2)DryvResultMessage>> rule$ruleSwitch)
+$parameters			Expression<Func<TModel, $($gen2)DryvValidationResult>> rule$ruleSwitch)
         {
 			this.Add$($methodPrefix)(groupName, rule,
 				new[] { $properties},
@@ -72,7 +72,7 @@ $parameters			Expression<Func<TModel, $($gen2)DryvResultMessage>> rule$ruleSwitc
 			return this;
         }
 		public DryvRules<TModel> $($methodPrefix)Rule$gen(
-$parameters			Expression<Func<TModel, $($gen2)Task<DryvResultMessage>>> rule$ruleSwitch)
+$parameters			Expression<Func<TModel, $($gen2)Task<DryvValidationResult>>> rule$ruleSwitch)
         {
 			this.Add$($methodPrefix)(null, rule,
 				new[] { $properties},
@@ -80,7 +80,7 @@ $parameters			Expression<Func<TModel, $($gen2)Task<DryvResultMessage>>> rule$rul
 			return this;
         }
 		public DryvRules<TModel> $($methodPrefix)Rule$gen(string groupName,
-$parameters			Expression<Func<TModel, $($gen2)Task<DryvResultMessage>>> rule$ruleSwitch)
+$parameters			Expression<Func<TModel, $($gen2)Task<DryvValidationResult>>> rule$ruleSwitch)
         {
 			this.Add$($methodPrefix)(groupName, rule,
 				new[] { $properties},

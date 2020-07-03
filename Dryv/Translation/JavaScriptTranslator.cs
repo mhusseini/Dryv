@@ -100,7 +100,7 @@ namespace Dryv.Translation
             [ExpressionType.IsFalse] = "!== false",
         };
 
-        private static MethodInfo DryvResultMessageImplicitConvert = typeof(DryvResultMessage).GetMethod("op_Implicit");
+        private static MethodInfo DryvValidationResultImplicitConvert = typeof(DryvValidationResult).GetMethod("op_Implicit");
         private readonly ITranslatorProvider translatorProvider;
 
         public JavaScriptTranslator(ITranslatorProvider translatorProvider)
@@ -414,7 +414,7 @@ namespace Dryv.Translation
                     break;
 
                 case ExpressionType.Convert:
-                    if (string.IsNullOrWhiteSpace(context.GroupName) || !Equals(expression.Method, DryvResultMessageImplicitConvert))
+                    if (string.IsNullOrWhiteSpace(context.GroupName) || !Equals(expression.Method, DryvValidationResultImplicitConvert))
                     {
                         break;
                     }

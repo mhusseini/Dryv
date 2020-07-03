@@ -39,7 +39,7 @@ namespace Dryv.AspNetCore
 
             return new DryvMvcBuilder(services)
                 .AddTranslator<ObjectTranslator>()
-                .AddTranslator<DryvResultMessageTranslator>()
+                .AddTranslator<DryvValidationResultTranslator>()
                 .AddTranslator<StringTranslator>()
                 .AddTranslator<EnumerableTranslator>()
                 .AddTranslator<RegexTranslator>()

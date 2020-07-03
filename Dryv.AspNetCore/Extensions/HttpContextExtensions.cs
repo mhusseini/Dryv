@@ -22,7 +22,7 @@ namespace Dryv.AspNetCore.Extensions
             return DryvValidationActionResult(controller, validationResults);
         }
 
-        public static IActionResult DryvValidationActionResult(this Controller controller, IDictionary<string, DryvResultMessage> validationResults)
+        public static IActionResult DryvValidationActionResult(this Controller controller, IDictionary<string, DryvValidationResult> validationResults)
         {
             return validationResults.Count == 0
                 ? controller.Json(new { success = true })
@@ -33,21 +33,21 @@ namespace Dryv.AspNetCore.Extensions
                 });
         }
 
-        public static Dictionary<string, DryvResultMessage> GetDryvValidationResults(this Controller controller, DryvResultType types = DryvResultType.Error) => controller.HttpContext.GetDryvValidationResults(types);
+        public static Dictionary<string, DryvValidationResult> GetDryvValidationResults(this Controller controller, DryvResultType types = DryvResultType.Error) => controller.HttpContext.GetDryvValidationResults(types);
 
-        public static Dictionary<string, DryvResultMessage> GetDryvValidationResults(this ActionContext actionContext, DryvResultType types = DryvResultType.Error) => actionContext.HttpContext.GetDryvValidationResults(types);
+        public static Dictionary<string, DryvValidationResult> GetDryvValidationResults(this ActionContext actionContext, DryvResultType types = DryvResultType.Error) => actionContext.HttpContext.GetDryvValidationResults(types);
 
-        public static Dictionary<string, DryvResultMessage> GetDryvValidationResults(this HttpContext httpContext, DryvResultType types = DryvResultType.Error)
+        public static Dictionary<string, DryvValidationResult> GetDryvValidationResults(this HttpContext httpContext, DryvResultType types = DryvResultType.Error)
         {
-            return httpContext.Items.TryGetValue(typeof(Dictionary<string, DryvResultMessage>), out var o) &&
-                   o is Dictionary<string, DryvResultMessage> dictionary
+            return httpContext.Items.TryGetValue(typeof(Dictionary<string, DryvValidationResult>), out var o) &&
+                   o is Dictionary<string, DryvValidationResult> dictionary
                 ? (from x in dictionary
                    where types.HasFlag(x.Value.Type)
                    select x)
                 .ToDictionary(
                     x => string.Join('.', x.Key.Split('.').Select(v => v.ToCamelCase())),
                     x => x.Value)
-                : new Dictionary<string, DryvResultMessage>();
+                : new Dictionary<string, DryvValidationResult>();
         }
     }
 }

@@ -13,10 +13,10 @@ namespace Dryv.Tests
 {
     public class JavascriptTranslatorTestsBase
     {
-        protected static System.Linq.Expressions.Expression<Func<TestModel, DryvResultMessage>> Expression(System.Linq.Expressions.Expression<Func<TestModel, DryvResultMessage>> exp) =>
+        protected static System.Linq.Expressions.Expression<Func<TestModel, DryvValidationResult>> Expression(System.Linq.Expressions.Expression<Func<TestModel, DryvValidationResult>> exp) =>
             exp;
 
-        protected static System.Linq.Expressions.Expression<Func<TModel, DryvResultMessage>> Expression<TModel>(System.Linq.Expressions.Expression<Func<TModel, DryvResultMessage>> exp) =>
+        protected static System.Linq.Expressions.Expression<Func<TModel, DryvValidationResult>> Expression<TModel>(System.Linq.Expressions.Expression<Func<TModel, DryvValidationResult>> exp) =>
             exp;
 
         protected static T GetBodyExpression<T>(FunctionExpression jsProgram)
@@ -58,11 +58,11 @@ namespace Dryv.Tests
             var translatorProvider = new TranslatorProvider();
 
             translatorProvider.MethodCallTranslators.Add(new RegexTranslator());
-            translatorProvider.MethodCallTranslators.Add(new DryvResultMessageTranslator());
+            translatorProvider.MethodCallTranslators.Add(new DryvValidationResultTranslator());
             translatorProvider.MethodCallTranslators.Add(new StringTranslator());
             translatorProvider.MethodCallTranslators.Add(new EnumerableTranslator());
             translatorProvider.GenericTranslators.Add(new RegexTranslator());
-            translatorProvider.GenericTranslators.Add(new DryvResultMessageTranslator());
+            translatorProvider.GenericTranslators.Add(new DryvValidationResultTranslator());
             translatorProvider.GenericTranslators.Add(new ObjectTranslator());
 
             if (translators != null)

@@ -20,11 +20,11 @@ namespace Dryv.Compilation
             return rule.CompiledEnablingExpression(options);
         }
 
-        public DryvResultMessage Validate(DryvCompiledRule rule, object model, Func<Type, object> objectFactory)
+        public DryvValidationResult Validate(DryvCompiledRule rule, object model, Func<Type, object> objectFactory)
         {
             if (typeof(Task).IsAssignableFrom(rule.ValidationExpression.ReturnType))
             {
-                return DryvResultMessage.Success;
+                return DryvValidationResult.Success;
             }
 
             Compile(rule);
@@ -33,7 +33,7 @@ namespace Dryv.Compilation
 
             try
             {
-                return (DryvResultMessage)rule.CompiledValidationExpression(model, options);
+                return (DryvValidationResult)rule.CompiledValidationExpression(model, options);
             }
             catch (Exception ex)
             {
@@ -78,7 +78,7 @@ namespace Dryv.Compilation
             }
         }
 
-        public Task<DryvResultMessage> ValidateAsync(DryvCompiledRule rule, object model, Func<Type, object> objectFactory)
+        public Task<DryvValidationResult> ValidateAsync(DryvCompiledRule rule, object model, Func<Type, object> objectFactory)
         {
             Compile(rule);
 
@@ -87,9 +87,9 @@ namespace Dryv.Compilation
 
             switch (result)
             {
-                case DryvResultMessage dryvResult: return Task.FromResult(new DryvResultMessage(dryvResult.Text, dryvResult.Type, rule.GroupName));
-                case Task<DryvResultMessage> task: return task.ContinueWith(t => new DryvResultMessage(t.Result.Text, t.Result.Type, rule.GroupName));
-                default: throw new InvalidOperationException($"Compiled validation expression for property {rule.Property.DeclaringType.FullName}.{rule.Property.Name} should return '{result.GetType().FullName}'. Only DryvResultMessage and Task<DryvResultMessage> are allowed.");
+                case DryvValidationResult dryvResult: return Task.FromResult(new DryvValidationResult(dryvResult.Text, dryvResult.Type, rule.GroupName));
+                case Task<DryvValidationResult> task: return task.ContinueWith(t => new DryvValidationResult(t.Result.Text, t.Result.Type, rule.GroupName));
+                default: throw new InvalidOperationException($"Compiled validation expression for property {rule.Property.DeclaringType.FullName}.{rule.Property.Name} should return '{result.GetType().FullName}'. Only DryvValidationResult and Task<DryvValidationResult> are allowed.");
             }
         }
 

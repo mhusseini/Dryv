@@ -5,14 +5,14 @@ namespace Dryv.SampleVue.CustomValidation
 {
     public class AsyncValidator
     {
-        public async Task<DryvResultMessage> ValidateZipCode(string zipCode, string city, int zipCodeLength)
+        public async Task<DryvValidationResult> ValidateZipCode(string zipCode, string city, int zipCodeLength)
         {
             return zipCode.Length > zipCodeLength
                 ? $"The ZIP code cannot be longer than {zipCodeLength} characters."
                 : await this.ValidateZipCode(zipCode, city);
         }
 
-        public async Task<DryvResultMessage> ValidateZipCode(string zipCode, string city)
+        public async Task<DryvValidationResult> ValidateZipCode(string zipCode, string city)
         {
             return string.IsNullOrWhiteSpace(zipCode)
                 ? "ZIP code cannot be empty."

@@ -12,7 +12,7 @@ namespace Dryv.Tests
         {
             var expression = Expression(m =>
                 m.Text == "test"
-                    ? DryvResultMessage.Error("fail")
+                    ? DryvValidationResult.Error("fail")
                     : null);
 
             var jsProgram = GetTranslatedAst(expression);
@@ -32,7 +32,7 @@ namespace Dryv.Tests
         {
             var expression = Expression(m =>
                 m.Text == "test"
-                    ? DryvResultMessage.Success
+                    ? DryvValidationResult.Success
                     : "fail");
 
             var jsProgram = GetTranslatedAst(expression);

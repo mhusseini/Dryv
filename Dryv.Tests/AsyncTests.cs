@@ -26,7 +26,7 @@ namespace Dryv.Tests
         {
             public static DryvRules<Model> Rules = DryvRules.For<Model>()
                 .ServerRule(m => m.Name,
-                    m => Task.FromResult(m.Name == null ? 0 : m.Name.Length).ContinueWith(t => t.Result == 0 ? "failed" : DryvResultMessage.Success));
+                    m => Task.FromResult(m.Name == null ? 0 : m.Name.Length).ContinueWith(t => t.Result == 0 ? "failed" : DryvValidationResult.Success));
 
             [DryvRules]
             public string Name { get; set; }

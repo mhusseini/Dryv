@@ -7,7 +7,7 @@ namespace Dryv.Internal
 {
     internal struct DryvAsyncResult
     {
-        public DryvAsyncResult(object model, PropertyInfo property, string path, Task<IReadOnlyCollection<DryvResultMessage>> task)
+        public DryvAsyncResult(object model, PropertyInfo property, string path, Task<IReadOnlyCollection<DryvValidationResult>> task)
         {
             this.Task = task.ContinueWith(t => new DryvResult(model, property, path, t.Result));
         }

@@ -40,7 +40,7 @@ namespace Dryv.Tests
                 .Rule<IOptions<TestOptions>>(
                     m => m.Text,
                     (m, o) => m.Text == o.Value.Text
-                        ? DryvResultMessage.Success
+                        ? DryvValidationResult.Success
                         : "fail");
 
             [DryvRules]

@@ -85,7 +85,7 @@ namespace Dryv.Validation
             }
         }
 
-        internal IEnumerable<DryvResultMessage> ValidateProperty(
+        internal IEnumerable<DryvValidationResult> ValidateProperty(
             object currentModel,
             object rootModel,
             PropertyInfo property,
@@ -117,7 +117,7 @@ namespace Dryv.Validation
             }
         }
 
-        internal async Task<IReadOnlyCollection<DryvResultMessage>> ValidatePropertyAsync(
+        internal async Task<IReadOnlyCollection<DryvValidationResult>> ValidatePropertyAsync(
                                             object currentModel,
             object rootModel,
             PropertyInfo property,

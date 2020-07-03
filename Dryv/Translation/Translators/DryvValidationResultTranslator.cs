@@ -5,16 +5,16 @@ using Dryv.Reflection;
 
 namespace Dryv.Translation.Translators
 {
-    public class DryvResultMessageTranslator : MethodCallTranslator, ICustomTranslator
+    public class DryvValidationResultTranslator : MethodCallTranslator, ICustomTranslator
     {
-        private static readonly MemberInfo SuccessMember = typeof(DryvResultMessage).GetMember("Success");
+        private static readonly MemberInfo SuccessMember = typeof(DryvValidationResult).GetMember("Success");
 
-        public DryvResultMessageTranslator()
+        public DryvValidationResultTranslator()
         {
-            this.Supports<DryvResultMessage>();
-            this.AddMethodTranslator(nameof(DryvResultMessage.Error), Error);
-            this.AddMethodTranslator(nameof(DryvResultMessage.Warning), Warning);
-            this.AddMethodTranslator(nameof(DryvResultMessage.Success), Success);
+            this.Supports<DryvValidationResult>();
+            this.AddMethodTranslator(nameof(DryvValidationResult.Error), Error);
+            this.AddMethodTranslator(nameof(DryvValidationResult.Warning), Warning);
+            this.AddMethodTranslator(nameof(DryvValidationResult.Success), Success);
         }
 
         public bool? AllowSurroundingBrackets(Expression expression) => null;

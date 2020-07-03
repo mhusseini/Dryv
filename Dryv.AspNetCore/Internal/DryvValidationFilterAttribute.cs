@@ -48,7 +48,7 @@ namespace Dryv.AspNetCore.Internal
             var controller = (Controller)context.Controller;
             var result = true;
             var errors = await this.validator.Validate(model, controller.HttpContext.RequestServices.GetService);
-            var resultDictionary = new Dictionary<string, DryvResultMessage>();
+            var resultDictionary = new Dictionary<string, DryvValidationResult>();
 
             foreach (var x in from error in errors
                               from message in error.Message
@@ -65,7 +65,7 @@ namespace Dryv.AspNetCore.Internal
                 controller.ModelState.AddModelError(x.error.Path, x.message.Text);
             }
 
-            context.HttpContext.Items.Add(typeof(Dictionary<string, DryvResultMessage>), resultDictionary);
+            context.HttpContext.Items.Add(typeof(Dictionary<string, DryvValidationResult>), resultDictionary);
 
             return result;
         }
