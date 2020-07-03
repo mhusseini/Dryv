@@ -14,8 +14,10 @@ namespace Dryv.Translation
 
         private readonly List<Type> supportedTypes = new List<Type>();
 
+        public int? OrderIndex { get; set; }
+
         public static string QuoteValue(object value)
-            => value == null
+                    => value == null
             ? "null"
             : (value.GetType().GetTypeInfo().IsPrimitive
                 ? value.ToString()

@@ -4,7 +4,7 @@ namespace Dryv.Translation
 {
     public interface ITranslatorProvider
     {
-        IList<IMethodCallTranslator> MethodCallTranslators { get; }
-        IList<ICustomTranslator> GenericTranslators { get; }
+        ICollection<IMethodCallTranslator> MethodCallTranslators { get; }
+        ICollection<ICustomTranslator> GenericTranslators { get; }
     }
 }

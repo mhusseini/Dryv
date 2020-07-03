@@ -6,6 +6,6 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
 {
     public interface IDryvClientServerCallWriter
     {
-        void Write(CustomTranslationContext context, string url, string httpMethod, IList<MemberExpression> members);
+        void Write(TranslationContext context, ITranslator translator, string url, string httpMethod, IList<MemberExpression> members);
     }
 }

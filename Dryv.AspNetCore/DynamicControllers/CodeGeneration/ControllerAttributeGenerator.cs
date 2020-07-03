@@ -8,10 +8,19 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
 {
     internal class ControllerAttributeGenerator
     {
-        public static void AddCustomAttributes(DryvControllerGenerationContext context, Func<DryvControllerGenerationContext, IEnumerable<Expression<Func<Attribute>>>> get, Action<CustomAttributeBuilder> set)
+        public static void AddCustomAttributes(DryvControllerGenerationContext context, Action<CustomAttributeBuilder> set, Func<DryvControllerGenerationContext, IEnumerable<Expression<Func<Attribute>>>> get)
         {
             var expressions = get?.Invoke(context);
+            AddCustomAttributes(context, set, expressions);
+        }
 
+        public static void AddCustomAttributes(DryvControllerGenerationContext context, Action<CustomAttributeBuilder> set, params Expression<Func<Attribute>>[] expressions)
+        {
+            AddCustomAttributes(context, set, (IEnumerable<Expression<Func<Attribute>>>)expressions);
+        }
+
+        public static void AddCustomAttributes(DryvControllerGenerationContext context, Action<CustomAttributeBuilder> set, IEnumerable<Expression<Func<Attribute>>> expressions)
+        {
             if (expressions == null)
             {
                 return;

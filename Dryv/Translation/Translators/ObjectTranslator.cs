@@ -5,6 +5,7 @@ namespace Dryv.Translation.Translators
 {
     public class ObjectTranslator : ICustomTranslator
     {
+        public int? OrderIndex { get; set; }
         public bool? AllowSurroundingBrackets(Expression expression) => null;
 
         public bool TryTranslate(CustomTranslationContext context)
@@ -14,7 +15,7 @@ namespace Dryv.Translation.Translators
                 return false;
             }
 
-            if (methodCallExpression.Method.Name != nameof(object.ToString) || methodCallExpression.Arguments.Any())
+            if (methodCallExpression.Method.Name != nameof(this.ToString) || methodCallExpression.Arguments.Any())
             {
                 return false;
             }

@@ -44,7 +44,8 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
                 var typeBuilder = moduleBuilder.DefineType($"{NameSpace}.{typeNameBase}Controller", TypeAttributes.Class | TypeAttributes.Public, baseType);
 
                 var context = new DryvControllerGenerationContext(typeBuilder, methodInfo);
-                ControllerAttributeGenerator.AddCustomAttributes(context, this.options.Value.MapControllerFilters, typeBuilder.SetCustomAttribute);
+                ControllerAttributeGenerator.AddCustomAttributes(context, typeBuilder.SetCustomAttribute, this.options.Value.MapControllerFilters);
+                ControllerAttributeGenerator.AddCustomAttributes(context, typeBuilder.SetCustomAttribute, () => new DryvDisableAttribute());
 
                 var parameters = FindParameters(methodExpression);
                 var modelParameter = parameters.Find(p => p.Type == modelType);

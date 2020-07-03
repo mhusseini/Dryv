@@ -27,7 +27,7 @@ namespace Dryv.AspNetCore
             services.AddSingleton(Options.Create(options));
             services.AddSingleton<ControllerGenerator>();
             services.AddSingleton<DryvDynamicControllerRegistration>();
-            services.AddSingleton<ICustomTranslator, DryvDynamicControllerTranslator>();
+            services.AddSingleton<IMethodCallTranslator, DryvDynamicControllerTranslator>();
             services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.TryAddSingleton(typeof(IDryvClientServerCallWriter), options.DynamicControllerCallWriterType ?? typeof(DryvClientServerCallWriter));
 

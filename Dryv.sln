@@ -22,6 +22,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleVue", "SampleVue\Samp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleConsole", "SampleConsole\SampleConsole.csproj", "{D22ACF2C-28EB-40F2-9326-A9BD0D40E902}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lokad.ILPack", "..\..\tmp\ILPack\src\Lokad.ILPack.csproj", "{4BD63B4F-F232-46EA-A408-9BE6ED9C671A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,6 +50,10 @@ Global
 		{D22ACF2C-28EB-40F2-9326-A9BD0D40E902}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D22ACF2C-28EB-40F2-9326-A9BD0D40E902}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D22ACF2C-28EB-40F2-9326-A9BD0D40E902}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4BD63B4F-F232-46EA-A408-9BE6ED9C671A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4BD63B4F-F232-46EA-A408-9BE6ED9C671A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4BD63B4F-F232-46EA-A408-9BE6ED9C671A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4BD63B4F-F232-46EA-A408-9BE6ED9C671A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,15 +1,11 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Dryv.AspNetCore;
-using Dryv.AspNetCore.DynamicControllers;
-using Dryv.Configuration;
 using Dryv.SampleVue.CustomValidation;
-using Dryv.Validation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 namespace Dryv.SampleVue
 {
@@ -56,7 +52,8 @@ namespace Dryv.SampleVue
                 .AddDryvPreloading();
 
             services.AddSingleton<AsyncValidator>();
-            services.AddSingleton(new SampleOptions());
+            services.AddSingleton<SyncValidator>();
+            services.AddOptions<SampleOptions>();
         }
     }
 }

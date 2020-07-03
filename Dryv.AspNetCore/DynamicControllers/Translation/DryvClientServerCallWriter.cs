@@ -7,7 +7,7 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
 {
     internal class DryvClientServerCallWriter : IDryvClientServerCallWriter
     {
-        public void Write(CustomTranslationContext context, string url, string httpMethod, IList<MemberExpression> members)
+        public void Write(TranslationContext context, ITranslator translator, string url, string httpMethod, IList<MemberExpression> members)
         {
             var w = context.Writer;
 
@@ -25,7 +25,7 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
                 w.Write(memberExpression.Member.Name.ToCamelCase());
                 w.Write(":");
 
-                context.Translator.Translate(memberExpression, context);
+                translator.Translate(memberExpression, context);
 
                 sep = ",";
             }

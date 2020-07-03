@@ -1,5 +1,6 @@
 ﻿using System;
 using Dryv.Rules;
+using Dryv.SampleVue.CustomValidation;
 
 namespace Dryv.SampleConsole.Models
 {

@@ -14,7 +14,7 @@ using Microsoft.Extensions.Options;
 
 namespace Dryv.AspNetCore.DynamicControllers.Translation
 {
-    internal class DryvDynamicControllerTranslator : ICustomTranslator
+    internal class DryvDynamicControllerTranslator : /*ICustomTranslator,*/ IMethodCallTranslator
     {
         private static readonly ConcurrentDictionary<string, Lazy<TypeInfo>> Controllers = new ConcurrentDictionary<string, Lazy<TypeInfo>>();
         private readonly ControllerGenerator codeGenerator;
@@ -37,40 +37,24 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
             return true;
         }
 
-        public bool TryTranslate(CustomTranslationContext context)
+        public int? OrderIndex { get; set; } = int.MaxValue;
+
+        public bool SupportsType(Type type)
         {
-            if (!(context.Expression is MethodCallExpression methodCallExpression))
-            {
-                return false;
-            }
-
-            if (!typeof(Task).IsAssignableFrom(methodCallExpression.Method.ReturnType))
-            {
-                return false;
-            }
-
-            if (typeof(Task).IsAssignableFrom(methodCallExpression.Method.DeclaringType))
-            {
-                if (methodCallExpression.Method.Name != nameof(Task.FromResult))
-                {
-                    return false;
-                }
-
-                context.Translator.Translate(methodCallExpression.Arguments.First(), context);
-                return true;
-            }
-
-            var controller = this.GenerateController(methodCallExpression, context);
-            var url = this.linkGenerator.GetPathByRouteValues(controller.Name, null);
-            var httpMethod = this.options.Value.HttpMethod.ToString().ToUpper();
-            var usedProperties = FindModelPropertiesInExpression(context, methodCallExpression);
-
-            this.controllerCallWriter.Write(context, url, httpMethod, usedProperties);
-
             return true;
         }
 
-        private static List<MemberExpression> FindModelPropertiesInExpression(CustomTranslationContext context, MethodCallExpression methodCallExpression)
+        public bool Translate(MethodTranslationContext context)
+        {
+            return this.Translate(context, context.Translator, context.Expression);
+        }
+
+        public bool TryTranslate(CustomTranslationContext context)
+        {
+            return this.Translate(context, context.Translator, context.Expression);
+        }
+
+        private static List<MemberExpression> FindModelPropertiesInExpression(TranslationContext context, MethodCallExpression methodCallExpression)
         {
             var f = new ControllerGenerator.ChildFinder<MemberExpression>();
 
@@ -97,6 +81,44 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
 
                 return assembly.DefinedTypes.FirstOrDefault(typeof(Controller).IsAssignableFrom);
             })).Value;
+        }
+
+        private bool Translate(TranslationContext context, ITranslator translator, Expression expression)
+        {
+            if (!(expression is MethodCallExpression methodCallExpression))
+            {
+                return false;
+            }
+
+            //if (!typeof(Task).IsAssignableFrom(methodCallExpression.Method.ReturnType))
+            //{
+            //    return false;
+            //}
+
+            //if (typeof(Task).IsAssignableFrom(methodCallExpression.Method.DeclaringType))
+            //{
+            //    if (methodCallExpression.Method.Name != nameof(Task.FromResult))
+            //    {
+            //        return false;
+            //    }
+
+            //    translator.Translate(methodCallExpression.Arguments.First(), context);
+            //    return true;
+            //}
+            if (typeof(Task).IsAssignableFrom(methodCallExpression.Method.DeclaringType) && methodCallExpression.Method.Name == nameof(Task.FromResult))
+            {
+                translator.Translate(methodCallExpression.Arguments.First(), context);
+                return true;
+            }
+
+            var controller = this.GenerateController(methodCallExpression, context);
+            var url = this.linkGenerator.GetPathByRouteValues(controller.Name, null);
+            var httpMethod = this.options.Value.HttpMethod.ToString().ToUpper();
+            var usedProperties = FindModelPropertiesInExpression(context, methodCallExpression);
+
+            this.controllerCallWriter.Write(context, translator, url, httpMethod, usedProperties);
+
+            return true;
         }
     }
 }

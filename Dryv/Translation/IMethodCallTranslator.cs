@@ -9,6 +9,11 @@ namespace Dryv.Translation
     public interface IMethodCallTranslator
     {
         /// <summary>
+        /// A number specifying the order in which tha translator is called. The higher the number, the later the translator will get called.
+        /// </summary>
+        int? OrderIndex { get; set; }
+
+        /// <summary>
         /// Returns a valud indicating whether the  specified type is supported by the translator.
         /// </summary>
         bool SupportsType(Type type);

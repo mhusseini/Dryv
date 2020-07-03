@@ -25,6 +25,11 @@ namespace Dryv.AspNetCore.Internal
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+            if (context.Filters.OfType<DryvDisableAttribute>().Any())
+            {
+                return;
+            }
+
             var model = context.ActionArguments.Values.FirstOrDefault(ShouldValidate);
 
             if (model != null)

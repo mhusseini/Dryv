@@ -112,7 +112,7 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
         {
             var methodBuilder = typeBuilder.DefineMethod(methodName, MethodAttributes.Public, returnType, parameterTypes);
 
-            ControllerAttributeGenerator.AddCustomAttributes(context, options.MapActionFilters, methodBuilder.SetCustomAttribute);
+            ControllerAttributeGenerator.AddCustomAttributes(context, methodBuilder.SetCustomAttribute, options.MapActionFilters);
 
             return methodBuilder;
         }
