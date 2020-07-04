@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Dryv.AspNetCore</RootNamespace>
-    <Version>6.0.0-pre.1</Version>
+    <Version>6.0.0-pre.2</Version>
     <Authors>Munir husseini</Authors>
     <Company>Munir husseini</Company>
     <Product>Dryv</Product>
@@ -31,7 +31,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\tmp\ILPack\src\Lokad.ILPack.csproj" />
     <ProjectReference Include="..\Dryv\Dryv.csproj" />
   </ItemGroup>
 

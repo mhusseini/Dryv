@@ -28,10 +28,7 @@ namespace Dryv.SampleVue
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    "home",
-                    "/",
-                    new { controller = "Home", action = "Index" });
+                endpoints.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
             });
 
             app.UseDryv();

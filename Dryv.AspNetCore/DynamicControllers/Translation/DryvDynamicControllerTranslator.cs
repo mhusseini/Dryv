@@ -32,12 +32,12 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
             this.linkGenerator = linkGenerator;
         }
 
+        public int? OrderIndex { get; set; } = int.MaxValue;
+
         public bool? AllowSurroundingBrackets(Expression expression)
         {
             return true;
         }
-
-        public int? OrderIndex { get; set; } = int.MaxValue;
 
         public bool SupportsType(Type type)
         {
@@ -69,10 +69,12 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
                 .ToList();
         }
 
-        private TypeInfo GenerateController(MethodCallExpression methodCallExpression, TranslationContext context)
+        private TypeInfo GenerateController(MethodCallExpression methodCallExpression, TranslationContext context, List<MemberExpression> modelProperties)
         {
+            var modelFields = string.Join("|", modelProperties.Select(p => p.Member.Name));
             var m = methodCallExpression.Method;
-            var key = $"{m.DeclaringType?.FullName}|{m.Name}|{string.Join("|", m.GetParameters().Select(p => p.ParameterType.FullName))}";
+            var parameters = string.Join("|", m.GetParameters().Select(p => p.ParameterType.FullName));
+            var key = $"{m.DeclaringType?.FullName}|{m.Name}|{parameters}|{modelFields}";
 
             return Controllers.GetOrAdd(key, _ => new Lazy<TypeInfo>(() =>
             {
@@ -90,33 +92,18 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
                 return false;
             }
 
-            //if (!typeof(Task).IsAssignableFrom(methodCallExpression.Method.ReturnType))
-            //{
-            //    return false;
-            //}
-
-            //if (typeof(Task).IsAssignableFrom(methodCallExpression.Method.DeclaringType))
-            //{
-            //    if (methodCallExpression.Method.Name != nameof(Task.FromResult))
-            //    {
-            //        return false;
-            //    }
-
-            //    translator.Translate(methodCallExpression.Arguments.First(), context);
-            //    return true;
-            //}
             if (typeof(Task).IsAssignableFrom(methodCallExpression.Method.DeclaringType) && methodCallExpression.Method.Name == nameof(Task.FromResult))
             {
                 translator.Translate(methodCallExpression.Arguments.First(), context);
                 return true;
             }
 
-            var controller = this.GenerateController(methodCallExpression, context);
+            var modelProperties = FindModelPropertiesInExpression(context, methodCallExpression);
+            var controller = this.GenerateController(methodCallExpression, context, modelProperties);
             var url = this.linkGenerator.GetPathByRouteValues(controller.Name, null);
             var httpMethod = this.options.Value.HttpMethod.ToString().ToUpper();
-            var usedProperties = FindModelPropertiesInExpression(context, methodCallExpression);
 
-            this.controllerCallWriter.Write(context, translator, url, httpMethod, usedProperties);
+            this.controllerCallWriter.Write(context, translator, url, httpMethod, modelProperties);
 
             return true;
         }

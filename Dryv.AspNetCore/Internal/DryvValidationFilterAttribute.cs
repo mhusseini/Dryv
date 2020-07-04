@@ -27,6 +27,8 @@ namespace Dryv.AspNetCore.Internal
         {
             if (context.Filters.OfType<DryvDisableAttribute>().Any())
             {
+                await next();
+
                 return;
             }
 
@@ -69,28 +71,6 @@ namespace Dryv.AspNetCore.Internal
 
             return result;
         }
-
-        ///// <summary>
-        ///// Validates the model and sets the model state on the controller accordingly.
-        ///// </summary>
-        ///// <param name="asyncOnly">Set to true to only validate async rules which otherwise can't (and won't) be run
-        ///// inside the synchronous validation infrastructure in ASP.NET core.</param>
-        //public async Task<bool> ValidateSync<TModel>(Controller controller, TModel model)
-        //{
-        //    var result = true;
-        //    var errors = await this.validator.Validate(model, this.options.Value, controller.HttpContext.RequestServices.GetService);
-
-        //    foreach (var x in from error in errors
-        //                      from message in error.Message
-        //                      where message.Type == DryvResultType.Error
-        //                      select new { error, message })
-        //    {
-        //        result = false;
-        //        controller.ModelState.AddModelError(x.error.Path, x.message.Text);
-        //    }
-
-        //    return result;
-        //}
 
         private static IEnumerable<PropertyInfo> GetAllProperties(Type type) => GetAllProperties(type, new HashSet<PropertyInfo>());
 

@@ -67,12 +67,12 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
         public static void GenerateWrapperMethodPost(MethodInfo methodInfo, Type modelType, LambdaExpression lambda, TypeBuilder typeBuilder, FieldInfo delegateField, IDictionary<ParameterExpression, FieldBuilder> innerFields, DryvControllerGenerationContext context, DryvDynamicControllerOptions options)
         {
             var method = lambda.Type.GetMethod("Invoke");
-            var methodBuilder = ControllerMethodGenerator.CreateMethodBuilder(typeBuilder, methodInfo.Name, lambda.ReturnType, new[] { modelType }, context, options);
+            var methodBuilder = CreateMethodBuilder(typeBuilder, methodInfo.Name, lambda.ReturnType, new[] { modelType }, context, options);
             var parameterBuilder = methodBuilder.DefineParameter(1, ParameterAttributes.None, "model");
             parameterBuilder.SetCustomAttribute(ControllerAttributeGenerator.CreateAttributeBuilder<FromBodyAttribute>());
 
             ControllerAttributeGenerator.SetAttribute<HttpPostAttribute>(methodBuilder);
-            ControllerMethodGenerator.AddRoutingAttribute(methodBuilder, context, options);
+            AddRoutingAttribute(methodBuilder, context, options);
 
             var il = methodBuilder.GetILGenerator();
 
