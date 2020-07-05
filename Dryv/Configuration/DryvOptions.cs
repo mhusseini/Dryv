@@ -10,6 +10,7 @@ namespace Dryv.Configuration
         public bool BreakOnFirstValidationError { get; set; } = true;
         public Type ClientFunctionWriterType { get; internal set; } = DefaultClientFunctionWriterType;
         public Type ClientValidationSetWriterType { get; internal set; } = DefaultClientValidationSetWriterType;
+        public bool DisableAutomaticValidation { get; set; }
         public TranslationErrorBehavior TranslationErrorBehavior { get; set; }
     }
 }

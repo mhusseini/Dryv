@@ -18,9 +18,10 @@ namespace Dryv.AspNetCore
             var options = new DryvOptions();
             setupAction?.Invoke(options);
 
-            // As long as mvc validation is not async, we'll
-            // run the async validation from an action filter.
-            mvcBuilder.AddMvcOptions(opts => opts.Filters.Add<DryvValidationFilterAttribute>());
+            if(!options.DisableAutomaticValidation)
+            {
+                mvcBuilder.AddMvcOptions(opts => opts.Filters.Add<DryvValidationFilterAttribute>());
+            }
 
             return RegsterServices(mvcBuilder.Services, options);
         }
