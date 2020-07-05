@@ -50,7 +50,7 @@ namespace Dryv.Compilation
                                         select p).ToList();
 
             var propertyValidationExpressions = from property in properties
-                                                where !property.IsNavigationProperty() && property.GetCustomAttribute<DryvRulesAttribute>() != null
+                                                where !property.IsNavigationProperty() && property.GetCustomAttribute<DryvValidationAttribute>() != null
                                                 select Expression.Call(parameterResult, AddAsyncResultMethod,
                                                     Expression.New(AsyncValidationResultCtor,
                                                         parameterModel,

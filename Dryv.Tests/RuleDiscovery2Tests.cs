@@ -127,7 +127,7 @@ namespace Dryv.Tests
                         ? DryvValidationResult.Success
                         : DryvValidationResult.Error("error"));
 
-            [DryvRules]
+            [DryvValidation]
             public string Text { get; set; }
         }
 
@@ -144,7 +144,7 @@ namespace Dryv.Tests
                         ? "error"
                         : null);
 
-            [DryvRules]
+            [DryvValidation]
             public string Text { get; set; }
         }
 
@@ -152,7 +152,7 @@ namespace Dryv.Tests
         {
             public static DryvRules Rules = CommonRules.Text;
 
-            [DryvRules]
+            [DryvValidation]
             public string Text { get; set; }
         }
 
@@ -160,7 +160,7 @@ namespace Dryv.Tests
         {
             public static DryvRules Rules => CommonRules.Text;
 
-            [DryvRules]
+            [DryvValidation]
             public string Text { get; set; }
         }
 
@@ -173,7 +173,7 @@ namespace Dryv.Tests
                         ? DryvValidationResult.Success
                         : DryvValidationResult.Error("error"));
 
-            [DryvRules]
+            [DryvValidation]
             public override string Text { get; set; }
         }
 
@@ -196,7 +196,7 @@ namespace Dryv.Tests
                         ? DryvValidationResult.Success
                         : DryvValidationResult.Error("error"));
 
-            [DryvRules]
+            [DryvValidation]
             public Model7 Child { get; set; }
         }
 
@@ -211,7 +211,7 @@ namespace Dryv.Tests
 
             public Model7 Child { get; set; }
 
-            [DryvRules]
+            [DryvValidation]
             public string Text { get; set; }
         }
 
@@ -229,13 +229,13 @@ namespace Dryv.Tests
 
         private class Model9
         {
-            [DryvRules]
+            [DryvValidation]
             public string Text { get; set; }
         }
 
         private abstract class ModelBase
         {
-            [DryvRules]
+            [DryvValidation]
             public virtual string Text { get; set; }
         }
     }

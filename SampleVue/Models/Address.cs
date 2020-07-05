@@ -16,10 +16,10 @@ namespace Dryv.SampleVue.Models
             .Rule<AsyncValidator, IOptions<SampleOptions>>(a => a.ZipCode, (a, v, o) => v.ValidateZipCode(a.ZipCode, a.City, o.Value.ZipCodeLength))
             .Rule(a => a.City, a => a.City.Contains("ass", StringComparison.OrdinalIgnoreCase) ? DryvValidationResult.Warning("Are you sure about this name?") : DryvValidationResult.Success);
 
-        [DryvRules]
+        [DryvValidation]
         public string City { get; set; }
 
-        [DryvRules]
+        [DryvValidation]
         public string ZipCode { get; set; }
     }
 }

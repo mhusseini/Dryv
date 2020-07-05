@@ -1,4 +1,5 @@
-﻿using Dryv.AspNetCore.DynamicControllers;
+﻿using System.Linq;
+using Dryv.AspNetCore.DynamicControllers;
 using Dryv.AspNetCore.DynamicControllers.Endpoints;
 using Dryv.AspNetCore.Internal;
 using Dryv.Extensions;
@@ -13,7 +14,7 @@ namespace Dryv.AspNetCore
     {
         public static IApplicationBuilder UseDryv(this IApplicationBuilder app)
         {
-            var endpointRouteBuilder = app.Properties["__EndpointRouteBuilder"] as IEndpointRouteBuilder;
+            var endpointRouteBuilder = app.Properties.Values.OfType<IEndpointRouteBuilder>().FirstOrDefault();
             app.ApplicationServices.GetService<DryvEndpointRouteBuilderProvider>().RouteBuilder = endpointRouteBuilder;
             var translatorProvider = app.ApplicationServices.GetService<ITranslatorProvider>();
 

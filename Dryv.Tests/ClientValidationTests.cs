@@ -44,7 +44,7 @@ namespace Dryv.Tests
 
             public GrandChildModel Child { get; set; }
 
-            [DryvRules]
+            [DryvValidation]
             public string Name { get; set; }
         }
 
@@ -52,7 +52,7 @@ namespace Dryv.Tests
         {
             private static readonly DryvRules Rules = DryvRules.For<GrandChildModel>().Rule(m => m.Name, m => m.Name == "fail3" ? "invalid" : null);
 
-            [DryvRules]
+            [DryvValidation]
             public string Name { get; set; }
         }
 
@@ -64,7 +64,7 @@ namespace Dryv.Tests
 
             public ChildModel Child { get; set; }
 
-            [DryvRules]
+            [DryvValidation]
             public string Name { get; set; }
         }
     }

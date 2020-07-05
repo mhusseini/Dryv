@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
+using Dryv.Translation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
@@ -29,7 +30,7 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
 
         private static List<ParameterExpression> FindParameters(MethodCallExpression methodCallExpression)
         {
-            var finder = new ChildFinder<ParameterExpression>();
+            var finder = new ExpressionNodeFinder<ParameterExpression>();
 
             if (!methodCallExpression.Method.IsStatic)
             {
@@ -103,22 +104,6 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
             //}).WaitForExit();
 
             return assemblyBuilder;
-        }
-
-        public class ChildFinder<TExpression> : ExpressionVisitor
-            where TExpression : Expression
-        {
-            public List<TExpression> FoundChildren { get; } = new List<TExpression>();
-
-            public override Expression Visit(Expression node)
-            {
-                if (node is TExpression expression)
-                {
-                    this.FoundChildren.Add(expression);
-                }
-
-                return base.Visit(node);
-            }
         }
 
         public class MemberFinder : ExpressionVisitor

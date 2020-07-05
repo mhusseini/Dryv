@@ -8,7 +8,7 @@ namespace Dryv.SampleVue.Models
 
         public bool BillingEqualsShipping { get; set; } = true;
 
-        [DryvRules]
+        [DryvValidation]
         public Address BillingAddress { get; set; }
 
         public Person Person { get; set; }

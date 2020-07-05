@@ -13,10 +13,10 @@ namespace Dryv.SampleConsole.Models
                 ? Task.FromResult(DryvValidationResult.Success)
                 : validator.ValidateZipCode(a.ZipCode, a.City));
 
-        [DryvRules]
+        [DryvValidation]
         public string ZipCode { get; set; }
 
-        [DryvRules]
+        [DryvValidation]
         public string City { get; set; }
 
         public bool Deactivated { get; set; }

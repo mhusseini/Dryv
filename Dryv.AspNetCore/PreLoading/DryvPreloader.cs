@@ -44,7 +44,7 @@ namespace Dryv.AspNetCore.PreLoading
 
             foreach (var type in from t in assemblies.SelectMany(a => a.GetTypes())
                                  let props = t.GetProperties(BindingFlags.Instance | BindingFlags.FlattenHierarchy | BindingFlags.Public)
-                                 where props.Any(p => p.GetCustomAttribute<DryvRulesAttribute>() != null)
+                                 where props.Any(p => p.GetCustomAttribute<DryvValidationAttribute>() != null)
                                  select t)
             {
                 this.preLoader.GetDryvClientValidation(type);

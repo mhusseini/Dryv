@@ -14,10 +14,10 @@ namespace Dryv.SampleConsole.Models
                 m => m.LastName,
                 m => m.FirstName.Equals(m.LastName, StringComparison.OrdinalIgnoreCase) ? $"First and last name cannot both be '{m.FirstName}'." : null);
 
-        [DryvRules]
+        [DryvValidation]
         public string FirstName { get; set; }
 
-        [DryvRules]
+        [DryvValidation]
         public string LastName { get; set; }
     }
 }

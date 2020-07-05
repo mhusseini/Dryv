@@ -9,7 +9,8 @@ namespace Dryv.Validation
     {
         public virtual void WriteBegin(TextWriter writer)
         {
-            writer.Write("(function(dryv) { if (!dryv.v) { dryv.v = {}; }");
+            writer.WriteLine("(function(dryv) { if (!dryv.v) { dryv.v = {}; }");
+            writer.WriteLine("if (!dryv.r) { dryv.r = function(v, m, context) { return v.reduce(function(promiseChain, currentTask){ return promiseChain.then(function(r){ return r||currentTask(m, context); }); }, Promise.resolve());} }");
         }
 
         public virtual void WriteEnd(TextWriter writer)

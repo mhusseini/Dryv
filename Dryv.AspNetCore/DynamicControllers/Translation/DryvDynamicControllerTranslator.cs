@@ -14,7 +14,7 @@ using Microsoft.Extensions.Options;
 
 namespace Dryv.AspNetCore.DynamicControllers.Translation
 {
-    internal class DryvDynamicControllerTranslator : /*ICustomTranslator,*/ IMethodCallTranslator
+    internal class DryvDynamicControllerTranslator : IMethodCallTranslator
     {
         private static readonly ConcurrentDictionary<string, Lazy<TypeInfo>> Controllers = new ConcurrentDictionary<string, Lazy<TypeInfo>>();
         private readonly ControllerGenerator codeGenerator;
@@ -34,11 +34,6 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
 
         public int? OrderIndex { get; set; } = int.MaxValue;
 
-        public bool? AllowSurroundingBrackets(Expression expression)
-        {
-            return true;
-        }
-
         public bool SupportsType(Type type)
         {
             return true;
@@ -49,14 +44,9 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
             return this.Translate(context, context.Translator, context.Expression);
         }
 
-        public bool TryTranslate(CustomTranslationContext context)
-        {
-            return this.Translate(context, context.Translator, context.Expression);
-        }
-
         private static List<MemberExpression> FindModelPropertiesInExpression(TranslationContext context, MethodCallExpression methodCallExpression)
         {
-            var f = new ControllerGenerator.ChildFinder<MemberExpression>();
+            var f = new ExpressionNodeFinder<MemberExpression>();
 
             foreach (var argument in methodCallExpression.Arguments)
             {

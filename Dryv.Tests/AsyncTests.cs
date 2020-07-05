@@ -28,7 +28,7 @@ namespace Dryv.Tests
                 .ServerRule(m => m.Name,
                     m => Task.FromResult(m.Name == null ? 0 : m.Name.Length).ContinueWith(t => t.Result == 0 ? "failed" : DryvValidationResult.Success));
 
-            [DryvRules]
+            [DryvValidation]
             public string Name { get; set; }
         }
     }

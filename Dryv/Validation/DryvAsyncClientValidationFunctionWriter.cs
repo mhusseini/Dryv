@@ -9,7 +9,7 @@ namespace Dryv.Validation
     {
         public Action<TextWriter> GetValidationFunction(IDictionary<DryvRuleTreeNode, string> translatedRules) => writer =>
             {
-                writer.Write("function(m, context) { return [");
+                writer.Write("dryv.r.bind(this, [");
                 var sep = string.Empty;
 
                 foreach (var rule in translatedRules)
@@ -19,7 +19,7 @@ namespace Dryv.Validation
                     sep = ",";
                 }
 
-                writer.Write(@"].reduce(function(promiseChain, currentTask){ return promiseChain.then(function(r){ return r||currentTask(m, context); }); }, Promise.resolve());}");
+                writer.Write(@"])");
             };
     }
 }

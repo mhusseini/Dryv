@@ -124,13 +124,15 @@ namespace Dryv.RuleDetection
 
             foundTypes.Add(type);
 
+            var isDryvEnabled = type.GetTypeInfo().GetCustomAttribute<DryvValidationAttribute>() != null;
+
             foreach (var property in type.GetProperties(BindingFlagsForProperties))
             {
                 if (property.IsNavigationProperty())
                 {
                     pathStack.Enqueue(property.Name.ToCamelCase());
 
-                    if (ruleType == RuleType.Disabling && property.GetCustomAttribute<DryvRulesAttribute>() != null)
+                    if (ruleType == RuleType.Disabling && property.GetCustomAttribute<DryvValidationAttribute>() != null)
                     {
                         yield return new KeyValuePair<PropertyInfo, string>(property, string.Join(".", pathStack));
                     }
@@ -144,7 +146,7 @@ namespace Dryv.RuleDetection
 
                     pathStack.Dequeue();
                 }
-                else if (property.GetCustomAttribute<DryvRulesAttribute>() != null)
+                else if (isDryvEnabled || property.GetCustomAttribute<DryvValidationAttribute>() != null)
                 {
                     yield return new KeyValuePair<PropertyInfo, string>(property, string.Join(".", pathStack));
                 }

@@ -157,7 +157,10 @@ namespace Dryv.Translation
 
         public override void Visit(BinaryExpression expression, TranslationContext context, bool negated = false)
         {
-            this.Translate(expression.Left, context);
+            if (!TryWriteInjectedExpression(expression.Left, context))
+            {
+                this.Translate(expression.Left, context);
+            }
 
             if (!TryWriteTerminal(expression, context.Writer))
             {
@@ -166,11 +169,19 @@ namespace Dryv.Translation
                     : new DryvExpressionNotSupportedException(expression);
             }
 
-            this.Translate(expression.Right, context);
+            if (!TryWriteInjectedExpression(expression.Right, context))
+            {
+                this.Translate(expression.Right, context);
+            }
         }
 
         public override void Visit(BlockExpression expression, TranslationContext context, bool negated = false)
         {
+            if (TryWriteInjectedExpression(expression, context))
+            {
+                return;
+            }
+
             foreach (var variable in expression.Variables)
             {
                 context.Writer.WriteLine($"var {this.FormatIdentifier(variable.Name)};");
@@ -181,7 +192,10 @@ namespace Dryv.Translation
 
         public override void Visit(ConditionalExpression expression, TranslationContext context, bool negated = false)
         {
-            this.Translate(expression.Test, context);
+            if (!TryWriteInjectedExpression(expression.Test, context))
+            {
+                this.Translate(expression.Test, context);
+            }
             context.Writer.IncrementIndent();
             context.Writer.Write(" ? ");
             this.Translate(expression.IfTrue, context);
@@ -227,6 +241,11 @@ namespace Dryv.Translation
                 throw new NotSupportedException("JavaScript does not support indexers with more than one argument.");
             }
 
+            if (TryWriteInjectedExpression(expression, context))
+            {
+                return;
+            }
+
             this.Translate(expression.Object, context);
             context.Writer.Write("[");
             this.Translate(expression.Arguments.First(), context);
@@ -238,6 +257,11 @@ namespace Dryv.Translation
             if (expression.Expression is MemberExpression)
             {
                 throw new DryvExpressionNotSupportedException(expression);
+            }
+
+            if (TryWriteInjectedExpression(expression, context))
+            {
+                return;
             }
 
             this.Translate(expression.Expression, context);
@@ -371,7 +395,10 @@ namespace Dryv.Translation
         public override void Visit(SwitchExpression expression, TranslationContext context, bool negated = false)
         {
             context.Writer.Write("switch(");
-            this.Translate(expression.SwitchValue, context);
+            if (!TryWriteInjectedExpression(expression.SwitchValue, context))
+            {
+                this.Translate(expression.SwitchValue, context);
+            }
             context.Writer.WriteLine("){");
             foreach (var expressionCase in expression.Cases)
             {
@@ -405,6 +432,11 @@ namespace Dryv.Translation
 
         public override void Visit(UnaryExpression expression, TranslationContext context, bool negated = false)
         {
+            if (TryWriteInjectedExpression(expression, context))
+            {
+                return;
+            }
+
             var negatedExpression = false;
 
             switch (expression.NodeType)
@@ -438,13 +470,14 @@ namespace Dryv.Translation
 
         private static bool TryWriteInjectedExpression(Expression expression, TranslationContext context)
         {
-            var parameter = expression.GetOuterExpression<ParameterExpression>();
-            if (!context.OptionsTypes.Contains(parameter?.Type))
+            var visitor = new ExpressionNodeFinder<ParameterExpression>();
+            visitor.Visit(expression);
+            if (visitor.FoundChildren.Select(c => c.Type).Contains(context.ModelType))
             {
                 return false;
             }
 
-            context.InjectRuntimeExpression(expression, parameter);
+            context.InjectRuntimeExpression(expression, visitor.FoundChildren);
 
             return true;
         }

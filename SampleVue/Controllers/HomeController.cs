@@ -22,9 +22,5 @@ namespace Dryv.SampleVue.Controllers
             //    {
             //        success = false,
             //        results = this.ModelState.ToDictionary(
-            //            s => string.Join('.', s.Key.Split('.').Select(v => v.ToCamelCase())),
-            //            s => s.Value.Errors.Select(e => e.ErrorMessage).First())
-            //    });
-        }
-    }
+            //            s => string.Join('.', s.Key.Split
 }

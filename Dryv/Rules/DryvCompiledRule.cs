@@ -8,7 +8,7 @@ namespace Dryv.Rules
 {
     public sealed class DryvCompiledRule
     {
-        public bool IsDisablingRule { get; internal set; }   
+        public bool IsDisablingRule { get; internal set; }
         public string CodeTemplate { get; internal set; }
         public Func<object[], bool> CompiledEnablingExpression { get; internal set; }
         public Func<object, object[], object> CompiledValidationExpression { get; internal set; }
@@ -26,7 +26,11 @@ namespace Dryv.Rules
 
         public static DryvCompiledRule Create<TModel, TProperty>(Expression<Func<TModel, TProperty>> property, LambdaExpression rule, LambdaExpression enabled, DryvRuleLocation ruleLocation, string groupName)
         {
-            if (!(property.Body is MemberExpression memberExpression) ||
+            var body = property.Body is UnaryExpression unaryExpression
+                ? unaryExpression.Operand
+                : property.Body;
+
+            if (!(body is MemberExpression memberExpression) ||
                 !(memberExpression.Member is PropertyInfo propertyInfo))
             {
                 return null;

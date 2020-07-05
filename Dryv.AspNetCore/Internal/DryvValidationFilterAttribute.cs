@@ -105,6 +105,6 @@ namespace Dryv.AspNetCore.Internal
 
         private static bool ShouldValidate(object a) => ShouldValidate(a?.GetType());
 
-        private static bool ShouldValidate(Type t) => GetAllProperties(t).SelectMany(p => p.GetCustomAttributes<DryvRulesAttribute>()).Any();
+        private static bool ShouldValidate(Type t) => GetAllProperties(t).SelectMany(p => p.GetCustomAttributes<DryvValidationAttribute>()).Any();
     }
 }
