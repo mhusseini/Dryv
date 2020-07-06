@@ -12,7 +12,7 @@ namespace Dryv.SampleVue.Controllers
         }
 
         [HttpPost]
-        public IActionResult Index([FromBody]HomeModel _)
+        public IActionResult Index([FromBody] HomeModel _)
         {
             return this.DryvValidationActionResult();
 
@@ -23,4 +23,6 @@ namespace Dryv.SampleVue.Controllers
             //        success = false,
             //        results = this.ModelState.ToDictionary(
             //            s => string.Join('.', s.Key.Split
+        }
+    }
 }

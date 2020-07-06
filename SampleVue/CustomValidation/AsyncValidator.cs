@@ -10,6 +10,8 @@ namespace Dryv.SampleVue.CustomValidation
             return text?.Length ?? 0;
         }
 
+        public string GetSomeString(string zipCode) => "XXX";
+
         public async Task<DryvValidationResult> ValidateZipCode(string zipCode, string city, int zipCodeLength)
         {
             return string.IsNullOrWhiteSpace(zipCode)
