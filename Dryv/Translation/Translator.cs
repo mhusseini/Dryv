@@ -163,7 +163,8 @@ namespace Dryv.Translation
                 OptionDelegates = optionDelegates,
                 ModelType = propertyExpression?.Expression.GetExpressionType(),
                 PropertyExpression = propertyExpression?.Expression,
-                GroupName = groupName
+                GroupName = groupName,
+                StringBuilder = sb
             };
 
             this.Translate(expression, context);

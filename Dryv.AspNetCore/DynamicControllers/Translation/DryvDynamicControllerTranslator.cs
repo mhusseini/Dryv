@@ -95,6 +95,7 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
 
             this.controllerCallWriter.Write(context, translator, url, httpMethod, modelProperties);
 
+            context.IsAsync = true;
             return true;
         }
     }

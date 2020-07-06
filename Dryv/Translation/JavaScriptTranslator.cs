@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text;
 using Dryv.Extensions;
 using Dryv.Reflection;
 
@@ -11,6 +12,8 @@ namespace Dryv.Translation
 {
     public class JavaScriptTranslator : Translator
     {
+        private static readonly MethodInfo DryvValidationResultImplicitConvert = typeof(DryvValidationResult).GetMethod("op_Implicit");
+
         private static readonly Dictionary<ExpressionType, string> Terminals = new Dictionary<ExpressionType, string>
         {
             [ExpressionType.Add] = "+",
@@ -100,7 +103,6 @@ namespace Dryv.Translation
             [ExpressionType.IsFalse] = "!== false",
         };
 
-        private static MethodInfo DryvValidationResultImplicitConvert = typeof(DryvValidationResult).GetMethod("op_Implicit");
         private readonly ITranslatorProvider translatorProvider;
 
         public JavaScriptTranslator(ITranslatorProvider translatorProvider)
@@ -119,12 +121,10 @@ namespace Dryv.Translation
                 context.Writer.Write("(");
             }
 
-            var context2 = new CustomTranslationContext(context)
-            {
-                Expression = expression,
-                Translator = this,
-                Negated = negated
-            };
+            var context2 = context.Clone<CustomTranslationContext>();
+            context2.Expression = expression;
+            context2.Translator = this;
+            context2.Negated = negated;
 
             if (!this.translatorProvider.GenericTranslators.Any(t => t.TryTranslate(context2)))
             {
@@ -157,21 +157,33 @@ namespace Dryv.Translation
 
         public override void Visit(BinaryExpression expression, TranslationContext context, bool negated = false)
         {
-            if (!TryWriteInjectedExpression(expression.Left, context))
+            var closingCode = new List<string>();
+            var binaryExpression = Expression.MakeBinary(expression.NodeType,
+                this.TranslateAsyncBinary(expression.Left, context, closingCode),
+                this.TranslateAsyncBinary(expression.Right, context, closingCode),
+                expression.IsLiftedToNull,
+                expression.Method);
+
+            if (!TryWriteInjectedExpression(binaryExpression.Left, context))
             {
-                this.Translate(expression.Left, context);
+                this.Translate(binaryExpression.Left, context);
             }
 
-            if (!TryWriteTerminal(expression, context.Writer))
+            if (!TryWriteTerminal(binaryExpression, context.Writer))
             {
                 throw expression.Method != null
                     ? (Exception)new DryvMethodNotSupportedException(expression)
                     : new DryvExpressionNotSupportedException(expression);
             }
 
-            if (!TryWriteInjectedExpression(expression.Right, context))
+            if (!TryWriteInjectedExpression(binaryExpression.Right, context))
             {
-                this.Translate(expression.Right, context);
+                this.Translate(binaryExpression.Right, context);
+            }
+
+            foreach (var code in closingCode)
+            {
+                context.Writer.Write(code);
             }
         }
 
@@ -192,16 +204,52 @@ namespace Dryv.Translation
 
         public override void Visit(ConditionalExpression expression, TranslationContext context, bool negated = false)
         {
+            context.IsAsync = false;
+
             if (!TryWriteInjectedExpression(expression.Test, context))
             {
                 this.Translate(expression.Test, context);
             }
+
+            if (context.IsAsync)
+            {
+                var paramName = context.GetVirtualParameter();
+
+                context.Writer.Write(".then(function(");
+                context.Writer.Write(paramName);
+                context.Writer.Write("){ return ");
+
+                if (expression.Test is UnaryExpression unaryExpression)
+                {
+                    if (unaryExpression.NodeType == ExpressionType.Not)
+                    {
+                        context.Writer.Write("!");
+                        context.Writer.Write(paramName);
+                    }
+                    else
+                    {
+                        var parameter = Expression.Parameter(unaryExpression.Operand.Type, paramName);
+                        var exp = Expression.MakeUnary(unaryExpression.NodeType, parameter, unaryExpression.Type);
+                        this.Translate(exp, context);
+                    }
+                }
+                else
+                {
+                    context.Writer.Write(paramName);
+                }
+            }
+
             context.Writer.IncrementIndent();
             context.Writer.Write(" ? ");
             this.Translate(expression.IfTrue, context);
             context.Writer.Write(" : ");
             this.Translate(expression.IfFalse, context);
             context.Writer.DecrementIndent();
+
+            if (context.IsAsync)
+            {
+                context.Writer.Write(";})");
+            }
         }
 
         public override void Visit(ConstantExpression expression, TranslationContext context, bool negated = false)
@@ -229,11 +277,6 @@ namespace Dryv.Translation
             throw new NotSupportedException();
         }
 
-        //public override void Visit(IDynamicExpression expression, TranslationContext context, bool negated = false)
-        //{
-        //    throw new NotSupportedException();
-        //}
-
         public override void Visit(IndexExpression expression, TranslationContext context, bool negated = false)
         {
             if (expression.Arguments.Count > 1)
@@ -252,6 +295,10 @@ namespace Dryv.Translation
             context.Writer.Write("]");
         }
 
+        //public override void Visit(IDynamicExpression expression, TranslationContext context, bool negated = false)
+        //{
+        //    throw new NotSupportedException();
+        //}
         public override void Visit(InvocationExpression expression, TranslationContext context, bool negated = false)
         {
             if (expression.Expression is MemberExpression)
@@ -345,12 +392,10 @@ namespace Dryv.Translation
 
             var objectType = expression.Object?.Type ?? expression.Method.DeclaringType;
 
-            var context2 = new MethodTranslationContext(context)
-            {
-                Translator = this,
-                Expression = expression,
-                Negated = negated
-            };
+            var context2 = context.Clone<MethodTranslationContext>();
+            context2.Translator = this;
+            context2.Expression = expression;
+            context2.Negated = negated;
 
             if (this.translatorProvider
                 .MethodCallTranslators
@@ -472,7 +517,9 @@ namespace Dryv.Translation
         {
             var visitor = new ExpressionNodeFinder<ParameterExpression>();
             visitor.Visit(expression);
-            if (visitor.FoundChildren.Select(c => c.Type).Contains(context.ModelType))
+
+            // Parameters that start with '$' are generated dummy parameters and should not be injected.
+            if (visitor.FoundChildren.Any(c => c.Name.StartsWith("$") || c.Type == context.ModelType))
             {
                 return false;
             }
@@ -557,6 +604,37 @@ namespace Dryv.Translation
             }
 
             return this.translatorProvider.GenericTranslators.All(t => t.AllowSurroundingBrackets(expression) != false);
+        }
+
+        private Expression TranslateAsyncBinary(Expression expression, TranslationContext context, ICollection<string> closingCode)
+        {
+            var sb = new StringBuilder();
+            var context2 = context.Clone<TranslationContext>(sb);
+            context2.IsAsync = false;
+
+            if (TryWriteInjectedExpression(expression, context2))
+            {
+                return expression;
+            }
+
+            this.Translate(expression, context2);
+
+            if (!context2.IsAsync)
+            {
+                return expression;
+            }
+
+            context.Writer.Write(sb.ToString());
+
+            var parameter = context2.GetVirtualParameter();
+
+            context.Writer.Write(".then(function(");
+            context.Writer.Write(parameter);
+            context.Writer.Write("){ return ");
+
+            closingCode.Add(";})");
+
+            return Expression.Parameter(expression.Type, parameter);
         }
 
         private void WriteMember(MemberExpression expression, TranslationContext context)

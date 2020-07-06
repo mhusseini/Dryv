@@ -6,6 +6,11 @@ namespace Dryv.Translation
 {
     public static class TranslationContextExtensions
     {
+        public static string GetVirtualParameter(this TranslationContext context)
+        {
+            return $"$p{++TranslationContext.ParameterCount}";
+        }
+
         public static void InjectRuntimeExpression(this TranslationContext context, Expression expression, params ParameterExpression[] parameters)
         {
             InjectRuntimeExpression(context, expression, (IList<ParameterExpression>)parameters);
