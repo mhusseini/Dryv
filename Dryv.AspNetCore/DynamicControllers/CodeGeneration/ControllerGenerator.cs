@@ -84,8 +84,8 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
 
             field.SetValue(null, lambda.Compile());
 
-            var generator = new Lokad.ILPack.AssemblyGenerator();
-            generator.GenerateAssembly(assemblyBuilder, $"{typeNameBase}.dll");
+            //var generator = new Lokad.ILPack.AssemblyGenerator();
+            //generator.GenerateAssembly(assemblyBuilder, $"{typeNameBase}.dll");
             //Process.Start(new ProcessStartInfo
             //{
             //    UseShellExecute = true,
