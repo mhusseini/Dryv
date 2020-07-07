@@ -275,28 +275,23 @@ namespace Dryv.Translation
         public override void Visit(ConditionalExpression expression, TranslationContext context, bool negated = false)
         {
             var finder = new BinaryFinder(this, context);
-            Dictionary<StringBuilder, ParameterExpression> asyncCalls;
 
-            if (finder.Visit(expression.Test) is BinaryExpression chain && finder.AsyncExpressions.Any())
+            var asyncExpression = finder.Visit(expression.Test) is BinaryExpression chain && finder.AsyncExpressions.Any()
+                ? this.TranslateAsyncBooleanChain(chain, context, finder)
+                : expression.Test;
+
+            var asyncFinder = new AsyncMethodCallModifier(this, context);
+            var body = asyncFinder.ApplyPromises(asyncExpression);
+
+            foreach (var call in asyncFinder.AsyncCalls)
             {
-                asyncCalls = this.TranslateAsyncBooleanChain(chain, context, finder);
+                context.Writer.Write(call.Key.ToString());
+                context.Writer.Write(".then(function(");
+                context.Writer.Write(call.Value.Name);
+                context.Writer.Write("){return ");
             }
-            else
-            {
-                var asyncFinder = new AsyncMethodCallModifier(this, context);
-                var test = asyncFinder.ApplyPromises(expression.Test);
-                asyncCalls = asyncFinder.AsyncCalls;
 
-                this.Translate(test, context);
-
-                foreach (var call in asyncCalls)
-                {
-                    context.Writer.Write(call.Key.ToString());
-                    context.Writer.Write(".then(function(");
-                    context.Writer.Write(call.Value.Name);
-                    context.Writer.Write("){return ");
-                }
-            }
+            this.Translate(body, context);
 
             context.Writer.IncrementIndent();
             context.Writer.Write(" ? ");
@@ -305,13 +300,13 @@ namespace Dryv.Translation
             this.Translate(expression.IfFalse, context);
             context.Writer.DecrementIndent();
 
-            for (var i = 0; i < asyncCalls.Count; i++)
+            for (var i = 0; i < asyncFinder.AsyncCalls.Count; i++)
             {
                 context.Writer.Write(";})");
             }
         }
 
-        private Dictionary<StringBuilder, ParameterExpression> TranslateAsyncBooleanChain(BinaryExpression chain, TranslationContext context, BinaryFinder finder)
+        private Expression TranslateAsyncBooleanChain(BinaryExpression chain, TranslationContext context, BinaryFinder finder)
         {
             if (finder.AsyncExpressions.Contains(chain.Left))
             {
@@ -329,30 +324,17 @@ namespace Dryv.Translation
 
             this.Translate(chain.Right, context);
 
-            return new Dictionary<StringBuilder, ParameterExpression>();
+            return Expression.Empty();
         }
 
-        private Dictionary<StringBuilder, ParameterExpression> TranslateAsyncBooleanOperand(Expression expression, TranslationContext context, BinaryFinder finder)
+        private Expression TranslateAsyncBooleanOperand(Expression expression, TranslationContext context, BinaryFinder finder)
         {
             if (expression is BinaryExpression chain && (chain.NodeType == ExpressionType.OrElse || chain.NodeType == ExpressionType.AndAlso))
             {
                 return this.TranslateAsyncBooleanChain(chain, context, finder);
             }
 
-            var asyncFinder = new AsyncMethodCallModifier(this, context);
-            var body = asyncFinder.ApplyPromises(expression);
-
-            foreach (var call in asyncFinder.AsyncCalls)
-            {
-                context.Writer.Write(call.Key.ToString());
-                context.Writer.Write(".then(function(");
-                context.Writer.Write(call.Value.Name);
-                context.Writer.Write("){return ");
-            }
-
-            this.Translate(body, context);
-
-            return asyncFinder.AsyncCalls;
+            return expression;
         }
 
         public override void Visit(ListInitExpression expression, TranslationContext context, bool negated = false)
@@ -569,8 +551,9 @@ namespace Dryv.Translation
                 return false;
             }
 
+            var finder = new ExpressionNodeFinder<ParameterExpression>();
             var parameterExpressions = (from a in expression.Arguments
-                                        let p = a.GetOuterExpression<ParameterExpression>()
+                                        from p in finder.FindChildren(a)
                                         where p != null
                                         select p).ToList();
 

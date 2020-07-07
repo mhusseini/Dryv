@@ -8,6 +8,12 @@ namespace Dryv.Translation
     {
         public List<TExpression> FoundChildren { get; } = new List<TExpression>();
 
+        public List<TExpression> FindChildren(Expression node)
+        {
+            this.Visit(node);
+            return this.FoundChildren;
+        }
+
         public override Expression Visit(Expression node)
         {
             if (node is TExpression expression && !this.FoundChildren.Contains(expression))

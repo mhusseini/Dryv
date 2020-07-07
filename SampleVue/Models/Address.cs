@@ -10,7 +10,7 @@ namespace Dryv.SampleVue.Models
     public class Address
     {
         private static DryvRules<Address> ValidationRules = DryvRules.For<Address>()
-            .Rule<AsyncValidator>(a => a.ZipCode, (a, v) => a.ZipCode == "1" && v.GetSomeString(a.City) == "X" || a.ZipCode == "2" && a.City == "3" ? "error" : null);
+            .Rule<AsyncValidator>(a => a.ZipCode, (a, v) => v.ValidateZipCode(a.ZipCode, a.City).ContinueWith(t=>t.Result == null ? null : t.Result));
         //.Rule(a => a.City, a => string.IsNullOrWhiteSpace(a.City) ? "Please enter a city." : null)
         //.Rule(a => a.ZipCode, a => string.IsNullOrWhiteSpace(a.ZipCode) ? "Please enter a ZIP code." : null)
         //.Rule<IOptions<SampleOptions>>(a => a.ZipCode, (a, o) => a.ZipCode.Trim().Length < o.Value.ZipCodeLength ? $"ZIP code must have at least {o.Value.ZipCodeLength} characters." : null)
