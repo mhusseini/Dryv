@@ -45,7 +45,11 @@ namespace Dryv.Translation
                 return false;
             }
 
-            translator(options);
+            if (!options.WhatIfMode)
+            {
+                translator(options);
+            }
+
             return true;
         }
 

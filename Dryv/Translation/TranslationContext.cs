@@ -37,6 +37,7 @@ namespace Dryv.Translation
 
         public IndentingStringWriter Writer { get; set; }
         internal StringBuilder StringBuilder { get; set; }
+        public bool WhatIfMode { get; set; }
 
         public virtual T Clone<T>(StringBuilder sb = null)
         where T : TranslationContext, new()
@@ -50,7 +51,8 @@ namespace Dryv.Translation
                 OptionsTypes = this.OptionsTypes,
                 PropertyExpression = this.PropertyExpression,
                 Writer = sb == null ? this.Writer : new IndentingStringWriter(sb),
-                StringBuilder = sb
+                StringBuilder = sb,
+                WhatIfMode = this.WhatIfMode,
             };
         }
     }

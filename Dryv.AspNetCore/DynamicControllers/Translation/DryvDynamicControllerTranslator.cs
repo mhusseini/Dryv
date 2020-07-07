@@ -84,9 +84,13 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
 
             if (typeof(Task).IsAssignableFrom(methodCallExpression.Method.DeclaringType) && methodCallExpression.Method.Name == nameof(Task.FromResult))
             {
+                if (context.WhatIfMode) return true;
                 translator.Translate(methodCallExpression.Arguments.First(), context);
                 return true;
             }
+
+            context.IsAsync = true;
+            if (context.WhatIfMode) return true;
 
             var modelProperties = FindModelPropertiesInExpression(context, methodCallExpression);
             var controller = this.GenerateController(methodCallExpression, context, modelProperties);
@@ -94,8 +98,7 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
             var httpMethod = this.options.Value.HttpMethod.ToString().ToUpper();
 
             this.controllerCallWriter.Write(context, translator, url, httpMethod, modelProperties);
-
-            context.IsAsync = true;
+            
             return true;
         }
     }
