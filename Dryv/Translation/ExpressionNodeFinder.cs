@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Reflection;
+using System.Threading.Tasks;
+using Dryv.Reflection;
 
 namespace Dryv.Translation
 {
@@ -7,6 +10,8 @@ namespace Dryv.Translation
         where TExpression : Expression
     {
         public List<TExpression> FoundChildren { get; } = new List<TExpression>();
+
+        public List<TExpression> BlackList { get; } = new List<TExpression>();
 
         public List<TExpression> FindChildren(Expression node)
         {
@@ -16,7 +21,7 @@ namespace Dryv.Translation
 
         public override Expression Visit(Expression node)
         {
-            if (node is TExpression expression && !this.FoundChildren.Contains(expression))
+            if (node is TExpression expression && !this.FoundChildren.Contains(expression) && !this.BlackList.Contains(expression))
             {
                 this.FoundChildren.Add(expression);
             }

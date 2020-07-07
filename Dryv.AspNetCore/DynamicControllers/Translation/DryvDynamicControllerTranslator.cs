@@ -48,10 +48,7 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
         {
             var f = new ExpressionNodeFinder<MemberExpression>();
 
-            foreach (var argument in methodCallExpression.Arguments)
-            {
-                f.Visit(argument);
-            }
+            f.Visit(methodCallExpression);
 
             return f.FoundChildren
                 .Where(e => e.Member is PropertyInfo)
@@ -98,7 +95,7 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
             var httpMethod = this.options.Value.HttpMethod.ToString().ToUpper();
 
             this.controllerCallWriter.Write(context, translator, url, httpMethod, modelProperties);
-            
+
             return true;
         }
     }

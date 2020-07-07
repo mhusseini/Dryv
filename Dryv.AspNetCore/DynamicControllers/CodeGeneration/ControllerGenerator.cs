@@ -28,19 +28,10 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
             return this.CreateAssembly(methodExpression, modelType, methodInfo);
         }
 
-        private static List<ParameterExpression> FindParameters(MethodCallExpression methodCallExpression)
+        private static List<ParameterExpression> FindParameters(Expression methodCallExpression)
         {
-            var finder = new ExpressionNodeFinder<ParameterExpression>();
-
-            if (!methodCallExpression.Method.IsStatic)
-            {
-                finder.Visit(methodCallExpression.Object);
-            }
-
-            foreach (var argument in methodCallExpression.Arguments)
-            {
-                finder.Visit(argument);
-            }
+            var finder = new ParameterFinder();
+            finder.Visit(methodCallExpression);
 
             return finder.FoundChildren.Distinct().ToList();
         }
@@ -93,8 +84,8 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
 
             field.SetValue(null, lambda.Compile());
 
-            //var generator = new Lokad.ILPack.AssemblyGenerator();
-            //generator.GenerateAssembly(assemblyBuilder, $"{typeNameBase}.dll");
+            var generator = new Lokad.ILPack.AssemblyGenerator();
+            generator.GenerateAssembly(assemblyBuilder, $"{typeNameBase}.dll");
             //Process.Start(new ProcessStartInfo
             //{
             //    UseShellExecute = true,
