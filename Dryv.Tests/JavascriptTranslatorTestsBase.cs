@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Dryv.Configuration;
 using Dryv.Extensions;
 using Dryv.Translation;
 using Dryv.Translation.Translators;
@@ -71,7 +72,7 @@ namespace Dryv.Tests
                 translatorProvider.GenericTranslators.AddRange(translators.OfType<ICustomTranslator>());
             }
 
-            return new JavaScriptTranslator(translatorProvider);
+            return new JavaScriptTranslator(translatorProvider, new DryvOptions());
         }
 
         protected abstract class TestModel

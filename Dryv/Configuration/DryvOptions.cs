@@ -11,6 +11,7 @@ namespace Dryv.Configuration
         public Type ClientFunctionWriterType { get; internal set; } = DefaultClientFunctionWriterType;
         public Type ClientValidationSetWriterType { get; internal set; } = DefaultClientValidationSetWriterType;
         public bool DisableAutomaticValidation { get; set; }
+        public Func<object, string> JsonConversion { get; set; }
         public TranslationErrorBehavior TranslationErrorBehavior { get; set; }
     }
 }

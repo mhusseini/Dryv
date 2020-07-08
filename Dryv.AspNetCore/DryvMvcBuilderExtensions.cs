@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json;
 using Dryv.AspNetCore.DynamicControllers.Endpoints;
 using Dryv.AspNetCore.Internal;
 using Dryv.Configuration;
@@ -18,7 +19,17 @@ namespace Dryv.AspNetCore
             var options = new DryvOptions();
             setupAction?.Invoke(options);
 
-            if(!options.DisableAutomaticValidation)
+            if (options.JsonConversion == null)
+            {
+                var jsonOptions = new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                };
+
+                options.JsonConversion = o => JsonSerializer.Serialize(o, jsonOptions);
+            }
+
+            if (!options.DisableAutomaticValidation)
             {
                 mvcBuilder.AddMvcOptions(opts => opts.Filters.Add<DryvValidationFilterAttribute>());
             }
@@ -37,6 +48,7 @@ namespace Dryv.AspNetCore
             services.TryAddSingleton<DryvClientWriter>();
             services.TryAddSingleton<ITranslatorProvider, TranslatorProvider>();
             services.AddSingleton(Options.Create(options));
+            services.AddSingleton(options);
 
             return new DryvMvcBuilder(services)
                 .AddTranslator<ObjectTranslator>()

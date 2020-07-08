@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using Dryv.Configuration;
 
 namespace Dryv.Translation
 {
@@ -11,10 +12,13 @@ namespace Dryv.Translation
     {
         private readonly TranslationCompiler translationCompiler;
 
-        protected Translator()
+        protected Translator(DryvOptions options)
         {
+            this.Options = options;
             this.translationCompiler = new TranslationCompiler(this);
         }
+
+        protected DryvOptions Options { get; }
 
         public virtual TranslationResult Translate(Expression expression, MemberExpression propertyExpression, string groupName)
         {

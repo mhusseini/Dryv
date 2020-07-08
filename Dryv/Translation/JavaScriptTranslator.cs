@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using Dryv.Configuration;
 using Dryv.Extensions;
 using Dryv.Reflection;
 
@@ -105,7 +106,7 @@ namespace Dryv.Translation
 
         private readonly ITranslatorProvider translatorProvider;
 
-        public JavaScriptTranslator(ITranslatorProvider translatorProvider)
+        public JavaScriptTranslator(ITranslatorProvider translatorProvider, DryvOptions options) : base(options)
         {
             this.translatorProvider = translatorProvider;
         }
@@ -150,8 +151,11 @@ namespace Dryv.Translation
                 case null:
                     return "null";
 
+                case DryvValidationResult result:
+                    return TranslateValidationResultObject(result);
+
                 default:
-                    return value.ToString();
+                    return this.Options.JsonConversion == null ? value.ToString() : this.Options.JsonConversion(value);
             }
         }
 
@@ -304,37 +308,6 @@ namespace Dryv.Translation
             {
                 context.Writer.Write(";})");
             }
-        }
-
-        private Expression TranslateAsyncBooleanChain(BinaryExpression chain, TranslationContext context, BinaryFinder finder)
-        {
-            if (finder.AsyncExpressions.Contains(chain.Left))
-            {
-                return this.TranslateAsyncBooleanOperand(chain.Left, context, finder);
-            }
-
-            this.Translate(chain.Left, context);
-
-            TryWriteTerminal(chain, context.Writer);
-
-            if (finder.AsyncExpressions.Contains(chain.Right))
-            {
-                return this.TranslateAsyncBooleanOperand(chain.Right, context, finder);
-            }
-
-            this.Translate(chain.Right, context);
-
-            return Expression.Empty();
-        }
-
-        private Expression TranslateAsyncBooleanOperand(Expression expression, TranslationContext context, BinaryFinder finder)
-        {
-            if (expression is BinaryExpression chain && (chain.NodeType == ExpressionType.OrElse || chain.NodeType == ExpressionType.AndAlso))
-            {
-                return this.TranslateAsyncBooleanChain(chain, context, finder);
-            }
-
-            return expression;
         }
 
         public override void Visit(ListInitExpression expression, TranslationContext context, bool negated = false)
@@ -517,6 +490,33 @@ namespace Dryv.Translation
             this.Translate(expression.Operand, context, negatedExpression);
         }
 
+        private static string TranslateValidationResultObject(DryvValidationResult result)
+        {
+            if (result.Type == DryvResultType.Success)
+            {
+                return "null";
+            }
+
+            var sb = new StringBuilder("{");
+
+            if (!string.IsNullOrWhiteSpace(result.GroupName))
+            {
+                sb.Append("groupName:\"");
+                sb.Append(result.GroupName);
+                sb.Append("\",");
+            }
+
+            sb.Append("text:\"");
+            sb.Append(result.Text);
+            sb.Append("\",");
+            sb.Append("type:\"");
+            sb.Append(result.Type.ToString().ToLower());
+            sb.Append("\"");
+            sb.Append("}");
+
+            return sb.ToString();
+        }
+
         private static bool TryWriteInjectedExpression(Expression expression, TranslationContext context)
         {
             var visitor = new ExpressionNodeFinder<ParameterExpression>();
@@ -610,6 +610,37 @@ namespace Dryv.Translation
             }
 
             return this.translatorProvider.GenericTranslators.All(t => t.AllowSurroundingBrackets(expression) != false);
+        }
+
+        private Expression TranslateAsyncBooleanChain(BinaryExpression chain, TranslationContext context, BinaryFinder finder)
+        {
+            if (finder.AsyncExpressions.Contains(chain.Left))
+            {
+                return this.TranslateAsyncBooleanOperand(chain.Left, context, finder);
+            }
+
+            this.Translate(chain.Left, context);
+
+            TryWriteTerminal(chain, context.Writer);
+
+            if (finder.AsyncExpressions.Contains(chain.Right))
+            {
+                return this.TranslateAsyncBooleanOperand(chain.Right, context, finder);
+            }
+
+            this.Translate(chain.Right, context);
+
+            return Expression.Empty();
+        }
+
+        private Expression TranslateAsyncBooleanOperand(Expression expression, TranslationContext context, BinaryFinder finder)
+        {
+            if (expression is BinaryExpression chain && (chain.NodeType == ExpressionType.OrElse || chain.NodeType == ExpressionType.AndAlso))
+            {
+                return this.TranslateAsyncBooleanChain(chain, context, finder);
+            }
+
+            return expression;
         }
 
         private void TranslateAsyncExpression(Expression expression, TranslationContext context)
