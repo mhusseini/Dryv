@@ -38,12 +38,13 @@ namespace Dryv.SampleVue
         {
             services.AddRouting();
             services
-                .AddMvc(options =>
-                {
-                    options.EnableEndpointRouting = true;
-                })
+                .AddMvc(options => { options.EnableEndpointRouting = true; })
                 .AddRazorRuntimeCompilation()
-                .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)))
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+                })
                 .AddDryv()
                 .AddDryvDynamicControllers()
                 //.AddDryvPreloading()

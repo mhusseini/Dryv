@@ -2,12 +2,12 @@
 
 namespace Dryv.Extensions
 {
-    internal static class ServiceProviderExtensions
+    public static class ServiceProviderExtensions
     {
-        public static T GetService<T>(this IServiceProvider serviceProvider)
+        public static T GetService<T>(this Func<Type, object> serviceProvider)
             where T : class
         {
-            return serviceProvider.GetService(typeof(T)) as T;
+            return serviceProvider(typeof(T)) as T;
         }
     }
 }

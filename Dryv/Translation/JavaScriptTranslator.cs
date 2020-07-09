@@ -161,22 +161,57 @@ namespace Dryv.Translation
 
         public override void Visit(BinaryExpression expression, TranslationContext context, bool negated = false)
         {
+            var isEquals = expression.NodeType == ExpressionType.Equal;
+            var isNotEquals = expression.NodeType == ExpressionType.NotEqual;
+            var leftIsNull = (isEquals || isNotEquals) && expression.Left is ConstantExpression c1 && c1.Value == null;
+            var rightIsNull = (isEquals || isNotEquals) && expression.Right is ConstantExpression c2 && c2.Value == null;
+
+            if ((leftIsNull || rightIsNull) && !(isNotEquals ^ negated))
+            {
+                context.Writer.Write("!");
+            }
+
             if (!TryWriteInjectedExpression(expression.Left, context))
             {
                 this.Translate(expression.Left, context);
             }
 
-            if (!TryWriteTerminal(expression, context.Writer))
+            if (rightIsNull)
             {
-                throw expression.Method != null
-                    ? (Exception)new DryvMethodNotSupportedException(expression)
-                    : new DryvExpressionNotSupportedException(expression);
+                return;
+            }
+
+            if (!leftIsNull)
+            {
+                if (!TryWriteTerminal(expression, context.Writer))
+                {
+                    throw expression.Method != null
+                        ? (Exception)new DryvMethodNotSupportedException(expression)
+                        : new DryvExpressionNotSupportedException(expression);
+                }
             }
 
             if (!TryWriteInjectedExpression(expression.Right, context))
             {
                 this.Translate(expression.Right, context);
             }
+
+            //if (!TryWriteInjectedExpression(expression.Left, context))
+            //{
+            //    this.Translate(expression.Left, context);
+            //}
+
+            //if (!TryWriteTerminal(expression, context.Writer))
+            //{
+            //    throw expression.Method != null
+            //        ? (Exception)new DryvMethodNotSupportedException(expression)
+            //        : new DryvExpressionNotSupportedException(expression);
+            //}
+
+            //if (!TryWriteInjectedExpression(expression.Right, context))
+            //{
+            //    this.Translate(expression.Right, context);
+            //}
         }
 
         public override void Visit(BlockExpression expression, TranslationContext context, bool negated = false)

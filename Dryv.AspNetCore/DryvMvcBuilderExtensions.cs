@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Dryv.AspNetCore.DynamicControllers.Endpoints;
 using Dryv.AspNetCore.Internal;
 using Dryv.Configuration;
@@ -23,10 +24,11 @@ namespace Dryv.AspNetCore
             {
                 var jsonOptions = new JsonSerializerOptions
                 {
+                    Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                 };
 
-                options.JsonConversion = o => JsonSerializer.Serialize(o, jsonOptions);
+                options.JsonConversion = v => JsonSerializer.Serialize(v, jsonOptions);
             }
 
             if (!options.DisableAutomaticValidation)

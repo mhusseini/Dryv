@@ -171,6 +171,7 @@ namespace Dryv.Translation
                 StringBuilder = sb
             };
 
+            expression = new EnumComparisionModifier().Visit(expression);
             this.Translate(expression, context);
 
             return new GeneratedJavaScriptCode
