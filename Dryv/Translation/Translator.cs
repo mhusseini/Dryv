@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using Dryv.Configuration;
+using Dryv.Translation.Visitors;
 
 namespace Dryv.Translation
 {
@@ -20,9 +21,9 @@ namespace Dryv.Translation
 
         protected DryvOptions Options { get; }
 
-        public virtual TranslationResult Translate(Expression expression, MemberExpression propertyExpression, string groupName)
+        public virtual TranslationResult Translate(Expression expression, MemberExpression propertyExpression, string groupName, Func<Type, object> serviceProvider)
         {
-            var result = this.GenerateJavaScriptCode(expression, propertyExpression, groupName);
+            var result = this.GenerateJavaScriptCode(expression, propertyExpression, groupName, serviceProvider);
             return this.translationCompiler.GenerateTranslationDelegate(result.Code, result.OptionDelegates, result.OptionTypes);
         }
 
@@ -151,7 +152,8 @@ namespace Dryv.Translation
         private GeneratedJavaScriptCode GenerateJavaScriptCode(
             Expression expression,
             MemberExpression propertyExpression,
-            string groupName)
+            string groupName,
+            Func<Type, object> serviceProvider)
         {
             // Find all option types used in the validation expression.
             var optionTypes = ((LambdaExpression)expression).GetOptionTypes();
@@ -168,10 +170,12 @@ namespace Dryv.Translation
                 ModelType = propertyExpression?.Expression.GetExpressionType(),
                 PropertyExpression = propertyExpression?.Expression,
                 GroupName = groupName,
-                StringBuilder = sb
+                StringBuilder = sb,
+                ServiceProvider = serviceProvider,
             };
 
             expression = new EnumComparisionModifier().Visit(expression);
+            expression = new ConditionConversionModifier().Visit(expression);
             this.Translate(expression, context);
 
             return new GeneratedJavaScriptCode

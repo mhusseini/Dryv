@@ -1,10 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Reflection;
-using System.Threading.Tasks;
-using Dryv.Reflection;
 
-namespace Dryv.Translation
+namespace Dryv.Translation.Visitors
 {
     public class ExpressionNodeFinder<TExpression> : ExpressionVisitor
         where TExpression : Expression

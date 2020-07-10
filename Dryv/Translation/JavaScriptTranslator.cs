@@ -8,6 +8,7 @@ using System.Text;
 using Dryv.Configuration;
 using Dryv.Extensions;
 using Dryv.Reflection;
+using Dryv.Translation.Visitors;
 
 namespace Dryv.Translation
 {
@@ -503,17 +504,18 @@ namespace Dryv.Translation
                     break;
 
                 case ExpressionType.Convert:
-                    if (string.IsNullOrWhiteSpace(context.GroupName) || !Equals(expression.Method, DryvValidationResultImplicitConvert))
+                    if (string.IsNullOrWhiteSpace(context.GroupName) || !Equals(expression.Method, DryvValidationResultImplicitConvert) ||
+                        expression.Operand is ConstantExpression constant && constant.Value == null)
                     {
                         break;
                     }
 
-                    // TODO: Code smell! This class is too low level for this code. Move code to an interface.
                     context.Writer.Write("{ type:\"error\", text:");
                     this.Translate(expression.Operand, context);
                     context.Writer.Write(", groupName: ");
                     context.Writer.Write(MethodCallTranslator.QuoteValue(context.GroupName));
                     context.Writer.Write("}");
+
                     return;
             }
 
@@ -554,6 +556,11 @@ namespace Dryv.Translation
 
         private static bool TryWriteInjectedExpression(Expression expression, TranslationContext context)
         {
+            if (expression.Type == typeof(DryvValidationResult))
+            {
+                return false;
+            }
+
             var visitor = new ExpressionNodeFinder<ParameterExpression>();
             visitor.Visit(expression);
 

@@ -12,7 +12,7 @@ namespace Dryv.Translation
     {
         private static readonly MethodInfo FormatMethod = typeof(string).GetMethod(nameof(string.Format), typeof(string), typeof(object[]));
 
-        private static readonly MethodInfo TranslateValueMethod = typeof(Translator).GetMethod(nameof(Translator.TranslateValue));
+        private static readonly MethodInfo TranslateValueMethod = typeof(JavaScriptTranslator).GetMethod(nameof(JavaScriptTranslator.TranslateValue));
 
         private readonly object translator;
 

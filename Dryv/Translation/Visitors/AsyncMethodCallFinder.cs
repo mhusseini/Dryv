@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace Dryv.Translation
+namespace Dryv.Translation.Visitors
 {
     internal class AsyncMethodCallFinder : ExpressionVisitor
     {

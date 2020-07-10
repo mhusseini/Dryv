@@ -51,5 +51,11 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
             var attributeBuilder = CreateAttributeBuilder<T>(args);
             methodBuilder.SetCustomAttribute(attributeBuilder);
         }
+
+        public static void SetAttribute<T>(TypeBuilder typeBuilder, params object[] args) where T : Attribute
+        {
+            var attributeBuilder = CreateAttributeBuilder<T>(args);
+            typeBuilder.SetCustomAttribute(attributeBuilder);
+        }
     }
 }

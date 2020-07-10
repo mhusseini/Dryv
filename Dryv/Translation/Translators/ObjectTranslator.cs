@@ -6,7 +6,7 @@ namespace Dryv.Translation.Translators
     public class ObjectTranslator : ICustomTranslator
     {
         public int? OrderIndex { get; set; }
-        public bool? AllowSurroundingBrackets(Expression expression) => null;
+        public bool? AllowSurroundingBrackets(Expression expression) => false;
 
         public bool TryTranslate(CustomTranslationContext context)
         {

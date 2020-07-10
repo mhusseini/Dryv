@@ -7,11 +7,11 @@ namespace Dryv
     {
         public static readonly DryvValidationResult Success = new DryvValidationResult(DryvResultType.Success);
 
-        internal DryvValidationResult(string text, DryvResultType type, string groupName) : this(text, type) => this.GroupName = groupName;
+        public DryvValidationResult(string text, DryvResultType type, string groupName) : this(text, type) => this.GroupName = groupName;
+
+        public DryvValidationResult(string text, DryvResultType type) : this(type) => this.Text = text;
 
         private DryvValidationResult(DryvResultType type) => this.Type = type;
-
-        private DryvValidationResult(string text, DryvResultType type) : this(type) => this.Text = text;
 
         public string GroupName { get; }
 

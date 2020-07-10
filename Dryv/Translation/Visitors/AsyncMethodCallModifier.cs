@@ -2,7 +2,7 @@
 using System.Linq.Expressions;
 using System.Text;
 
-namespace Dryv.Translation
+namespace Dryv.Translation.Visitors
 {
     internal class AsyncMethodCallModifier : ExpressionVisitor
     {

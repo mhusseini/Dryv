@@ -7,8 +7,13 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Dryv.AspNetCore.DynamicControllers.CodeGeneration;
 using Dryv.AspNetCore.DynamicControllers.Endpoints;
+using Dryv.Extensions;
 using Dryv.Translation;
+using Dryv.Translation.Visitors;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 
@@ -20,16 +25,16 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
         private readonly ControllerGenerator codeGenerator;
         private readonly IDryvClientServerCallWriter controllerCallWriter;
         private readonly DryvDynamicControllerRegistration controllerRegistration;
-        private readonly LinkGenerator linkGenerator;
         private readonly IOptions<DryvDynamicControllerOptions> options;
+        private readonly IOptions<MvcOptions> mvcOptions;
 
-        public DryvDynamicControllerTranslator(DryvDynamicControllerRegistration controllerRegistration, ControllerGenerator codeGenerator, IDryvClientServerCallWriter controllerCallWriter, IOptions<DryvDynamicControllerOptions> options, LinkGenerator linkGenerator)
+        public DryvDynamicControllerTranslator(DryvDynamicControllerRegistration controllerRegistration, ControllerGenerator codeGenerator, IDryvClientServerCallWriter controllerCallWriter, IOptions<DryvDynamicControllerOptions> options, IOptions<MvcOptions> mvcOptions)
         {
             this.controllerRegistration = controllerRegistration;
             this.codeGenerator = codeGenerator;
             this.controllerCallWriter = controllerCallWriter;
             this.options = options;
-            this.linkGenerator = linkGenerator;
+            this.mvcOptions = mvcOptions;
         }
 
         public int? OrderIndex { get; set; } = int.MaxValue;
@@ -91,7 +96,21 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
 
             var modelProperties = FindModelPropertiesInExpression(context, methodCallExpression);
             var controller = this.GenerateController(methodCallExpression, context, modelProperties);
-            var url = this.linkGenerator.GetPathByRouteValues(controller.Name, null);
+            string url;
+
+            if (this.mvcOptions.Value.EnableEndpointRouting)
+            {
+                var linkGenerator = context.ServiceProvider.GetService<LinkGenerator>();
+                url = linkGenerator.GetPathByRouteValues(controller.Name, null);
+            }
+            else
+            {
+                var actionContext = context.ServiceProvider.GetService<IActionContextAccessor>().ActionContext;
+                var urlHelperFactory = context.ServiceProvider.GetService<IUrlHelperFactory>();
+                var urlHelper = urlHelperFactory.GetUrlHelper(actionContext);
+                url = urlHelper.Action(methodCallExpression.Method.Name, controller.Name.Replace("Controller", string.Empty));
+            }
+            
             var httpMethod = this.options.Value.HttpMethod.ToString().ToUpper();
 
             this.controllerCallWriter.Write(context, translator, url, httpMethod, modelProperties);

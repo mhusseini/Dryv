@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Reflection;
 using Microsoft.AspNetCore.Routing;
 
 namespace Dryv.AspNetCore.DynamicControllers
 {
     public class DryvDynamicControllerOptions
     {
+        public Action<Assembly> GeneratedAssemblyOutput { get; set; }
         public Type DynamicControllerCallWriterType { get; set; }
         public DryvDynamicControllerMethods HttpMethod { get; set; } = DryvDynamicControllerMethods.Post;
         internal Action<DryvControllerGenerationContext, IEndpointRouteBuilder> MapEndpoint { get; set; }

@@ -11,7 +11,7 @@ namespace Dryv.Translation
         /// <summary>
         /// Translates the specified expression.
         /// </summary>
-        TranslationResult Translate(Expression expression, MemberExpression propertyExpression, string ruleGroupName);
+        TranslationResult Translate(Expression expression, MemberExpression propertyExpression, string ruleGroupName, Func<Type,object> serviceProvider);
 
         void Translate(Expression expression, TranslationContext context, bool negated = false);
 

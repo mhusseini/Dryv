@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace Dryv.Translation
+namespace Dryv.Translation.Visitors
 {
     internal class BinaryFinder : ExpressionVisitor
     {

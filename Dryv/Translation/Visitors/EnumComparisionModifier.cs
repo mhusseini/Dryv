@@ -4,27 +4,10 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Dryv.Reflection;
 
-namespace Dryv.Translation
+namespace Dryv.Translation.Visitors
 {
     internal class EnumComparisionModifier : ExpressionVisitor
     {
-        //protected override Expression VisitUnary(UnaryExpression node)
-        //{
-        //    if (node.NodeType != ExpressionType.Convert)
-        //    {
-        //        return base.VisitUnary(node);
-        //    }
-
-        //    var typeInfo = node.Operand.Type.GetTypeInfo();
-
-        //    if (!typeInfo.IsEnum)
-        //    {
-        //        return base.VisitUnary(node);
-        //    }
-
-        //    return this.Visit(node.Operand) ?? throw new InvalidOperationException();
-        //}
-
         public static bool Equals(object a, object b) => object.Equals(a, b);
 
         protected override Expression VisitBinary(BinaryExpression node)
@@ -48,8 +31,6 @@ namespace Dryv.Translation
                     left = Expression.Convert(left, right.Type);
                 }
             }
-            //left = GetInnerNode(left);
-            //right = GetInnerNode(right);
 
             var x = ChangeIntegerToEnum(node, left, right)
                     ?? ChangeIntegerToEnum(node, right, left);
@@ -57,24 +38,6 @@ namespace Dryv.Translation
 
             return Expression.MakeBinary(node.NodeType, left, right, node.IsLiftedToNull, node.Method);
         }
-
-        //private static Expression GetInnerNode(Expression node)
-        //{
-        //    if (!(node is UnaryExpression unaryExpression) || node.NodeType != ExpressionType.Convert)
-        //    {
-        //        return node;
-        //    }
-
-        //    var innerType = GetTypeOrNullable(unaryExpression.Operand.Type);
-        //    var outerType = GetTypeOrNullable(unaryExpression.Type);
-
-        //    if (outerType == typeof(int) && innerType.GetTypeInfo().IsEnum)
-        //    {
-        //        return Expression.Convert(unaryExpression.Operand, unaryExpression.Operand.Type);
-        //    }
-
-        //    return node;
-        //}
 
         protected override Expression VisitUnary(UnaryExpression node)
         {

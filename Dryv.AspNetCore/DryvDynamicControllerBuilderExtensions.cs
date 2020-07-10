@@ -17,6 +17,8 @@ namespace Dryv.AspNetCore
 {
     public static class DryvDynamicControllerBuilderExtensions
     {
+        private static int controllerCount;
+
         public static IDryvMvcBuilder AddDryvDynamicControllers(this IDryvMvcBuilder dryvBuilder, Action<DryvDynamicControllerOptions> setupAction = null)
         {
             var services = dryvBuilder.Services;
@@ -50,7 +52,7 @@ namespace Dryv.AspNetCore
 
         private static string DefaultTemplateMapping(DryvControllerGenerationContext context)
         {
-            return $"validation/{context.Controller}/{context.Action}";
+            return $"_v/c{++controllerCount}";
         }
 
         private static void SetupEndpointMapping(IServiceCollection serviceCollection)

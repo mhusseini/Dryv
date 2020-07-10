@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Dryv.Translation;
+using Dryv.Translation.Visitors;
 
 namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
 {

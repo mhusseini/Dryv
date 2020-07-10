@@ -24,7 +24,7 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
                 p => methodBuilder.DefineParameter(index++, ParameterAttributes.None, p.Name));
 
             ControllerAttributeGenerator.SetAttribute<HttpGetAttribute>(methodBuilder);
-            AddRoutingAttribute(methodBuilder, context, options);
+            AddRoutingAttribute(typeBuilder, methodBuilder, context, options);
 
             var il = methodBuilder.GetILGenerator();
             var modelVariable = il.DeclareLocal(modelType);
@@ -72,12 +72,12 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
             parameterBuilder.SetCustomAttribute(ControllerAttributeGenerator.CreateAttributeBuilder<FromBodyAttribute>());
 
             ControllerAttributeGenerator.SetAttribute<HttpPostAttribute>(methodBuilder);
-            AddRoutingAttribute(methodBuilder, context, options);
+            AddRoutingAttribute(typeBuilder, methodBuilder, context, options);
 
             var il = methodBuilder.GetILGenerator();
 
-            il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Ldfld, delegateField);
+            il.Emit(OpCodes.Nop);
+            il.Emit(OpCodes.Ldsfld, delegateField);
 
             foreach (var parameter in lambda.Parameters)
             {
@@ -96,16 +96,12 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
             il.Emit(OpCodes.Ret);
         }
 
-        private static void AddRoutingAttribute(MethodBuilder methodBuilder, DryvControllerGenerationContext context, DryvDynamicControllerOptions options)
+        private static void AddRoutingAttribute(TypeBuilder typeBuilder, MethodBuilder methodBuilder, DryvControllerGenerationContext context, DryvDynamicControllerOptions options)
         {
-            if (options.MapRouteTemplate == null)
+            if (options.MapRouteTemplate != null)
             {
-                return;
+                ControllerAttributeGenerator.SetAttribute<RouteAttribute>(methodBuilder, options.MapRouteTemplate(context));
             }
-
-            var template = options.MapRouteTemplate(context);
-
-            ControllerAttributeGenerator.SetAttribute<RouteAttribute>(methodBuilder, template);
         }
 
         private static MethodBuilder CreateMethodBuilder(TypeBuilder typeBuilder, string methodName, Type returnType, Type[] parameterTypes, DryvControllerGenerationContext context, DryvDynamicControllerOptions options)
