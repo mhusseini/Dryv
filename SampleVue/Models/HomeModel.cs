@@ -4,11 +4,11 @@ namespace Dryv.SampleVue.Models
 {
     public class HomeModel
     {
-        private static DryvRules Rules = DryvRules.For<HomeModel>().DisableRules(m => m.BillingAddress, m => m.BillingEqualsShipping);
+        //private static DryvRules Rules = DryvRules.For<HomeModel>().DisableRules(m => m.BillingAddress, m => m.BillingEqualsShipping);
 
         public bool BillingEqualsShipping { get; set; } = true;
 
-        [DryvValidation]
+        //[DryvValidation]
         public Address BillingAddress { get; set; }
 
         public Person Person { get; set; }

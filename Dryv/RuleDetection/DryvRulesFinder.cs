@@ -41,12 +41,18 @@ namespace Dryv.RuleDetection
                   {
                       pathStack.Enqueue(modelPath);
                   }
-                  var properties = this.TraverseTypeTreeForProperties(type, types, pathStack, ruleType).ToDictionary(i => i.Key, i => i.Value);
-                  var validationRules = FindValidationRulesOnTypes(types, ruleType);
+
+                  var properties = this.TraverseTypeTreeForProperties(type, types, pathStack, ruleType).ToList();
+                  types.AddRange((from t in properties.Select(p => p.Key.DeclaringType).Distinct()
+                                  from a in t.GetTypeInfo().GetCustomAttributes<DryvValidationAttribute>()
+                                  where a.RuleContainerType != null
+                                  select a.RuleContainerType).Distinct());
+                  var validationRules = FindValidationRulesOnTypes(types.Distinct(), ruleType);
 
                   var g = from item in properties
                           let property = item.Key
                           let path = item.Value
+                          let propertyRules = FindValidationRulesForProperty(property, validationRules, ruleType)
                           from inheritedProperty in property.GetInheritedProperties()
                           from rule in GetElementsFromDictionary(validationRules, inheritedProperty)
                           where rule != null
@@ -64,6 +70,24 @@ namespace Dryv.RuleDetection
                 .TryGetValue(property, out var nodes)
                 ? new DryvRuleTreeNode[0]
                 : nodes;
+        }
+
+        private static IDictionary<PropertyInfo, List<DryvCompiledRule>> FindValidationRulesForProperty(MemberInfo property, IDictionary<PropertyInfo, List<DryvCompiledRule>> commonValidationRules, RuleType ruleType)
+        {
+            var attributes = (from a in property.GetCustomAttributes<DryvValidationAttribute>()
+                              where a.RuleContainerType != null
+                              select a).ToList();
+
+            if (!attributes.Any())
+            {
+                return commonValidationRules;
+            }
+
+            var types = attributes.Select(a => a.RuleContainerType);
+            var result = FindValidationRulesOnTypes(types.Distinct(), ruleType);
+            result.AddRange(commonValidationRules);
+
+            return result;
         }
 
         private static IEnumerable<DryvCompiledRule> FindValidationRulesOnType(Type type, RuleType ruleType)
@@ -95,7 +119,11 @@ namespace Dryv.RuleDetection
 
         private static IDictionary<PropertyInfo, List<DryvCompiledRule>> FindValidationRulesOnTypes(IEnumerable<Type> types, RuleType ruleType)
         {
-            return (from type in types
+            var typesWithBaseTypes = (from type in types
+                                      from t2 in type.Iterate(t => t.GetBaseType())
+                                      select t2).Distinct();
+
+            return (from type in typesWithBaseTypes
                     from rule in FindValidationRulesOnType(type, ruleType)
                     group rule by rule.Property)
                 .ToDictionary(r => r.Key, r => r.Distinct().ToList(), PropertyComparer.Default);

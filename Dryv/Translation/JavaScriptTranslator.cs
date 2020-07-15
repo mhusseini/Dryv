@@ -565,7 +565,12 @@ namespace Dryv.Translation
             visitor.Visit(expression);
 
             // Parameters that start with '$' are generated dummy parameters and should not be injected.
-            if (visitor.FoundChildren.Any(c => c.Name.StartsWith("$") || c.Type == context.ModelType))
+            if (visitor.FoundChildren.Any(c => c.Name.StartsWith("$")))
+            {
+                return false;
+            }
+
+            if (visitor.FoundChildrenWithStack.Any(x => x.Value.Contains(expression) && x.Value.Any(o => o.Type == context.ModelType)))
             {
                 return false;
             }

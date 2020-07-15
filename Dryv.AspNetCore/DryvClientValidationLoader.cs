@@ -107,10 +107,7 @@ namespace Dryv.AspNetCore
             return items.Union(childItems).ToList();
         }
 
-        private DryvClientValidationItem GetClientPropertyValidation(
-                                    Type modelType,
-            string modelPath,
-            PropertyInfo property)
+        private DryvClientValidationItem GetClientPropertyValidation(Type modelType, string modelPath, PropertyInfo property)
         {
             if (modelPath == null)
             {
