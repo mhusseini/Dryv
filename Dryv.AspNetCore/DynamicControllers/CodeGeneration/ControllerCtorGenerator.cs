@@ -34,8 +34,6 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
 
             ilGenerator.Emit(OpCodes.Ldarg_0);
             ilGenerator.Emit(OpCodes.Call, baseConstructorInfo);
-            ilGenerator.Emit(OpCodes.Nop);
-            ilGenerator.Emit(OpCodes.Nop);
         }
 
         private static void AddFieldInitializer(IEnumerable<FieldBuilder> fields, ILGenerator ilGenerator)

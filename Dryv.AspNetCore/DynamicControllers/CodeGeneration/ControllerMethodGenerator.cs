@@ -68,6 +68,10 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
             }
 
             il.Emit(OpCodes.Callvirt, method);
+            if (method.ReturnType.IsValueType)
+            {
+                il.Emit(OpCodes.Box, method.ReturnType);
+            }
             il.Emit(OpCodes.Callvirt, isAsync ? JsonAsyncMethod : JsonMethod);
 
             il.Emit(OpCodes.Ret);
@@ -103,6 +107,10 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
             }
 
             il.Emit(OpCodes.Callvirt, method);
+            if (method.ReturnType.IsValueType)
+            {
+                il.Emit(OpCodes.Box, method.ReturnType);
+            }
             il.Emit(OpCodes.Callvirt, isAsync ? JsonAsyncMethod : JsonMethod);
 
             il.Emit(OpCodes.Ret);

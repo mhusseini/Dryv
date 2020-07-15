@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Dryv.AspNetCore</RootNamespace>
-    <Version>6.0.0-pre.7</Version>
+    <Version>6.0.0-pre.8</Version>
     <Authors>Munir husseini</Authors>
     <Company>Munir husseini</Company>
     <Product>Dryv</Product>

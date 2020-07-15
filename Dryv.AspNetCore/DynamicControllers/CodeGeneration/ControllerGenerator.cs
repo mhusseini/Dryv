@@ -39,7 +39,7 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
         {
             var assemblyIndex = ++assemblyCount;
             var typeNameBase = $"DryvDynamic{assemblyIndex}";
-            var baseType = typeof(Controller);
+            var baseType = typeof(DryvDynamicController);
             var currentAssembly = Assembly.GetExecutingAssembly();
             var assemblyName = new AssemblyName($"DryvDynamicAssembly{assemblyIndex}")
             {
