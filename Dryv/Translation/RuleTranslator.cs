@@ -19,7 +19,7 @@ namespace Dryv.Translation
             this.serviceProvider = serviceProvider;
         }
 
-        public IDictionary<DryvRuleTreeNode, string> Translate(IEnumerable<DryvRuleTreeNode> rules, string modelPath, Type modelType)
+        public IDictionary<DryvRuleTreeNode, Func<string>> Translate(IEnumerable<DryvRuleTreeNode> rules, string modelPath, Type modelType)
         {
             var translator = this.serviceProvider(typeof(ITranslator)) as ITranslator;
             return (from r in rules
@@ -28,8 +28,12 @@ namespace Dryv.Translation
                     let p1 = string.IsNullOrWhiteSpace(r.Path) ? r.Path : $".{r.Path}"
                     let path = rule.IsDisablingRule && p1.Contains(".") ? p1.Substring(0, p1.LastIndexOf(".", StringComparison.Ordinal)) : p1
                     let preevaluationOptions = new[] { path }.Union(rule.PreevaluationOptionTypes.Select(this.serviceProvider)).ToArray()
-                    select new { Rule = r, Translation = this.GetTranslationFromRule(rule, preevaluationOptions) })
-                .ToDictionary(x => x.Rule, x => x.Translation);
+                    select new
+                    {
+                        Rule = r,
+                        Translate = (Func<string>)(() => this.GetTranslationFromRule(rule, preevaluationOptions))
+                    })
+                .ToDictionary(x => x.Rule, x => x.Translate);
         }
 
         private static DryvTranslationException CreateException(string msg, Exception ex, DryvCompiledRule rule)

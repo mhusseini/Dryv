@@ -7,7 +7,7 @@ namespace Dryv.Validation
 {
     public class DryvAsyncClientValidationFunctionWriter : IDryvClientValidationFunctionWriter
     {
-        public Action<TextWriter> GetValidationFunction(IDictionary<DryvRuleTreeNode, string> translatedRules) => writer =>
+        public Action<TextWriter> GetValidationFunction(IDictionary<DryvRuleTreeNode, Func<string>> translatedRules) => writer =>
             {
                 writer.Write("dryv.r.bind(this, [");
                 var sep = string.Empty;
@@ -15,7 +15,7 @@ namespace Dryv.Validation
                 foreach (var rule in translatedRules)
                 {
                     writer.Write(sep);
-                    writer.Write(rule.Value);
+                    writer.Write(rule.Value());
                     sep = ",";
                 }
 

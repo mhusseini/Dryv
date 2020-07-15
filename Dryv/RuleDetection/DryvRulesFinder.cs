@@ -160,7 +160,7 @@ namespace Dryv.RuleDetection
                 {
                     pathStack.Enqueue(property.Name.ToCamelCase());
 
-                    if (ruleType == RuleType.Disabling && property.GetCustomAttribute<DryvValidationAttribute>() != null)
+                    if (ruleType == RuleType.Disabling && (isDryvEnabled || property.GetCustomAttribute<DryvValidationAttribute>() != null))
                     {
                         yield return new KeyValuePair<PropertyInfo, string>(property, string.Join(".", pathStack));
                     }

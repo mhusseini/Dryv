@@ -43,12 +43,22 @@ namespace Dryv.AspNetCore.PreLoading
             }
 
             foreach (var type in from t in assemblies.SelectMany(a => a.GetTypes())
-                                 let props = t.GetProperties(BindingFlags.Instance | BindingFlags.FlattenHierarchy | BindingFlags.Public)
-                                 where props.Any(p => p.GetCustomAttribute<DryvValidationAttribute>() != null)
+                                 where IsValidatable(t)
                                  select t)
             {
                 this.preLoader.GetDryvClientValidation(type);
             }
+        }
+
+        private static bool IsValidatable(Type type)
+        {
+            if (type.GetCustomAttribute<DryvValidationAttribute>() != null)
+            {
+                return true;
+            }
+
+            var props = type.GetProperties(BindingFlags.Instance | BindingFlags.FlattenHierarchy | BindingFlags.Public);
+            return props.Any(p => p.GetCustomAttribute<DryvValidationAttribute>() != null);
         }
 
         private void CurrentDomainOnAssemblyLoad(object sender, AssemblyLoadEventArgs args)

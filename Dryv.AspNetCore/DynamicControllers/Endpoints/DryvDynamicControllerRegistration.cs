@@ -38,7 +38,7 @@ namespace Dryv.AspNetCore.DynamicControllers.Endpoints
             }
 
             this.actionDescriptorChangeProvider.HasChanged = true;
-            this.actionDescriptorChangeProvider.TokenSource.Cancel();
+            this.actionDescriptorChangeProvider.TokenSource?.Cancel();
         }
 
         private void MapEndpoint(Type controllerTyp, MethodInfo method)

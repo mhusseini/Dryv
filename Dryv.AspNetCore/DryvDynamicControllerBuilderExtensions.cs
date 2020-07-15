@@ -23,7 +23,7 @@ namespace Dryv.AspNetCore
         {
             var services = dryvBuilder.Services;
             var options = new DryvDynamicControllerOptions();
-
+            
             setupAction?.Invoke(options);
 
             services.AddSingleton(Options.Create(options));

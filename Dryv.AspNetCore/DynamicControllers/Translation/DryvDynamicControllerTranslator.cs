@@ -10,7 +10,6 @@ using Dryv.AspNetCore.DynamicControllers.Endpoints;
 using Dryv.Extensions;
 using Dryv.Translation;
 using Dryv.Translation.Visitors;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
@@ -25,8 +24,8 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
         private readonly ControllerGenerator codeGenerator;
         private readonly IDryvClientServerCallWriter controllerCallWriter;
         private readonly DryvDynamicControllerRegistration controllerRegistration;
-        private readonly IOptions<DryvDynamicControllerOptions> options;
         private readonly IOptions<MvcOptions> mvcOptions;
+        private readonly IOptions<DryvDynamicControllerOptions> options;
 
         public DryvDynamicControllerTranslator(DryvDynamicControllerRegistration controllerRegistration, ControllerGenerator codeGenerator, IDryvClientServerCallWriter controllerCallWriter, IOptions<DryvDynamicControllerOptions> options, IOptions<MvcOptions> mvcOptions)
         {
@@ -59,6 +58,39 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
                 .Where(e => e.Member is PropertyInfo)
                 .Where(e => e.Member.DeclaringType == context.ModelType)
                 .ToList();
+        }
+
+        private static string GetUrlFromAttributes(TranslationContext context, MethodCallExpression methodCallExpression, Type controller)
+        {
+            string url;
+            var actionContext = context.ServiceProvider.GetService<IActionContextAccessor>().ActionContext;
+
+            if (actionContext != null)
+            {
+                var urlHelperFactory = context.ServiceProvider.GetService<IUrlHelperFactory>();
+                var urlHelper = urlHelperFactory.GetUrlHelper(actionContext);
+                url = urlHelper.Action(methodCallExpression.Method.Name, controller.Name.Replace("Controller", string.Empty));
+            }
+            else
+            {
+                var routeAttribute = controller.GetMethods().Select(m => m.GetCustomAttribute<RouteAttribute>()).First(a => a != null);
+                url = routeAttribute.Template;
+
+                if (!url.StartsWith("/"))
+                {
+                    url = "/" + url;
+                }
+            }
+
+            return url;
+        }
+
+        private static string GetUrlFromEndpoint(TranslationContext context, Type controller)
+        {
+            string url;
+            var linkGenerator = context.ServiceProvider.GetService<LinkGenerator>();
+            url = linkGenerator.GetPathByRouteValues(controller.Name, null);
+            return url;
         }
 
         private TypeInfo GenerateController(MethodCallExpression methodCallExpression, TranslationContext context, List<MemberExpression> modelProperties)
@@ -96,21 +128,7 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
 
             var modelProperties = FindModelPropertiesInExpression(context, methodCallExpression);
             var controller = this.GenerateController(methodCallExpression, context, modelProperties);
-            string url;
-
-            if (this.mvcOptions.Value.EnableEndpointRouting)
-            {
-                var linkGenerator = context.ServiceProvider.GetService<LinkGenerator>();
-                url = linkGenerator.GetPathByRouteValues(controller.Name, null);
-            }
-            else
-            {
-                var actionContext = context.ServiceProvider.GetService<IActionContextAccessor>().ActionContext;
-                var urlHelperFactory = context.ServiceProvider.GetService<IUrlHelperFactory>();
-                var urlHelper = urlHelperFactory.GetUrlHelper(actionContext);
-                url = urlHelper.Action(methodCallExpression.Method.Name, controller.Name.Replace("Controller", string.Empty));
-            }
-            
+            var url = this.mvcOptions.Value.EnableEndpointRouting ? GetUrlFromEndpoint(context, controller) : GetUrlFromAttributes(context, methodCallExpression, controller);
             var httpMethod = this.options.Value.HttpMethod.ToString().ToUpper();
 
             this.controllerCallWriter.Write(context, translator, url, httpMethod, modelProperties);
