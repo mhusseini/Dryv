@@ -442,7 +442,7 @@ namespace Dryv.Translation
 
         public override void Visit(ParameterExpression expression, TranslationContext context, bool negated = false)
         {
-            context.Writer.Write(expression.Name);
+            context.Writer.Write(string.IsNullOrWhiteSpace(context.Rule.TransposedPath) ? expression.Name : context.Rule.TransposedPath);
         }
 
         public override void Visit(RuntimeVariablesExpression expression, TranslationContext context, bool negated = false)
@@ -563,6 +563,15 @@ namespace Dryv.Translation
 
             var visitor = new ExpressionNodeFinder<ParameterExpression>();
             visitor.Visit(expression);
+
+
+            var visitor2 = new ExpressionNodeFinder<MethodCallExpression>();
+            visitor2.Visit(expression);
+
+            if (!visitor.FoundChildren.Any() && !visitor2.FoundChildren.Any())
+            {
+                return false;
+            }
 
             // Parameters that start with '$' are generated dummy parameters and should not be injected.
             if (visitor.FoundChildren.Any(c => c.Name.StartsWith("$")))
@@ -690,39 +699,39 @@ namespace Dryv.Translation
             return expression;
         }
 
-        private void TranslateAsyncExpression(Expression expression, TranslationContext context)
-        {
-            var asyncFinder = new AsyncMethodCallModifier(this, context);
-            var body = asyncFinder.ApplyPromises(expression);
+        //private void TranslateAsyncExpression(Expression expression, TranslationContext context)
+        //{
+        //    var asyncFinder = new AsyncMethodCallModifier(this, context);
+        //    var body = asyncFinder.ApplyPromises(expression);
 
-            var skipLastThen = body.NodeType == ExpressionType.Parameter;
-            var limit = skipLastThen ? 1 : 0;
-            var count = asyncFinder.AsyncCalls.Count;
+        //    var skipLastThen = body.NodeType == ExpressionType.Parameter;
+        //    var limit = skipLastThen ? 1 : 0;
+        //    var count = asyncFinder.AsyncCalls.Count;
 
-            foreach (var call in asyncFinder.AsyncCalls)
-            {
-                context.Writer.Write(call.Key.ToString());
+        //    foreach (var call in asyncFinder.AsyncCalls)
+        //    {
+        //        context.Writer.Write(call.Key.ToString());
 
-                if (--count < limit)
-                {
-                    break;
-                }
+        //        if (--count < limit)
+        //        {
+        //            break;
+        //        }
 
-                context.Writer.Write(".then(function(");
-                context.Writer.Write(call.Value.Name);
-                context.Writer.Write("){return ");
-            }
+        //        context.Writer.Write(".then(function(");
+        //        context.Writer.Write(call.Value.Name);
+        //        context.Writer.Write("){return ");
+        //    }
 
-            if (!skipLastThen)
-            {
-                this.Translate(body, context);
-            }
+        //    if (!skipLastThen)
+        //    {
+        //        this.Translate(body, context);
+        //    }
 
-            for (var i = limit; i < asyncFinder.AsyncCalls.Count; i++)
-            {
-                context.Writer.Write(";})");
-            }
-        }
+        //    for (var i = limit; i < asyncFinder.AsyncCalls.Count; i++)
+        //    {
+        //        context.Writer.Write(";})");
+        //    }
+        //}
 
         private void WriteMember(MemberExpression expression, TranslationContext context)
         {

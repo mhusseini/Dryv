@@ -13,7 +13,7 @@ namespace Dryv
 
         private DryvValidationResult(DryvResultType type) => this.Type = type;
 
-        public string GroupName { get; }
+        public string GroupName { get; internal set; }
 
         public string Text { get; }
 

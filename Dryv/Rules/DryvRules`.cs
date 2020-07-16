@@ -19,7 +19,7 @@ namespace Dryv.Rules
         {
             var ruleDefinition = DryvCompiledRule.Create(property, rule, enabled, ruleLocation, groupName);
 
-            this.PropertyRules.Add(ruleDefinition);
+            this.ValidationRules.Add(ruleDefinition);
         }
 
         private void Disable<TProperty>(

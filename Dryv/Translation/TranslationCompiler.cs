@@ -91,7 +91,7 @@ namespace Dryv.Translation
             arrayItems.Add(Expression.ArrayAccess(parameter, Expression.Constant(0)));
 
             // Replace all occurrences of $$MODELPATH$$ with the appropriate formatting placeholder
-            code = code.Replace("$$MODELPATH$$", "{0}");
+            code = code.Replace("$$MODELPATH$$", string.Empty);
 
             foreach (var optionDelegate in optionDelegates)
             {

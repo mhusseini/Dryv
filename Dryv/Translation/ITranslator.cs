@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using Dryv.Rules;
 
 namespace Dryv.Translation
 {
@@ -10,7 +11,7 @@ namespace Dryv.Translation
         /// <summary>
         /// Translates the specified expression.
         /// </summary>
-        TranslationResult Translate(Expression expression, MemberExpression propertyExpression, string ruleGroupName);
+        TranslationResult Translate(Expression expression, MemberExpression propertyExpression, DryvCompiledRule rule);
 
         void Translate(Expression expression, TranslationContext context, bool negated = false);
 

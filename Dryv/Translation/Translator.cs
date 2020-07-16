@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using Dryv.Configuration;
+using Dryv.Rules;
 using Dryv.Translation.Visitors;
 
 namespace Dryv.Translation
@@ -21,9 +22,9 @@ namespace Dryv.Translation
 
         protected DryvOptions Options { get; }
 
-        public virtual TranslationResult Translate(Expression expression, MemberExpression propertyExpression, string groupName)
+        public virtual TranslationResult Translate(Expression expression, MemberExpression propertyExpression, DryvCompiledRule rule)
         {
-            var result = this.GenerateJavaScriptCode(expression, propertyExpression, groupName);
+            var result = this.GenerateJavaScriptCode(expression, propertyExpression, rule);
             return this.translationCompiler.GenerateTranslationDelegate(result.Code, result.OptionDelegates, result.OptionTypes);
         }
 
@@ -152,7 +153,7 @@ namespace Dryv.Translation
         private GeneratedJavaScriptCode GenerateJavaScriptCode(
             Expression expression,
             MemberExpression propertyExpression,
-            string groupName)
+            DryvCompiledRule rule)
         {
             // Find all option types used in the validation expression.
             var optionTypes = ((LambdaExpression)expression).GetOptionTypes();
@@ -168,8 +169,9 @@ namespace Dryv.Translation
                 OptionDelegates = optionDelegates,
                 ModelType = propertyExpression?.Expression.GetExpressionType(),
                 PropertyExpression = propertyExpression?.Expression,
-                GroupName = groupName,
+                GroupName = rule.GroupName,
                 StringBuilder = sb,
+                Rule = rule,
             };
 
             expression = new EnumComparisionModifier().Visit(expression);

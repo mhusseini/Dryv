@@ -139,7 +139,7 @@ namespace Dryv.RuleDetection
             return ruleType switch
             {
                 RuleType.Disabling => rules.DisablingRules,
-                _ => rules.PropertyRules
+                _ => rules.ValidationRules
             };
         }
 

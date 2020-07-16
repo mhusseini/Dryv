@@ -3,6 +3,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using Dryv.AspNetCore;
 using Dryv.Configuration;
+using Dryv.Rules;
 using Dryv.Translation;
 using Dryv.Validation;
 using Microsoft.Extensions.Options;
@@ -18,7 +19,7 @@ namespace Dryv.Tests
         public void Child_rules_are_included_in_HTML_extensions()
         {
             var translatorMock = new Mock<ITranslator>();
-            translatorMock.Setup(m => m.Translate(It.IsAny<Expression>(), It.IsAny<MemberExpression>(), It.IsAny<string>()))
+            translatorMock.Setup(m => m.Translate(It.IsAny<Expression>(), It.IsAny<MemberExpression>(), It.IsAny<DryvCompiledRule>()))
                 .Returns(() => new TranslationResult
                 {
                     Factory = (_, __) => "nop",

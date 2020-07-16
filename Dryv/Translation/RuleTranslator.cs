@@ -95,7 +95,7 @@ namespace Dryv.Translation
 
             try
             {
-                var translatedRule = this.translator.Translate(rule.ValidationExpression, rule.PropertyExpression, rule.GroupName);
+                var translatedRule = this.translator.Translate(rule.ValidationExpression, rule.PropertyExpression, rule);
 
                 rule.CompiledEnablingExpression = DryvServerRuleEvaluator.CompileEnablingExpression(rule);
                 rule.TranslatedValidationExpression = translatedRule.Factory;
@@ -104,17 +104,14 @@ namespace Dryv.Translation
             }
             catch (DryvException ex)
             {
-                switch (this.options.TranslationErrorBehavior)
+                if (this.options.TranslationErrorBehavior != TranslationErrorBehavior.ValidateOnServer)
                 {
-                    case TranslationErrorBehavior.ValidateOnServer:
-                        rule.TranslatedValidationExpression = null;
-                        rule.PreevaluationOptionTypes = null;
-                        rule.TranslationError = ex;
-                        break;
-
-                    default:
-                        throw;
+                    throw;
                 }
+
+                rule.TranslatedValidationExpression = null;
+                rule.PreevaluationOptionTypes = null;
+                rule.TranslationError = ex;
             }
 
             return rule;

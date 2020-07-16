@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Dryv.Configuration;
 using Dryv.Extensions;
+using Dryv.Rules;
 using Dryv.Translation;
 using Dryv.Translation.Translators;
 using Escape;
@@ -50,7 +51,7 @@ namespace Dryv.Tests
 
             var args = new object[] { "" }.Union(validationOptions).ToArray();
             var translator = CreateTranslator(translators);
-            var translation = translator.Translate(expression, null, string.Empty).Factory(null, args);
+            var translation = translator.Translate(expression, null, new DryvCompiledRule()).Factory(null, args);
             return translation;
         }
 

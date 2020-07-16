@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Text;
+using Dryv.Rules;
 
 namespace Dryv.Translation
 {
@@ -39,6 +40,8 @@ namespace Dryv.Translation
         internal StringBuilder StringBuilder { get; set; }
         public bool WhatIfMode { get; set; }
 
+        internal DryvCompiledRule Rule { get; set; }
+
         public virtual T Clone<T>(StringBuilder sb = null)
         where T : TranslationContext, new()
         {
@@ -53,6 +56,7 @@ namespace Dryv.Translation
                 Writer = sb == null ? this.Writer : new IndentingStringWriter(sb),
                 StringBuilder = sb,
                 WhatIfMode = this.WhatIfMode,
+                Rule = this.Rule,
             };
         }
     }
