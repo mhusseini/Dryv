@@ -18,20 +18,15 @@ namespace Dryv.Tests
         public void Child_rules_are_included_in_HTML_extensions()
         {
             var translatorMock = new Mock<ITranslator>();
-            translatorMock.Setup(m => m.Translate(It.IsAny<Expression>(), It.IsAny<MemberExpression>(), It.IsAny<string>(), It.IsAny<Func<Type, object>>()))
+            translatorMock.Setup(m => m.Translate(It.IsAny<Expression>(), It.IsAny<MemberExpression>(), It.IsAny<string>()))
                 .Returns(() => new TranslationResult
                 {
                     Factory = (_, __) => "nop",
                     CodeTemplate = "nothing",
                     OptionTypes = new Type[0]
                 });
-            var serviceProvider = new Mock<IServiceProvider>();
-            serviceProvider
-                .Setup(p => p.GetService(It.Is<Type>(t => t == typeof(ITranslator))))
-                .Returns(translatorMock.Object);
-
             var validator = new DryvClientValidationFunctionWriter();
-            var loader = new DryvClientValidationLoader(validator, Options.Create(new DryvOptions()), serviceProvider.Object);
+            var loader = new DryvClientValidationLoader(translatorMock.Object, validator, Options.Create(new DryvOptions()));
             var results = loader.GetDryvClientValidation<ParentModel>();
             var l = results.ToList();
 
