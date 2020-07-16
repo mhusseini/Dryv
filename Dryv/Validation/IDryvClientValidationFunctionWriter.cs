@@ -7,6 +7,6 @@ namespace Dryv.Validation
 {
     public interface IDryvClientValidationFunctionWriter
     {
-        Action<TextWriter> GetValidationFunction(IDictionary<DryvRuleTreeNode, Func<string>> translatedRules);
+        Action<Func<Type, object>, TextWriter> GetValidationFunction(IDictionary<DryvRuleTreeNode, Func<Func<Type, object>, string>> translatedRules);
     }
 }

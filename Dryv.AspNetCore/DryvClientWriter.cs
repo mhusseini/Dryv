@@ -19,20 +19,20 @@ namespace Dryv.AspNetCore
             this.rulesWriter = rulesWriter ?? throw new ArgumentNullException(nameof(rulesWriter));
         }
 
-        public IHtmlContent WriteDryvValidation<TModel>(string validationSetName)
+        public IHtmlContent WriteDryvValidation<TModel>(Func<Type, object> serviceProvider, string validationSetName)
         {
             var validators = this.loader.GetDryvClientValidationFunctions<TModel>();
             var disablers = this.loader.GetDryvClientDisablingFunctions<TModel>();
 
             return new LazyHtmlContent(writer =>
             {
-                this.rulesWriter.WriteBegin(writer);
-                this.rulesWriter.WriteValidationSet(writer, validationSetName, validators, disablers);
-                this.rulesWriter.WriteEnd(writer);
+                this.rulesWriter.WriteBegin(writer, serviceProvider);
+                this.rulesWriter.WriteValidationSet(writer, validationSetName, validators, disablers, serviceProvider);
+                this.rulesWriter.WriteEnd(writer, serviceProvider);
             });
         }
 
-        public IHtmlContent WriteDryvValidation(params (string, Type)[] validationSets)
+        public IHtmlContent WriteDryvValidation(Func<Type, object> serviceProvider, params (string, Type)[] validationSets)
         {
             var arguments = from x in validationSets
                             select (
@@ -41,10 +41,10 @@ namespace Dryv.AspNetCore
                                 disablers: this.loader.GetDryvClientDisablingFunctions(x.Item2)
                             );
 
-            return this.CreateHtmlContent(arguments);
+            return this.CreateHtmlContent(arguments, serviceProvider);
         }
 
-        public IHtmlContent WriteDryvValidation(IEnumerable<KeyValuePair<string, Type>> validationSets)
+        public IHtmlContent WriteDryvValidation(IEnumerable<KeyValuePair<string, Type>> validationSets, Func<Type, object> serviceProvider)
         {
             var arguments = from x in validationSets
                             select (
@@ -53,21 +53,21 @@ namespace Dryv.AspNetCore
                                 disablers: this.loader.GetDryvClientDisablingFunctions(x.Value)
                             );
 
-            return this.CreateHtmlContent(arguments);
+            return this.CreateHtmlContent(arguments, serviceProvider);
         }
 
-        private IHtmlContent CreateHtmlContent(IEnumerable<(string name, IDictionary<string, Action<TextWriter>> validators, IDictionary<string, Action<TextWriter>> disablers)> arguments)
+        private IHtmlContent CreateHtmlContent(IEnumerable<(string name, IDictionary<string, Action<Func<Type, object>, TextWriter>> validators, IDictionary<string, Action<Func<Type, object>, TextWriter>> disablers)> arguments, Func<Type, object> serviceProvider)
         {
             return new LazyHtmlContent(writer =>
             {
-                this.rulesWriter.WriteBegin(writer);
+                this.rulesWriter.WriteBegin(writer, serviceProvider);
 
                 foreach (var (name, validators, disablers) in arguments)
                 {
-                    this.rulesWriter.WriteValidationSet(writer, name, validators, disablers);
+                    this.rulesWriter.WriteValidationSet(writer, name, validators, disablers, serviceProvider);
                 }
 
-                this.rulesWriter.WriteEnd(writer);
+                this.rulesWriter.WriteEnd(writer, serviceProvider);
             });
         }
     }

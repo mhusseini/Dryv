@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Dryv.Compilation;
 using Dryv.Configuration;
 using Dryv.RuleDetection;
 using Dryv.Rules;
@@ -10,28 +11,26 @@ namespace Dryv.Translation
 {
     public sealed class DryvRuleTranslator
     {
+        private readonly ITranslator translator;
         private readonly DryvOptions options;
-        private readonly Func<Type, object> serviceProvider;
 
-        public DryvRuleTranslator(DryvOptions options, Func<Type, object> serviceProvider)
+        public DryvRuleTranslator(ITranslator translator, DryvOptions options)
         {
+            this.translator = translator;
             this.options = options;
-            this.serviceProvider = serviceProvider;
         }
 
-        public IDictionary<DryvRuleTreeNode, Func<string>> Translate(IEnumerable<DryvRuleTreeNode> rules, string modelPath, Type modelType)
+        public IDictionary<DryvRuleTreeNode, Func<Func<Type, object>, string>> Translate(IEnumerable<DryvRuleTreeNode> rules, string modelPath, Type modelType)
         {
-            var translator = this.serviceProvider(typeof(ITranslator)) as ITranslator;
             return (from r in rules
-                    let rule = this.Translate(r.Rule, translator)
+                    let rule = this.Translate(r.Rule)
                     where rule.TranslationError == null
                     let p1 = string.IsNullOrWhiteSpace(r.Path) ? r.Path : $".{r.Path}"
                     let path = rule.IsDisablingRule && p1.Contains(".") ? p1.Substring(0, p1.LastIndexOf(".", StringComparison.Ordinal)) : p1
-                    let preevaluationOptions = new[] { path }.Union(rule.PreevaluationOptionTypes.Select(this.serviceProvider)).ToArray()
                     select new
                     {
                         Rule = r,
-                        Translate = (Func<string>)(() => this.GetTranslationFromRule(rule, preevaluationOptions))
+                        Translate = (Func<Func<Type, object>, string>)(serviceProvider => GetTranslationFromRule(rule, serviceProvider, path))
                     })
                 .ToDictionary(x => x.Rule, x => x.Translate);
         }
@@ -51,11 +50,20 @@ namespace Dryv.Translation
             return new DryvTranslationException(sb.ToString(), ex);
         }
 
-        private string GetTranslationFromRule(DryvCompiledRule rule, object[] preevaluationOptions)
+        private static string GetTranslationFromRule(DryvCompiledRule rule, Func<Type, object> serviceProvider, string path)
         {
+            var preevaluationServices = rule.PreevaluationOptionTypes.Select(serviceProvider).ToArray();
+
+            if (!rule.CompiledEnablingExpression(preevaluationServices))
+            {
+                return null;
+            }
+
+            var preevaluationOptions = new[] { path }.Union(preevaluationServices).ToArray();
+
             try
             {
-                return rule.TranslatedValidationExpression(this.serviceProvider, preevaluationOptions);
+                return rule.TranslatedValidationExpression(serviceProvider, preevaluationOptions);
             }
             catch (NullReferenceException ex)
             {
@@ -77,7 +85,7 @@ namespace Dryv.Translation
             }
         }
 
-        private DryvCompiledRule Translate(DryvCompiledRule rule, ITranslator translator)
+        private DryvCompiledRule Translate(DryvCompiledRule rule)
         {
             if (rule.TranslatedValidationExpression != null ||
                 rule.TranslationError != null)
@@ -87,8 +95,9 @@ namespace Dryv.Translation
 
             try
             {
-                var translatedRule = translator.Translate(rule.ValidationExpression, rule.PropertyExpression, rule.GroupName, this.serviceProvider);
+                var translatedRule = this.translator.Translate(rule.ValidationExpression, rule.PropertyExpression, rule.GroupName);
 
+                rule.CompiledEnablingExpression = DryvServerRuleEvaluator.CompileEnablingExpression(rule);
                 rule.TranslatedValidationExpression = translatedRule.Factory;
                 rule.PreevaluationOptionTypes = translatedRule.OptionTypes;
                 rule.CodeTemplate = translatedRule.CodeTemplate;

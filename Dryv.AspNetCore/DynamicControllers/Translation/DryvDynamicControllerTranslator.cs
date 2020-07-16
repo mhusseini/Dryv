@@ -7,12 +7,9 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Dryv.AspNetCore.DynamicControllers.CodeGeneration;
 using Dryv.AspNetCore.DynamicControllers.Endpoints;
-using Dryv.Extensions;
 using Dryv.Translation;
 using Dryv.Translation.Visitors;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 
@@ -24,16 +21,18 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
         private readonly ControllerGenerator codeGenerator;
         private readonly IDryvClientServerCallWriter controllerCallWriter;
         private readonly DryvDynamicControllerRegistration controllerRegistration;
+        private readonly LinkGenerator linkGenerator;
         private readonly IOptions<MvcOptions> mvcOptions;
         private readonly IOptions<DryvDynamicControllerOptions> options;
 
-        public DryvDynamicControllerTranslator(DryvDynamicControllerRegistration controllerRegistration, ControllerGenerator codeGenerator, IDryvClientServerCallWriter controllerCallWriter, IOptions<DryvDynamicControllerOptions> options, IOptions<MvcOptions> mvcOptions)
+        public DryvDynamicControllerTranslator(DryvDynamicControllerRegistration controllerRegistration, ControllerGenerator codeGenerator, IDryvClientServerCallWriter controllerCallWriter, IOptions<DryvDynamicControllerOptions> options, IOptions<MvcOptions> mvcOptions, LinkGenerator linkGenerator)
         {
             this.controllerRegistration = controllerRegistration;
             this.codeGenerator = codeGenerator;
             this.controllerCallWriter = controllerCallWriter;
             this.options = options;
             this.mvcOptions = mvcOptions;
+            this.linkGenerator = linkGenerator;
         }
 
         public int? OrderIndex { get; set; } = int.MaxValue;
@@ -60,36 +59,16 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
                 .ToList();
         }
 
-        private static string GetUrlFromAttributes(TranslationContext context, MethodCallExpression methodCallExpression, Type controller)
+        private static string GetUrlFromAttributes(Type controller)
         {
-            string url;
-            var actionContext = context.ServiceProvider.GetService<IActionContextAccessor>().ActionContext;
+            var routeAttribute = controller.GetMethods().Select(m => m.GetCustomAttribute<RouteAttribute>()).First(a => a != null);
+            var url = routeAttribute.Template;
 
-            if (actionContext != null)
+            if (!url.StartsWith("/"))
             {
-                var urlHelperFactory = context.ServiceProvider.GetService<IUrlHelperFactory>();
-                var urlHelper = urlHelperFactory.GetUrlHelper(actionContext);
-                url = urlHelper.Action(methodCallExpression.Method.Name, controller.Name.Replace("Controller", string.Empty));
-            }
-            else
-            {
-                var routeAttribute = controller.GetMethods().Select(m => m.GetCustomAttribute<RouteAttribute>()).First(a => a != null);
-                url = routeAttribute.Template;
-
-                if (!url.StartsWith("/"))
-                {
-                    url = "/" + url;
-                }
+                url = "/" + url;
             }
 
-            return url;
-        }
-
-        private static string GetUrlFromEndpoint(TranslationContext context, Type controller)
-        {
-            string url;
-            var linkGenerator = context.ServiceProvider.GetService<LinkGenerator>();
-            url = linkGenerator.GetPathByRouteValues(controller.Name, null);
             return url;
         }
 
@@ -107,6 +86,11 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
 
                 return assembly.DefinedTypes.FirstOrDefault(typeof(Controller).IsAssignableFrom);
             })).Value;
+        }
+
+        private string GetUrlFromEndpoint(Type controller)
+        {
+            return this.linkGenerator.GetPathByRouteValues(controller.Name, null);
         }
 
         private bool Translate(TranslationContext context, ITranslator translator, Expression expression)
@@ -128,7 +112,7 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
 
             var modelProperties = FindModelPropertiesInExpression(context, methodCallExpression);
             var controller = this.GenerateController(methodCallExpression, context, modelProperties);
-            var url = this.mvcOptions.Value.EnableEndpointRouting ? GetUrlFromEndpoint(context, controller) : GetUrlFromAttributes(context, methodCallExpression, controller);
+            var url = this.mvcOptions.Value.EnableEndpointRouting ? this.GetUrlFromEndpoint(controller) : GetUrlFromAttributes(controller);
             var httpMethod = this.options.Value.HttpMethod.ToString().ToUpper();
 
             this.controllerCallWriter.Write(context, translator, url, httpMethod, modelProperties);

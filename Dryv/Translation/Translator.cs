@@ -21,9 +21,9 @@ namespace Dryv.Translation
 
         protected DryvOptions Options { get; }
 
-        public virtual TranslationResult Translate(Expression expression, MemberExpression propertyExpression, string groupName, Func<Type, object> serviceProvider)
+        public virtual TranslationResult Translate(Expression expression, MemberExpression propertyExpression, string groupName)
         {
-            var result = this.GenerateJavaScriptCode(expression, propertyExpression, groupName, serviceProvider);
+            var result = this.GenerateJavaScriptCode(expression, propertyExpression, groupName);
             return this.translationCompiler.GenerateTranslationDelegate(result.Code, result.OptionDelegates, result.OptionTypes);
         }
 
@@ -152,8 +152,7 @@ namespace Dryv.Translation
         private GeneratedJavaScriptCode GenerateJavaScriptCode(
             Expression expression,
             MemberExpression propertyExpression,
-            string groupName,
-            Func<Type, object> serviceProvider)
+            string groupName)
         {
             // Find all option types used in the validation expression.
             var optionTypes = ((LambdaExpression)expression).GetOptionTypes();
@@ -171,7 +170,6 @@ namespace Dryv.Translation
                 PropertyExpression = propertyExpression?.Expression,
                 GroupName = groupName,
                 StringBuilder = sb,
-                ServiceProvider = serviceProvider,
             };
 
             expression = new EnumComparisionModifier().Visit(expression);

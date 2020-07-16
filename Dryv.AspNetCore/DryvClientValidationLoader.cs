@@ -15,21 +15,23 @@ namespace Dryv.AspNetCore
 {
     public class DryvClientValidationLoader
     {
+        public ITranslator Translator { get; }
         private readonly IDryvClientValidationFunctionWriter clientValidationFunctionWriter;
 
         private readonly DryvRulesFinder rulesFinder = new DryvRulesFinder();
 
         private readonly DryvRuleTranslator translator;
 
-        public DryvClientValidationLoader(IDryvClientValidationFunctionWriter clientValidationFunctionWriter, IOptions<DryvOptions> options, IServiceProvider serviceProvider)
+        public DryvClientValidationLoader(ITranslator translator, IDryvClientValidationFunctionWriter clientValidationFunctionWriter, IOptions<DryvOptions> options)
         {
+            this.Translator = translator;
             this.clientValidationFunctionWriter = clientValidationFunctionWriter;
-            this.translator = new DryvRuleTranslator(options.Value, serviceProvider.GetService);
+            this.translator = new DryvRuleTranslator(translator, options.Value);
         }
 
-        public IDictionary<string, Action<TextWriter>> GetDryvClientDisablingFunctions<TModel>() => GetDryvClientDisablingFunctions(typeof(TModel));
+        public IDictionary<string, Action<Func<Type, object>, TextWriter>> GetDryvClientDisablingFunctions<TModel>() => this.GetDryvClientDisablingFunctions(typeof(TModel));
 
-        public IDictionary<string, Action<TextWriter>> GetDryvClientDisablingFunctions(Type modelType)
+        public IDictionary<string, Action<Func<Type, object>, TextWriter>> GetDryvClientDisablingFunctions(Type modelType)
         {
             return (from val in this.GetDryvClientValidation(modelType)
                     where val.DisablingFunction != null
@@ -64,9 +66,9 @@ namespace Dryv.AspNetCore
             return this.CollectClientValidation(modelType, modelType, string.Empty, new Stack<string>());
         }
 
-        public IDictionary<string, Action<TextWriter>> GetDryvClientValidationFunctions<TModel>() => this.GetDryvClientValidationFunctions(typeof(TModel));
+        public IDictionary<string, Action<Func<Type, object>, TextWriter>> GetDryvClientValidationFunctions<TModel>() => this.GetDryvClientValidationFunctions(typeof(TModel));
 
-        public IDictionary<string, Action<TextWriter>> GetDryvClientValidationFunctions(Type modelType)
+        public IDictionary<string, Action<Func<Type, object>, TextWriter>> GetDryvClientValidationFunctions(Type modelType)
         {
             return (from val in this.GetDryvClientValidation(modelType)
                     where val.ValidationFunction != null
@@ -138,7 +140,7 @@ namespace Dryv.AspNetCore
             };
         }
 
-        private Action<TextWriter> TranslateRules(Type modelType, string modelPath, IEnumerable<DryvRuleTreeNode> rules)
+        private Action<Func<Type, object>, TextWriter> TranslateRules(Type modelType, string modelPath, IEnumerable<DryvRuleTreeNode> rules)
         {
             var translatedRules = this.translator.Translate(rules, modelPath, modelType);
             var validationFunction = translatedRules.Any() ? this.clientValidationFunctionWriter.GetValidationFunction(translatedRules) : null;

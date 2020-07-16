@@ -117,7 +117,7 @@ namespace Dryv.Compilation
             rule.CompiledEnablingExpression = CompileEnablingExpression(rule);
         }
 
-        private static Func<object[], bool> CompileEnablingExpression(DryvCompiledRule rule)
+        public static Func<object[], bool> CompileEnablingExpression(DryvCompiledRule rule)
         {
             var lambdaExpression = rule.EnablingExpression;
             EnsurePreevaluationOptionTypes(rule);
