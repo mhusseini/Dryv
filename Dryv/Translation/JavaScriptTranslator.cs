@@ -205,9 +205,19 @@ namespace Dryv.Translation
                 return;
             }
 
-            foreach (var variable in expression.Variables)
+            if (expression.Variables.Any())
             {
-                context.Writer.WriteLine($"var {this.FormatIdentifier(variable.Name)};");
+                context.Writer.Write("var ");
+                var sep = string.Empty;
+
+                foreach (var variable in expression.Variables)
+                {
+                    context.Writer.Write(sep);
+                    context.Writer.Write(this.FormatIdentifier(variable.Name));
+                    sep = ", ";
+                }
+
+                context.Writer.Write(";");
             }
 
             base.Visit(expression, context, negated);
@@ -284,12 +294,10 @@ namespace Dryv.Translation
             context.Writer.Write("function(");
             context.Writer.Write(string.Join(", ", expression.Parameters.Select(p => this.FormatIdentifier(p.Name))));
             context.Writer.Write(") {");
-            context.Writer.IncrementIndent();
             context.Writer.Write("return ");
 
             this.Translate(expression.Body, context);
 
-            context.Writer.DecrementIndent();
             context.Writer.Write("}");
         }
 
@@ -314,12 +322,10 @@ namespace Dryv.Translation
 
             this.Translate(body, context);
 
-            context.Writer.IncrementIndent();
             context.Writer.Write(" ? ");
             this.Translate(expression.IfTrue, context);
             context.Writer.Write(" : ");
             this.Translate(expression.IfFalse, context);
-            context.Writer.DecrementIndent();
 
             for (var i = 0; i < asyncFinder.AsyncCalls.Count; i++)
             {
@@ -474,11 +480,9 @@ namespace Dryv.Translation
                 }
 
                 context.Writer.WriteLine("{");
-                context.Writer.IncrementIndent();
                 this.Translate(expressionCase.Body, context);
                 context.Writer.WriteLine();
                 context.Writer.WriteLine("break;");
-                context.Writer.DecrementIndent();
                 context.Writer.WriteLine("}");
             }
             context.Writer.Write("}");

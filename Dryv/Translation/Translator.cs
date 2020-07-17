@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -162,7 +163,7 @@ namespace Dryv.Translation
             var optionDelegates = new Dictionary<int, OptionDelegate>();
             var sb = new StringBuilder();
 
-            using var writer = new IndentingStringWriter(sb);
+            using var writer = new StringWriter(sb);
             var context = new TranslationContext
             {
                 OptionsTypes = optionTypes,

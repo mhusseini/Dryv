@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq.Expressions;
 using System.Text;
 using Dryv.Rules;
@@ -36,7 +37,7 @@ namespace Dryv.Translation
         public TranslationContext ParentContext { get; set; }
         public Expression PropertyExpression { get; set; }
 
-        public IndentingStringWriter Writer { get; set; }
+        public StringWriter Writer { get; set; }
         internal StringBuilder StringBuilder { get; set; }
         public bool WhatIfMode { get; set; }
 
@@ -53,7 +54,7 @@ namespace Dryv.Translation
                 OptionDelegates = this.OptionDelegates,
                 OptionsTypes = this.OptionsTypes,
                 PropertyExpression = this.PropertyExpression,
-                Writer = sb == null ? this.Writer : new IndentingStringWriter(sb),
+                Writer = sb == null ? this.Writer : new StringWriter(sb),
                 StringBuilder = sb,
                 WhatIfMode = this.WhatIfMode,
                 Rule = this.Rule,

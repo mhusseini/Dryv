@@ -53,7 +53,10 @@ namespace Dryv.SampleVue
                         new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
                     }
                 }))
-                .AddDryvDynamicControllers(options => options.GeneratedAssemblyOutput = ass => new Lokad.ILPack.AssemblyGenerator().GenerateAssembly(ass, ass.GetName().Name + ".dll"))
+                .AddDryvDynamicControllers(options =>
+                {
+                    // options.GeneratedAssemblyOutput = ass => new Lokad.ILPack.AssemblyGenerator().GenerateAssembly(ass, ass.GetName().Name + ".dll");
+                })
             //.AddDryvPreloading()
             ;
 
