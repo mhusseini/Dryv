@@ -69,8 +69,7 @@ namespace Dryv.RuleDetection
 
             processed.Add(rootType);
 
-            var baseTypes = rootType
-                .Iterate(t => t?.GetBaseType())
+            var baseTypes = IterationExtensions.Iterate(rootType, t => t?.GetBaseType())
                 .Where(t => t != null && t.Namespace != typeof(object).Namespace)
                 .ToList();
 

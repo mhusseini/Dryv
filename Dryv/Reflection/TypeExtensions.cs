@@ -8,26 +8,20 @@ namespace Dryv.Reflection
 {
     internal static class TypeExtensions
     {
+        private static BindingFlags DefaultBindingFlags =>
+            BindingFlags.Public | BindingFlags.FlattenHierarchy |
+            BindingFlags.Instance | BindingFlags.NonPublic |
+            BindingFlags.Static;
+
         public static Type GetBaseType(this Type type)
         {
             return type.GetTypeInfo().BaseType;
         }
 
-        public static IList<FieldInfo> GetFields(this Type type)
-            => GetFields(
-            type,
-            BindingFlags.Public | BindingFlags.FlattenHierarchy |
-            BindingFlags.Instance | BindingFlags.NonPublic |
-            BindingFlags.Static);
-
         public static IList<FieldInfo> GetFields(this Type type, BindingFlags flags)
-            => GetFields(type.GetTypeInfo(), flags);
-
-        public static IList<FieldInfo> GetFields(this TypeInfo typeInfo) => GetFields(
-            typeInfo,
-            BindingFlags.Public | BindingFlags.FlattenHierarchy |
-            BindingFlags.Instance | BindingFlags.NonPublic |
-            BindingFlags.Static);
+        {
+            return GetFields(type.GetTypeInfo(), flags);
+        }
 
         public static IList<FieldInfo> GetFields(this TypeInfo typeInfo, BindingFlags flags)
         {
@@ -38,7 +32,7 @@ namespace Dryv.Reflection
 
             var items = isFlatten
                 ? typeInfo.DeclaredFields
-                : from t in typeInfo.Iterrate(i => i.BaseType.GetTypeInfo())
+                : from t in typeInfo.Iterate(i => i.BaseType.GetTypeInfo())
                   from i in t.DeclaredFields
                   select i;
 
@@ -52,11 +46,6 @@ namespace Dryv.Reflection
         public static IList<Type> GetGenericArguments(this Type type)
         {
             return type.GetTypeInfo().GenericTypeArguments;
-        }
-
-        public static IEnumerable<Type> GetInterfaces(this Type type)
-        {
-            return type.GetTypeInfo().ImplementedInterfaces;
         }
 
         public static MemberInfo GetMember(this Type type, string name)
@@ -75,21 +64,14 @@ namespace Dryv.Reflection
         }
 
         public static IList<MethodInfo> GetMethods(this Type type)
-            => GetMethods(
-                type,
-                BindingFlags.Public | BindingFlags.FlattenHierarchy |
-                BindingFlags.Instance | BindingFlags.NonPublic |
-                BindingFlags.Static);
+        {
+            return GetMethods(type, DefaultBindingFlags);
+        }
 
         public static IList<MethodInfo> GetMethods(this Type type, BindingFlags flags)
-            => GetMethods(type.GetTypeInfo(), flags);
-
-        public static IList<MethodInfo> GetMethods(this TypeInfo typeInfo)
-            => GetMethods(
-                typeInfo,
-                BindingFlags.Public | BindingFlags.FlattenHierarchy |
-                BindingFlags.Instance | BindingFlags.NonPublic |
-                BindingFlags.Static);
+        {
+            return GetMethods(type.GetTypeInfo(), flags);
+        }
 
         public static IList<MethodInfo> GetMethods(this TypeInfo typeInfo, BindingFlags flags)
         {
@@ -100,7 +82,7 @@ namespace Dryv.Reflection
 
             var items = isFlatten
                 ? typeInfo.DeclaredMethods
-                : from t in typeInfo.Iterrate(i => i.BaseType.GetTypeInfo())
+                : from t in typeInfo.Iterate(i => i.BaseType.GetTypeInfo())
                   from i in t.DeclaredMethods
                   select i;
 
@@ -112,21 +94,14 @@ namespace Dryv.Reflection
         }
 
         public static IList<PropertyInfo> GetProperties(this Type type)
-                                                            => GetProperties(
-            type,
-            BindingFlags.Public | BindingFlags.FlattenHierarchy |
-            BindingFlags.Instance | BindingFlags.NonPublic |
-            BindingFlags.Static);
+        {
+            return GetProperties(type, DefaultBindingFlags);
+        }
 
         public static IList<PropertyInfo> GetProperties(this Type type, BindingFlags flags)
-            => GetProperties(type.GetTypeInfo(), flags);
-
-        public static IList<PropertyInfo> GetProperties(this TypeInfo typeInfo)
-            => GetProperties(
-            typeInfo,
-            BindingFlags.Public | BindingFlags.FlattenHierarchy |
-            BindingFlags.Instance | BindingFlags.NonPublic |
-            BindingFlags.Static);
+        {
+            return GetProperties(type.GetTypeInfo(), flags);
+        }
 
         public static IList<PropertyInfo> GetProperties(this TypeInfo typeInfo, BindingFlags flags)
         {
@@ -137,7 +112,7 @@ namespace Dryv.Reflection
             var isInstance = flags.HasFlag(BindingFlags.Instance) || !isStatic;
 
             var items = isFlatten
-                ? from t in typeInfo.Iterrate(i => i.BaseType?.GetTypeInfo())
+                ? from t in typeInfo.Iterate(i => i.BaseType?.GetTypeInfo())
                   from i in t.DeclaredProperties
                   select i
                 : typeInfo.DeclaredProperties;
@@ -156,15 +131,6 @@ namespace Dryv.Reflection
             return type.GetTypeInfo().IsAssignableFrom(other.GetTypeInfo());
         }
 
-        public static bool IsClass(this Type type)
-        {
-            return type.GetTypeInfo().IsClass;
-        }
-
-        public static bool IsInterface(this Type type)
-        {
-            return type.GetTypeInfo().IsInterface;
-        }
         public static bool IsSystemType(this Type type)
         {
             return type.Namespace == "System";

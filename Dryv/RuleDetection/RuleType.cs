@@ -2,7 +2,7 @@
 {
     public enum RuleType
     {
-        Default,
+        Validation,
         Disabling,
     }
 }

@@ -96,7 +96,7 @@ namespace Dryv
         {
             return new GroupedValidation
             {
-                ValidationRules = this.ruleFinder.FindValidationRulesInTree(type, RuleType.Default)
+                ValidationRules = this.ruleFinder.FindValidationRulesInTree(type, RuleType.Validation)
                     .GroupBy(r => r.ModelPath)
                     .ToDictionary(g => g.Key, g => g.ToList()),
 

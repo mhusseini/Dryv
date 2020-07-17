@@ -37,8 +37,7 @@ namespace Dryv.Rules
                 return null;
             }
 
-            var members = memberExpression
-                .Iterrate(e => e.Expression as MemberExpression)
+            var members = memberExpression.Iterate(e => e.Expression as MemberExpression)
                 .ToList();
 
             var parameter = (ParameterExpression)members.Last().Expression;

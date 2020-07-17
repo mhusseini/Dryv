@@ -17,15 +17,18 @@ namespace Dryv.Translation
         public int? OrderIndex { get; set; }
 
         public static string QuoteValue(object value)
-                    => value == null
-            ? "null"
-            : (value.GetType().GetTypeInfo().IsPrimitive
-                ? value.ToString()
-                : $@"""{value.ToString().Trim('\"')}""");
+        {
+            return value == null
+                ? "null"
+                : value.GetType().GetTypeInfo().IsPrimitive
+                    ? value.ToString()
+                    : $@"""{value.ToString().Trim('\"')}""";
+        }
 
         public static void WriteArguments(ITranslator translator, IEnumerable<Expression> arguments, TranslationContext context)
         {
             var sep = string.Empty;
+
             foreach (var argument in arguments)
             {
                 context.Writer.Write(sep);
@@ -34,7 +37,10 @@ namespace Dryv.Translation
             }
         }
 
-        public virtual bool SupportsType(Type type) => this.supportedTypes.Contains(type);
+        public virtual bool SupportsType(Type type)
+        {
+            return this.supportedTypes.Contains(type);
+        }
 
         public virtual bool Translate(MethodTranslationContext options)
         {
@@ -54,43 +60,43 @@ namespace Dryv.Translation
         }
 
         protected static bool ArgumentIs<T>(MethodTranslationContext options, int index, T value)
-            => Equals(options.Expression.Arguments
-            .Skip(index)
-            .Take(1)
-            .OfType<ConstantExpression>()
-            .Select(i => i.Value)
-            .FirstOrDefault(), value);
+        {
+            return Equals(options.Expression.Arguments
+                .Skip(index)
+                .Take(1)
+                .OfType<ConstantExpression>()
+                .Select(i => i.Value)
+                .FirstOrDefault(), value);
+        }
 
         protected static T FindValue<T>(MemberInfo member)
             where T : class
         {
-            switch (member)
+            return member switch
             {
-                case FieldInfo fieldInfo when fieldInfo.IsStatic:
-                    return fieldInfo.GetValue(null) as T;
-
-                case PropertyInfo propertyInfo when propertyInfo.GetMethod.IsStatic:
-                    return propertyInfo.GetValue(null) as T;
-
-                default:
-                    return default(T);
-            }
+                FieldInfo fieldInfo when fieldInfo.IsStatic => (fieldInfo.GetValue(null) as T),
+                PropertyInfo propertyInfo when propertyInfo.GetMethod.IsStatic => (propertyInfo.GetValue(null) as T),
+                _ => default
+            };
         }
 
         protected static T FindValue<T>(params Expression[] expressions)
-            => FindValue<T>((IList<Expression>)expressions);
+        {
+            return FindValue<T>((IList<Expression>)expressions);
+        }
 
         protected static T FindValue<T>(IList<Expression> expressions)
         {
-            var contsantExpressions = expressions.OfType<ConstantExpression>().ToList();
-            return contsantExpressions.Select(e => e.Value)
-                .Union(from exp in contsantExpressions
+            var constantExpressions = expressions.OfType<ConstantExpression>().ToList();
+
+            return constantExpressions.Select(e => e.Value)
+                .Union(from exp in constantExpressions
                        let v = exp.Value
                        from f in v?.GetType().GetFields(BindingFlags.Instance | BindingFlags.Static |
                                                         BindingFlags.Public | BindingFlags.NonPublic |
                                                         BindingFlags.FlattenHierarchy)
                        select f.GetValue(v))
-                .Union(from exp in contsantExpressions
+                .Union(from exp in constantExpressions
                        let v = exp.Value
                        from f in v?.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Static |
                                                             BindingFlags.Public | BindingFlags.NonPublic |
@@ -107,14 +113,24 @@ namespace Dryv.Translation
         }
 
         protected void AddMethodTranslator(string methodName, Action<MethodTranslationContext> translator)
-            => this.AddMethodTranslator(new Regex($"^{methodName}$"), translator);
+        {
+            this.AddMethodTranslator(new Regex($"^{methodName}$"), translator);
+        }
 
         protected void AddMethodTranslator(Regex regex, Action<MethodTranslationContext> translator)
-            => this.methodTranslatorsByRegex.Add(new RegexAndTranslator(regex, translator));
+        {
+            this.methodTranslatorsByRegex.Add(new RegexAndTranslator(regex, translator));
+        }
 
-        protected void Supports(Type type) => this.supportedTypes.Add(type);
+        protected void Supports(Type type)
+        {
+            this.supportedTypes.Add(type);
+        }
 
-        protected void Supports<T>() => this.Supports(typeof(T));
+        protected void Supports<T>()
+        {
+            this.Supports(typeof(T));
+        }
 
         private struct RegexAndTranslator
         {

@@ -2,7 +2,6 @@
 
 namespace Dryv
 {
-    [Flags]
     public enum DryvResultType
     {
         Success,

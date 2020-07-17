@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace Dryv.RuleDetection
 {
-    [DebuggerDisplay("{" + nameof(UniquePath) + "}")]
+    [DebuggerDisplay("{" + nameof(ModelPath) + "}")]
     public class ModelTreeNode
     {
         public string UniquePath { get; set; }

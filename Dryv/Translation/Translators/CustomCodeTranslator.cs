@@ -11,7 +11,10 @@ namespace Dryv.Translation.Translators
             this.AddMethodTranslator(nameof(DryvClientCode.Raw), CustomScript);
         }
 
-        public bool? AllowSurroundingBrackets(Expression expression) => !TryGetBinaryExpression(expression, out _);
+        public bool? AllowSurroundingBrackets(Expression expression)
+        {
+            return !TryGetBinaryExpression(expression, out _);
+        }
 
         public bool TryTranslate(CustomTranslationContext context)
         {
@@ -34,10 +37,12 @@ namespace Dryv.Translation.Translators
             }
         }
 
-        private static MethodCallExpression GetDryvClientCodeMethodCall(Expression expression) =>
-            expression is MethodCallExpression callExpression2 && callExpression2.Method.DeclaringType == typeof(DryvClientCode)
-            ? callExpression2
-            : null;
+        private static MethodCallExpression GetDryvClientCodeMethodCall(Expression expression)
+        {
+            return expression is MethodCallExpression callExpression2 && callExpression2.Method.DeclaringType == typeof(DryvClientCode)
+                ? callExpression2
+                : null;
+        }
 
         private static bool TryGetBinaryExpression(Expression expression, out BinaryExpression binaryExpression)
         {

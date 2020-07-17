@@ -13,19 +13,9 @@ namespace Dryv
             EnsurePreevaluationOptionTypes(rule);
 
             var optionsParameter = Expression.Parameter(typeof(object[]), "options");
-            Expression<Func<object[], bool>> resultLambda;
-
-            if (lambdaExpression != null)
-            {
-                var invokeArguments = new List<Expression>();
-                AddOptionParameters(invokeArguments, lambdaExpression, optionsParameter);
-                var invokeExpression = Expression.Invoke(lambdaExpression, invokeArguments);
-                resultLambda = Expression.Lambda<Func<object[], bool>>(invokeExpression, optionsParameter);
-            }
-            else
-            {
-                resultLambda = Expression.Lambda<Func<object[], bool>>(Expression.Constant(true), optionsParameter);
-            }
+            var resultLambda = lambdaExpression != null
+                ? CreateInvokingLambda(lambdaExpression, optionsParameter)
+                : CreateAlwaysTrueLambda(optionsParameter);
 
             return resultLambda.Compile();
         }
@@ -51,10 +41,7 @@ namespace Dryv
             return resultLambda.Compile();
         }
 
-        private static void AddOptionParameters(List<Expression> invokeArguments,
-                    LambdaExpression lambdaExpression,
-            Expression optionsParameters,
-            int skip = 0)
+        private static void AddOptionParameters(List<Expression> invokeArguments, LambdaExpression lambdaExpression, Expression optionsParameters, int skip = 0)
         {
             var index = 0;
 
@@ -62,6 +49,20 @@ namespace Dryv
                                      let indexConstant = Expression.Constant(index++)
                                      let arrayAccess = Expression.ArrayAccess(optionsParameters, indexConstant)
                                      select Expression.Convert(arrayAccess, options.Type));
+        }
+
+        private static Expression<Func<object[], bool>> CreateAlwaysTrueLambda(ParameterExpression optionsParameter)
+        {
+            return Expression.Lambda<Func<object[], bool>>(Expression.Constant(true), optionsParameter);
+        }
+
+        private static Expression<Func<object[], bool>> CreateInvokingLambda(LambdaExpression lambdaExpression, ParameterExpression optionsParameter)
+        {
+            var invokeArguments = new List<Expression>();
+            AddOptionParameters(invokeArguments, lambdaExpression, optionsParameter);
+            var invokeExpression = Expression.Invoke(lambdaExpression, invokeArguments);
+
+            return Expression.Lambda<Func<object[], bool>>(invokeExpression, optionsParameter);
         }
 
         private static void EnsurePreevaluationOptionTypes(DryvCompiledRule rule)

@@ -3,13 +3,12 @@ using System.Reflection;
 
 namespace Dryv.RuleDetection
 {
-    [DebuggerDisplay("{Property.Name}")]
+    [DebuggerDisplay("{" + nameof(Name) + "}")]
     public class ModelTreeEdge
     {
-        public PropertyInfo Property { get; set; }
-
-        public ModelTreeNode Parent { get; set; }
-
         public ModelTreeNode Child { get; set; }
+        public string Name => this.Property?.Name;
+        public ModelTreeNode Parent { get; set; }
+        public PropertyInfo Property { get; set; }
     }
 }

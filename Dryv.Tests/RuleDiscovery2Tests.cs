@@ -45,7 +45,7 @@ namespace Dryv.Tests
         public void FindeRuleOnParentNode()
         {
             var property = typeof(Model9).GetProperty(nameof(Model9.Text));
-            var allRules = this.sut.FindValidationRulesInTree(typeof(Model8), RuleType.Default);
+            var allRules = this.sut.FindValidationRulesInTree(typeof(Model8), RuleType.Validation);
             var rules = GetRulesForProperty(allRules, property);
 
             Assert.IsTrue(rules.Any());
@@ -65,7 +65,7 @@ namespace Dryv.Tests
             var model = new Model();
             var property = model.GetType().GetProperty(nameof(model.Text));
 
-            var allRules = this.sut.FindValidationRulesInTree(model.GetType(), RuleType.Default);
+            var allRules = this.sut.FindValidationRulesInTree(model.GetType(), RuleType.Validation);
             var rules = GetRulesForProperty(allRules, property);
 
             Assert.IsNotNull(rules);
@@ -78,7 +78,7 @@ namespace Dryv.Tests
             var model = new Model3();
             var property = model.GetType().GetProperty(nameof(model.Text));
 
-            var allRules = this.sut.FindValidationRulesInTree(model.GetType(), RuleType.Default);
+            var allRules = this.sut.FindValidationRulesInTree(model.GetType(), RuleType.Validation);
             var rules = GetRulesForProperty(allRules, property);
 
             Assert.IsNotNull(rules);
@@ -91,7 +91,7 @@ namespace Dryv.Tests
             var model = new Model5();
             var property = model.GetType().GetProperty(nameof(model.Text));
 
-            var allRules = this.sut.FindValidationRulesInTree(model.GetType(), RuleType.Default);
+            var allRules = this.sut.FindValidationRulesInTree(model.GetType(), RuleType.Validation);
             var rules = GetRulesForProperty(allRules, property);
 
             Assert.IsNotNull(rules);
@@ -104,7 +104,7 @@ namespace Dryv.Tests
             var model = new Model2();
             var property = model.GetType().GetProperty(nameof(model.Text));
 
-            var allRules = this.sut.FindValidationRulesInTree(model.GetType(), RuleType.Default);
+            var allRules = this.sut.FindValidationRulesInTree(model.GetType(), RuleType.Validation);
             var rules = GetRulesForProperty(allRules, property);
 
             Assert.IsNotNull(rules);
@@ -116,7 +116,7 @@ namespace Dryv.Tests
         {
             var property = typeof(Model7).GetProperty(nameof(Model7.Text));
 
-            var allRules = this.sut.FindValidationRulesInTree(typeof(Model7), RuleType.Default);
+            var allRules = this.sut.FindValidationRulesInTree(typeof(Model7), RuleType.Validation);
             var rules = GetRulesForProperty(allRules, property);
 
             Assert.IsNotNull(rules);
@@ -129,7 +129,7 @@ namespace Dryv.Tests
             var model = new Model4();
             var property = model.GetType().GetProperty(nameof(model.Text));
 
-            var allRules = this.sut.FindValidationRulesInTree(model.GetType(), RuleType.Default);
+            var allRules = this.sut.FindValidationRulesInTree(model.GetType(), RuleType.Validation);
             var rules = GetRulesForProperty(allRules, property);
 
             Assert.IsNotNull(rules);
@@ -150,7 +150,7 @@ namespace Dryv.Tests
 
             var property = typeof(Model11).GetProperty(nameof(Model11.Text));
 
-            var allRules = this.sut.FindValidationRulesInTree(model.GetType(), RuleType.Default);
+            var allRules = this.sut.FindValidationRulesInTree(model.GetType(), RuleType.Validation);
             var rules = GetRulesForProperty(allRules, property);
 
             Assert.IsNotNull(rules);

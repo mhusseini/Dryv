@@ -2,7 +2,7 @@
 
 namespace Dryv.Translation
 {
-    public class TranslatorProvider : ITranslatorProvider
+    public class TranslatorProvider
     {
         public ICollection<ICustomTranslator> GenericTranslators { get; } = new SortedSet<ICustomTranslator>(CustomTranslatorComparer.Default);
 

@@ -47,12 +47,12 @@ namespace Dryv.AspNetCore
             services.TryAddSingleton(typeof(IDryvClientValidationSetWriter), options.ClientValidationSetWriterType ?? DryvOptions.DefaultClientValidationSetWriterType);
             services.TryAddSingleton<ITranslator, JavaScriptTranslator>();
             services.TryAddSingleton<ModelTreeBuilder>();
+            services.TryAddSingleton<TranslatorProvider>();
             services.TryAddSingleton<DryvValidator>();
             services.TryAddSingleton<DryvCompiler>();
             services.TryAddSingleton<DryvTranslator>();
             services.TryAddSingleton<DryvRuleFinder>();
             services.TryAddSingleton<DryvClientWriter>();
-            services.TryAddSingleton<ITranslatorProvider, TranslatorProvider>();
             services.AddSingleton(Options.Create(options));
             services.AddSingleton(options);
 

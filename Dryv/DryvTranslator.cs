@@ -20,7 +20,7 @@ namespace Dryv
         public TranslatedExpressions TranslateValidationRules(Type modelType, Func<Type, object> serviceProvider)
         {
             var rules = this.ruleFinder
-                .FindValidationRulesInTree(modelType, RuleType.Default)
+                .FindValidationRulesInTree(modelType, RuleType.Validation)
                 .Where(rule => IsRuleEnabled(rule, serviceProvider))
                 .ToList();
 

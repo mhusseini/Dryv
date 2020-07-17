@@ -18,96 +18,96 @@ namespace Dryv.Translation
 
         private static readonly Dictionary<ExpressionType, string> Terminals = new Dictionary<ExpressionType, string>
         {
-            [ExpressionType.Add] = "+",
-            //[ExpressionType.AddChecked] = "",
-            [ExpressionType.And] = "&&",
-            [ExpressionType.AndAlso] = "&&",
-            //[ExpressionType.ArrayLength] = "",
             //[ExpressionType.ArrayIndex] = "",
+            //[ExpressionType.ArrayLength] = "",
+            //[ExpressionType.Block] = "",
             //[ExpressionType.Call] = "",
-            [ExpressionType.Coalesce] = "||",
-            [ExpressionType.Conditional] = "",
             //[ExpressionType.Constant] = "",
             //[ExpressionType.Convert] = "",
             //[ExpressionType.ConvertChecked] = "",
-            [ExpressionType.Divide] = "/",
-            [ExpressionType.Equal] = "===",
-            [ExpressionType.ExclusiveOr] = "||",
-            [ExpressionType.GreaterThan] = ">",
-            [ExpressionType.GreaterThanOrEqual] = ">=",
-            //[ExpressionType.Invoke] = "",
-            //[ExpressionType.Lambda] = "",
-            //[ExpressionType.LeftShift] = "",
-            [ExpressionType.LessThan] = "<",
-            [ExpressionType.LessThanOrEqual] = "<=",
-            //[ExpressionType.ListInit] = "",
-            //[ExpressionType.MemberAccess] = "",
-            //[ExpressionType.MemberInit] = "",
-            [ExpressionType.Modulo] = "%",
-            [ExpressionType.Multiply] = "*",
-            //[ExpressionType.MultiplyChecked] = "",
-            [ExpressionType.Negate] = "!",
-            [ExpressionType.UnaryPlus] = "++",
-            //[ExpressionType.NegateChecked] = "",
-            //[ExpressionType.New] = "",
-            //[ExpressionType.NewArrayInit] = "",
-            //[ExpressionType.NewArrayBounds] = "",
-            [ExpressionType.Not] = "!",
-            [ExpressionType.NotEqual] = "!=",
-            [ExpressionType.Or] = "||",
-            [ExpressionType.OrElse] = "||",
-            //[ExpressionType.Parameter] = "",
-            //[ExpressionType.Power] = "",
-            [ExpressionType.Quote] = "\"",
-            //[ExpressionType.RightShift] = "",
-            [ExpressionType.Subtract] = "-",
-            //[ExpressionType.SubtractChecked] = "",
-            //[ExpressionType.TypeAs] = "",
-            [ExpressionType.TypeIs] = "is",
-            [ExpressionType.Assign] = "=",
-            //[ExpressionType.Block] = "",
             //[ExpressionType.DebugInfo] = "",
-            [ExpressionType.Decrement] = "--",
-            //[ExpressionType.Dynamic] = "",
             //[ExpressionType.Default] = "",
+            //[ExpressionType.Dynamic] = "",
             //[ExpressionType.Extension] = "",
             //[ExpressionType.Goto] = "",
-            [ExpressionType.Increment] = "++",
             //[ExpressionType.Index] = "",
+            //[ExpressionType.Invoke] = "",
             //[ExpressionType.Label] = "",
-            //[ExpressionType.RuntimeVariables] = "",
+            //[ExpressionType.Lambda] = "",
+            //[ExpressionType.ListInit] = "",
             //[ExpressionType.Loop] = "",
+            //[ExpressionType.MemberAccess] = "",
+            //[ExpressionType.MemberInit] = "",
+            //[ExpressionType.New] = "",
+            //[ExpressionType.NewArrayBounds] = "",
+            //[ExpressionType.NewArrayInit] = "",
+            //[ExpressionType.OnesComplement] = "",
+            //[ExpressionType.Parameter] = "",
+            //[ExpressionType.RuntimeVariables] = "",
             //[ExpressionType.Switch] = "",
             //[ExpressionType.Throw] = "throw",
             //[ExpressionType.Try] = "",
-            //[ExpressionType.Unbox] = "",
-            [ExpressionType.AddAssign] = "+=",
-            [ExpressionType.AndAssign] = "&=",
-            [ExpressionType.DivideAssign] = "/=",
-            [ExpressionType.ExclusiveOrAssign] = "|=",
-            //[ExpressionType.LeftShiftAssign] = "",
-            //[ExpressionType.ModuloAssign] = "",
-            [ExpressionType.MultiplyAssign] = "*=",
-            [ExpressionType.OrAssign] = "|=",
-            //[ExpressionType.PowerAssign] = "",
-            //[ExpressionType.RightShiftAssign] = "",
-            [ExpressionType.SubtractAssign] = "-=",
-            //[ExpressionType.AddAssignChecked] = "",
-            //[ExpressionType.MultiplyAssignChecked] = "",
-            //[ExpressionType.SubtractAssignChecked] = "",
-            //[ExpressionType.PreIncrementAssign] = "",
-            //[ExpressionType.PreDecrementAssign] = "",
-            //[ExpressionType.PostIncrementAssign] = "",
-            //[ExpressionType.PostDecrementAssign] = "",
+            //[ExpressionType.TypeAs] = "",
             //[ExpressionType.TypeEqual] = "",
-            //[ExpressionType.OnesComplement] = "",
-            [ExpressionType.IsTrue] = "!== true",
+            //[ExpressionType.Unbox] = "",
+            [ExpressionType.Add] = "+",
+            [ExpressionType.AddAssign] = "+=",
+            [ExpressionType.AddAssignChecked] = "+=",
+            [ExpressionType.AddChecked] = "+",
+            [ExpressionType.And] = "&&",
+            [ExpressionType.AndAlso] = "&&",
+            [ExpressionType.AndAssign] = "&=",
+            [ExpressionType.Assign] = "=",
+            [ExpressionType.Coalesce] = "||",
+            //[ExpressionType.Conditional] = "",
+            [ExpressionType.Decrement] = "--",
+            [ExpressionType.Divide] = "/",
+            [ExpressionType.DivideAssign] = "/=",
+            [ExpressionType.Equal] = "===",
+            [ExpressionType.ExclusiveOr] = "||",
+            [ExpressionType.ExclusiveOrAssign] = "|=",
+            [ExpressionType.GreaterThan] = ">",
+            [ExpressionType.GreaterThanOrEqual] = ">=",
+            [ExpressionType.Increment] = "++",
             [ExpressionType.IsFalse] = "!== false",
+            [ExpressionType.IsTrue] = "!== true",
+            [ExpressionType.LeftShift] = "<<",
+            [ExpressionType.LeftShiftAssign] = "<<=",
+            [ExpressionType.LessThan] = "<",
+            [ExpressionType.LessThanOrEqual] = "<=",
+            [ExpressionType.Modulo] = "%",
+            [ExpressionType.ModuloAssign] = "%=",
+            [ExpressionType.Multiply] = "*",
+            [ExpressionType.MultiplyAssign] = "*=",
+            [ExpressionType.MultiplyAssignChecked] = "*=",
+            [ExpressionType.MultiplyChecked] = "*",
+            [ExpressionType.Negate] = "-",
+            [ExpressionType.NegateChecked] = "-",
+            [ExpressionType.Not] = "!",
+            [ExpressionType.NotEqual] = "!=",
+            [ExpressionType.Or] = "||",
+            [ExpressionType.OrAssign] = "|=",
+            [ExpressionType.OrElse] = "||",
+            [ExpressionType.PostDecrementAssign] = "--",
+            [ExpressionType.PostIncrementAssign] = "++",
+            [ExpressionType.Power] = "**",
+            [ExpressionType.PowerAssign] = "**=",
+            [ExpressionType.PreDecrementAssign] = "--",
+            [ExpressionType.PreIncrementAssign] = "++",
+            [ExpressionType.Quote] = "\"",
+            [ExpressionType.RightShift] = ">>",
+            [ExpressionType.RightShiftAssign] = ">>=",
+            [ExpressionType.Subtract] = "-",
+            [ExpressionType.SubtractAssign] = "-=",
+            [ExpressionType.SubtractAssignChecked] = "-=",
+            [ExpressionType.SubtractChecked] = "-",
+            [ExpressionType.TypeIs] = "is",
+            [ExpressionType.UnaryPlus] = "++",
         };
 
-        private readonly ITranslatorProvider translatorProvider;
+        private readonly TranslatorProvider translatorProvider;
 
-        public JavaScriptTranslator(ITranslatorProvider translatorProvider, DryvOptions options) : base(options)
+        public JavaScriptTranslator(TranslatorProvider translatorProvider, DryvOptions options) : base(options)
         {
             this.translatorProvider = translatorProvider;
         }
@@ -196,23 +196,6 @@ namespace Dryv.Translation
             {
                 this.Translate(expression.Right, context);
             }
-
-            //if (!TryWriteInjectedExpression(expression.Left, context))
-            //{
-            //    this.Translate(expression.Left, context);
-            //}
-
-            //if (!TryWriteTerminal(expression, context.Writer))
-            //{
-            //    throw expression.Method != null
-            //        ? (Exception)new DryvMethodNotSupportedException(expression)
-            //        : new DryvExpressionNotSupportedException(expression);
-            //}
-
-            //if (!TryWriteInjectedExpression(expression.Right, context))
-            //{
-            //    this.Translate(expression.Right, context);
-            //}
         }
 
         public override void Visit(BlockExpression expression, TranslationContext context, bool negated = false)
@@ -304,9 +287,7 @@ namespace Dryv.Translation
             context.Writer.IncrementIndent();
             context.Writer.Write("return ");
 
-#warning remove next line
             this.Translate(expression.Body, context);
-            // this.TranslateAsyncExpression(expression.Body, context);
 
             context.Writer.DecrementIndent();
             context.Writer.Write("}");
@@ -369,17 +350,42 @@ namespace Dryv.Translation
 
         public override void Visit(MemberExpression expression, TranslationContext context, bool negated = false)
         {
+            var asyncFinder = new AsyncMethodCallModifier(this, context);
+            var body = asyncFinder.ApplyPromises(expression);
+
+
+            foreach (var call in asyncFinder.AsyncCalls)
+            {
+                context.Writer.Write(call.Key.ToString());
+                context.Writer.Write(".then(function(");
+                context.Writer.Write(call.Value.Name);
+                context.Writer.Write("){return ");
+            }
+
             if (negated)
             {
                 context.Writer.Write("!(");
             }
 
-            this.WriteMember(expression, context);
+            if (asyncFinder.AsyncCalls.Any())
+            {
+                this.Translate(body, context);
+            }
+            else
+            {
+                this.WriteMember(expression, context);
+            }
 
             if (negated)
             {
                 context.Writer.Write(")");
             }
+
+            for (var i = 0; i < asyncFinder.AsyncCalls.Count; i++)
+            {
+                context.Writer.Write(";})");
+            }
+
         }
 
         public override void Visit(MemberInitExpression expression, TranslationContext context, bool negated = false)
@@ -698,40 +704,6 @@ namespace Dryv.Translation
 
             return expression;
         }
-
-        //private void TranslateAsyncExpression(Expression expression, TranslationContext context)
-        //{
-        //    var asyncFinder = new AsyncMethodCallModifier(this, context);
-        //    var body = asyncFinder.ApplyPromises(expression);
-
-        //    var skipLastThen = body.NodeType == ExpressionType.Parameter;
-        //    var limit = skipLastThen ? 1 : 0;
-        //    var count = asyncFinder.AsyncCalls.Count;
-
-        //    foreach (var call in asyncFinder.AsyncCalls)
-        //    {
-        //        context.Writer.Write(call.Key.ToString());
-
-        //        if (--count < limit)
-        //        {
-        //            break;
-        //        }
-
-        //        context.Writer.Write(".then(function(");
-        //        context.Writer.Write(call.Value.Name);
-        //        context.Writer.Write("){return ");
-        //    }
-
-        //    if (!skipLastThen)
-        //    {
-        //        this.Translate(body, context);
-        //    }
-
-        //    for (var i = limit; i < asyncFinder.AsyncCalls.Count; i++)
-        //    {
-        //        context.Writer.Write(";})");
-        //    }
-        //}
 
         private void WriteMember(MemberExpression expression, TranslationContext context)
         {

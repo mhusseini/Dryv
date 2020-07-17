@@ -47,7 +47,7 @@ namespace Dryv.AspNetCore.PreLoading
                                  where IsValidatable(t)
                                  select t)
             {
-                this.ruleFinder.FindValidationRulesInTree(type, RuleType.Default);
+                this.ruleFinder.FindValidationRulesInTree(type, RuleType.Validation);
                 this.ruleFinder.FindValidationRulesInTree(type, RuleType.Disabling);
             }
         }

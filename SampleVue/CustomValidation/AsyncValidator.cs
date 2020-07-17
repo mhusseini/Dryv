@@ -12,6 +12,8 @@ namespace Dryv.SampleVue.CustomValidation
 
         public string GetSomeString(string zipCode) => "XXX";
 
+        public TestResult Test(string something) => new TestResult { Text = something };
+
         public async Task<DryvValidationResult> ValidateZipCode(string zipCode, string city, int zipCodeLength)
         {
             return string.IsNullOrWhiteSpace(zipCode)
@@ -31,5 +33,10 @@ namespace Dryv.SampleVue.CustomValidation
                         ? null
                         : DryvValidationResult.Warning("The ZIP code should contain only zeros and even numbers. Are you sure you want to use it?");
         }
+    }
+
+    public class TestResult
+    {
+        public string Text { get; set; }
     }
 }
