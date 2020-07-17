@@ -13,9 +13,9 @@ namespace Dryv.Rework
     public class DryvValidator
     {
         private static readonly ConcurrentDictionary<Type, GroupedValidation> Cache = new ConcurrentDictionary<Type, GroupedValidation>();
-        private readonly RuleFinder ruleFinder;
+        private readonly DryvRuleFinder ruleFinder;
 
-        internal DryvValidator(RuleFinder ruleFinder)
+        public DryvValidator(DryvRuleFinder ruleFinder)
         {
             this.ruleFinder = ruleFinder;
         }

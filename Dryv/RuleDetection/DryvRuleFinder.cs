@@ -12,10 +12,11 @@ using Dryv.Rework.Compilation;
 using Dryv.RuleDetection;
 using Dryv.Rules;
 using Dryv.Translation;
+using Dryv.Translation.Visitors;
 
 namespace Dryv.Rework.RuleDetection
 {
-    internal class RuleFinder
+    public class DryvRuleFinder
     {
         private const BindingFlags BindingFlagsForProperties = BindingFlags.FlattenHierarchy |
                                                                BindingFlags.Instance |
@@ -29,12 +30,12 @@ namespace Dryv.Rework.RuleDetection
 
         private static readonly ConcurrentDictionary<string, IEnumerable<DryvCompiledRule>> CompiledRuleCache = new ConcurrentDictionary<string, IEnumerable<DryvCompiledRule>>();
         private static readonly ConcurrentDictionary<string, IEnumerable<DryvCompiledRule>> CompiledRuleTreeCache = new ConcurrentDictionary<string, IEnumerable<DryvCompiledRule>>();
-        private readonly RuleCompiler compiler;
+        private readonly DryvCompiler compiler;
         private readonly ModelTreeBuilder treeBuilder;
         private readonly DryvOptions options;
         private readonly ITranslator translator;
 
-        public RuleFinder(ModelTreeBuilder treeBuilder, RuleCompiler compiler, ITranslator translator, DryvOptions options)
+        public DryvRuleFinder(ModelTreeBuilder treeBuilder, DryvCompiler compiler, ITranslator translator, DryvOptions options)
         {
             this.compiler = compiler;
             this.treeBuilder = treeBuilder;
@@ -64,22 +65,39 @@ namespace Dryv.Rework.RuleDetection
                         if (node.UniquePath != rule.UniquePath)
                         {
                             var firstMember = node.Hierarchy.First();
-                            var parameter = Expression.Parameter(firstMember.DeclaringType, "m");
-                            Expression expression = parameter;
-                            var sb = new StringBuilder(parameter.Name);
+                            var modelParameter = Expression.Parameter(firstMember.DeclaringType, "$m");
+                            Expression modelReplacement = modelParameter;
+                            var sb = new StringBuilder(modelParameter.Name);
 
                             foreach (var memberInfo in node.Hierarchy)
                             {
                                 sb.Append(".");
                                 sb.Append(memberInfo.Name.ToCamelCase());
-                                expression = Expression.MakeMemberAccess(expression, memberInfo);
+                                modelReplacement = Expression.MakeMemberAccess(modelReplacement, memberInfo);
                             }
 
                             transposedPath = sb.ToString();
 
-                            newValidationExpression = Expression.Lambda(Expression.Invoke(rule.ValidationExpression, expression), parameter);
+                            var parameters = new List<ParameterExpression> { modelParameter };
+                            parameters.AddRange(rule.ValidationExpression.Parameters.Skip(1));
+
+                            if (rule.PreevaluationOptionTypes == null)
+                            {
+                                rule.PreevaluationOptionTypes = parameters.Skip(1).Select(p => p.Type).ToArray();
+                            }
+
+                            var innerParameters = parameters.Cast<Expression>().ToList();
+                            innerParameters[0] = modelReplacement;
+
+                            var replacer = new NodeReplacer();
+                            var body = replacer.Replace(
+                                rule.ValidationExpression.Body,
+                                rule.ValidationExpression.Parameters.First(),
+                                modelReplacement);
+
+                            newValidationExpression = Expression.Lambda(body, parameters);
                             newEnablingExpression = rule.EnablingExpression != null
-                                ? Expression.Lambda(Expression.Invoke(rule.EnablingExpression, expression), parameter)
+                                ? Expression.Lambda(body, parameters.Skip(1))
                                 : null;
                         }
                         else
@@ -92,20 +110,20 @@ namespace Dryv.Rework.RuleDetection
                         {
                             CompiledEnablingExpression = this.compiler.CompileEnablingExpression(rule, newEnablingExpression),
                             CompiledValidationExpression = this.compiler.CompileValidationExpression(rule, newValidationExpression),
-                            EnablingExpression = rule.EnablingExpression,
+                            EnablingExpression = newEnablingExpression,
+                            ValidationExpression = newValidationExpression,
                             EvaluationLocation = rule.EvaluationLocation,
                             PropertyExpression = rule.PropertyExpression,
-                            ValidationExpression = rule.ValidationExpression,
+                            PreevaluationOptionTypes = rule.PreevaluationOptionTypes,
                             GroupName = rule.GroupName,
                             IsDisablingRule = rule.IsDisablingRule,
                             ModelPath = GetEffectiveModelPath(rule.ModelPath, transposedPath, rule.Property),
-                            TransposedPath = transposedPath,
                             ModelType = rule.ModelType,
                             Property = rule.Property,
                             UniquePath = rule.UniquePath,
                         };
 
-                        this.Translate(transposedRule, rule.ValidationExpression);
+                        this.Translate(transposedRule, transposedRule.ValidationExpression);
 
                         result.Add(transposedRule);
                     }
@@ -138,8 +156,8 @@ namespace Dryv.Rework.RuleDetection
             processed.Add(rootType);
 
             var baseTypes = rootType
-                .Iterate(t => t.GetBaseType())
-                .Where(t => t.Namespace != typeof(object).Namespace)
+                .Iterate(t => t?.GetBaseType())
+                .Where(t => t != null && t.Namespace != typeof(object).Namespace)
                 .ToList();
 
             foreach (var rule in from type in baseTypes
@@ -151,6 +169,7 @@ namespace Dryv.Rework.RuleDetection
 
             foreach (var rule in from type in baseTypes
                                  from attribute in type.GetTypeInfo().GetCustomAttributes<DryvValidationAttribute>()
+                                 where attribute.RuleContainerType != null
                                  from rule in FindValidationRulesInTree(attribute.RuleContainerType, ruleType, processed)
                                  select rule)
             {
@@ -195,35 +214,33 @@ namespace Dryv.Rework.RuleDetection
 
         private static IEnumerable<DryvCompiledRule> GetRulesOfType(DryvRules rules, RuleType ruleType)
         {
-            return ruleType switch
-            {
-                RuleType.Disabling => rules.DisablingRules,
-                _ => rules.ValidationRules
-            };
+            return ruleType == RuleType.Disabling ? rules.DisablingRules : rules.ValidationRules;
         }
 
         private void Translate(DryvCompiledRule rule, Expression validationExpression)
         {
+            if (this.translator == null)
+            {
+                return;
+            }
+
             try
             {
-                var translation = translator.Translate(validationExpression, rule.PropertyExpression, rule);
+                var translation = this.translator.Translate(validationExpression, rule.PropertyExpression, rule);
                 rule.TranslatedValidationExpression = translation.Factory;
                 rule.PreevaluationOptionTypes = translation.OptionTypes;
                 rule.CodeTemplate = translation.CodeTemplate;
             }
             catch (DryvException ex)
             {
-                switch (this.options.TranslationErrorBehavior)
+                if (this.options.TranslationErrorBehavior != TranslationErrorBehavior.ValidateOnServer)
                 {
-                    case TranslationErrorBehavior.ValidateOnServer:
-                        rule.TranslatedValidationExpression = null;
-                        rule.PreevaluationOptionTypes = null;
-                        rule.TranslationError = ex;
-                        break;
-
-                    default:
-                        throw;
+                    throw;
                 }
+
+                rule.TranslatedValidationExpression = null;
+                rule.PreevaluationOptionTypes = null;
+                rule.TranslationError = ex;
             }
         }
     }

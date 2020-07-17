@@ -56,28 +56,15 @@ namespace Dryv.Tests
 
             var options = new DryvOptions();
             var treeBuilder = new ModelTreeBuilder();
-            var compiler = new RuleCompiler();
+            var compiler = new DryvCompiler();
             var javaScriptTranslator = new JavaScriptTranslator(translatorProvider, options);
-            var ruleFinder = new RuleFinder(treeBuilder, compiler, javaScriptTranslator, options);
+            var ruleFinder = new DryvRuleFinder(treeBuilder, compiler, javaScriptTranslator, options);
             var modelType = typeof(ParentModel);
             
             var validator = new DryvValidator(ruleFinder);
             var errors = await validator.Validate(m, t => new Thingy());
             var translator = new DryvTranslator(ruleFinder);
-            var code = translator.GetClientValidation(m.GetType(), t => null);
-        }
-
-        private static string GetClientModelPath(DryvCompiledRule r)
-        {
-            if (string.IsNullOrWhiteSpace(r.TransposedPath))
-            {
-                return r.ModelPath;
-            }
-
-            var parts = r.TransposedPath.Split('.');
-            var path = string.Join(".", parts.Skip(1).Select(p => p.ToCamelCase()));
-
-            return path;
+            var code = translator.TranslateValidationRules(m.GetType(), t => null);
         }
     }
 

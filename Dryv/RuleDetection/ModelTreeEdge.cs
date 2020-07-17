@@ -4,7 +4,7 @@ using System.Reflection;
 namespace Dryv.Rework.RuleDetection
 {
     [DebuggerDisplay("{Property.Name}")]
-    internal class ModelTreeEdge
+    public class ModelTreeEdge
     {
         public PropertyInfo Property { get; set; }
 

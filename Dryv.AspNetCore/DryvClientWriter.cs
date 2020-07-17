@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Dryv.AspNetCore.Razor;
+using Dryv.Rework;
 using Dryv.Validation;
 using Microsoft.AspNetCore.Html;
 
@@ -10,64 +11,54 @@ namespace Dryv.AspNetCore
 {
     public class DryvClientWriter
     {
-        private readonly DryvClientValidationLoader loader;
-        private readonly IDryvClientValidationSetWriter rulesWriter;
+        private readonly DryvTranslator translator;
+        private readonly IDryvClientValidationFunctionWriter functionWriter;
+        private readonly IDryvClientValidationSetWriter setWriter;
 
-        public DryvClientWriter(DryvClientValidationLoader loader, IDryvClientValidationSetWriter rulesWriter)
+        public DryvClientWriter(DryvTranslator translator, IDryvClientValidationFunctionWriter functionWriter, IDryvClientValidationSetWriter setWriter)
         {
-            this.loader = loader ?? throw new ArgumentNullException(nameof(loader));
-            this.rulesWriter = rulesWriter ?? throw new ArgumentNullException(nameof(rulesWriter));
+            this.translator = translator ?? throw new ArgumentNullException(nameof(translator));
+            this.functionWriter = functionWriter ?? throw new ArgumentNullException(nameof(functionWriter));
+            this.setWriter = setWriter ?? throw new ArgumentNullException(nameof(setWriter));
         }
 
-        public IHtmlContent WriteDryvValidation<TModel>(Func<Type, object> serviceProvider, string validationSetName)
+        public IHtmlContent WriteDryvValidation<TModel>(string validationSetName, Func<Type, object> serviceProvider)
         {
-            var validators = this.loader.GetDryvClientValidationFunctions<TModel>();
-            var disablers = this.loader.GetDryvClientDisablingFunctions<TModel>();
+            var translation = this.translator.TranslateValidationRules(typeof(TModel), serviceProvider);
+            var validators = translation.ValidationFunctions.ToDictionary(i => i.Key, i => this.functionWriter.GetValidationFunction(i.Value));
+            var disablers = translation.DisablingFunctions.ToDictionary(i => i.Key, i => this.functionWriter.GetValidationFunction(i.Value));
 
             return new LazyHtmlContent(writer =>
             {
-                this.rulesWriter.WriteBegin(writer, serviceProvider);
-                this.rulesWriter.WriteValidationSet(writer, validationSetName, validators, disablers, serviceProvider);
-                this.rulesWriter.WriteEnd(writer, serviceProvider);
+                this.setWriter.WriteBegin(writer);
+                this.setWriter.WriteValidationSet(writer, validationSetName, validators, disablers);
+                this.setWriter.WriteEnd(writer);
             });
-        }
-
-        public IHtmlContent WriteDryvValidation(Func<Type, object> serviceProvider, params (string, Type)[] validationSets)
-        {
-            var arguments = from x in validationSets
-                            select (
-                                name: x.Item1,
-                                validators: this.loader.GetDryvClientValidationFunctions(x.Item2),
-                                disablers: this.loader.GetDryvClientDisablingFunctions(x.Item2)
-                            );
-
-            return this.CreateHtmlContent(arguments, serviceProvider);
         }
 
         public IHtmlContent WriteDryvValidation(IEnumerable<KeyValuePair<string, Type>> validationSets, Func<Type, object> serviceProvider)
         {
-            var arguments = from x in validationSets
-                            select (
-                                name: x.Key,
-                                validators: this.loader.GetDryvClientValidationFunctions(x.Value),
-                                disablers: this.loader.GetDryvClientDisablingFunctions(x.Value)
-                            );
+            var resultSet = new Dictionary<string, (Dictionary<string, Action<TextWriter>> validators, Dictionary<string, Action<TextWriter>> disablers)>();
 
-            return this.CreateHtmlContent(arguments, serviceProvider);
-        }
+            foreach (var (setName, type) in validationSets)
+            {
+                var translation = this.translator.TranslateValidationRules(type, serviceProvider);
+                var validators = translation.ValidationFunctions.ToDictionary(i => i.Key, i => this.functionWriter.GetValidationFunction(i.Value));
+                var disablers = translation.DisablingFunctions.ToDictionary(i => i.Key, i => this.functionWriter.GetValidationFunction(i.Value));
 
-        private IHtmlContent CreateHtmlContent(IEnumerable<(string name, IDictionary<string, Action<Func<Type, object>, TextWriter>> validators, IDictionary<string, Action<Func<Type, object>, TextWriter>> disablers)> arguments, Func<Type, object> serviceProvider)
-        {
+                resultSet.Add(setName, (validators, disablers));
+            }
+
             return new LazyHtmlContent(writer =>
             {
-                this.rulesWriter.WriteBegin(writer, serviceProvider);
+                this.setWriter.WriteBegin(writer);
 
-                foreach (var (name, validators, disablers) in arguments)
+                foreach (var (setName, (validators, disablers)) in resultSet)
                 {
-                    this.rulesWriter.WriteValidationSet(writer, name, validators, disablers, serviceProvider);
+                    this.setWriter.WriteValidationSet(writer, setName, validators, disablers);
                 }
 
-                this.rulesWriter.WriteEnd(writer, serviceProvider);
+                this.setWriter.WriteEnd(writer);
             });
         }
     }

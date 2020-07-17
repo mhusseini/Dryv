@@ -6,10 +6,10 @@ namespace Dryv.Validation
 {
     public interface IDryvClientValidationSetWriter
     {
-        void WriteBegin(TextWriter writer, Func<Type, object> serviceProvider);
+        void WriteBegin(TextWriter writer);
 
-        void WriteEnd(TextWriter writer, Func<Type, object> serviceProvider);
+        void WriteEnd(TextWriter writer);
 
-        void WriteValidationSet(TextWriter writer, string validationSetName, IDictionary<string, Action<Func<Type, object>, TextWriter>> validators, IDictionary<string, Action<Func<Type, object>, TextWriter>> disablers, Func<Type, object> serviceProvider);
+        void WriteValidationSet(TextWriter writer, string validationSetName, IDictionary<string, Action<TextWriter>> validators, IDictionary<string, Action<TextWriter>> disablers);
     }
 }

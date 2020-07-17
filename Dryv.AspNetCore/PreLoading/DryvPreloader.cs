@@ -1,20 +1,22 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using Dryv.Rework.RuleDetection;
+using Dryv.RuleDetection;
 using Microsoft.Extensions.Options;
 
 namespace Dryv.AspNetCore.PreLoading
 {
     internal class DryvPreloader : IDisposable
     {
+        private readonly DryvRuleFinder ruleFinder;
         private readonly IOptions<DryvPreloaderOptions> options;
-        private readonly DryvClientValidationLoader preLoader;
         private bool hasStarted;
 
-        public DryvPreloader(IOptions<DryvPreloaderOptions> options, DryvClientValidationLoader preLoader)
+        public DryvPreloader(DryvRuleFinder ruleFinder, IOptions<DryvPreloaderOptions> options)
         {
+            this.ruleFinder = ruleFinder;
             this.options = options;
-            this.preLoader = preLoader;
         }
 
         public void Dispose()
@@ -46,7 +48,8 @@ namespace Dryv.AspNetCore.PreLoading
                                  where IsValidatable(t)
                                  select t)
             {
-                this.preLoader.GetDryvClientValidation(type);
+                this.ruleFinder.FindValidationRulesInTree(type, RuleType.Default);
+                this.ruleFinder.FindValidationRulesInTree(type, RuleType.Disabling);
             }
         }
 

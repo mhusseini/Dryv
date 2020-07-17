@@ -2,7 +2,7 @@
 
 namespace Dryv
 {
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Class)]
     public class DryvValidationAttribute : Attribute
     {
         public DryvValidationAttribute()

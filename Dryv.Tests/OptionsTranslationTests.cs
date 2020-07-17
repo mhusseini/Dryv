@@ -43,7 +43,6 @@ namespace Dryv.Tests
                         ? DryvValidationResult.Success
                         : "fail");
 
-            [DryvValidation]
             public abstract string Text { get; set; }
         }
     }

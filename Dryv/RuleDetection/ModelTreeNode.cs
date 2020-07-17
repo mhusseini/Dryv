@@ -6,7 +6,7 @@ using System.Reflection;
 namespace Dryv.Rework.RuleDetection
 {
     [DebuggerDisplay("{" + nameof(UniquePath) + "}")]
-    internal class ModelTreeNode
+    public class ModelTreeNode
     {
         public string UniquePath { get; set; }
         public string ModelPath { get; set; }

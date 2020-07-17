@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Dryv.RuleDetection;
 
 namespace Dryv.Validation
 {
     public class DryvAsyncClientValidationFunctionWriter : IDryvClientValidationFunctionWriter
     {
-        public Action<Func<Type, object>, TextWriter> GetValidationFunction(IDictionary<DryvRuleTreeNode, Func<Func<Type, object>, string>> translatedRules) =>
-            (serviceProvider, writer) =>
+        public Action<TextWriter> GetValidationFunction(IEnumerable<string> translatedRules) => writer =>
             {
                 writer.Write("dryv.r.bind(this, [");
                 var sep = string.Empty;
@@ -16,7 +14,7 @@ namespace Dryv.Validation
                 foreach (var rule in translatedRules)
                 {
                     writer.Write(sep);
-                    writer.Write(rule.Value(serviceProvider));
+                    writer.Write(rule);
                     sep = ",";
                 }
 

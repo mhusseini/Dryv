@@ -37,6 +37,11 @@ namespace Dryv.AspNetCore.Extensions
 
         public static Dictionary<string, DryvValidationResult> GetDryvValidationResults(this ActionContext actionContext, DryvResultType types = DryvResultType.Error) => actionContext.HttpContext.GetDryvValidationResults(types);
 
+        public static void SaveDryvValidationResults(this HttpContext httpContext, Dictionary<string, DryvValidationResult> results)
+        {
+            httpContext.Items.Add(typeof(Dictionary<string, DryvValidationResult>), results);
+        }
+
         public static Dictionary<string, DryvValidationResult> GetDryvValidationResults(this HttpContext httpContext, DryvResultType types = DryvResultType.Error)
         {
             return httpContext.Items.TryGetValue(typeof(Dictionary<string, DryvValidationResult>), out var o) &&

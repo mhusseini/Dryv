@@ -15,7 +15,7 @@ namespace Dryv.SampleVue.Models
 
     internal static class AddressValidation
     {
-        private static DryvRules<Address> ValidationRules = DryvRules.For<Address>()
+        public static DryvRules<Address> ValidationRules = DryvRules.For<Address>()
             .Rule(a => a.City, a => string.IsNullOrWhiteSpace(a.City) ? "Please enter a city." : null)
             .Rule(a => a.ZipCode, a => string.IsNullOrWhiteSpace(a.ZipCode) ? "Please enter a ZIP code." : null)
             .Rule<IOptions<SampleOptions>>(a => a.ZipCode, (a, o) => a.ZipCode.Trim().Length < o.Value.ZipCodeLength ? $"ZIP code must have at least {o.Value.ZipCodeLength} characters." : null)
@@ -23,13 +23,13 @@ namespace Dryv.SampleVue.Models
             .Rule(a => a.City, a => a.City.Contains("ass", StringComparison.OrdinalIgnoreCase) ? DryvValidationResult.Warning("Are you sure about this name?") : DryvValidationResult.Success);
     }
 
+    //[DryvValidation(typeof(AddressValidation))]
     public class Address
     {
+        private static DryvRules<Address> ValidationRules = AddressValidation.ValidationRules;
 
-        [DryvValidation(typeof(AddressValidation))]
         public string City { get; set; }
 
-        [DryvValidation]
         public string ZipCode { get; set; }
 
         public MyEnum SomeEnum { get; set; }

@@ -22,7 +22,6 @@ namespace Dryv.Rules
         public Exception TranslationError { get; internal set; }
         internal LambdaExpression EnablingExpression { get; set; }
         internal MemberExpression PropertyExpression { get; set; }
-        internal string TransposedPath { get; set; }
         internal string UniquePath { get; set; }
         internal LambdaExpression ValidationExpression { get; set; }
 

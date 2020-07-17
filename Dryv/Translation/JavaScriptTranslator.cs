@@ -442,7 +442,7 @@ namespace Dryv.Translation
 
         public override void Visit(ParameterExpression expression, TranslationContext context, bool negated = false)
         {
-            context.Writer.Write(string.IsNullOrWhiteSpace(context.Rule.TransposedPath) ? expression.Name : context.Rule.TransposedPath);
+            context.Writer.Write(expression.Name);
         }
 
         public override void Visit(RuntimeVariablesExpression expression, TranslationContext context, bool negated = false)

@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Dryv.Validation;
+using Dryv.AspNetCore.Extensions;
+using Dryv.Rework;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -52,22 +53,20 @@ namespace Dryv.AspNetCore.Internal
             var errors = await this.validator.Validate(model, controller.HttpContext.RequestServices.GetService);
             var resultDictionary = new Dictionary<string, DryvValidationResult>();
 
-            foreach (var x in from error in errors
-                              from message in error.Message
-                              select new { error, message })
+            foreach (var error in errors)
             {
-                resultDictionary.Add(x.error.Path, x.message);
+                resultDictionary.Add(error.Key, error.Value);
 
-                if (x.message.Type != DryvResultType.Error)
+                if (error.Value.Type != DryvResultType.Error)
                 {
                     continue;
                 }
 
                 result = false;
-                controller.ModelState.AddModelError(x.error.Path, x.message.Text);
+                controller.ModelState.AddModelError(error.Key, error.Value.Text);
             }
 
-            context.HttpContext.Items.Add(typeof(Dictionary<string, DryvValidationResult>), resultDictionary);
+            context.HttpContext.SaveDryvValidationResults(resultDictionary);
 
             return result;
         }

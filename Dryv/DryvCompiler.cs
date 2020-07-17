@@ -6,7 +6,7 @@ using Dryv.Rules;
 
 namespace Dryv.Rework.Compilation
 {
-    internal class RuleCompiler
+    public class DryvCompiler
     {
         public Func<object[], bool> CompileEnablingExpression(DryvCompiledRule rule, LambdaExpression lambdaExpression)
         {
@@ -14,6 +14,7 @@ namespace Dryv.Rework.Compilation
 
             var optionsParameter = Expression.Parameter(typeof(object[]), "options");
             Expression<Func<object[], bool>> resultLambda;
+
             if (lambdaExpression != null)
             {
                 var invokeArguments = new List<Expression>();

@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Dryv.Compilation;
 using Dryv.Configuration;
+using Dryv.Rework;
+using Dryv.Rework.Compilation;
+using Dryv.Rework.RuleDetection;
 using Dryv.RuleDetection;
 using Dryv.Validation;
 using Dryv.SampleConsole.Models;
@@ -19,12 +21,13 @@ internal class Program
             BillingAddress = new Address { Deactivated = true },
         };
 
-        var validator = new DryvValidator();
+        var options = new DryvOptions();
+        var validator = new DryvValidator(new DryvRuleFinder(new ModelTreeBuilder(), new DryvCompiler(), null, options));
+
         var errors = await validator.Validate(model, Activator.CreateInstance);
 
         foreach (var error in from e in errors
-                              from m in e.Message
-                              select m.Type + " " + e.Path + ": " + m.Text)
+                              select e.Value.Type + " " + e.Key + ": " + e.Value.Text)
         {
             Console.WriteLine(error);
         }
