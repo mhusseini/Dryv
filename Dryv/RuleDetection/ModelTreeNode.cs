@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 
-namespace Dryv.Rework.RuleDetection
+namespace Dryv.RuleDetection
 {
     [DebuggerDisplay("{" + nameof(UniquePath) + "}")]
     public class ModelTreeNode

@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Dryv.AspNetCore.DynamicControllers.CodeGeneration;
 using Dryv.AspNetCore.DynamicControllers.Endpoints;
+using Dryv.Extensions;
 using Dryv.Translation;
 using Dryv.Translation.Visitors;
 using Microsoft.AspNetCore.Mvc;
@@ -55,7 +56,7 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
 
             return f.FoundChildren
                 .Where(e => e.Member is PropertyInfo)
-                .Where(e => e.Member.DeclaringType == context.ModelType)
+                .Where(e => e.GetOuterExpression<ParameterExpression>().Type == context.ModelType)
                 .ToList();
         }
 

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Dryv.Reflection;
 
-namespace Dryv.Rework.RuleDetection
+namespace Dryv.RuleDetection
 {
     public class ModelTreeBuilder
     {

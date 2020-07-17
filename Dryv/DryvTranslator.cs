@@ -1,14 +1,12 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Dryv.Rework.RuleDetection;
 using Dryv.RuleDetection;
 using Dryv.Rules;
 using Dryv.Translation;
 
-namespace Dryv.Rework
+namespace Dryv
 {
     public class DryvTranslator
     {

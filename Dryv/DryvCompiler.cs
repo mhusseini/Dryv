@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using Dryv.Rules;
 
-namespace Dryv.Rework.Compilation
+namespace Dryv
 {
     public class DryvCompiler
     {

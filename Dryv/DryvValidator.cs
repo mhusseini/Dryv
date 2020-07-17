@@ -4,11 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Dryv.Extensions;
-using Dryv.Rework.RuleDetection;
 using Dryv.RuleDetection;
 using Dryv.Rules;
 
-namespace Dryv.Rework
+namespace Dryv
 {
     public class DryvValidator
     {

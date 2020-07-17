@@ -1,5 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
+using Dryv.AspNetCore.Extensions;
 using Dryv.Extensions;
 using Dryv.Translation;
 
@@ -15,22 +20,72 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
             w.Write(url);
             w.Write("','");
             w.Write(httpMethod);
-            w.Write("',{");
+            w.Write("',");
 
-            var sep = string.Empty;
+            var parameter = members.First().GetOuterExpression<ParameterExpression>();
+            var visitor = new ObjectWriter(translator, context, members.ToDictionary(m => m.Member, m => (Expression)m), w);
+            visitor.Write(parameter.Type);
 
-            foreach (var memberExpression in members)
+            w.Write(")");
+        }
+
+        private class ObjectWriter
+        {
+            private IDictionary<MemberInfo, Expression> members;
+            private readonly ITranslator translator;
+            private readonly TranslationContext context;
+            private TextWriter writer;
+            private Dictionary<Expression, List<Expression>> usedObjects;
+
+            public ObjectWriter(ITranslator translator, TranslationContext context, IDictionary<MemberInfo, Expression> members, TextWriter writer)
             {
-                w.Write(sep);
-                w.Write(memberExpression.Member.Name.ToCamelCase());
-                w.Write(":");
+                this.usedObjects = (from expression in members.Values
+                                    from outer in expression.GetOuterExpressions<ParameterExpression>().Select(containingExpression => (expression, containingExpression))
+                                    group outer.containingExpression by outer.expression)
+                    .ToDictionary(g => g.Key, g => g.ToList());
 
-                translator.Translate(memberExpression, context);
-
-                sep = ",";
+                this.members = members;
+                this.translator = translator;
+                this.context = context;
+                this.writer = writer;
             }
 
-            w.Write("})");
+            public void Write(Type type)
+            {
+                var sep = string.Empty;
+
+                this.writer.Write("{");
+
+                foreach (var member in type.GetPropertiesAndFields())
+                {
+                    if (!this.members.TryGetValue(member, out var expression))
+                    {
+                        continue;
+                    }
+
+                    this.writer.Write(sep);
+                    this.writer.Write("\"");
+                    this.writer.Write(member.Name.ToCamelCase());
+                    this.writer.Write("\"");
+                    this.writer.Write(":");
+
+                    if (member.IsNavigationMember())
+                    {
+                        if (this.usedObjects.ContainsKey(expression))
+                        {
+                            this.Write(member.GetMemberType());
+                        }
+                    }
+                    else
+                    {
+                        this.translator.Translate(expression, this.context);
+                    }
+
+                    sep = ",";
+                }
+
+                this.writer.Write("}");
+            }
         }
     }
 }

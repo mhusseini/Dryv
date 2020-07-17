@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 
-namespace Dryv.Rework.RuleDetection
+namespace Dryv.RuleDetection
 {
     [DebuggerDisplay("{Property.Name}")]
     public class ModelTreeEdge

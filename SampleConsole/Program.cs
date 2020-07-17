@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Dryv;
 using Dryv.Configuration;
-using Dryv.Rework;
-using Dryv.Rework.Compilation;
-using Dryv.Rework.RuleDetection;
 using Dryv.RuleDetection;
 using Dryv.Validation;
 using Dryv.SampleConsole.Models;

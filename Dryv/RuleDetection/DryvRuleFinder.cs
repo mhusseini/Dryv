@@ -8,13 +8,11 @@ using System.Text;
 using Dryv.Configuration;
 using Dryv.Extensions;
 using Dryv.Reflection;
-using Dryv.Rework.Compilation;
-using Dryv.RuleDetection;
 using Dryv.Rules;
 using Dryv.Translation;
 using Dryv.Translation.Visitors;
 
-namespace Dryv.Rework.RuleDetection
+namespace Dryv.RuleDetection
 {
     public class DryvRuleFinder
     {

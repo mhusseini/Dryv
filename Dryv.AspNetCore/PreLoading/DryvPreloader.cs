@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using Dryv.Rework.RuleDetection;
 using Dryv.RuleDetection;
 using Microsoft.Extensions.Options;
 

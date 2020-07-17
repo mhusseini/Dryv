@@ -2,8 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Dryv.Configuration;
-using Dryv.Rework.Compilation;
-using Dryv.Rework.RuleDetection;
 using Dryv.RuleDetection;
 using Dryv.Rules;
 using Dryv.Translation;

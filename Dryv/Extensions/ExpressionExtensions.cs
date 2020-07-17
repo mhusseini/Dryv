@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Dryv.Reflection;
 
-namespace Dryv.Translation
+namespace Dryv.Extensions
 {
     public static class ExpressionExtensions
     {
@@ -100,6 +100,39 @@ namespace Dryv.Translation
 
                     default:
                         return null;
+                }
+            }
+        }
+
+        public static IList<Expression> GetOuterExpressions<T>(this Expression expression)
+            where T : Expression
+        {
+            var list = new List<Expression>();
+
+            while (true)
+            {
+                switch (expression)
+                {
+                    case T _:
+                        return list;
+
+                    case MethodCallExpression methodCallExpression:
+                        expression = methodCallExpression.Object;
+                        list.Add(expression);
+                        continue;
+
+                    case InvocationExpression invocationExpression:
+                        expression = invocationExpression.Expression;
+                        list.Add(expression);
+                        continue;
+
+                    case MemberExpression memberExpression:
+                        expression = memberExpression.Expression;
+                        list.Add(expression);
+                        continue;
+
+                    default:
+                        return new List<Expression>();
                 }
             }
         }
