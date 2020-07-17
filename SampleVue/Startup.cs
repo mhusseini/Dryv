@@ -46,9 +46,9 @@ namespace Dryv.SampleVue
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
                 })
                 .AddDryv()
-                .AddDryvDynamicControllers()
-                //.AddDryvPreloading()
-                ;
+                .AddDryvDynamicControllers(options => options.GeneratedAssemblyOutput = ass => new Lokad.ILPack.AssemblyGenerator().GenerateAssembly(ass, ass.GetName().Name + ".dll"))
+            //.AddDryvPreloading()
+            ;
 
             services.AddSingleton<AsyncValidator>();
             services.AddSingleton<SyncValidator>();

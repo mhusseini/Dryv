@@ -103,8 +103,8 @@ namespace Dryv.Rules
 
 $prefixes = @("","Server","Client")
 
-for($i = 1; $i -lt 10; $i++) {
-	for($o = 0; $o -lt 9; $o++)	{
+for($i = 1; $i -lt 6; $i++) {
+	for($o = 0; $o -lt 6; $o++)	{
 		foreach ($prefix in $prefixes) {
 			WriteMethod -propCount $i -optionCount $o -methodPrefix $prefix;
 		}

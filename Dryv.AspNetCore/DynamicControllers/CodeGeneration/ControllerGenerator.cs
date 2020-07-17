@@ -5,7 +5,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
 namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
@@ -84,16 +83,6 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
             field.SetValue(null, lambda.Compile());
 
             this.options.Value.GeneratedAssemblyOutput?.Invoke(assemblyBuilder);
-
-            //var generator = new Lokad.ILPack.AssemblyGenerator();
-            //generator.GenerateAssembly(assemblyBuilder, $"{typeNameBase}.dll");
-            //Process.Start(new ProcessStartInfo
-            //{
-            //    UseShellExecute = true,
-            //    WindowStyle = ProcessWindowStyle.Normal,
-            //    FileName = "dotnet",
-            //    Arguments = $"ildasm {typeNameBase}.dll -o EMIT.ildasm --force",
-            //}).WaitForExit();
 
             return assemblyBuilder;
         }

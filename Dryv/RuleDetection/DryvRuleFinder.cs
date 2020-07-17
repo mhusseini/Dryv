@@ -31,9 +31,9 @@ namespace Dryv.Rework.RuleDetection
         private static readonly ConcurrentDictionary<string, IEnumerable<DryvCompiledRule>> CompiledRuleCache = new ConcurrentDictionary<string, IEnumerable<DryvCompiledRule>>();
         private static readonly ConcurrentDictionary<string, IEnumerable<DryvCompiledRule>> CompiledRuleTreeCache = new ConcurrentDictionary<string, IEnumerable<DryvCompiledRule>>();
         private readonly DryvCompiler compiler;
-        private readonly ModelTreeBuilder treeBuilder;
         private readonly DryvOptions options;
         private readonly ITranslator translator;
+        private readonly ModelTreeBuilder treeBuilder;
 
         public DryvRuleFinder(ModelTreeBuilder treeBuilder, DryvCompiler compiler, ITranslator translator, DryvOptions options)
         {
@@ -50,103 +50,19 @@ namespace Dryv.Rework.RuleDetection
                 var result = new List<DryvCompiledRule>();
                 var tree = this.treeBuilder.Build(rootType);
                 var flatTree = tree.Iterate(t => t.Children.Select(c => c.Child).Where(c => c != null)).ToList();
-                var rules = FindValidationRulesInTree(rootType, ruleType, new HashSet<Type>()).ToList();
+                var rules = FindRulesInModelTree(rootType, ruleType, new HashSet<Type>()).ToList();
 
                 foreach (var rule in rules)
                 {
-                    var nodes = flatTree.FindAll(n => n.UniquePath.EndsWith(rule.UniquePath));
-
-                    foreach (var node in nodes)
-                    {
-                        LambdaExpression newValidationExpression;
-                        LambdaExpression newEnablingExpression;
-                        string transposedPath = null;
-
-                        if (node.UniquePath != rule.UniquePath)
-                        {
-                            var firstMember = node.Hierarchy.First();
-                            var modelParameter = Expression.Parameter(firstMember.DeclaringType, "$m");
-                            Expression modelReplacement = modelParameter;
-                            var sb = new StringBuilder(modelParameter.Name);
-
-                            foreach (var memberInfo in node.Hierarchy)
-                            {
-                                sb.Append(".");
-                                sb.Append(memberInfo.Name.ToCamelCase());
-                                modelReplacement = Expression.MakeMemberAccess(modelReplacement, memberInfo);
-                            }
-
-                            transposedPath = sb.ToString();
-
-                            var parameters = new List<ParameterExpression> { modelParameter };
-                            parameters.AddRange(rule.ValidationExpression.Parameters.Skip(1));
-
-                            if (rule.PreevaluationOptionTypes == null)
-                            {
-                                rule.PreevaluationOptionTypes = parameters.Skip(1).Select(p => p.Type).ToArray();
-                            }
-
-                            var innerParameters = parameters.Cast<Expression>().ToList();
-                            innerParameters[0] = modelReplacement;
-
-                            var replacer = new NodeReplacer();
-                            var body = replacer.Replace(
-                                rule.ValidationExpression.Body,
-                                rule.ValidationExpression.Parameters.First(),
-                                modelReplacement);
-
-                            newValidationExpression = Expression.Lambda(body, parameters);
-                            newEnablingExpression = rule.EnablingExpression != null
-                                ? Expression.Lambda(body, parameters.Skip(1))
-                                : null;
-                        }
-                        else
-                        {
-                            newValidationExpression = rule.ValidationExpression;
-                            newEnablingExpression = rule.EnablingExpression;
-                        }
-
-                        var transposedRule = new DryvCompiledRule
-                        {
-                            CompiledEnablingExpression = this.compiler.CompileEnablingExpression(rule, newEnablingExpression),
-                            CompiledValidationExpression = this.compiler.CompileValidationExpression(rule, newValidationExpression),
-                            EnablingExpression = newEnablingExpression,
-                            ValidationExpression = newValidationExpression,
-                            EvaluationLocation = rule.EvaluationLocation,
-                            PropertyExpression = rule.PropertyExpression,
-                            PreevaluationOptionTypes = rule.PreevaluationOptionTypes,
-                            GroupName = rule.GroupName,
-                            IsDisablingRule = rule.IsDisablingRule,
-                            ModelPath = GetEffectiveModelPath(rule.ModelPath, transposedPath, rule.Property),
-                            ModelType = rule.ModelType,
-                            Property = rule.Property,
-                            UniquePath = rule.UniquePath,
-                        };
-
-                        this.Translate(transposedRule, transposedRule.ValidationExpression);
-
-                        result.Add(transposedRule);
-                    }
+                    var nodes = GetNodesForRule(flatTree, rule);
+                    result.AddRange(nodes.Select(node => this.ApplyRuleToNode(node, rule)));
                 }
 
                 return result;
             });
         }
 
-
-        private static string GetEffectiveModelPath(string originalPath, string transposedPath, PropertyInfo property)
-        {
-            if (string.IsNullOrWhiteSpace(transposedPath))
-            {
-                return originalPath;
-            }
-
-            var parts = transposedPath.Split('.');
-            var path = string.Join(".", parts.Skip(1).Select(p => p.ToCamelCase()));
-
-            return path + "." + property.Name.ToCamelCase();
-        }
-        private static IEnumerable<DryvCompiledRule> FindValidationRulesInTree(Type rootType, RuleType ruleType, ICollection<Type> processed)
+        private static IEnumerable<DryvCompiledRule> FindRulesInModelTree(Type rootType, RuleType ruleType, ICollection<Type> processed)
         {
             if (processed.Contains(rootType))
             {
@@ -161,7 +77,7 @@ namespace Dryv.Rework.RuleDetection
                 .ToList();
 
             foreach (var rule in from type in baseTypes
-                                 from rule in FindValidationRulesOnType(type, ruleType)
+                                 from rule in FindRulesOnType(type, ruleType)
                                  select rule)
             {
                 yield return rule;
@@ -170,7 +86,7 @@ namespace Dryv.Rework.RuleDetection
             foreach (var rule in from type in baseTypes
                                  from attribute in type.GetTypeInfo().GetCustomAttributes<DryvValidationAttribute>()
                                  where attribute.RuleContainerType != null
-                                 from rule in FindValidationRulesInTree(attribute.RuleContainerType, ruleType, processed)
+                                 from rule in FindRulesInModelTree(attribute.RuleContainerType, ruleType, processed)
                                  select rule)
             {
                 yield return rule;
@@ -178,14 +94,14 @@ namespace Dryv.Rework.RuleDetection
 
             foreach (var rule in from property in rootType.GetProperties(BindingFlagsForProperties)
                                  where property.PropertyType.Namespace != typeof(object).Namespace
-                                 from rule in FindValidationRulesInTree(property.PropertyType, ruleType, processed)
+                                 from rule in FindRulesInModelTree(property.PropertyType, ruleType, processed)
                                  select rule)
             {
                 yield return rule;
             }
         }
 
-        private static IEnumerable<DryvCompiledRule> FindValidationRulesOnType(Type type, RuleType ruleType)
+        private static IEnumerable<DryvCompiledRule> FindRulesOnType(Type type, RuleType ruleType)
         {
             return CompiledRuleCache.GetOrAdd($"{type.FullName}|{ruleType}", _ =>
             {
@@ -212,9 +128,112 @@ namespace Dryv.Rework.RuleDetection
             });
         }
 
+        private static string GetEffectiveModelPath(string originalPath, string transposedPath, PropertyInfo property)
+        {
+            if (string.IsNullOrWhiteSpace(transposedPath))
+            {
+                return originalPath;
+            }
+
+            var parts = transposedPath.Split('.');
+            var path = string.Join(".", parts.Skip(1).Select(p => p.ToCamelCase()));
+
+            return path + "." + property.Name.ToCamelCase();
+        }
+
+        private static IEnumerable<ModelTreeNode> GetNodesForRule(List<ModelTreeNode> flatTree, DryvCompiledRule rule)
+        {
+            return flatTree.FindAll(n => n.UniquePath.EndsWith(rule.UniquePath));
+        }
+
         private static IEnumerable<DryvCompiledRule> GetRulesOfType(DryvRules rules, RuleType ruleType)
         {
             return ruleType == RuleType.Disabling ? rules.DisablingRules : rules.ValidationRules;
+        }
+
+        private static Type TransposeExpressions(ModelTreeNode node, DryvCompiledRule rule, out LambdaExpression newValidationExpression, out LambdaExpression newEnablingExpression, out string transposedPath)
+        {
+            var firstMember = node.Hierarchy.First();
+            var modelType = firstMember.DeclaringType;
+            var modelParameter = Expression.Parameter(modelType, "$m");
+            var modelReplacement = TransposePath(modelParameter, node, out transposedPath);
+
+            var parameters = new List<ParameterExpression> { modelParameter };
+            parameters.AddRange(rule.ValidationExpression.Parameters.Skip(1));
+
+            if (rule.PreevaluationOptionTypes == null)
+            {
+                rule.PreevaluationOptionTypes = parameters.Skip(1).Select(p => p.Type).ToArray();
+            }
+
+            var replacer = new NodeReplacer();
+            var body = replacer.Replace(
+                rule.ValidationExpression.Body,
+                rule.ValidationExpression.Parameters.First(),
+                modelReplacement);
+
+            newValidationExpression = Expression.Lambda(body, parameters);
+            newEnablingExpression = rule.EnablingExpression != null
+                ? Expression.Lambda(body, parameters.Skip(1))
+                : null;
+
+            return modelType;
+        }
+
+        private static Expression TransposePath(ParameterExpression modelParameter, ModelTreeNode node, out string transposedPath)
+        {
+            Expression modelReplacement = modelParameter;
+            var sb = new StringBuilder(modelParameter.Name);
+
+            foreach (var memberInfo in node.Hierarchy)
+            {
+                sb.Append(".");
+                sb.Append(memberInfo.Name.ToCamelCase());
+                modelReplacement = Expression.MakeMemberAccess(modelReplacement, memberInfo);
+            }
+
+            transposedPath = sb.ToString();
+            return modelReplacement;
+        }
+
+        private DryvCompiledRule ApplyRuleToNode(ModelTreeNode node, DryvCompiledRule rule)
+        {
+            LambdaExpression newValidationExpression;
+            LambdaExpression newEnablingExpression;
+            Type modelType;
+            string transposedPath = null;
+
+            if (node.UniquePath != rule.UniquePath)
+            {
+                modelType = TransposeExpressions(node, rule, out newValidationExpression, out newEnablingExpression, out transposedPath);
+            }
+            else
+            {
+                newValidationExpression = rule.ValidationExpression;
+                newEnablingExpression = rule.EnablingExpression;
+                modelType = rule.ModelType;
+            }
+
+            var transposedRule = new DryvCompiledRule
+            {
+                ModelType = modelType,
+                CompiledEnablingExpression = this.compiler.CompileEnablingExpression(rule, newEnablingExpression),
+                CompiledValidationExpression = this.compiler.CompileValidationExpression(rule, newValidationExpression),
+                EnablingExpression = newEnablingExpression,
+                ValidationExpression = newValidationExpression,
+                EvaluationLocation = rule.EvaluationLocation,
+                PropertyExpression = rule.PropertyExpression,
+                PreevaluationOptionTypes = rule.PreevaluationOptionTypes,
+                GroupName = rule.GroupName,
+                IsDisablingRule = rule.IsDisablingRule,
+                ModelPath = GetEffectiveModelPath(rule.ModelPath, transposedPath, rule.Property),
+                Property = rule.Property,
+                UniquePath = rule.UniquePath,
+            };
+
+            this.Translate(transposedRule, transposedRule.ValidationExpression);
+
+            return transposedRule;
         }
 
         private void Translate(DryvCompiledRule rule, Expression validationExpression)

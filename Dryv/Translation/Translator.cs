@@ -167,7 +167,7 @@ namespace Dryv.Translation
                 OptionsTypes = optionTypes,
                 Writer = writer,
                 OptionDelegates = optionDelegates,
-                ModelType = propertyExpression?.Expression.GetExpressionType(),
+                ModelType = rule.ModelType,
                 PropertyExpression = propertyExpression?.Expression,
                 GroupName = rule.GroupName,
                 StringBuilder = sb,
