@@ -58,7 +58,7 @@ namespace Dryv.Tests
             var ruleFinder = new DryvRuleFinder(treeBuilder, compiler, javaScriptTranslator, options);
             var modelType = typeof(ParentModel);
             
-            var validator = new DryvValidator(ruleFinder);
+            var validator = new DryvValidator(ruleFinder, options);
             var errors = await validator.Validate(m, t => new Thingy());
             var translator = new DryvTranslator(ruleFinder);
             var code = translator.TranslateValidationRules(m.GetType(), t => null);

@@ -20,7 +20,7 @@ internal class Program
         };
 
         var options = new DryvOptions();
-        var validator = new DryvValidator(new DryvRuleFinder(new ModelTreeBuilder(), new DryvCompiler(), null, options));
+        var validator = new DryvValidator(new DryvRuleFinder(new ModelTreeBuilder(), new DryvCompiler(), null, options), options);
 
         var errors = await validator.Validate(model, Activator.CreateInstance);
 
