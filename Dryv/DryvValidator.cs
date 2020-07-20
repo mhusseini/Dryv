@@ -2,21 +2,26 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using Dryv.Configuration;
 using Dryv.Extensions;
 using Dryv.RuleDetection;
 using Dryv.Rules;
+using Dryv.Validation;
 
 namespace Dryv
 {
     public class DryvValidator
     {
         private static readonly ConcurrentDictionary<Type, GroupedValidation> Cache = new ConcurrentDictionary<Type, GroupedValidation>();
+        private readonly DryvOptions options;
         private readonly DryvRuleFinder ruleFinder;
 
-        public DryvValidator(DryvRuleFinder ruleFinder)
+        public DryvValidator(DryvRuleFinder ruleFinder, DryvOptions options)
         {
             this.ruleFinder = ruleFinder;
+            this.options = options;
         }
 
         public async Task<IDictionary<string, DryvValidationResult>> Validate(object model, Func<Type, object> serviceProvider)
@@ -29,48 +34,13 @@ namespace Dryv
             var modelType = model.GetType();
             var validation = Cache.GetOrAdd(modelType, this.GroupValidation);
             var taskResults = await Task.WhenAll(from kvp in validation.ValidationRules
-                                                 where !IsSubtreeDisabled(model, kvp.Key, validation.DisablingRules, serviceProvider)
-                                                 select GetFirstValidationError(model, serviceProvider, kvp));
+                                                 where !this.IsSubtreeDisabled(model, kvp.Key, validation.DisablingRules, serviceProvider)
+                                                 select this.GetFirstValidationError(model, serviceProvider, kvp));
 
             return (from result in taskResults
                     where result.HasValue
                     select result.Value)
                 .ToDictionary(i => i.Key, i => i.Value);
-        }
-
-        private static async Task<KeyValuePair<string, DryvValidationResult>?> GetFirstValidationError(object model, Func<Type, object> serviceProvider, KeyValuePair<string, List<DryvCompiledRule>> kvp)
-        {
-            foreach (var rule in kvp.Value)
-            {
-                var services = rule.PreevaluationOptionTypes.Select(serviceProvider).ToArray();
-                if (!rule.CompiledEnablingExpression(services))
-                {
-                    continue;
-                }
-
-                var result = await TryGetValidationResult(model, rule, services);
-                if (result == null)
-                {
-                    return null;
-                }
-
-                result.GroupName = rule.GroupName;
-
-                return new KeyValuePair<string, DryvValidationResult>(kvp.Key, result);
-            }
-
-            return null;
-        }
-
-        private static bool IsSubtreeDisabled(object model, string modelPath, IReadOnlyDictionary<string, List<DryvCompiledRule>> disablingRules, Func<Type, object> serviceProvider)
-        {
-            return disablingRules.TryGetValue(modelPath, out var disablers) && disablers.Any(d =>
-            {
-                var services = d.PreevaluationOptionTypes.Select(serviceProvider).ToArray();
-                var o = d.CompiledValidationExpression(model, services);
-
-                return !(o is bool) || (bool)o;
-            });
         }
 
         private static async Task<DryvValidationResult> TryGetValidationResult(object model, DryvCompiledRule rule, object[] services)
@@ -92,6 +62,37 @@ namespace Dryv
             }
         }
 
+        private async Task<KeyValuePair<string, DryvValidationResult>?> GetFirstValidationError(object model, Func<Type, object> serviceProvider, KeyValuePair<string, List<DryvCompiledRule>> kvp)
+        {
+            foreach (var rule in kvp.Value)
+            {
+                try
+                {
+                    var services = rule.PreevaluationOptionTypes.Select(serviceProvider).ToArray();
+                    if (!rule.CompiledEnablingExpression(services))
+                    {
+                        continue;
+                    }
+
+                    var result = await TryGetValidationResult(model, rule, services);
+                    if (result == null)
+                    {
+                        return null;
+                    }
+
+                    result.GroupName = rule.GroupName;
+
+                    return new KeyValuePair<string, DryvValidationResult>(kvp.Key, result);
+                }
+                catch (Exception ex)
+                {
+                    throw this.ThrowValidationException(model, rule, ex, RuleType.Validation);
+                }
+            }
+
+            return null;
+        }
+
         private GroupedValidation GroupValidation(Type type)
         {
             return new GroupedValidation
@@ -104,6 +105,40 @@ namespace Dryv
                     .GroupBy(r => r.ModelPath)
                     .ToDictionary(g => g.Key, g => g.ToList())
             };
+        }
+
+        private bool IsSubtreeDisabled(object model, string modelPath, IReadOnlyDictionary<string, List<DryvCompiledRule>> disablingRules, Func<Type, object> serviceProvider)
+        {
+            return disablingRules.TryGetValue(modelPath, out var disablers) && disablers.Any(rule =>
+            {
+                try
+                {
+                    var services = rule.PreevaluationOptionTypes.Select(serviceProvider).ToArray();
+                    var o = rule.CompiledValidationExpression(model, services);
+
+                    return !(o is bool) || (bool)o;
+                }
+                catch (Exception ex)
+                {
+                    throw this.ThrowValidationException(model, rule, ex, RuleType.Disabling);
+                }
+            });
+        }
+
+        private Exception ThrowValidationException(object model, DryvCompiledRule rule, Exception innerException, RuleType ruleType)
+        {
+            var json = this.options.JsonConversion(model);
+            var expressionText = rule.ValidationExpression.ToString();
+
+            var sb = new StringBuilder($"An error occurred executing the {ruleType.ToString().ToLowerInvariant()} expression '{expressionText}' for property '{rule.Property.DeclaringType.Name}.{rule.Property.Name}'. See the inner exception for details.");
+
+            if (this.options.IncludeModelDataInExceptions)
+            {
+                sb.AppendLine("The model being validated is:");
+                sb.Append(json);
+            }
+
+            return new DryvValidationException(sb.ToString(), innerException);
         }
 
         private class GroupedValidation

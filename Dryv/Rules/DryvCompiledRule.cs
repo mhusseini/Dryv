@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -6,6 +7,7 @@ using Dryv.Extensions;
 
 namespace Dryv.Rules
 {
+    [DebuggerDisplay("{" + nameof(ValidationExpression) + "}")]
     public sealed class DryvCompiledRule
     {
         public string CodeTemplate { get; internal set; }

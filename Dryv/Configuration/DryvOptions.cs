@@ -12,5 +12,6 @@ namespace Dryv.Configuration
         public bool DisableAutomaticValidation { get; set; }
         public Func<object, string> JsonConversion { get; set; }
         public TranslationErrorBehavior TranslationErrorBehavior { get; set; }
+        public bool IncludeModelDataInExceptions { get; set; }
     }
 }

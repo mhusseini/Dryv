@@ -8,8 +8,8 @@ namespace Dryv.AspNetCore.PreLoading
 {
     internal class DryvPreloader : IDisposable
     {
-        private readonly DryvRuleFinder ruleFinder;
         private readonly IOptions<DryvPreloaderOptions> options;
+        private readonly DryvRuleFinder ruleFinder;
         private bool hasStarted;
 
         public DryvPreloader(DryvRuleFinder ruleFinder, IOptions<DryvPreloaderOptions> options)
@@ -44,23 +44,12 @@ namespace Dryv.AspNetCore.PreLoading
             }
 
             foreach (var type in from t in assemblies.SelectMany(a => a.GetTypes())
-                                 where IsValidatable(t)
+                                 where t.GetCustomAttribute<DryvPreloadAttribute>() != null
                                  select t)
             {
                 this.ruleFinder.FindValidationRulesInTree(type, RuleType.Validation);
                 this.ruleFinder.FindValidationRulesInTree(type, RuleType.Disabling);
             }
-        }
-
-        private static bool IsValidatable(Type type)
-        {
-            if (type.GetCustomAttribute<DryvValidationAttribute>() != null)
-            {
-                return true;
-            }
-
-            var props = type.GetProperties(BindingFlags.Instance | BindingFlags.FlattenHierarchy | BindingFlags.Public);
-            return props.Any(p => p.GetCustomAttribute<DryvValidationAttribute>() != null);
         }
 
         private void CurrentDomainOnAssemblyLoad(object sender, AssemblyLoadEventArgs args)

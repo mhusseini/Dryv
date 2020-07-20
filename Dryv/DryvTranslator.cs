@@ -19,15 +19,17 @@ namespace Dryv
 
         public TranslatedExpressions TranslateValidationRules(Type modelType, Func<Type, object> serviceProvider)
         {
-            var rules = this.ruleFinder
+            var validationRules = this.ruleFinder
                 .FindValidationRulesInTree(modelType, RuleType.Validation)
                 .Where(rule => IsRuleEnabled(rule, serviceProvider))
                 .ToList();
-
-            var validationRules = rules.Where(r => !r.IsDisablingRule);
             var clientValidation = validationRules.Select(r => Translate(serviceProvider, r));
 
-            var disablingRules = rules.Where(r => r.IsDisablingRule);
+            var disablingRules = this.ruleFinder
+                .FindValidationRulesInTree(modelType, RuleType.Disabling)
+                .Where(rule => IsRuleEnabled(rule, serviceProvider))
+                .ToList();
+
             var clientDisablers = disablingRules.Select(r => Translate(serviceProvider, r));
 
             return new TranslatedExpressions
