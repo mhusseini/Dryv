@@ -127,15 +127,12 @@ namespace Dryv.RuleDetection
 
         private static string GetEffectiveModelPath(string originalPath, string transposedPath, PropertyInfo property)
         {
-            if (string.IsNullOrWhiteSpace(transposedPath))
-            {
-                return originalPath;
-            }
-
-            var parts = transposedPath.Split('.');
+            var basePath = string.IsNullOrWhiteSpace(transposedPath) ? originalPath : transposedPath;
+            var parts = basePath.Split('.');
             var path = string.Join(".", parts.Skip(1).Select(p => p.ToCamelCase()));
+            var sep = string.IsNullOrWhiteSpace(path) ? string.Empty : ".";
 
-            return path + "." + property.Name.ToCamelCase();
+            return path + sep + property.Name.ToCamelCase();
         }
 
         private static IEnumerable<ModelTreeNode> GetNodesForRule(List<ModelTreeNode> flatTree, DryvCompiledRule rule)
