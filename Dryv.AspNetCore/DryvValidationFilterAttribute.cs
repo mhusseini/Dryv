@@ -1,22 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Dryv.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Dryv.AspNetCore
 {
     /// <inheritdoc />
-    public class DryvValidationFilterAttribute : IAsyncActionFilter
+    public class DryvValidationFilterAttribute : Attribute, IAsyncActionFilter
     {
-        private readonly DryvValidator validator;
-
-        public DryvValidationFilterAttribute(DryvValidator validator)
-        {
-            this.validator = validator;
-        }
-
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             if (context.Filters.OfType<DryvDisableAttribute>().Any())
@@ -39,11 +34,12 @@ namespace Dryv.AspNetCore
         /// <summary>
         /// Validates the model and sets the model state on the controller accordingly.
         /// </summary>
-        public async Task<bool> ValidateAsync<TModel>(ActionExecutingContext context, TModel model)
+        private async Task<bool> ValidateAsync<TModel>(ActionExecutingContext context, TModel model)
         {
+            var validator = context.HttpContext.RequestServices.GetService<DryvValidator>();
             var controller = (Controller)context.Controller;
             var result = true;
-            var errors = await this.validator.Validate(model, controller.HttpContext.RequestServices.GetService);
+            var errors = await validator.Validate(model, controller.HttpContext.RequestServices.GetService);
             var resultDictionary = new Dictionary<string, DryvValidationResult>();
 
             foreach (var error in errors)
