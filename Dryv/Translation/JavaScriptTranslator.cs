@@ -164,8 +164,12 @@ namespace Dryv.Translation
         {
             var isEquals = expression.NodeType == ExpressionType.Equal;
             var isNotEquals = expression.NodeType == ExpressionType.NotEqual;
-            var leftIsNull = (isEquals || isNotEquals) && expression.Left is ConstantExpression c1 && c1.Value == null;
-            var rightIsNull = (isEquals || isNotEquals) && expression.Right is ConstantExpression c2 && c2.Value == null;
+
+            var leftType = EnumComparisionModifier.GetTypeOrNullable(expression.Left.Type).GetTypeInfo();
+            var rightType = EnumComparisionModifier.GetTypeOrNullable(expression.Right.Type).GetTypeInfo();
+
+            var leftIsNull = !leftType.IsValueType && (isEquals || isNotEquals) && expression.Left is ConstantExpression c1 && c1.Value == null;
+            var rightIsNull = !rightType.IsValueType && (isEquals || isNotEquals) && expression.Right is ConstantExpression c2 && c2.Value == null;
 
             if ((leftIsNull || rightIsNull) && !(isNotEquals ^ negated))
             {

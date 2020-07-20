@@ -99,7 +99,7 @@ namespace Dryv.Translation.Visitors
             return Expression.MakeBinary(node.NodeType, Expression.Constant(newValue), memberExpression, node.IsLiftedToNull, node.Method);
         }
 
-        private static Type GetTypeOrNullable(Type type)
+        public static Type GetTypeOrNullable(Type type)
         {
             return IsNullable(type) ? type.GetGenericArguments().First() : type;
         }
