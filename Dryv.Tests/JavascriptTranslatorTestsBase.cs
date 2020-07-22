@@ -69,8 +69,8 @@ namespace Dryv.Tests
 
             if (translators != null)
             {
-                translatorProvider.MethodCallTranslators.AddRange(translators.OfType<IMethodCallTranslator>());
-                translatorProvider.GenericTranslators.AddRange(translators.OfType<ICustomTranslator>());
+                translatorProvider.MethodCallTranslators.AddRange(translators.OfType<IDryvMethodCallTranslator>());
+                translatorProvider.GenericTranslators.AddRange(translators.OfType<IDryvCustomTranslator>());
             }
 
             return new JavaScriptTranslator(translatorProvider, new DryvOptions());
