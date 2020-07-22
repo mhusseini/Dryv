@@ -26,6 +26,7 @@ namespace Dryv.Rules
         internal MemberExpression PropertyExpression { get; set; }
         internal string UniquePath { get; set; }
         internal LambdaExpression ValidationExpression { get; set; }
+        public string Name { get; set; }
 
         public static DryvCompiledRule Create<TModel, TProperty>(Expression<Func<TModel, TProperty>> propertyExpression, LambdaExpression validationExpression, LambdaExpression enablingExpression, DryvRuleLocation ruleLocation, string groupName)
         {

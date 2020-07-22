@@ -15,9 +15,11 @@ namespace Dryv.Rules
             Expression<Func<TModel, TProperty>> property,
             LambdaExpression rule,
             LambdaExpression enabled,
+            string ruleName,
             DryvRuleLocation ruleLocation)
         {
             var ruleDefinition = DryvCompiledRule.Create(property, rule, enabled, ruleLocation, groupName);
+            ruleDefinition.Name = ruleName;
 
             this.ValidationRules.Add(ruleDefinition);
         }
@@ -49,11 +51,12 @@ namespace Dryv.Rules
             string groupName,
             LambdaExpression rule,
             IEnumerable<Expression<Func<TModel, TProperty>>> properties,
-            LambdaExpression ruleSwitch)
+            LambdaExpression ruleSwitch,
+            string ruleName)
         {
             foreach (var property in properties)
             {
-                this.Add(groupName, property, rule, ruleSwitch, DryvRuleLocation.Server | DryvRuleLocation.Client);
+                this.Add(groupName, property, rule, ruleSwitch, ruleName, DryvRuleLocation.Server | DryvRuleLocation.Client);
             }
         }
 
@@ -61,11 +64,12 @@ namespace Dryv.Rules
             string groupName,
             LambdaExpression rule,
             IEnumerable<Expression<Func<TModel, TProperty>>> properties,
-            LambdaExpression ruleSwitch)
+            LambdaExpression ruleSwitch,
+            string ruleName)
         {
             foreach (var property in properties)
             {
-                this.Add(groupName, property, rule, ruleSwitch, DryvRuleLocation.Server);
+                this.Add(groupName, property, rule, ruleSwitch, ruleName, DryvRuleLocation.Server);
             }
         }
 
@@ -73,11 +77,12 @@ namespace Dryv.Rules
             string groupName,
             LambdaExpression rule,
             IEnumerable<Expression<Func<TModel, TProperty>>> properties,
-            LambdaExpression ruleSwitch)
+            LambdaExpression ruleSwitch,
+        string ruleName)
         {
             foreach (var property in properties)
             {
-                this.Add(groupName, property, rule, ruleSwitch, DryvRuleLocation.Client);
+                this.Add(groupName, property, rule, ruleSwitch, ruleName, DryvRuleLocation.Client);
             }
         }
     }

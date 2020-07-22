@@ -66,8 +66,11 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
 
                 if (context.Expression is LambdaExpression lambdaExpression)
                 {
+                    var parameters = lambdaExpression.Parameters.Select(p => context.Translator.FormatIdentifier(p.Name)).ToList();
+                    parameters.Add("$context");
+
                     context.Writer.Write("function(");
-                    context.Writer.Write(string.Join(", ", lambdaExpression.Parameters.Select(p => context.Translator.FormatIdentifier(p.Name))));
+                    context.Writer.Write(string.Join(", ", parameters));
                     context.Writer.Write(") {");
                     context.Writer.Write("return ");
                 }

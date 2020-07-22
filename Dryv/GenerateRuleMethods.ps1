@@ -56,35 +56,39 @@ $parameters			Expression<Func<TModel, $($gen2)Task<bool>>> rule$ruleSwitch)
 
 	@"
 		public DryvRules<TModel> $($methodPrefix)Rule$gen(
-$parameters			Expression<Func<TModel, $($gen2)DryvValidationResult>> rule$ruleSwitch)
+$parameters			Expression<Func<TModel, $($gen2)DryvValidationResult>> rule$ruleSwitch, string ruleName = null)
         {
 			this.Add$($methodPrefix)(null, rule,
 				new[] { $properties},
-				$ruleSwitchArgument);
+				$ruleSwitchArgument,
+				ruleName);
 			return this;
         }
 		public DryvRules<TModel> $($methodPrefix)Rule$gen(string groupName,
-$parameters			Expression<Func<TModel, $($gen2)DryvValidationResult>> rule$ruleSwitch)
+$parameters			Expression<Func<TModel, $($gen2)DryvValidationResult>> rule$ruleSwitch, string ruleName = null)
         {
 			this.Add$($methodPrefix)(groupName, rule,
 				new[] { $properties},
-				$ruleSwitchArgument);
+				$ruleSwitchArgument,
+				ruleName);
 			return this;
         }
 		public DryvRules<TModel> $($methodPrefix)Rule$gen(
-$parameters			Expression<Func<TModel, $($gen2)Task<DryvValidationResult>>> rule$ruleSwitch)
+$parameters			Expression<Func<TModel, $($gen2)Task<DryvValidationResult>>> rule$ruleSwitch, string ruleName = null)
         {
 			this.Add$($methodPrefix)(null, rule,
 				new[] { $properties},
-				$ruleSwitchArgument);
+				$ruleSwitchArgument,
+				ruleName);
 			return this;
         }
 		public DryvRules<TModel> $($methodPrefix)Rule$gen(string groupName,
-$parameters			Expression<Func<TModel, $($gen2)Task<DryvValidationResult>>> rule$ruleSwitch)
+$parameters			Expression<Func<TModel, $($gen2)Task<DryvValidationResult>>> rule$ruleSwitch, string ruleName = null)
         {
 			this.Add$($methodPrefix)(groupName, rule,
 				new[] { $properties},
-				$ruleSwitchArgument);
+				$ruleSwitchArgument,
+				ruleName);
 			return this;
         }
 "@ | Add-Content $fn;

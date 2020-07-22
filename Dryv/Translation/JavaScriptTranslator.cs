@@ -300,8 +300,11 @@ namespace Dryv.Translation
 
         public override void Visit(LambdaExpression expression, TranslationContext context, bool negated = false)
         {
+            var parameters = expression.Parameters.Select(p => this.FormatIdentifier(p.Name)).ToList();
+            parameters.Add("$context");
+
             context.Writer.Write("function(");
-            context.Writer.Write(string.Join(", ", expression.Parameters.Select(p => this.FormatIdentifier(p.Name))));
+            context.Writer.Write(string.Join(", ", parameters));
             context.Writer.Write(") {");
             context.Writer.Write("return ");
 
@@ -454,11 +457,7 @@ namespace Dryv.Translation
 
         public override void Visit(NewExpression expression, TranslationContext context, bool negated = false)
         {
-            context.Writer.Write("new ");
-            context.Writer.Write(expression.Constructor.DeclaringType.Name);
-            context.Writer.Write("(");
-            MethodCallTranslator.WriteArguments(this, expression.Arguments, context);
-            context.Writer.Write(")");
+            context.Writer.Write("{}");
         }
 
         public override void Visit(ParameterExpression expression, TranslationContext context, bool negated = false)

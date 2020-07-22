@@ -40,7 +40,7 @@ namespace Dryv.Translation
         public ITranslator Translator { get; set; }
         public bool WhatIfMode { get; set; }
         public StringWriter Writer { get; set; }
-        internal DryvCompiledRule Rule { get; set; }
+        public DryvCompiledRule Rule { get; set; }
         internal StringBuilder StringBuilder { get; set; }
 
         public virtual T Clone<T>(StringBuilder sb = null)
