@@ -8,7 +8,7 @@ using Dryv.Reflection;
 
 namespace Dryv.Translation
 {
-    public abstract class MethodCallTranslator : IMethodCallTranslator
+    public abstract class MethodCallTranslator : IDryvMethodCallTranslator
     {
         private readonly List<RegexAndTranslator> methodTranslatorsByRegex = new List<RegexAndTranslator>();
 

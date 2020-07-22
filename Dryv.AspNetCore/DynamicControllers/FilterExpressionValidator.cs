@@ -12,7 +12,7 @@ namespace Dryv.AspNetCore.DynamicControllers
     {
         public static void ValidateFilterExpressions(Func<DryvControllerGenerationContext, IEnumerable<Expression<Func<Attribute>>>> filters)
         {
-            var dummyContext = new DryvControllerGenerationContext(typeof(FilterExpressionValidator.TestControllerDummy), typeof(FilterExpressionValidator.TestControllerDummy).GetMethods().First());
+            var dummyContext = new DryvControllerGenerationContext(typeof(TestControllerDummy), nameof(TestControllerDummy));
 
             foreach (var expression in from filter in filters(dummyContext)
                                        where filter != null

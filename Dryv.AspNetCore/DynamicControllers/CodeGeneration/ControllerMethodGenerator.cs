@@ -17,15 +17,15 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
 
         private static readonly MethodInfo JsonMethod = ControllerBaseType.GetMethod(nameof(DryvDynamicController.JsonSync));
 
-        public static void GenerateWrapperMethodGet(MethodInfo methodInfo, Type modelType, MethodCallExpression methodExpression, LambdaExpression lambda, TypeBuilder typeBuilder, FieldInfo delegateField, IDictionary<ParameterExpression, FieldBuilder> innerFields, DryvControllerGenerationContext context, DryvDynamicControllerOptions options)
+        public static void GenerateWrapperMethodGet(Type modelType, string action, Expression expression, LambdaExpression lambda, TypeBuilder typeBuilder, FieldInfo delegateField, IDictionary<ParameterExpression, FieldBuilder> innerFields, DryvControllerGenerationContext context, DryvDynamicControllerOptions options)
         {
             var isAsync = IsTaskType(lambda);
             var memberFinder = new ControllerGenerator.MemberFinder(modelType);
-            memberFinder.Visit(methodExpression);
+            memberFinder.Visit(expression);
             var properties = memberFinder.FoundMemberExpressions.Select(e => e.Member).Distinct().OfType<PropertyInfo>().ToList();
 
             var method = lambda.Type.GetMethod("Invoke");
-            var methodBuilder = CreateMethodBuilder(typeBuilder, methodInfo.Name, GetReturnType(lambda), properties.Select(p => p.PropertyType).ToArray(), context, options);
+            var methodBuilder = CreateMethodBuilder(typeBuilder, action, GetReturnType(lambda), properties.Select(p => p.PropertyType).ToArray(), context, options);
             var index = 1;
             var parameterBuilders = properties.ToDictionary(
                 p => p,
@@ -77,11 +77,11 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
             il.Emit(OpCodes.Ret);
         }
 
-        public static void GenerateWrapperMethodPost(MethodInfo methodInfo, Type modelType, LambdaExpression lambda, TypeBuilder typeBuilder, FieldInfo delegateField, IDictionary<ParameterExpression, FieldBuilder> innerFields, DryvControllerGenerationContext context, DryvDynamicControllerOptions options)
+        public static void GenerateWrapperMethodPost(Type modelType, string action, LambdaExpression lambda, TypeBuilder typeBuilder, FieldInfo delegateField, IDictionary<ParameterExpression, FieldBuilder> innerFields, DryvControllerGenerationContext context, DryvDynamicControllerOptions options)
         {
             var isAsync = IsTaskType(lambda);
             var method = lambda.Type.GetMethod("Invoke");
-            var methodBuilder = CreateMethodBuilder(typeBuilder, methodInfo.Name, GetReturnType(lambda), new[] { modelType }, context, options);
+            var methodBuilder = CreateMethodBuilder(typeBuilder, action, GetReturnType(lambda), new[] { modelType }, context, options);
             var parameterBuilder = methodBuilder.DefineParameter(1, ParameterAttributes.None, "model");
             parameterBuilder.SetCustomAttribute(ControllerAttributeGenerator.CreateAttributeBuilder<FromBodyAttribute>());
 

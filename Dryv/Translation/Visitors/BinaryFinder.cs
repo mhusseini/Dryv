@@ -7,9 +7,9 @@ namespace Dryv.Translation.Visitors
     {
         private readonly AsyncMethodCallFinder asyncFinder;
 
-        public BinaryFinder(JavaScriptTranslator translator, TranslationContext context)
+        public BinaryFinder(TranslationContext context)
         {
-            this.asyncFinder = new AsyncMethodCallFinder(translator, context);
+            this.asyncFinder = new AsyncMethodCallFinder(context);
         }
 
         public List<BinaryExpression> Binaries { get; } = new List<BinaryExpression>();

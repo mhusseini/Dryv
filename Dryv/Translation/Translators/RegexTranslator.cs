@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace Dryv.Translation.Translators
 {
-    public class RegexTranslator : MethodCallTranslator, ICustomTranslator
+    public class RegexTranslator : MethodCallTranslator, IDryvCustomTranslator
     {
         private static readonly PropertyInfo SuccessProperty = typeof(Group).GetTypeInfo().GetDeclaredProperty(nameof(Group.Success));
 

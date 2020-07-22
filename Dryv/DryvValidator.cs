@@ -68,7 +68,7 @@ namespace Dryv
             {
                 try
                 {
-                    var services = rule.PreevaluationOptionTypes.Select(serviceProvider).ToArray();
+                    var services = serviceProvider.GetServices(rule.PreevaluationOptionTypes);
                     if (!rule.CompiledEnablingExpression(services))
                     {
                         continue;
@@ -113,7 +113,7 @@ namespace Dryv
             {
                 try
                 {
-                    var services = rule.PreevaluationOptionTypes.Select(serviceProvider).ToArray();
+                    var services = serviceProvider.GetServices(rule.PreevaluationOptionTypes);
                     var o = rule.CompiledValidationExpression(model, services);
 
                     return !(o is bool) || (bool)o;

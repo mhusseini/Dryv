@@ -7,15 +7,14 @@ namespace Dryv.AspNetCore.DynamicControllers
     {
         private static readonly int ControllerLength = "controller".Length;
 
-        internal DryvControllerGenerationContext(MemberInfo type, MemberInfo method)
+        internal DryvControllerGenerationContext(MemberInfo type, string action)
         {
             var typeName = type.Name.Split('.').Last();
             var controller = typeName.Substring(0, typeName.Length - ControllerLength);
 
             this.ControllerFullName = type.Name;
             this.Controller = controller;
-            this.Action = method.Name;
-            this.RuleMethod = method;
+            this.Action = action;
         }
 
         public DryvControllerGenerationContext()
@@ -36,10 +35,5 @@ namespace Dryv.AspNetCore.DynamicControllers
         /// The full name of the generated controller.
         /// </summary>
         public string ControllerFullName { get; set; }
-
-        /// <summary>
-        /// The method that is used for the async method call in the validation rule.
-        /// </summary>
-        public MemberInfo RuleMethod { get; set; }
     }
 }

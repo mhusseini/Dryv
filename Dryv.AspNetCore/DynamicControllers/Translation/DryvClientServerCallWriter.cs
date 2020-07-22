@@ -7,6 +7,7 @@ using System.Reflection;
 using Dryv.AspNetCore.Extensions;
 using Dryv.Extensions;
 using Dryv.Translation;
+using Dryv.Translation.Visitors;
 
 namespace Dryv.AspNetCore.DynamicControllers.Translation
 {
@@ -22,7 +23,10 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
             w.Write(httpMethod);
             w.Write("',");
 
-            var parameter = members.First().GetOuterExpression<ParameterExpression>();
+
+            var parameter = members
+                .SelectMany(ExpressionNodeFinder<ParameterExpression>.FindChildrenStatic)
+                .First(p => p.Type == context.ModelType);
             var visitor = new ObjectWriter(translator, context, members.ToDictionary(m => m.Member, m => (Expression)m), w);
             visitor.Write(parameter.Type);
 

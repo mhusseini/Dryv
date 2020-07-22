@@ -22,7 +22,7 @@ namespace Dryv.AspNetCore.DynamicControllers.Endpoints
             this.options = options;
         }
 
-        public void Register(Assembly assembly, MethodInfo method)
+        public void Register(Assembly assembly, string action)
         {
             var assemblyPart = new AssemblyPart(assembly);
             this.partManager.ApplicationParts.Add(assemblyPart);
@@ -33,7 +33,7 @@ namespace Dryv.AspNetCore.DynamicControllers.Endpoints
                                      where typeof(Controller).IsAssignableFrom(t)
                                      select t)
                 {
-                    this.MapEndpoint(type, method);
+                    this.MapEndpoint(type, action);
                 }
             }
 
@@ -41,9 +41,9 @@ namespace Dryv.AspNetCore.DynamicControllers.Endpoints
             this.actionDescriptorChangeProvider.TokenSource?.Cancel();
         }
 
-        private void MapEndpoint(Type controllerTyp, MethodInfo method)
+        private void MapEndpoint(Type controllerTyp, string action)
         {
-            var context = new DryvControllerGenerationContext(controllerTyp, method);
+            var context = new DryvControllerGenerationContext(controllerTyp, action);
             this.options.Value.MapEndpoint(context, this.routeBuilderProvider.RouteBuilder);
         }
     }

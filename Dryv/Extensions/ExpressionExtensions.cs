@@ -76,34 +76,6 @@ namespace Dryv.Extensions
                 .ToList();
         }
 
-        public static T GetOuterExpression<T>(this Expression expression)
-        where T : Expression
-        {
-            while (true)
-            {
-                switch (expression)
-                {
-                    case T result:
-                        return result;
-
-                    case MethodCallExpression methodCallExpression:
-                        expression = methodCallExpression.Object;
-                        continue;
-
-                    case InvocationExpression invocationExpression:
-                        expression = invocationExpression.Expression;
-                        continue;
-
-                    case MemberExpression memberExpression:
-                        expression = memberExpression.Expression;
-                        continue;
-
-                    default:
-                        return null;
-                }
-            }
-        }
-
         public static IList<Expression> GetOuterExpressions<T>(this Expression expression)
             where T : Expression
         {
@@ -136,7 +108,6 @@ namespace Dryv.Extensions
                 }
             }
         }
-
 
         /// <summary>
         /// Returns the constant value or compiles and runs the expression and returns the result.

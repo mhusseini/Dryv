@@ -176,6 +176,11 @@ namespace Dryv.Translation
                 context.Writer.Write("!");
             }
 
+            if (TryWriteInjectedExpression(expression, context))
+            {
+                return;
+            }
+
             if (!TryWriteInjectedExpression(expression.Left, context))
             {
                 this.Translate(expression.Left, context);
@@ -307,7 +312,7 @@ namespace Dryv.Translation
 
         public override void Visit(ConditionalExpression expression, TranslationContext context, bool negated = false)
         {
-            var finder = new BinaryFinder(this, context);
+            var finder = new BinaryFinder(context);
 
             var asyncExpression = finder.Visit(expression.Test) is BinaryExpression chain && finder.AsyncExpressions.Any()
                 ? this.TranslateAsyncBooleanChain(chain, context, finder)
@@ -610,13 +615,13 @@ namespace Dryv.Translation
                 return false;
             }
 
-            var parameter = expression.Object.GetOuterExpression<ParameterExpression>();
-            if (parameter != null && !context.OptionsTypes.Contains(parameter.Type))
+            var parameters = ExpressionNodeFinder<ParameterExpression>.FindChildrenStatic(expression.Object);
+            if (parameters.Any(p => !context.OptionsTypes.Contains(p.Type)))
             {
                 return false;
             }
 
-            if (parameter == null && !expression.Method.IsStatic)
+            if (!parameters.Any() && !expression.Method.IsStatic)
             {
                 return false;
             }
@@ -632,17 +637,17 @@ namespace Dryv.Translation
                 return false;
             }
 
-            if (parameter == null && parameterExpressions.Any())
+            if (!parameters.Any() && parameterExpressions.Any())
             {
-                parameter = parameterExpressions.FirstOrDefault(p => context.OptionsTypes.Contains(p.Type));
+                parameters = parameterExpressions.Where(p => context.OptionsTypes.Contains(p.Type)).ToList();
             }
 
-            if (parameter == null)
+            if (!parameters.Any())
             {
                 return false;
             }
 
-            context.InjectRuntimeExpression(expression.Object ?? expression, parameter);
+            context.InjectRuntimeExpression(expression.Object ?? expression, parameters);
             return true;
         }
 
@@ -657,7 +662,7 @@ namespace Dryv.Translation
             return true;
         }
 
-        private string FormatIdentifier(string name)
+        public override string FormatIdentifier(string name)
         {
             return this.UseLowercaseMembers
                 ? name.Length == 1
@@ -670,6 +675,8 @@ namespace Dryv.Translation
         {
             switch (expression)
             {
+                case BinaryExpression _:
+                    return true;
                 case ConstantExpression _:
                 case ParameterExpression _:
                 case MethodCallExpression _:

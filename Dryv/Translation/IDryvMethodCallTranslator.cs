@@ -6,7 +6,7 @@ namespace Dryv.Translation
     /// <summary>
     /// Defines translators that translate method calls (specified by a <see cref="MethodCallExpression"/>). 
     /// </summary>
-    public interface IMethodCallTranslator
+    public interface IDryvMethodCallTranslator
     {
         /// <summary>
         /// A number specifying the order in which tha translator is called. The higher the number, the later the translator will get called.

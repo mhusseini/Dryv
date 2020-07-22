@@ -11,16 +11,16 @@ namespace Dryv.Configuration
         /// Registers a translator type.
         /// </summary>
         /// <typeparam name="T">The type of the translator to register.</typeparam>
-        /// <returns>The registered translator may implement <see cref="IMethodCallTranslator"/> 
-        /// or <see cref="ICustomTranslator"/>.</returns>
+        /// <returns>The registered translator may implement <see cref="IDryvMethodCallTranslator"/> 
+        /// or <see cref="IDryvCustomTranslator"/>.</returns>
         TBuilder AddTranslator<T>();
 
         /// <summary>
         /// Registers a translator object.
         /// </summary>
         /// <param name="translator">The type of the translator to register.</param>
-        /// <returns>The registered translator may implement <see cref="IMethodCallTranslator"/> 
-        /// or <see cref="ICustomTranslator"/>.</returns>
+        /// <returns>The registered translator may implement <see cref="IDryvMethodCallTranslator"/> 
+        /// or <see cref="IDryvCustomTranslator"/>.</returns>
         TBuilder AddTranslator(object translator);
     }
 }

@@ -17,8 +17,8 @@ namespace Dryv.AspNetCore
             app.ApplicationServices.GetService<DryvEndpointRouteBuilderProvider>().RouteBuilder = endpointRouteBuilder;
             var translatorProvider = app.ApplicationServices.GetService<TranslatorProvider>();
 
-            translatorProvider.MethodCallTranslators.AddRange(app.ApplicationServices.GetServices<IMethodCallTranslator>());
-            translatorProvider.GenericTranslators.AddRange(app.ApplicationServices.GetServices<ICustomTranslator>());
+            translatorProvider.MethodCallTranslators.AddRange(app.ApplicationServices.GetServices<IDryvMethodCallTranslator>());
+            translatorProvider.GenericTranslators.AddRange(app.ApplicationServices.GetServices<IDryvCustomTranslator>());
 
             foreach (var initializer in app.ApplicationServices.GetServices<DryvMvcInitializer>())
             {

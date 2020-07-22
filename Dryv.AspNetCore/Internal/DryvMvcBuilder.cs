@@ -18,21 +18,21 @@ namespace Dryv.AspNetCore.Internal
             var type = typeof(T);
             var used = false;
 
-            if (typeof(IMethodCallTranslator).IsAssignableFrom(type))
+            if (typeof(IDryvMethodCallTranslator).IsAssignableFrom(type))
             {
                 used = true;
-                this.Services.AddSingleton(typeof(IMethodCallTranslator), type);
+                this.Services.AddSingleton(typeof(IDryvMethodCallTranslator), type);
             }
 
-            if (typeof(ICustomTranslator).IsAssignableFrom(type))
+            if (typeof(IDryvCustomTranslator).IsAssignableFrom(type))
             {
                 used = true;
-                this.Services.AddSingleton(typeof(ICustomTranslator), type);
+                this.Services.AddSingleton(typeof(IDryvCustomTranslator), type);
             }
 
             if (!used)
             {
-                throw new ArgumentException($"A custom translator must implement {nameof(IMethodCallTranslator)} or {nameof(ICustomTranslator)}.");
+                throw new ArgumentException($"A custom translator must implement {nameof(IDryvMethodCallTranslator)} or {nameof(IDryvCustomTranslator)}.");
             }
 
             return this;
@@ -42,13 +42,13 @@ namespace Dryv.AspNetCore.Internal
         {
             var used = false;
 
-            if (translator is IMethodCallTranslator methodCallTranslator)
+            if (translator is IDryvMethodCallTranslator methodCallTranslator)
             {
                 used = true;
                 this.Services.AddSingleton(methodCallTranslator);
             }
 
-            if (translator is ICustomTranslator customTranslator)
+            if (translator is IDryvCustomTranslator customTranslator)
             {
                 used = true;
                 this.Services.AddSingleton(customTranslator);
@@ -56,7 +56,7 @@ namespace Dryv.AspNetCore.Internal
 
             if (!used)
             {
-                throw new ArgumentException($"A custom translator must implement {nameof(IMethodCallTranslator)} or {nameof(ICustomTranslator)}.");
+                throw new ArgumentException($"A custom translator must implement {nameof(IDryvMethodCallTranslator)} or {nameof(IDryvCustomTranslator)}.");
             }
 
             return this;

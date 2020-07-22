@@ -3,7 +3,7 @@ using Dryv.Rules;
 
 namespace Dryv.Translation.Translators
 {
-    public class CustomCodeTranslator : MethodCallTranslator, ICustomTranslator
+    public class CustomCodeTranslator : MethodCallTranslator, IDryvCustomTranslator
     {
         public CustomCodeTranslator()
         {

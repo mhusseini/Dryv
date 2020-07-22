@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Linq.Expressions;
 using Dryv.Extensions;
+using Dryv.Translation.Visitors;
 
 namespace Dryv.Translation
 {
@@ -31,9 +32,7 @@ namespace Dryv.Translation
         {
             if (!parameters.Any())
             {
-                parameters = expression is MethodCallExpression methodCallExpression
-                    ? methodCallExpression.Arguments.Select(a => a.GetOuterExpression<ParameterExpression>()).ToArray()
-                    : new ParameterExpression[0];
+                parameters = ExpressionNodeFinder<ParameterExpression>.FindChildrenStatic(expression);
             }
 
             var hash = expression.ToString().GetHashCode();

@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 
 namespace Dryv.Translation.Translators
 {
-    public class ObjectTranslator : ICustomTranslator
+    public class ObjectTranslator : IDryvCustomTranslator
     {
         public int? OrderIndex { get; set; }
         public bool? AllowSurroundingBrackets(Expression expression) => false;

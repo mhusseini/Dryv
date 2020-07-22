@@ -7,7 +7,5 @@ namespace Dryv.Translation
         public Expression Expression { get; set; }
 
         public bool Negated { get; set; }
-
-        public ITranslator Translator { get; set; }
     }
 }

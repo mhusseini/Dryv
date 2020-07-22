@@ -20,21 +20,18 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
             this.options = options;
         }
 
-        public Assembly CreateControllerAssembly(MethodCallExpression methodExpression, Type modelType)
+        public Assembly CreateControllerAssembly(Expression expression, Type modelType, string action)
         {
-            var methodInfo = methodExpression.Method;
-            return this.CreateAssembly(methodExpression, modelType, methodInfo);
+            return this.CreateAssembly(expression, modelType, action);
         }
 
-        private static List<ParameterExpression> FindParameters(Expression methodCallExpression)
+        public static List<ParameterExpression> FindParameters(Expression methodCallExpression)
         {
-            var finder = new ParameterFinder();
-            finder.Visit(methodCallExpression);
-
-            return finder.FoundChildren.Distinct().ToList();
+            //var finder = new ExpressionNodeFinder<ParameterExpression>();
+            return new ParameterFinder().Find(methodCallExpression);
         }
 
-        private Assembly CreateAssembly(MethodCallExpression methodExpression, Type modelType, MethodInfo methodInfo)
+        private Assembly CreateAssembly(Expression expression, Type modelType, string action)
         {
             var assemblyIndex = ++assemblyCount;
             var typeNameBase = $"DryvDynamic{assemblyIndex}";
@@ -49,13 +46,15 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
             var moduleBuilder = assemblyBuilder.DefineDynamicModule(assemblyName.Name);
             var typeBuilder = moduleBuilder.DefineType($"{NameSpace}.{typeNameBase}Controller", TypeAttributes.Class | TypeAttributes.Public, baseType);
 
-            var context = new DryvControllerGenerationContext(typeBuilder, methodInfo);
+            var context = new DryvControllerGenerationContext(typeBuilder, action);
             ControllerAttributeGenerator.AddCustomAttributes(context, typeBuilder.SetCustomAttribute, this.options.Value.MapControllerFilters);
             ControllerAttributeGenerator.AddCustomAttributes(context, typeBuilder.SetCustomAttribute, () => new DryvDisableAttribute());
 
-            var parameters = FindParameters(methodExpression);
+            var parameters = FindParameters(expression);
             var modelParameter = parameters.Find(p => p.Type == modelType);
-            var lambda = Expression.Lambda(methodExpression, parameters);
+            var lambda = expression is LambdaExpression l
+                ? Expression.Lambda(l.Body, parameters)
+                : Expression.Lambda(expression, parameters);
 
             var delegateField = typeBuilder.DefineField("_delegate", lambda.Type, FieldAttributes.Private | FieldAttributes.Static);
             parameters.Remove(modelParameter);
@@ -68,11 +67,11 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
 
             if (this.options.Value.HttpMethod == DryvDynamicControllerMethods.Post)
             {
-                ControllerMethodGenerator.GenerateWrapperMethodPost(methodInfo, modelType, lambda, typeBuilder, delegateField, innerFields, context, this.options.Value);
+                ControllerMethodGenerator.GenerateWrapperMethodPost(modelType, action, lambda, typeBuilder, delegateField, innerFields, context, this.options.Value);
             }
             else
             {
-                ControllerMethodGenerator.GenerateWrapperMethodGet(methodInfo, modelType, methodExpression, lambda, typeBuilder, delegateField, innerFields, context, this.options.Value);
+                ControllerMethodGenerator.GenerateWrapperMethodGet(modelType, action, expression, lambda, typeBuilder, delegateField, innerFields, context, this.options.Value);
             }
 
             var type = typeBuilder.CreateType();

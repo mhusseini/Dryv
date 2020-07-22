@@ -5,7 +5,7 @@ using Dryv.Reflection;
 
 namespace Dryv.Translation.Translators
 {
-    public class DryvValidationResultTranslator : MethodCallTranslator, ICustomTranslator
+    public class DryvValidationResultTranslator : MethodCallTranslator, IDryvCustomTranslator
     {
         private static readonly MemberInfo SuccessMember = typeof(DryvValidationResult).GetMember("Success");
 

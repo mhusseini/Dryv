@@ -8,9 +8,17 @@ namespace Dryv.Translation.Visitors
         where TExpression : Expression
     {
         private Stack<Expression> stack = new Stack<Expression>();
+
         public List<TExpression> BlackList { get; } = new List<TExpression>();
+
         public List<TExpression> FoundChildren { get; } = new List<TExpression>();
+
         public Dictionary<TExpression, ICollection<Expression>> FoundChildrenWithStack { get; } = new Dictionary<TExpression, ICollection<Expression>>();
+
+        public static IList<TExpression> FindChildrenStatic(Expression expression)
+        {
+            return new ExpressionNodeFinder<TExpression>().FindChildren(expression);
+        }
 
         public List<TExpression> FindChildren(Expression node)
         {

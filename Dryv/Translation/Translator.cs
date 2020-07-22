@@ -39,6 +39,11 @@ namespace Dryv.Translation
             return value?.ToString();
         }
 
+        public virtual string FormatIdentifier(string name)
+        {
+            return name;
+        }
+
         public virtual void Visit(BinaryExpression expression, TranslationContext context, bool negated = false)
         {
         }

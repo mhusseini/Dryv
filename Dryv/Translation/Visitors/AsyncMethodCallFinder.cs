@@ -2,23 +2,26 @@
 
 namespace Dryv.Translation.Visitors
 {
-    internal class AsyncMethodCallFinder : ExpressionVisitor
+    public class AsyncMethodCallFinder : ExpressionVisitor
     {
-        private readonly JavaScriptTranslator translator;
         private readonly TranslationContext context;
         private bool isAsync;
+
+        public AsyncMethodCallFinder(TranslationContext context)
+        {
+            this.context = context;
+        }
+
+        public static bool ContainsAsyncCalls(TranslationContext context, Expression expression)
+        {
+            return new AsyncMethodCallFinder(context).IsAsync(expression);
+        }
 
         public bool IsAsync(Expression expression)
         {
             this.isAsync = false;
             this.Visit(expression);
             return this.isAsync;
-        }
-
-        public AsyncMethodCallFinder(JavaScriptTranslator translator, TranslationContext context)
-        {
-            this.translator = translator;
-            this.context = context;
         }
 
         protected override Expression VisitBinary(BinaryExpression node)
@@ -35,7 +38,7 @@ namespace Dryv.Translation.Visitors
             ctx.WhatIfMode = true;
             ctx.IsAsync = false;
 
-            this.translator.Translate(node, ctx);
+            this.context.Translator.Translate(node, ctx);
 
             if (!ctx.IsAsync)
             {

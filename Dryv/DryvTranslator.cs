@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Dryv.Extensions;
 using Dryv.RuleDetection;
 using Dryv.Rules;
 using Dryv.Translation;
@@ -41,33 +42,25 @@ namespace Dryv
 
         private static bool IsRuleEnabled(DryvCompiledRule rule, Func<Type, object> serviceProvider)
         {
-            var arguments = rule.PreevaluationOptionTypes.Select(serviceProvider).ToArray();
+            var arguments = serviceProvider.GetServices(rule.PreevaluationOptionTypes);
             return rule.CompiledEnablingExpression(arguments);
         }
 
         private static KeyValuePair<string, string> Translate(Func<Type, object> serviceProvider, DryvCompiledRule rule)
         {
-            var services = rule.PreevaluationOptionTypes.Select(serviceProvider);
-            var arguments = new object[] { null }.Union(services).ToArray();
+            var services = serviceProvider.GetServices(rule.PreevaluationOptionTypes);
+
+            // index 0 was used to transpose the path. It isn't used anymore,
+            // but it was too cumbersome to update all that code :-)
+            // TODO: Update all that code.
+            var arguments = new object[services.Length + 1];
+            services.CopyTo(arguments, 1);
+
             try
             {
                 var code = rule.TranslatedValidationExpression(_ => null, arguments);
 
                 return new KeyValuePair<string, string>(rule.ModelPath, code);
-            }
-            catch (NullReferenceException ex)
-            {
-                var p = rule.ValidationExpression.Parameters;
-                var parameters = arguments.Select((o, i) => new { o, i }).Where(x => x.o == null).Select(x => $"'{p[x.i].Name}'").ToList();
-
-                var msg = parameters.Count switch
-                {
-                    0 => "An error occurred while translating the validation rule.",
-                    1 => $"The injected rule parameter {parameters.First()} is null.",
-                    _ => $"An injected rule parameter is null. Possible candidates are {string.Join(", ", parameters)}."
-                };
-
-                throw CreateException(msg, ex, rule);
             }
             catch (Exception ex)
             {

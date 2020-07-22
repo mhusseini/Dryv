@@ -5,7 +5,7 @@ namespace Dryv.Translation
     /// <summary>
     /// Defines translators that perform a custom translation of any given <see cref="Expression"/>.
     /// </summary>
-    public interface ICustomTranslator
+    public interface IDryvCustomTranslator
     {
         /// <summary>
         /// A number specifying the order in which tha translator is called. The higher the number, the later the translator will get called.

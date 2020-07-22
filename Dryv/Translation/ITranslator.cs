@@ -16,5 +16,7 @@ namespace Dryv.Translation
         void Translate(Expression expression, TranslationContext context, bool negated = false);
 
         string TranslateValue(object value);
+
+        string FormatIdentifier(string name);
     }
 }
