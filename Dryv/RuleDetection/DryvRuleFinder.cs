@@ -219,6 +219,7 @@ namespace Dryv.RuleDetection
                 PropertyExpression = rule.PropertyExpression,
                 PreevaluationOptionTypes = rule.PreevaluationOptionTypes,
                 GroupName = rule.GroupName,
+                Name = rule.Name,
                 IsDisablingRule = rule.IsDisablingRule,
                 ModelPath = GetEffectiveModelPath(rule.ModelPath, transposedPath, rule.Property),
                 Property = rule.Property,

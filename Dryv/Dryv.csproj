@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.2</TargetFramework>
-    <Version>6.0.0-pre.15</Version>
+    <Version>6.0.0-pre.16</Version>
     <Copyright>2020 Munir Husseini</Copyright>
     <PackageProjectUrl>https://github.com/mhusseini/Dryv</PackageProjectUrl>
     <PackageLicense>https://github.com/mhusseini/Dryv/blob/master/LICENSE</PackageLicense>

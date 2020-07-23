@@ -12,10 +12,10 @@ namespace Dryv.Translation
     public class TranslationContext
     {
         internal static int ParameterCount = 0;
-        public Dictionary<object, object> CustomData { get; private set; } = new Dictionary<object, object>();
-
         private bool isAsync;
+        public Dictionary<object, object> CustomData { get; private set; } = new Dictionary<object, object>();
         private string DebugView => this.StringBuilder?.Length > 0 ? this.StringBuilder.ToString() : "PARENT: " + this.ParentContext?.DebugView;
+        public List<Func<Expression, TranslationContext, bool>> DynamicTranslation { get; private set; } = new List<Func<Expression, TranslationContext, bool>>();
         public string GroupName { get; set; }
 
         public bool IsAsync
@@ -37,10 +37,10 @@ namespace Dryv.Translation
         public IList<Type> OptionsTypes { get; set; }
         public TranslationContext ParentContext { get; set; }
         public Expression PropertyExpression { get; set; }
+        public DryvCompiledRule Rule { get; set; }
         public ITranslator Translator { get; set; }
         public bool WhatIfMode { get; set; }
         public StringWriter Writer { get; set; }
-        public DryvCompiledRule Rule { get; set; }
         internal StringBuilder StringBuilder { get; set; }
 
         public virtual T Clone<T>(StringBuilder sb = null)
@@ -59,7 +59,8 @@ namespace Dryv.Translation
                 WhatIfMode = this.WhatIfMode,
                 Rule = this.Rule,
                 Translator = this.Translator,
-                CustomData= this.CustomData,
+                CustomData = this.CustomData,
+                DynamicTranslation = this.DynamicTranslation,
             };
         }
     }

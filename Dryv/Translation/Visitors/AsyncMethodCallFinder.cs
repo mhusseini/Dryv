@@ -5,7 +5,7 @@ namespace Dryv.Translation.Visitors
     public class AsyncMethodCallFinder : ExpressionVisitor
     {
         private readonly TranslationContext context;
-        private bool isAsync;
+        private int count;
 
         public AsyncMethodCallFinder(TranslationContext context)
         {
@@ -17,11 +17,21 @@ namespace Dryv.Translation.Visitors
             return new AsyncMethodCallFinder(context).IsAsync(expression);
         }
 
+        public static int GetAsyncCallCount(TranslationContext context, Expression expression)
+        {
+            return new AsyncMethodCallFinder(context).GetAsyncCallCount(expression);
+        }
+
+        public int GetAsyncCallCount(Expression expression)
+        {
+            this.Visit(expression);
+            return this.count;
+        }
+
         public bool IsAsync(Expression expression)
         {
-            this.isAsync = false;
             this.Visit(expression);
-            return this.isAsync;
+            return this.count > 0;
         }
 
         protected override Expression VisitBinary(BinaryExpression node)
@@ -40,12 +50,14 @@ namespace Dryv.Translation.Visitors
 
             this.context.Translator.Translate(node, ctx);
 
-            if (!ctx.IsAsync)
+            if (ctx.IsAsync)
             {
-                return base.VisitMethodCall(node);
+                this.count++;
             }
 
-            this.isAsync = true;
+            ctx.IsAsync = false;
+
+            return base.VisitMethodCall(node);
 
             return node;
         }

@@ -12,8 +12,8 @@ namespace Dryv.Translation.Translators
         public DryvValidationResultTranslator()
         {
             this.Supports<DryvValidationResult>();
-            this.AddMethodTranslator(nameof(DryvValidationResult.Error), Error);
-            this.AddMethodTranslator(nameof(DryvValidationResult.Warning), Warning);
+            this.AddMethodTranslator(nameof(DryvValidationResult.Error), ctx => Translate(ctx, "error"));
+            this.AddMethodTranslator(nameof(DryvValidationResult.Warning), ctx => Translate(ctx, "warning"));
             this.AddMethodTranslator(nameof(DryvValidationResult.Success), Success);
         }
 
@@ -31,32 +31,31 @@ namespace Dryv.Translation.Translators
             return true;
         }
 
-        private static void Error(MethodTranslationContext context)
-        {
-            context.Writer.Write("{ type:\"error\", text:");
-            context.Translator.Translate(context.Expression.Arguments.First(), context);
-            if (!string.IsNullOrWhiteSpace(context.GroupName))
-            {
-                context.Writer.Write(", groupName: ");
-                context.Writer.Write(QuoteValue(context.GroupName));
-            }
-            context.Writer.Write(" }");
-        }
-
         private static void Success(MethodTranslationContext context)
         {
             context.Writer.Write("null");
         }
 
-        private static void Warning(MethodTranslationContext context)
+        private static void Translate(MethodTranslationContext context, string resultType)
         {
-            context.Writer.Write("{ type:\"warning\", text:");
+            var data = context.Expression.Arguments.FirstOrDefault(a => a.Type == typeof(object));
+
+            context.Writer.Write("{ type:\"");
+            context.Writer.Write(resultType);
+            context.Writer.Write("\", text:");
             context.Translator.Translate(context.Expression.Arguments.First(), context);
             if (!string.IsNullOrWhiteSpace(context.GroupName))
             {
                 context.Writer.Write(", groupName: ");
                 context.Writer.Write(QuoteValue(context.GroupName));
             }
+
+            if (data != null)
+            {
+                context.Writer.Write(", data: ");
+                context.Translator.Translate(data, context);
+            }
+
             context.Writer.Write(" }");
         }
     }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using Dryv.Configuration;
 using Dryv.Extensions;
 using Dryv.Reflection;
@@ -128,7 +129,8 @@ namespace Dryv.Translation
             context2.Translator = this;
             context2.Negated = negated;
 
-            if (!this.translatorProvider.GenericTranslators.Any(t => t.TryTranslate(context2)))
+            if (!this.translatorProvider.GenericTranslators.Any(t => t.TryTranslate(context2)) &&
+                !context.DynamicTranslation.Any(t => t(expression, context2)))
             {
                 this.Visit((dynamic)expression, context2, negated);
             }
@@ -153,7 +155,7 @@ namespace Dryv.Translation
                     return "null";
 
                 case DryvValidationResult result:
-                    return TranslateValidationResultObject(result);
+                    return this.TranslateValidationResultObject(result);
 
                 default:
                     return this.Options.JsonConversion == null ? value.ToString() : this.Options.JsonConversion(value);
@@ -300,8 +302,14 @@ namespace Dryv.Translation
 
         public override void Visit(LambdaExpression expression, TranslationContext context, bool negated = false)
         {
-            var parameters = expression.Parameters.Select(p => this.FormatIdentifier(p.Name)).ToList();
-            parameters.Add("$context");
+            var parameters = new[]
+            {
+                expression.Parameters
+                    .Where(p => p.Type == context.ModelType)
+                    .Select(p => this.FormatIdentifier(p.Name))
+                    .FirstOrDefault(),
+                "$context"
+            }.Where(p => !string.IsNullOrWhiteSpace(p));
 
             context.Writer.Write("function(");
             context.Writer.Write(string.Join(", ", parameters));
@@ -545,7 +553,7 @@ namespace Dryv.Translation
             this.Translate(expression.Operand, context, negatedExpression);
         }
 
-        private static string TranslateValidationResultObject(DryvValidationResult result)
+        private string TranslateValidationResultObject(DryvValidationResult result)
         {
             if (result.Type == DryvResultType.Success)
             {
@@ -567,6 +575,11 @@ namespace Dryv.Translation
             sb.Append("type:\"");
             sb.Append(result.Type.ToString().ToLower());
             sb.Append("\"");
+            if (result.Data != null)
+            {
+                sb.Append("data: ");
+                sb.Append(this.Options.JsonConversion(result.Data));
+            }
             sb.Append("}");
 
             return sb.ToString();
@@ -577,6 +590,17 @@ namespace Dryv.Translation
             if (expression.Type == typeof(DryvValidationResult))
             {
                 return false;
+            }
+
+            var memberExpression = expression as MemberExpression;
+            while (memberExpression != null)
+            {
+                if (typeof(Task).IsAssignableFrom(memberExpression.Expression.Type))
+                {
+                    return false;
+                }
+
+                memberExpression = memberExpression.Expression as MemberExpression;
             }
 
             var visitor = new ExpressionNodeFinder<ParameterExpression>();

@@ -59,15 +59,21 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
 
             try
             {
-                if (!AsyncMethodCallFinder.ContainsAsyncCalls(context, context.Expression))
+                if (AsyncMethodCallFinder.GetAsyncCallCount(context, context.Expression) < 2)
                 {
                     return false;
                 }
 
                 if (context.Expression is LambdaExpression lambdaExpression)
                 {
-                    var parameters = lambdaExpression.Parameters.Select(p => context.Translator.FormatIdentifier(p.Name)).ToList();
-                    parameters.Add("$context");
+                    var parameters = new[]
+                    {
+                        lambdaExpression.Parameters
+                            .Where(p => p.Type == context.ModelType)
+                            .Select(p => context.Translator.FormatIdentifier(p.Name))
+                            .FirstOrDefault(),
+                        "$context"
+                    }.Where(p => !string.IsNullOrWhiteSpace(p));
 
                     context.Writer.Write("function(");
                     context.Writer.Write(string.Join(", ", parameters));
@@ -97,14 +103,17 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
 
         public bool Translate(MethodTranslationContext context)
         {
-            var methodCallExpression = context.Expression;
-
-            if (!context.WhatIfMode)
+            if (context.WhatIfMode)
             {
-                if (typeof(Task).IsAssignableFrom(methodCallExpression.Method.DeclaringType) && methodCallExpression.Method.Name == nameof(Task.FromResult))
-                {
-                    context.Translator.Translate(methodCallExpression.Arguments.First(), context);
-                }
+                return true;
+            }
+
+            var methodCallExpression = context.Expression;
+            var isAsync = typeof(Task).IsAssignableFrom(methodCallExpression.Method.DeclaringType);
+
+            if (isAsync && methodCallExpression.Method.Name == nameof(Task.FromResult))
+            {
+                context.Translator.Translate(methodCallExpression.Arguments.First(), context);
             }
             else
             {
