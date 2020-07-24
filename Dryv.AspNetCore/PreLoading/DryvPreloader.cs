@@ -43,7 +43,9 @@ namespace Dryv.AspNetCore.PreLoading
                 return;
             }
 
-            foreach (var type in from t in assemblies.SelectMany(a => a.GetTypes())
+            foreach (var type in from a in assemblies
+                                 from t in a.GetTypes()
+                                 orderby t.FullName
                                  where t.GetCustomAttribute<DryvPreloadAttribute>() != null
                                  select t)
             {

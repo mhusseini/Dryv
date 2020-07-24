@@ -23,6 +23,12 @@ namespace Dryv.Translation.Visitors
             return this.Visit(expression);
         }
 
+        public TExpression ApplyPromises<TExpression>(TExpression expression)
+            where TExpression : Expression
+        {
+            return (TExpression) this.Visit(expression);
+        }
+
         protected override Expression VisitConditional(ConditionalExpression node)
         {
             this.disabled = true;

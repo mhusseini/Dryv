@@ -435,6 +435,40 @@ namespace Dryv.Translation
                 return;
             }
 
+            var asyncCalls = new Dictionary<StringBuilder, ParameterExpression>();
+            var newArguments = new List<Expression>();
+
+            foreach (var argument in expression.Arguments)
+            {
+                var asyncFinder = new AsyncMethodCallModifier(this, context);
+                var newArgument = asyncFinder.ApplyPromises(argument);
+
+                newArguments.Add(newArgument);
+                asyncCalls.AddRange(asyncFinder.AsyncCalls);
+            }
+
+            var newExpression = Expression.Call(expression.Object, expression.Method, newArguments);
+
+            foreach (var call in asyncCalls)
+            {
+                context.Writer.Write(call.Key.ToString());
+                context.Writer.Write(".then(function(");
+                context.Writer.Write(call.Value.Name);
+                context.Writer.Write("){return ");
+            }
+
+            //this.Translate(body, context);
+            this.TranslateMethodCall(newExpression, context, negated);
+
+            for (var i = 0; i < asyncCalls.Count; i++)
+            {
+                context.Writer.Write(";})");
+            }
+
+        }
+
+        private void TranslateMethodCall(MethodCallExpression expression, TranslationContext context, bool negated)
+        {
             var objectType = expression.Object?.Type ?? expression.Method.DeclaringType;
 
             var context2 = context.Clone<MethodTranslationContext>();
