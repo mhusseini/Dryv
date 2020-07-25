@@ -1,65 +1,47 @@
-﻿using System.Linq.Expressions;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace Dryv.Translation.Visitors
 {
-    public class AsyncMethodCallFinder : ExpressionVisitor
+    public class AsyncMethodCallFinder : ExpressionVisitor<object>
     {
-        private readonly TranslationContext context;
-        private int count;
+        private readonly TranslationContext translationContext;
+        private readonly TranslatorProvider translatorProvider;
 
-        public AsyncMethodCallFinder(TranslationContext context)
+        public AsyncMethodCallFinder(TranslatorProvider translatorProvider, TranslationContext translationContext)
         {
-            this.context = context;
+            this.translatorProvider = translatorProvider;
+            this.translationContext = translationContext;
         }
 
-        public static bool ContainsAsyncCalls(TranslationContext context, Expression expression)
+        public List<MethodCallExpression> AsyncMethodCallsExpressions { get; } = new List<MethodCallExpression>();
+
+        public void FindAsyncMethodCalls(Expression node)
         {
-            return new AsyncMethodCallFinder(context).IsAsync(expression);
+            this.AsyncMethodCallsExpressions.Clear();
+            this.Visit(node);
         }
 
-        public static int GetAsyncCallCount(TranslationContext context, Expression expression)
+        protected override void VisitMethodCall(Context context, MethodCallExpression node)
         {
-            return new AsyncMethodCallFinder(context).GetAsyncCallCount(expression);
-        }
+            var objectType = node.Object?.Type ?? node.Method.DeclaringType;
+            var context2 = this.translationContext.Clone<MethodTranslationContext>();
 
-        public int GetAsyncCallCount(Expression expression)
-        {
-            this.Visit(expression);
-            return this.count;
-        }
+            context2.Expression = node;
+            context2.WhatIfMode = true;
+            context2.IsAsync = false;
 
-        public bool IsAsync(Expression expression)
-        {
-            this.Visit(expression);
-            return this.count > 0;
-        }
-
-        protected override Expression VisitBinary(BinaryExpression node)
-        {
-            this.Visit(node.Left);
-            this.Visit(node.Right);
-            return node;
-            // return base.VisitBinary(node);
-        }
-
-        protected override Expression VisitMethodCall(MethodCallExpression node)
-        {
-            var ctx = this.context.Clone<TranslationContext>();
-            ctx.WhatIfMode = true;
-            ctx.IsAsync = false;
-
-            this.context.Translator.Translate(node, ctx);
-
-            if (ctx.IsAsync)
+            if (this.translatorProvider
+                    .MethodCallTranslators
+                    .Where(t => t.SupportsType(objectType))
+                    .Any(t => t.Translate(context2)) &&
+                context2.IsAsync)
             {
-                this.count++;
+                this.AsyncMethodCallsExpressions.Add(node);
             }
 
-            ctx.IsAsync = false;
-
-            return base.VisitMethodCall(node);
-
-            return node;
+            base.VisitMethodCall(context, node);
         }
     }
 }

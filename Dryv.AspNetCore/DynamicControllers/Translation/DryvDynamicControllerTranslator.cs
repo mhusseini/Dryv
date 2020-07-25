@@ -24,8 +24,9 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
         private readonly LinkGenerator linkGenerator;
         private readonly IOptions<MvcOptions> mvcOptions;
         private readonly IOptions<DryvDynamicControllerOptions> options;
+        private readonly TranslatorProvider translatorProvider;
 
-        public DryvDynamicControllerTranslator(DryvDynamicControllerRegistration controllerRegistration, ControllerGenerator codeGenerator, IDryvClientServerCallWriter controllerCallWriter, IOptions<DryvDynamicControllerOptions> options, IOptions<MvcOptions> mvcOptions, LinkGenerator linkGenerator)
+        public DryvDynamicControllerTranslator(DryvDynamicControllerRegistration controllerRegistration, ControllerGenerator codeGenerator, IDryvClientServerCallWriter controllerCallWriter, IOptions<DryvDynamicControllerOptions> options, IOptions<MvcOptions> mvcOptions, LinkGenerator linkGenerator, TranslatorProvider translatorProvider)
         {
             this.controllerRegistration = controllerRegistration;
             this.codeGenerator = codeGenerator;
@@ -33,6 +34,7 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
             this.options = options;
             this.mvcOptions = mvcOptions;
             this.linkGenerator = linkGenerator;
+            this.translatorProvider = translatorProvider;
         }
 
         public int? OrderIndex { get; set; } = int.MaxValue;
@@ -43,10 +45,10 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
 
         public bool TryTranslate(CustomTranslationContext context)
         {
-            if (!this.options.Value.Greedy)
-            {
-                return false;
-            }
+            //if (!this.options.Value.Greedy)
+            //{
+            //    return false;
+            //}
 
             const string key = nameof(DryvDynamicControllerTranslator);
 
@@ -55,19 +57,18 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
                 return false;
             }
 
-            context.CustomData[key] = true;
+            var finder = new AsyncMethodCallFinder(this.translatorProvider, context);
+            finder.FindAsyncMethodCalls(context.Expression);
 
-            try
+            if (finder.AsyncMethodCallsExpressions.Count < 2)
             {
-                if (AsyncMethodCallFinder.GetAsyncCallCount(context, context.Expression) < 2)
-                {
-                    return false;
-                }
+                return false;
+            }
 
-                if (context.Expression is LambdaExpression lambdaExpression)
+            if (context.Expression is LambdaExpression lambdaExpression)
+            {
+                var parameters = new[]
                 {
-                    var parameters = new[]
-                    {
                         lambdaExpression.Parameters
                             .Where(p => p.Type == context.ModelType)
                             .Select(p => context.Translator.FormatIdentifier(p.Name))
@@ -75,25 +76,20 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
                         "$context"
                     }.Where(p => !string.IsNullOrWhiteSpace(p));
 
-                    context.Writer.Write("function(");
-                    context.Writer.Write(string.Join(", ", parameters));
-                    context.Writer.Write(") {");
-                    context.Writer.Write("return ");
-                }
-
-                this.TranslateToServerCall(context, context.Translator, context.Expression, "Process");
-
-                if (context.Expression.NodeType == ExpressionType.Lambda)
-                {
-                    context.Writer.Write("}");
-                }
-
-                return true;
+                context.Writer.Write("function(");
+                context.Writer.Write(string.Join(", ", parameters));
+                context.Writer.Write(") {");
+                context.Writer.Write("return ");
             }
-            finally
+
+            this.TranslateToServerCall(context, context.Translator, context.Expression, "Process");
+
+            if (context.Expression.NodeType == ExpressionType.Lambda)
             {
-                context.CustomData.Remove(key);
+                context.Writer.Write("}");
             }
+
+            return true;
         }
 
         public bool SupportsType(Type type)
@@ -103,6 +99,8 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
 
         public bool Translate(MethodTranslationContext context)
         {
+            context.IsAsync = true;
+
             if (context.WhatIfMode)
             {
                 return true;

@@ -44,7 +44,7 @@ namespace Dryv.Translation
             return name;
         }
 
-        public virtual void Visit(BinaryExpression expression, TranslationContext context, bool negated = false)
+        public virtual void Visit(BinaryExpression expression, TranslationContext context, bool negated = false, bool leftOnly = false)
         {
         }
 

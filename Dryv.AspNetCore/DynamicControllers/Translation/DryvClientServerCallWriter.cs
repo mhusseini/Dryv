@@ -23,7 +23,6 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
             w.Write(httpMethod);
             w.Write("',");
 
-
             var parameter = members
                 .SelectMany(ExpressionNodeFinder<ParameterExpression>.FindChildrenStatic)
                 .First(p => p.Type == context.ModelType);

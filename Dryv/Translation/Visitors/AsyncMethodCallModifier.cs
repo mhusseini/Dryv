@@ -26,7 +26,7 @@ namespace Dryv.Translation.Visitors
         public TExpression ApplyPromises<TExpression>(TExpression expression)
             where TExpression : Expression
         {
-            return (TExpression) this.Visit(expression);
+            return (TExpression)this.Visit(expression);
         }
 
         protected override Expression VisitConditional(ConditionalExpression node)
@@ -41,6 +41,11 @@ namespace Dryv.Translation.Visitors
             {
                 return expression;
             }
+
+            //if (this.pathFinder.FindAsyncPaths(expression) > 1)
+            //{
+            //    return base.VisitMethodCall(expression);
+            //}
 
             var sb = new StringBuilder();
             var context = this.translationContext.Clone<TranslationContext>(sb);

@@ -162,7 +162,7 @@ namespace Dryv.Translation
             }
         }
 
-        public override void Visit(BinaryExpression expression, TranslationContext context, bool negated = false)
+        public override void Visit(BinaryExpression expression, TranslationContext context, bool negated = false, bool leftOnly = false)
         {
             var isEquals = expression.NodeType == ExpressionType.Equal;
             var isNotEquals = expression.NodeType == ExpressionType.NotEqual;
@@ -203,7 +203,7 @@ namespace Dryv.Translation
                 }
             }
 
-            if (!TryWriteInjectedExpression(expression.Right, context))
+            if (!leftOnly && !TryWriteInjectedExpression(expression.Right, context))
             {
                 this.Translate(expression.Right, context);
             }
@@ -323,9 +323,18 @@ namespace Dryv.Translation
 
         public override void Visit(ConditionalExpression expression, TranslationContext context, bool negated = false)
         {
-            var finder = new BinaryFinder(context);
+            //this.Translate(expression.Test, context);
+            //context.Writer.Write(" ? ");
+            //this.Translate(expression.IfTrue, context);
+            //context.Writer.Write(" : ");
+            //this.Translate(expression.IfFalse, context);
 
-            var asyncExpression = finder.Visit(expression.Test) is BinaryExpression chain && finder.AsyncExpressions.Any()
+            var finder = new AsyncBinaryFinder(this.translatorProvider, context);
+            finder.Visit(expression.Test);
+
+            var test = AsyncBinarySwitcher.Modify(expression.Test, finder.AsyncPath);
+
+            var asyncExpression = test is BinaryExpression chain && finder.AsyncBinaryExpressions.Any()
                 ? this.TranslateAsyncBooleanChain(chain, context, finder)
                 : expression.Test;
 
@@ -351,6 +360,37 @@ namespace Dryv.Translation
             {
                 context.Writer.Write(";})");
             }
+        }
+
+        private Expression TranslateAsyncBooleanChain(BinaryExpression chain, TranslationContext context, AsyncBinaryFinder finder)
+        {
+            if (finder.AsyncPath.Contains(chain.Left))
+            {
+                return this.TranslateAsyncBooleanOperand(chain.Left, context, finder);
+            }
+
+            this.Translate(chain.Left, context);
+
+            TryWriteTerminal(chain, context.Writer);
+
+            if (finder.AsyncPath.Contains(chain.Right))
+            {
+                return this.TranslateAsyncBooleanOperand(chain.Right, context, finder);
+            }
+
+            this.Translate(chain.Right, context);
+
+            return Expression.Empty();
+        }
+
+        private Expression TranslateAsyncBooleanOperand(Expression expression, TranslationContext context, AsyncBinaryFinder finder)
+        {
+            if (expression is BinaryExpression chain && (chain.NodeType == ExpressionType.OrElse || chain.NodeType == ExpressionType.AndAlso))
+            {
+                return this.TranslateAsyncBooleanChain(chain, context, finder);
+            }
+
+            return expression;
         }
 
         public override void Visit(ListInitExpression expression, TranslationContext context, bool negated = false)
@@ -470,7 +510,6 @@ namespace Dryv.Translation
         private void TranslateMethodCall(MethodCallExpression expression, TranslationContext context, bool negated)
         {
             var objectType = expression.Object?.Type ?? expression.Method.DeclaringType;
-
             var context2 = context.Clone<MethodTranslationContext>();
             context2.Translator = this;
             context2.Expression = expression;
@@ -640,7 +679,6 @@ namespace Dryv.Translation
             var visitor = new ExpressionNodeFinder<ParameterExpression>();
             visitor.Visit(expression);
 
-
             var visitor2 = new ExpressionNodeFinder<MethodCallExpression>();
             visitor2.Visit(expression);
 
@@ -730,51 +768,17 @@ namespace Dryv.Translation
 
         private bool GetNeedsBrackets(Expression expression)
         {
-            switch (expression)
+            return expression switch
             {
-                case BinaryExpression _:
-                    return true;
-                case ConstantExpression _:
-                case ParameterExpression _:
-                case MethodCallExpression _:
-                case MemberExpression _:
-                case UnaryExpression _:
-                case LambdaExpression _:
-                    return false;
-            }
-
-            return this.translatorProvider.GenericTranslators.All(t => t.AllowSurroundingBrackets(expression) != false);
-        }
-
-        private Expression TranslateAsyncBooleanChain(BinaryExpression chain, TranslationContext context, BinaryFinder finder)
-        {
-            if (finder.AsyncExpressions.Contains(chain.Left))
-            {
-                return this.TranslateAsyncBooleanOperand(chain.Left, context, finder);
-            }
-
-            this.Translate(chain.Left, context);
-
-            TryWriteTerminal(chain, context.Writer);
-
-            if (finder.AsyncExpressions.Contains(chain.Right))
-            {
-                return this.TranslateAsyncBooleanOperand(chain.Right, context, finder);
-            }
-
-            this.Translate(chain.Right, context);
-
-            return Expression.Empty();
-        }
-
-        private Expression TranslateAsyncBooleanOperand(Expression expression, TranslationContext context, BinaryFinder finder)
-        {
-            if (expression is BinaryExpression chain && (chain.NodeType == ExpressionType.OrElse || chain.NodeType == ExpressionType.AndAlso))
-            {
-                return this.TranslateAsyncBooleanChain(chain, context, finder);
-            }
-
-            return expression;
+                BinaryExpression _ => true,
+                ConstantExpression _ => false,
+                ParameterExpression _ => false,
+                MethodCallExpression _ => false,
+                MemberExpression _ => false,
+                UnaryExpression _ => false,
+                LambdaExpression _ => false,
+                _ => this.translatorProvider.GenericTranslators.All(t => t.AllowSurroundingBrackets(expression) != false)
+            };
         }
 
         private void WriteMember(MemberExpression expression, TranslationContext context)
