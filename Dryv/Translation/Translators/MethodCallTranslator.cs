@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using Dryv.Reflection;
 
-namespace Dryv.Translation
+namespace Dryv.Translation.Translators
 {
     public abstract class MethodCallTranslator : IDryvMethodCallTranslator
     {
@@ -39,7 +39,7 @@ namespace Dryv.Translation
 
         public virtual bool SupportsType(Type type)
         {
-            return this.supportedTypes.Contains(type);
+            return this.supportedTypes.Find(t => t.IsAssignableFrom(type)) != null;
         }
 
         public virtual bool Translate(MethodTranslationContext options)

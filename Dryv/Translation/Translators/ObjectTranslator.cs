@@ -20,9 +20,8 @@ namespace Dryv.Translation.Translators
                 return false;
             }
 
-            context.Writer.Write("String(");
             context.Translator.Translate(methodCallExpression.Object, context);
-            context.Writer.Write(")");
+            context.Writer.Write(".toString()");
 
             return true;
         }

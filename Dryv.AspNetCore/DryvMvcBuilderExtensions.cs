@@ -57,9 +57,10 @@ namespace Dryv.AspNetCore
             services.AddSingleton(options);
 
             return new DryvMvcBuilder(services)
-                .AddTranslator<ObjectTranslator>()
+                //.AddTranslator<ObjectTranslator>()
                 .AddTranslator<DryvValidationResultTranslator>()
                 .AddTranslator<StringTranslator>()
+                .AddTranslator<ToStringTranslator>()
                 .AddTranslator<EnumerableTranslator>()
                 .AddTranslator<RegexTranslator>()
                 .AddTranslator<CustomCodeTranslator>();
