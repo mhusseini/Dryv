@@ -151,7 +151,7 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
         {
             return Controllers.GetOrAdd(key, _ => new Lazy<TypeInfo>(() =>
             {
-                var assembly = this.codeGenerator.CreateControllerAssembly(expression, context.ModelType, action);
+                var assembly = this.codeGenerator.CreateControllerAssembly(expression, context.ModelType, action, context.Rule);
                 this.controllerRegistration.Register(assembly, action);
 
                 return assembly.DefinedTypes.FirstOrDefault(typeof(Controller).IsAssignableFrom);

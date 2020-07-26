@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Threading.Tasks;
+using Dryv.AspNetCore.DynamicControllers.Runtime;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration

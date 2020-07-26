@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
+namespace Dryv.AspNetCore.DynamicControllers.Runtime
 {
     [DryvDynamicControllerFilter]
     public abstract class DryvDynamicController : Controller

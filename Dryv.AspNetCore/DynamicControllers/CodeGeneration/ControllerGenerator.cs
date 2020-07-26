@@ -5,6 +5,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
+using Dryv.AspNetCore.DynamicControllers.Runtime;
+using Dryv.Rules;
 using Microsoft.Extensions.Options;
 
 namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
@@ -20,9 +22,9 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
             this.options = options;
         }
 
-        public Assembly CreateControllerAssembly(Expression expression, Type modelType, string action)
+        public Assembly CreateControllerAssembly(Expression expression, Type modelType, string action, DryvCompiledRule rule)
         {
-            return this.CreateAssembly(expression, modelType, action);
+            return this.CreateAssembly(expression, modelType, action, rule);
         }
 
         public static List<ParameterExpression> FindParameters(Expression methodCallExpression)
@@ -31,7 +33,7 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
             return new ParameterFinder().Find(methodCallExpression);
         }
 
-        private Assembly CreateAssembly(Expression expression, Type modelType, string action)
+        private Assembly CreateAssembly(Expression expression, Type modelType, string action, DryvCompiledRule rule)
         {
             var assemblyIndex = ++assemblyCount;
             var typeNameBase = $"DryvDynamic{assemblyIndex}";
@@ -49,6 +51,11 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
             var context = new DryvControllerGenerationContext(typeBuilder, action);
             ControllerAttributeGenerator.AddCustomAttributes(context, typeBuilder.SetCustomAttribute, this.options.Value.MapControllerFilters);
             ControllerAttributeGenerator.AddCustomAttributes(context, typeBuilder.SetCustomAttribute, () => new DryvDisableAttribute());
+            
+            if (!string.IsNullOrWhiteSpace(rule.Name))
+            {
+                ControllerAttributeGenerator.AddCustomAttributes(context, typeBuilder.SetCustomAttribute, () => new DryvControllerInfoAttribute(nameof(rule.Name), rule.Name));
+            }
 
             var parameters = FindParameters(expression);
             var modelParameter = parameters.Find(p => p.Type == modelType);

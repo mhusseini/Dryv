@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
+namespace Dryv.AspNetCore.DynamicControllers.Runtime
 {
     internal class DryvDynamicControllerFilterAttribute : Attribute, IAsyncActionFilter
     {
