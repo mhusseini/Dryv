@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 
 namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
 {
+    [DryvDynamicControllerFilter]
     public abstract class DryvDynamicController : Controller
     {
         public async Task<IActionResult> JsonAsync(Task<object> task)
