@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Dryv.Configuration;
 using Dryv.Extensions;
 using Dryv.Reflection;
+using Dryv.Translation.Translators;
 using Dryv.Translation.Visitors;
 
 namespace Dryv.Translation
@@ -125,14 +126,18 @@ namespace Dryv.Translation
             }
 
             var context2 = context.Clone<CustomTranslationContext>();
-            context2.Expression = expression;
             context2.Translator = this;
+            context2.Expression = expression;
             context2.Negated = negated;
 
             if (!this.translatorProvider.GenericTranslators.Any(t => t.TryTranslate(context2)) &&
                 !context.DynamicTranslation.Any(t => t(expression, context2)))
             {
                 this.Visit((dynamic)expression, context2, negated);
+            }
+            else if (context2.IsAsync)
+            {
+                context.Rule.IsAsync = true;
             }
 
             if (needsBrackets)
@@ -332,33 +337,45 @@ namespace Dryv.Translation
             var finder = new AsyncBinaryFinder(this.translatorProvider, context);
             finder.Visit(expression.Test);
 
-            var test = AsyncBinarySwitcher.Modify(expression.Test, finder.AsyncPath);
-
-            var asyncExpression = test is BinaryExpression chain && finder.AsyncBinaryExpressions.Any()
-                ? this.TranslateAsyncBooleanChain(chain, context, finder)
-                : expression.Test;
-
-            var asyncFinder = new AsyncMethodCallModifier(this, context);
-            var body = asyncFinder.ApplyPromises(asyncExpression);
-
-            foreach (var call in asyncFinder.AsyncCalls)
+            if (finder.AsyncBinaryExpressions.Any())
             {
-                context.Writer.Write(call.Key.ToString());
-                context.Writer.Write(".then(function(");
-                context.Writer.Write(call.Value.Name);
-                context.Writer.Write("){return ");
+                var test = AsyncBinarySwitcher.Modify(expression.Test, finder.AsyncPath);
+
+                var asyncExpression = test is BinaryExpression chain
+                    ? this.TranslateAsyncBooleanChain(chain, context, finder)
+                    : expression.Test;
+
+                var asyncFinder = new AsyncMethodCallModifier(this, context);
+                var body = asyncFinder.ApplyPromises(context.Rule, asyncExpression);
+
+                foreach (var call in asyncFinder.AsyncCalls)
+                {
+                    context.Writer.Write(call.Key.ToString());
+                    context.Writer.Write(".then(function(");
+                    context.Writer.Write(call.Value.Name);
+                    context.Writer.Write("){return ");
+                }
+
+                this.Translate(body, context);
+
+                context.Writer.Write(" ? ");
+                this.Translate(expression.IfTrue, context);
+                context.Writer.Write(" : ");
+                this.Translate(expression.IfFalse, context);
+
+                for (var i = 0; i < asyncFinder.AsyncCalls.Count; i++)
+                {
+                    context.Writer.Write(";})");
+                }
             }
-
-            this.Translate(body, context);
-
-            context.Writer.Write(" ? ");
-            this.Translate(expression.IfTrue, context);
-            context.Writer.Write(" : ");
-            this.Translate(expression.IfFalse, context);
-
-            for (var i = 0; i < asyncFinder.AsyncCalls.Count; i++)
+            else
             {
-                context.Writer.Write(";})");
+                this.Translate(expression.Test, context);
+
+                context.Writer.Write(" ? ");
+                this.Translate(expression.IfTrue, context);
+                context.Writer.Write(" : ");
+                this.Translate(expression.IfFalse, context);
             }
         }
 
@@ -417,7 +434,7 @@ namespace Dryv.Translation
         public override void Visit(MemberExpression expression, TranslationContext context, bool negated = false)
         {
             var asyncFinder = new AsyncMethodCallModifier(this, context);
-            var body = asyncFinder.ApplyPromises(expression);
+            var body = asyncFinder.ApplyPromises(context.Rule, expression);
 
 
             foreach (var call in asyncFinder.AsyncCalls)
@@ -481,7 +498,7 @@ namespace Dryv.Translation
             foreach (var argument in expression.Arguments)
             {
                 var asyncFinder = new AsyncMethodCallModifier(this, context);
-                var newArgument = asyncFinder.ApplyPromises(argument);
+                var newArgument = asyncFinder.ApplyPromises(context.Rule, argument);
 
                 newArguments.Add(newArgument);
                 asyncCalls.AddRange(asyncFinder.AsyncCalls);
