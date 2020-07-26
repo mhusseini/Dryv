@@ -6,6 +6,6 @@ namespace Dryv.Validation
 {
     public interface IDryvClientValidationFunctionWriter
     {
-        Action<TextWriter> GetValidationFunction(IEnumerable<string> translatedRules);
+        Action<TextWriter> GetValidationFunction(IEnumerable<TranslatedRule> translatedRules);
     }
 }

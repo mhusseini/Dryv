@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Dryv.Extensions;
@@ -18,7 +17,7 @@ namespace Dryv
             this.ruleFinder = ruleFinder;
         }
 
-        public TranslatedExpressions TranslateValidationRules(Type modelType, Func<Type, object> serviceProvider)
+        public TranslationResult TranslateValidationRules(Type modelType, Func<Type, object> serviceProvider)
         {
             var validationRules = this.ruleFinder
                 .FindValidationRulesInTree(modelType, RuleType.Validation)
@@ -33,10 +32,10 @@ namespace Dryv
 
             var clientDisablers = disablingRules.Select(r => Translate(serviceProvider, r));
 
-            return new TranslatedExpressions
+            return new TranslationResult
             {
-                ValidationFunctions = clientValidation.GroupBy(c => c.Key, c => c.Value).ToDictionary(i => i.Key, i => i.ToList()),
-                DisablingFunctions = clientDisablers.GroupBy(c => c.Key, c => c.Value).ToDictionary(i => i.Key, i => i.ToList()),
+                ValidationFunctions = clientValidation.GroupBy(c => c.Rule.ModelPath, c => c).ToDictionary(i => i.Key, i => i.ToList()),
+                DisablingFunctions = clientDisablers.GroupBy(c => c.Rule.ModelPath, c => c).ToDictionary(i => i.Key, i => i.ToList()),
             };
         }
 
@@ -46,7 +45,7 @@ namespace Dryv
             return rule.CompiledEnablingExpression(arguments);
         }
 
-        private static KeyValuePair<string, string> Translate(Func<Type, object> serviceProvider, DryvCompiledRule rule)
+        private static TranslatedRule Translate(Func<Type, object> serviceProvider, DryvCompiledRule rule)
         {
             var services = serviceProvider.GetServices(rule.PreevaluationOptionTypes);
 
@@ -60,18 +59,12 @@ namespace Dryv
             {
                 var code = rule.TranslatedValidationExpression(_ => null, arguments);
 
-                return new KeyValuePair<string, string>(rule.ModelPath, code);
+                return new TranslatedRule { Rule = rule, ClientCode = code };
             }
             catch (Exception ex)
             {
                 throw CreateException("An error occurred while translating validation rule.", ex, rule);
             }
-        }
-
-        public class TranslatedExpressions
-        {
-            public Dictionary<string, List<string>> ValidationFunctions { get; internal set; }
-            public Dictionary<string, List<string>> DisablingFunctions { get; internal set; }
         }
 
         private static DryvTranslationException CreateException(string msg, Exception ex, DryvCompiledRule rule)
