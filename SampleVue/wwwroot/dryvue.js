@@ -7,7 +7,7 @@ function hashCode(text) {
     var hash = 0, i, chr;
     for (i = 0; i < text.length; i++) {
         chr = text.charCodeAt(i);
-        hash = ((hash << 5) - hash) + chr;
+        hash = (hash << 5) - hash + chr;
         hash |= 0; // Convert to 32bit integer
     }
     return hash;
@@ -371,9 +371,9 @@ const Dryvue = {
                                 context2.component = formComponent;
 
                                 let result = null;
-                                const isEnabled = (!disabledFields || disabledFields.filter(f => path.indexOf(f) >= 0).length === 0);
+                                const isEnabled = !disabledFields || disabledFields.filter(f => path.indexOf(f) >= 0).length === 0;
                                 if (isEnabled) {
-                                    var validationFunctions = validator.map(v => v.validate);
+                                    const validationFunctions = validator.map(v => v.validate);
                                     result = await runValidation(validationFunctions, data, context2);
                                 }
                                 return handleValidationResult(Vue, component, result, errorField, warningField, groupComponent);
@@ -391,7 +391,7 @@ const Dryvue = {
                     $dryv.formValidators.push(fieldValidator);
 
                     formComponent.$watch(path, (newValue, oldValue) => {
-                        if (lastDisabledFields != undefined && !fieldValidator.isValidating) {
+                        if (lastDisabledFields !== undefined && !fieldValidator.isValidating) {
                             fieldValidator.validate(lastDisabledFields, fieldValidator.lastContext);
                         }
                     });
