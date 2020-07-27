@@ -37,6 +37,7 @@ namespace Dryv
             {
                 ValidationFunctions = clientValidation.GroupBy(c => c.Rule.ModelPath, c => c).ToDictionary(i => i.Key, i => i.ToList()),
                 DisablingFunctions = clientDisablers.GroupBy(c => c.Rule.ModelPath, c => c).ToDictionary(i => i.Key, i => i.ToList()),
+                Parameters = parameters.Values.Select(p => p.Values).Merge()
             };
         }
 

@@ -18,6 +18,7 @@
             <div class="form-content">
                 <div class="form-block">
                     <h3>Personal Data</h3>
+                    {{ config.a }}
 
                     <dryv-group>
                         <div slot-scope="{allErrors, allWanings, errors, warnings}">
@@ -126,7 +127,11 @@
                 billingAddress: {
                     zipCode: null,
                     city: null
-                }
+                },
+                config: {}
+            },
+            mounted() {
+                this.config = this.$dryv.parameters;
             },
             methods: {
                 async validateForm(e) {

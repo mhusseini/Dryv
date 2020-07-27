@@ -142,6 +142,7 @@ function initializeFormComponent(component, name, path, options) {
         }
 
         d.v = validationSet;
+        d.parameters = d.v.parameters;
     }
 
     if (!d.formValidators) {

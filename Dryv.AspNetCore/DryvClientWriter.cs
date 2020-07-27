@@ -24,37 +24,39 @@ namespace Dryv.AspNetCore
         public IHtmlContent WriteDryvValidation<TModel>(string validationSetName, Func<Type, object> serviceProvider)
         {
             var translation = this.translator.TranslateValidationRules(typeof(TModel), serviceProvider);
+            var parameters = translation.Parameters;
             var validators = translation.ValidationFunctions.ToDictionary(i => i.Key, i => this.functionWriter.GetValidationFunction(i.Value));
             var disablers = translation.DisablingFunctions.ToDictionary(i => i.Key, i => this.functionWriter.GetValidationFunction(i.Value));
 
             return new LazyHtmlContent(writer =>
             {
                 this.setWriter.WriteBegin(writer);
-                this.setWriter.WriteValidationSet(writer, validationSetName, validators, disablers);
+                this.setWriter.WriteValidationSet(writer, validationSetName, validators, disablers, parameters);
                 this.setWriter.WriteEnd(writer);
             });
         }
 
         public IHtmlContent WriteDryvValidation(IEnumerable<KeyValuePair<string, Type>> validationSets, Func<Type, object> serviceProvider)
         {
-            var resultSet = new Dictionary<string, (Dictionary<string, Action<TextWriter>> validators, Dictionary<string, Action<TextWriter>> disablers)>();
+            var resultSet = new Dictionary<string, (Dictionary<string, Action<TextWriter>> validators, Dictionary<string, Action<TextWriter>> disablers, Dictionary<string, object> parameters)>();
 
             foreach (var (setName, type) in validationSets)
             {
                 var translation = this.translator.TranslateValidationRules(type, serviceProvider);
+                var parameters = translation.Parameters;
                 var validators = translation.ValidationFunctions.ToDictionary(i => i.Key, i => this.functionWriter.GetValidationFunction(i.Value));
                 var disablers = translation.DisablingFunctions.ToDictionary(i => i.Key, i => this.functionWriter.GetValidationFunction(i.Value));
 
-                resultSet.Add(setName, (validators, disablers));
+                resultSet.Add(setName, (validators, disablers, parameters));
             }
 
             return new LazyHtmlContent(writer =>
             {
                 this.setWriter.WriteBegin(writer);
 
-                foreach (var (setName, (validators, disablers)) in resultSet)
+                foreach (var (setName, (validators, disablers, parameters)) in resultSet)
                 {
-                    this.setWriter.WriteValidationSet(writer, setName, validators, disablers);
+                    this.setWriter.WriteValidationSet(writer, setName, validators, disablers, parameters);
                 }
 
                 this.setWriter.WriteEnd(writer);
