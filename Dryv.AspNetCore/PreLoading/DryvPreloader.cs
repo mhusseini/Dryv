@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using Dryv.RuleDetection;
+using Dryv.Rules;
 using Microsoft.Extensions.Options;
 
 namespace Dryv.AspNetCore.PreLoading

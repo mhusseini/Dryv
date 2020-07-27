@@ -220,10 +220,11 @@ namespace Dryv.RuleDetection
                 PreevaluationOptionTypes = rule.PreevaluationOptionTypes,
                 GroupName = rule.GroupName,
                 Name = rule.Name,
-                IsDisablingRule = rule.IsDisablingRule,
+                RuleType = rule.RuleType,
                 ModelPath = GetEffectiveModelPath(rule.ModelPath, transposedPath, rule.Property),
                 Property = rule.Property,
                 UniquePath = rule.UniquePath,
+                Parameters = rule.Parameters,
             };
 
             this.Translate(transposedRule, transposedRule.ValidationExpression);

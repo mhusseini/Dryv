@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Dryv.Extensions;
@@ -21,16 +22,16 @@ namespace Dryv
         {
             var validationRules = this.ruleFinder
                 .FindValidationRulesInTree(modelType, RuleType.Validation)
-                .Where(rule => IsRuleEnabled(rule, serviceProvider))
                 .ToList();
-            var clientValidation = validationRules.Select(r => Translate(serviceProvider, r));
 
             var disablingRules = this.ruleFinder
                 .FindValidationRulesInTree(modelType, RuleType.Disabling)
-                .Where(rule => IsRuleEnabled(rule, serviceProvider))
                 .ToList();
 
-            var clientDisablers = disablingRules.Select(r => Translate(serviceProvider, r));
+            var parameters = DryvParametersHelper.GetDryvParameters(validationRules.Union(disablingRules), serviceProvider);
+
+            var clientValidation = validationRules.Where(rule => IsRuleEnabled(rule, serviceProvider, parameters)).Select(r => Translate(r, serviceProvider, parameters));
+            var clientDisablers = disablingRules.Where(rule => IsRuleEnabled(rule, serviceProvider, parameters)).Select(r => Translate(r, serviceProvider, parameters));
 
             return new TranslationResult
             {
@@ -39,15 +40,15 @@ namespace Dryv
             };
         }
 
-        private static bool IsRuleEnabled(DryvCompiledRule rule, Func<Type, object> serviceProvider)
+        private static bool IsRuleEnabled(DryvCompiledRule rule, Func<Type, object> serviceProvider, IReadOnlyDictionary<List<DryvCompiledRule>, DryvParameters> parameters)
         {
-            var arguments = serviceProvider.GetServices(rule.PreevaluationOptionTypes);
+            var arguments = serviceProvider.GetServices(rule, parameters);
             return rule.CompiledEnablingExpression(arguments);
         }
 
-        private static TranslatedRule Translate(Func<Type, object> serviceProvider, DryvCompiledRule rule)
+        private static TranslatedRule Translate(DryvCompiledRule rule, Func<Type, object> serviceProvider, IReadOnlyDictionary<List<DryvCompiledRule>, DryvParameters> parameters)
         {
-            var services = serviceProvider.GetServices(rule.PreevaluationOptionTypes);
+            var services = serviceProvider.GetServices(rule, parameters);
 
             // index 0 was used to transpose the path. It isn't used anymore,
             // but it was too cumbersome to update all that code :-)

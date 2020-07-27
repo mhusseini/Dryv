@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
@@ -16,7 +17,7 @@ namespace Dryv.Rules
         public DryvRuleLocation EvaluationLocation { get; internal set; }
         public string GroupName { get; internal set; }
         public bool IsAsync { get; internal set; }
-        public bool IsDisablingRule { get; internal set; }
+        public RuleType RuleType { get; internal set; } = RuleType.Validation;
         public string ModelPath { get; internal set; }
         public Type ModelType { get; internal set; }
         public string Name { get; internal set; }
@@ -28,7 +29,18 @@ namespace Dryv.Rules
         internal MemberExpression PropertyExpression { get; set; }
         internal string UniquePath { get; set; }
         internal LambdaExpression ValidationExpression { get; set; }
+        internal List<DryvCompiledRule> Parameters { get; set; }
 
+        public static DryvCompiledRule CreateParameter(string name, Expression<Func<object, object[], object>> lambda, Type[] services)
+        {
+            return new DryvCompiledRule
+            {
+                RuleType = RuleType.Parameter,
+                Name = name,
+                PreevaluationOptionTypes = services,
+                CompiledValidationExpression = lambda.Compile()
+            };
+        }
         public static DryvCompiledRule Create<TModel, TProperty>(Expression<Func<TModel, TProperty>> propertyExpression, LambdaExpression validationExpression, LambdaExpression enablingExpression, DryvRuleLocation ruleLocation, string groupName)
         {
             var body = propertyExpression.Body is UnaryExpression unaryExpression

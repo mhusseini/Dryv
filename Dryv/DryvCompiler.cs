@@ -34,9 +34,12 @@ namespace Dryv
             AddOptionParameters(invokeArguments, lambdaExpression, optionsParameter, 1);
 
             var invokeExpression = Expression.Invoke(lambdaExpression, invokeArguments);
-            var resultLambda = rule.IsDisablingRule
-                ? Expression.Lambda<Func<object, object[], object>>(Expression.Convert(invokeExpression, typeof(object)), modelParameter, optionsParameter)
-                : Expression.Lambda<Func<object, object[], object>>(invokeExpression, modelParameter, optionsParameter);
+            var resultLambda = rule.RuleType switch
+            {
+                RuleType.Disabling => Expression.Lambda<Func<object, object[], object>>(Expression.Convert(invokeExpression, typeof(object)), modelParameter, optionsParameter),
+                RuleType.Validation => Expression.Lambda<Func<object, object[], object>>(invokeExpression, modelParameter, optionsParameter),
+                _ => throw new NotSupportedException("Cannot compile parameter.")
+            };
 
             return resultLambda.Compile();
         }

@@ -33,9 +33,12 @@ namespace Dryv
 
             var modelType = model.GetType();
             var validation = Cache.GetOrAdd(modelType, this.GroupValidation);
+
+            var rules = validation.ValidationRules.SelectMany(i => i.Value).Union(validation.DisablingRules.SelectMany(i => i.Value));
+            var parameters = DryvParametersHelper.GetDryvParameters(rules, serviceProvider);
             var taskResults = await Task.WhenAll(from kvp in validation.ValidationRules
-                                                 where !this.IsSubtreeDisabled(model, kvp.Key, validation.DisablingRules, serviceProvider)
-                                                 select this.GetFirstValidationError(model, serviceProvider, kvp));
+                                                 where !this.IsSubtreeDisabled(model, kvp.Key, validation.DisablingRules, serviceProvider, parameters)
+                                                 select this.GetFirstValidationError(model, serviceProvider, kvp, parameters));
 
             return (from result in taskResults
                     where result.HasValue
@@ -62,13 +65,13 @@ namespace Dryv
             }
         }
 
-        private async Task<KeyValuePair<string, DryvValidationResult>?> GetFirstValidationError(object model, Func<Type, object> serviceProvider, KeyValuePair<string, List<DryvCompiledRule>> kvp)
+        private async Task<KeyValuePair<string, DryvValidationResult>?> GetFirstValidationError(object model, Func<Type, object> serviceProvider, KeyValuePair<string, List<DryvCompiledRule>> kvp, Dictionary<List<DryvCompiledRule>, DryvParameters> parameters)
         {
             foreach (var rule in kvp.Value)
             {
                 try
                 {
-                    var services = serviceProvider.GetServices(rule.PreevaluationOptionTypes);
+                    var services = serviceProvider.GetServices(rule, parameters);
                     if (!rule.CompiledEnablingExpression(services))
                     {
                         continue;
@@ -107,13 +110,13 @@ namespace Dryv
             };
         }
 
-        private bool IsSubtreeDisabled(object model, string modelPath, IReadOnlyDictionary<string, List<DryvCompiledRule>> disablingRules, Func<Type, object> serviceProvider)
+        private bool IsSubtreeDisabled(object model, string modelPath, IReadOnlyDictionary<string, List<DryvCompiledRule>> disablingRules, Func<Type, object> serviceProvider, Dictionary<List<DryvCompiledRule>, DryvParameters> parameters)
         {
             return disablingRules.TryGetValue(modelPath, out var disablers) && disablers.Any(rule =>
             {
                 try
                 {
-                    var services = serviceProvider.GetServices(rule.PreevaluationOptionTypes);
+                    var services = serviceProvider.GetServices(rule, parameters);
                     var o = rule.CompiledValidationExpression(model, services);
 
                     return !(o is bool) || (bool)o;

@@ -32,6 +32,24 @@ function WriteMethod($propCount, $optionCount, $methodPrefix)
 		$ruleSwitchArgument = "null";
 	}
 
+	if($methodPrefix -eq "Parameter"){
+		$gen3 = "";
+		for($i = 1; $i -le $optionCount; $i++)
+		{
+			$gen3 += ", typeof(TOptions$i)";
+		}
+	
+		@"
+		public DryvRules<TModel> Parameter<$($gen2)TResult>(string name, Func<$($gen2)TResult> parameter)
+        {
+			this.AddParameter(name, parameter$gen3);
+			return this;
+        }
+"@ | Add-Content $fn
+
+		return;
+	}
+
 	if(-Not($methodPrefix)){
 		@"
 		public DryvRules<TModel> DisableRules$gen(
@@ -107,9 +125,11 @@ namespace Dryv.Rules
 
 $prefixes = @("","Server","Client")
 
-for($i = 1; $i -lt 6; $i++) {
-	for($o = 0; $o -lt 6; $o++)	{
-		foreach ($prefix in $prefixes) {
+for($o = 0; $o -lt 6; $o++)	{
+	WriteMethod -propCount 0 -optionCount $o -methodPrefix "Parameter";
+
+	foreach ($prefix in $prefixes) {
+		for($i = 1; $i -lt 6; $i++) {
 			WriteMethod -propCount $i -optionCount $o -methodPrefix $prefix;
 		}
 	}

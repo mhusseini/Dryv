@@ -722,39 +722,7 @@ namespace Dryv.Translation
 
         private static bool TryWriteInjectedMethod(MethodCallExpression expression, TranslationContext context)
         {
-            if (!expression.Type.IsSystemType())
-            {
-                return false;
-            }
-
-            var parameters = ExpressionNodeFinder<ParameterExpression>.FindChildrenStatic(expression.Object);
-            if (parameters.Any(p => !context.OptionsTypes.Contains(p.Type)))
-            {
-                return false;
-            }
-
-            if (!parameters.Any() && !expression.Method.IsStatic)
-            {
-                return false;
-            }
-
-            var finder = new ExpressionNodeFinder<ParameterExpression>();
-            var parameterExpressions = (from a in expression.Arguments
-                                        from p in finder.FindChildren(a)
-                                        where p != null
-                                        select p).ToList();
-
-            if (parameterExpressions.Any(p => p.Type == context.ModelType))
-            {
-                return false;
-            }
-
-            if (!parameters.Any() && parameterExpressions.Any())
-            {
-                parameters = parameterExpressions.Where(p => context.OptionsTypes.Contains(p.Type)).ToList();
-            }
-
-            if (!parameters.Any())
+            if (!MethodCallExpressionHelper.CanInjectMethodCall(expression, context, out var parameters))
             {
                 return false;
             }

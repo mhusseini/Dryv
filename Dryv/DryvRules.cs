@@ -5,6 +5,7 @@ namespace Dryv
 {
     public abstract class DryvRules
     {
+        internal List<DryvCompiledRule> Parameters { get; } = new List<DryvCompiledRule>();
         internal List<DryvCompiledRule> ValidationRules { get; } = new List<DryvCompiledRule>();
         internal List<DryvCompiledRule> DisablingRules { get; } = new List<DryvCompiledRule>();
 

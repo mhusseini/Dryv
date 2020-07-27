@@ -1,4 +1,7 @@
-﻿const dryv = window.dryv || (window.dryv = {});
+﻿//
+// Diese Datei wird beizeiten durch ein NPM-Paket ausgetauscht.
+//
+const dryv = window.dryv || (window.dryv = {});
 
 function hashCode(text) {
     var hash = 0, i, chr;
@@ -10,7 +13,7 @@ function hashCode(text) {
     return hash;
 }
 
-async function validate(component, dryv) {
+async function validate(component, dryv, context) {
     const $dryv = component.$dryv;
     const formValidators = $dryv.formValidators;
     if (!formValidators) {
@@ -27,7 +30,13 @@ async function validate(component, dryv) {
     if (disablers) {
         for (let field of Object.keys(disablers)) {
             const disabler = disablers[field];
-            if (disabler && await disabler(component.$data)) {
+            if (!disabler) {
+                continue;
+            }
+
+            var validationFunctions = disabler.filter(v => v.validate(component.$data));
+
+            if (validationFunctions.length) {
                 disabledFields.push(field + ".");
             }
         }
@@ -37,7 +46,7 @@ async function validate(component, dryv) {
     let warnings = "";
 
     for (let v of formValidators) {
-        const result = await v.validate(disabledFields);
+        const result = await v.validate(disabledFields, context);
         if (!result) {
             continue;
         }
@@ -105,7 +114,7 @@ function findFormComponent(vnode) {
     return { groupComponent, formComponent };
 }
 
-function findeModelExpression(vnode) {
+function findModelExpression(vnode) {
     let n = vnode;
 
     while (n) {
@@ -118,12 +127,13 @@ function findeModelExpression(vnode) {
     return null;
 }
 
-function initializeFormComponent(component, name, options) {
+function initializeFormComponent(component, name, path, options) {
     if (!component.$dryv) {
         component.$dryv = {};
     }
 
     const d = component.$dryv;
+    d.path = path;
 
     if (!d.v) {
         const validationSet = options.dryv.v[name];
@@ -180,6 +190,14 @@ function handleValidationResult(Vue, component, result, errorField, warningField
     }
 
     return text && { type, text, groupName };
+}
+
+function runValidation(v, m, context) {
+    return v.reduce(function (promiseChain, currentTask) {
+        return promiseChain.then(function (r) {
+            return r || currentTask(m, context);
+        });
+    }, Promise.resolve());
 }
 
 const Dryvue = {
@@ -249,7 +267,7 @@ const Dryvue = {
                         addResultItem(this.warnings, text, groupName);
                     }
                 },
-                template: "<slot :errors='errors' :warnings='warnings' :allErrors='allErrors' :allWarnings='allWarnings'></slot>"
+                template: "<div><slot :errors='errors' :warnings='warnings' :allErrors='allErrors' :allWarnings='allWarnings'></slot></div>"
             });
 
         Vue.directive(dryvFieldDirective,
@@ -272,6 +290,12 @@ const Dryvue = {
                         formComponent.$dryv = {
                             formValidators: []
                         };
+
+                        const directive = formComponent._vnode.data.directives.filter(d => d.name === dryvSetDirective)[0].value;
+
+                        if (typeof directive === "object") {
+                            formComponent.$dryv.path = directive.path;
+                        }
                     }
 
                     const $dryv = formComponent.$dryv;
@@ -302,21 +326,27 @@ const Dryvue = {
                     }
 
                     if (!path) {
-                        path = findeModelExpression(vnode);
+                        path = findModelExpression(vnode);
                     }
 
                     if (!path) {
                         throw `The property path is missing. Please specify a value for the ${dryvFieldDirective} attribute or use the ${dryvFieldDirective} directive in combination with 'v-model'. Example value: 'firstName' or 'child.firstName'.`;
                     }
 
-                    let validator = undefined;
+                    if ($dryv.path) {
+                        path = path.substr($dryv.path.length + 1);
+                    }
 
                     Vue.set(component, errorField, null);
                     Vue.set(component, warningField, null);
 
-                    $dryv.formValidators.push({
+                    let validator = undefined;
+                    let lastDisabledFields = undefined;
+
+                    const fieldValidator = {
+                        isValidating: false,
                         path,
-                        validate: async (disabledFields) => {
+                        validate: async (disabledFields, context) => {
                             if (validator === undefined) {
                                 validator = $dryv.v.validators[path];
                             }
@@ -325,12 +355,43 @@ const Dryvue = {
                                 return null;
                             }
 
-                            const result = (!disabledFields || disabledFields.filter(f => path.indexOf(f) >= 0).length === 0) && await validator(formComponent.$data);
-                            return handleValidationResult(Vue, component, result, errorField, warningField, groupComponent);
+                            fieldValidator.lastContext = context;
+                            fieldValidator.isValidating = true;
+
+                            try {
+                                lastDisabledFields = disabledFields || null;
+                                let data = formComponent.$data;
+
+                                if ($dryv.path) {
+                                    $dryv.path.split(".").forEach(p => data = data[p]);
+                                }
+
+                                const context2 = Object.assign({}, context);
+                                context2.component = formComponent;
+
+                                let result = null;
+                                const isEnabled = (!disabledFields || disabledFields.filter(f => path.indexOf(f) >= 0).length === 0);
+                                if (isEnabled) {
+                                    var validationFunctions = validator.map(v => v.validate);
+                                    result = await runValidation(validationFunctions, data, context2);
+                                }
+                                return handleValidationResult(Vue, component, result, errorField, warningField, groupComponent);
+                            }
+                            finally {
+                                fieldValidator.isValidating = false;
+                            }
                         },
                         setResults: results => {
                             const result = results && results[path];
                             return handleValidationResult(Vue, component, result, errorField, warningField, groupComponent);
+                        }
+                    };
+
+                    $dryv.formValidators.push(fieldValidator);
+
+                    formComponent.$watch(path, (newValue, oldValue) => {
+                        if (lastDisabledFields != undefined && !fieldValidator.isValidating) {
+                            fieldValidator.validate(lastDisabledFields, fieldValidator.lastContext);
                         }
                     });
                 }
@@ -344,9 +405,12 @@ const Dryvue = {
                 }
 
                 let name;
+                let path = null;
+
                 switch (typeof binding.value) {
                     case "object":
                         name = binding.value.name;
+                        path = binding.value.path;
                         break;
                     case "string":
                         name = binding.value;
@@ -359,7 +423,7 @@ const Dryvue = {
                     throw `Form name is missing. Please specify a value for the ${dryvSetDirective} attribute.`;
                 }
 
-                initializeFormComponent(component, name, options);
+                initializeFormComponent(component, name, path, options);
             }
         });
     }

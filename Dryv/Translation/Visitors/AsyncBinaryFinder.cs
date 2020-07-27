@@ -30,6 +30,11 @@ namespace Dryv.Translation.Visitors
 
         protected override void VisitMethodCall(Context context, MethodCallExpression node)
         {
+            if (MethodCallExpressionHelper.CanInjectMethodCall(node, this.translationContext))
+            {
+                return;
+            }
+
             var objectType = node.Object?.Type ?? node.Method.DeclaringType;
             var context2 = this.translationContext.Clone<MethodTranslationContext>();
 
