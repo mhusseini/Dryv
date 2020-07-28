@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using System.IO;
+using System.Linq.Expressions;
 using Dryv.Rules;
 
 namespace Dryv.Translation
@@ -8,6 +9,8 @@ namespace Dryv.Translation
     /// </summary>
     public interface ITranslator
     {
+        string FormatIdentifier(string name);
+
         /// <summary>
         /// Translates the specified expression.
         /// </summary>
@@ -17,6 +20,6 @@ namespace Dryv.Translation
 
         string TranslateValue(object value);
 
-        string FormatIdentifier(string name);
+        bool TryWriteTerminal(Expression expression, TextWriter writer);
     }
 }

@@ -51,7 +51,7 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
             //}
 
             const string key = nameof(DryvDynamicControllerTranslator);
-
+            
             if (context.CustomData.ContainsKey(key))
             {
                 return false;

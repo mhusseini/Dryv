@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using Dryv.Configuration;
 using Dryv.Extensions;
 using Dryv.Reflection;
@@ -116,6 +116,15 @@ namespace Dryv.Translation
 
         public bool UseLowercaseMembers { get; set; }
 
+        public override string FormatIdentifier(string name)
+        {
+            return this.UseLowercaseMembers
+                ? name.Length == 1
+                    ? name.ToLower()
+                    : name.Substring(0, 1).ToLower() + name.Substring(1)
+                : name;
+        }
+
         public override void Translate(Expression expression, TranslationContext context, bool negated = false)
         {
             var needsBrackets = this.GetNeedsBrackets(expression);
@@ -148,23 +157,27 @@ namespace Dryv.Translation
 
         public override string TranslateValue(object value)
         {
-            switch (value)
+            return value switch
             {
-                case string txt:
-                    return $"\"{txt}\"";
+                string txt => $"\"{txt}\"",
+                bool b => (b ? "true" : "false"),
+                null => "null",
+                DateTime dateTime => $@"""{dateTime.ToString(CultureInfo.CurrentCulture)}""",
+                DateTimeOffset dateTime => $@"""{dateTime.ToString(CultureInfo.CurrentCulture)}""",
+                DryvValidationResult result => this.TranslateValidationResultObject(result),
+                _ => (this.Options.JsonConversion == null ? value.ToString() : this.Options.JsonConversion(value))
+            };
+        }
 
-                case bool b:
-                    return b ? "true" : "false";
-
-                case null:
-                    return "null";
-
-                case DryvValidationResult result:
-                    return this.TranslateValidationResultObject(result);
-
-                default:
-                    return this.Options.JsonConversion == null ? value.ToString() : this.Options.JsonConversion(value);
+        public override bool TryWriteTerminal(Expression expression, TextWriter writer)
+        {
+            if (!Terminals.TryGetValue(expression.NodeType, out var terminal))
+            {
+                return false;
             }
+
+            writer.Write(terminal);
+            return true;
         }
 
         public override void Visit(BinaryExpression expression, TranslationContext context, bool negated = false, bool leftOnly = false)
@@ -379,37 +392,6 @@ namespace Dryv.Translation
             }
         }
 
-        private Expression TranslateAsyncBooleanChain(BinaryExpression chain, TranslationContext context, AsyncBinaryFinder finder)
-        {
-            if (finder.AsyncPath.Contains(chain.Left))
-            {
-                return this.TranslateAsyncBooleanOperand(chain.Left, context, finder);
-            }
-
-            this.Translate(chain.Left, context);
-
-            TryWriteTerminal(chain, context.Writer);
-
-            if (finder.AsyncPath.Contains(chain.Right))
-            {
-                return this.TranslateAsyncBooleanOperand(chain.Right, context, finder);
-            }
-
-            this.Translate(chain.Right, context);
-
-            return Expression.Empty();
-        }
-
-        private Expression TranslateAsyncBooleanOperand(Expression expression, TranslationContext context, AsyncBinaryFinder finder)
-        {
-            if (expression is BinaryExpression chain && (chain.NodeType == ExpressionType.OrElse || chain.NodeType == ExpressionType.AndAlso))
-            {
-                return this.TranslateAsyncBooleanChain(chain, context, finder);
-            }
-
-            return expression;
-        }
-
         public override void Visit(ListInitExpression expression, TranslationContext context, bool negated = false)
         {
             context.Writer.Write("= [");
@@ -435,7 +417,6 @@ namespace Dryv.Translation
         {
             var asyncFinder = new AsyncMethodCallModifier(this, context);
             var body = asyncFinder.ApplyPromises(context.Rule, expression);
-
 
             foreach (var call in asyncFinder.AsyncCalls)
             {
@@ -468,7 +449,6 @@ namespace Dryv.Translation
             {
                 context.Writer.Write(";})");
             }
-
         }
 
         public override void Visit(MemberInitExpression expression, TranslationContext context, bool negated = false)
@@ -521,26 +501,6 @@ namespace Dryv.Translation
             {
                 context.Writer.Write(";})");
             }
-
-        }
-
-        private void TranslateMethodCall(MethodCallExpression expression, TranslationContext context, bool negated)
-        {
-            var objectType = expression.Object?.Type ?? expression.Method.DeclaringType;
-            var context2 = context.Clone<MethodTranslationContext>();
-            context2.Translator = this;
-            context2.Expression = expression;
-            context2.Negated = negated;
-
-            if (this.translatorProvider
-                .MethodCallTranslators
-                .Where(t => t.SupportsType(objectType))
-                .Any(t => t.Translate(context2)))
-            {
-                return;
-            }
-
-            throw new DryvMethodNotSupportedException(expression);
         }
 
         public override void Visit(NewArrayExpression expression, TranslationContext context, bool negated = false)
@@ -643,6 +603,95 @@ namespace Dryv.Translation
             this.Translate(expression.Operand, context, negatedExpression);
         }
 
+        private static bool TryWriteInjectedExpression(Expression expression, TranslationContext context)
+        {
+            var children = ExpressionInjectionHelper.GetInjectionParameters(expression, context);
+            if (children == null)
+            {
+                return false;
+            }
+
+            context.InjectRuntimeExpression(expression, children);
+
+            return true;
+        }
+
+        private static bool TryWriteInjectedMethod(MethodCallExpression expression, TranslationContext context)
+        {
+            if (!ExpressionInjectionHelper.CanInjectMethodCall(expression, context, out var parameters))
+            {
+                return false;
+            }
+
+            context.InjectRuntimeExpression(expression.Object ?? expression, parameters);
+            return true;
+        }
+
+        private bool GetNeedsBrackets(Expression expression)
+        {
+            return expression switch
+            {
+                BinaryExpression _ => true,
+                ConstantExpression _ => false,
+                ParameterExpression _ => false,
+                MethodCallExpression _ => false,
+                MemberExpression _ => false,
+                UnaryExpression _ => false,
+                LambdaExpression _ => false,
+                _ => this.translatorProvider.GenericTranslators.All(t => t.AllowSurroundingBrackets(expression) != false)
+            };
+        }
+
+        private Expression TranslateAsyncBooleanChain(BinaryExpression chain, TranslationContext context, AsyncBinaryFinder finder)
+        {
+            if (finder.AsyncPath.Contains(chain.Left))
+            {
+                return this.TranslateAsyncBooleanOperand(chain.Left, context, finder);
+            }
+
+            this.Translate(chain.Left, context);
+
+            TryWriteTerminal(chain, context.Writer);
+
+            if (finder.AsyncPath.Contains(chain.Right))
+            {
+                return this.TranslateAsyncBooleanOperand(chain.Right, context, finder);
+            }
+
+            this.Translate(chain.Right, context);
+
+            return Expression.Empty();
+        }
+
+        private Expression TranslateAsyncBooleanOperand(Expression expression, TranslationContext context, AsyncBinaryFinder finder)
+        {
+            if (expression is BinaryExpression chain && (chain.NodeType == ExpressionType.OrElse || chain.NodeType == ExpressionType.AndAlso))
+            {
+                return this.TranslateAsyncBooleanChain(chain, context, finder);
+            }
+
+            return expression;
+        }
+
+        private void TranslateMethodCall(MethodCallExpression expression, TranslationContext context, bool negated)
+        {
+            var objectType = expression.Object?.Type ?? expression.Method.DeclaringType;
+            var context2 = context.Clone<MethodTranslationContext>();
+            context2.Translator = this;
+            context2.Expression = expression;
+            context2.Negated = negated;
+
+            if (this.translatorProvider
+                .MethodCallTranslators
+                .Where(t => t.SupportsType(objectType))
+                .Any(t => t.Translate(context2)))
+            {
+                return;
+            }
+
+            throw new DryvMethodNotSupportedException(expression);
+        }
+
         private string TranslateValidationResultObject(DryvValidationResult result)
         {
             if (result.Type == DryvResultType.Success)
@@ -673,97 +722,6 @@ namespace Dryv.Translation
             sb.Append("}");
 
             return sb.ToString();
-        }
-
-        private static bool TryWriteInjectedExpression(Expression expression, TranslationContext context)
-        {
-            if (expression.Type == typeof(DryvValidationResult))
-            {
-                return false;
-            }
-
-            var memberExpression = expression as MemberExpression;
-            while (memberExpression != null)
-            {
-                if (typeof(Task).IsAssignableFrom(memberExpression.Expression.Type))
-                {
-                    return false;
-                }
-
-                memberExpression = memberExpression.Expression as MemberExpression;
-            }
-
-            var visitor = new ExpressionNodeFinder<ParameterExpression>();
-            visitor.Visit(expression);
-
-            var visitor2 = new ExpressionNodeFinder<MethodCallExpression>();
-            visitor2.Visit(expression);
-
-            if (!visitor.FoundChildren.Any() && !visitor2.FoundChildren.Any())
-            {
-                return false;
-            }
-
-            // Parameters that start with '$' are generated dummy parameters and should not be injected.
-            if (visitor.FoundChildren.Any(c => c.Name.StartsWith("$")))
-            {
-                return false;
-            }
-
-            if (visitor.FoundChildrenWithStack.Any(x => x.Value.Contains(expression) && x.Value.Any(o => o.Type == context.ModelType)))
-            {
-                return false;
-            }
-
-            context.InjectRuntimeExpression(expression, visitor.FoundChildren);
-
-            return true;
-        }
-
-        private static bool TryWriteInjectedMethod(MethodCallExpression expression, TranslationContext context)
-        {
-            if (!MethodCallExpressionHelper.CanInjectMethodCall(expression, context, out var parameters))
-            {
-                return false;
-            }
-
-            context.InjectRuntimeExpression(expression.Object ?? expression, parameters);
-            return true;
-        }
-
-        private static bool TryWriteTerminal(Expression expression, TextWriter writer)
-        {
-            if (!Terminals.TryGetValue(expression.NodeType, out var terminal))
-            {
-                return false;
-            }
-
-            writer.Write(terminal);
-            return true;
-        }
-
-        public override string FormatIdentifier(string name)
-        {
-            return this.UseLowercaseMembers
-                ? name.Length == 1
-                    ? name.ToLower()
-                    : name.Substring(0, 1).ToLower() + name.Substring(1)
-                : name;
-        }
-
-        private bool GetNeedsBrackets(Expression expression)
-        {
-            return expression switch
-            {
-                BinaryExpression _ => true,
-                ConstantExpression _ => false,
-                ParameterExpression _ => false,
-                MethodCallExpression _ => false,
-                MemberExpression _ => false,
-                UnaryExpression _ => false,
-                LambdaExpression _ => false,
-                _ => this.translatorProvider.GenericTranslators.All(t => t.AllowSurroundingBrackets(expression) != false)
-            };
         }
 
         private void WriteMember(MemberExpression expression, TranslationContext context)

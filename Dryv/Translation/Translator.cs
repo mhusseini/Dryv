@@ -24,6 +24,11 @@ namespace Dryv.Translation
 
         protected DryvOptions Options { get; }
 
+        public virtual string FormatIdentifier(string name)
+        {
+            return name;
+        }
+
         public virtual TranslationResult Translate(Expression expression, MemberExpression propertyExpression, DryvCompiledRule rule)
         {
             var result = this.GenerateJavaScriptCode(expression, propertyExpression, rule);
@@ -39,10 +44,7 @@ namespace Dryv.Translation
             return value?.ToString();
         }
 
-        public virtual string FormatIdentifier(string name)
-        {
-            return name;
-        }
+        public abstract bool TryWriteTerminal(Expression expression, TextWriter writer);
 
         public virtual void Visit(BinaryExpression expression, TranslationContext context, bool negated = false, bool leftOnly = false)
         {

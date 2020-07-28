@@ -30,8 +30,9 @@ namespace Dryv.Translation.Visitors
 
         protected override void VisitMethodCall(Context context, MethodCallExpression node)
         {
-            if (MethodCallExpressionHelper.CanInjectMethodCall(node, this.translationContext))
+            if (ExpressionInjectionHelper.CanInjectMethodCall(node, this.translationContext))
             {
+                base.VisitMethodCall(context, node);
                 return;
             }
 

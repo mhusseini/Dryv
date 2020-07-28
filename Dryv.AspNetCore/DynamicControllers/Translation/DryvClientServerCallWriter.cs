@@ -17,7 +17,7 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
         {
             var w = context.Writer;
 
-            w.Write("dryv.validateAsync('");
+            w.Write("$context.dryv.callServer('");
             w.Write(url);
             w.Write("','");
             w.Write(httpMethod);
@@ -29,8 +29,8 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
             var visitor = new ObjectWriter(translator, context, members.ToDictionary(m => m.Member, m => (Expression)m), w);
             visitor.Write(parameter.Type);
 
-            w.Write(@").then(function($result){ return $context && $context.intercept ? $context.intercept($context, ");
-            w.Write(parameter.Name);
+            w.Write(@").then(function($result){ return $context && $context.onServerResult ? $context.onServerResult($context, ");
+            w.Write(context.Translator.TranslateValue(parameter.Name));
             w.Write(", ");
             w.Write(context.Translator.TranslateValue(context.Rule.ModelPath));
             w.Write(", ");
@@ -40,11 +40,11 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
 
         private class ObjectWriter
         {
-            private IDictionary<MemberInfo, Expression> members;
-            private readonly ITranslator translator;
             private readonly TranslationContext context;
-            private TextWriter writer;
-            private Dictionary<Expression, List<Expression>> usedObjects;
+            private readonly IDictionary<MemberInfo, Expression> members;
+            private readonly ITranslator translator;
+            private readonly Dictionary<Expression, List<Expression>> usedObjects;
+            private readonly TextWriter writer;
 
             public ObjectWriter(ITranslator translator, TranslationContext context, IDictionary<MemberInfo, Expression> members, TextWriter writer)
             {
