@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Dryv.Configuration;
 using Dryv.Extensions;
+using Dryv.Translation;
 
 namespace Dryv.Validation
 {
@@ -49,7 +50,7 @@ namespace Dryv.Validation
                 writer.Write("\"");
                 writer.Write(parameter.Key.ToCamelCase());
                 writer.Write("\":");
-                writer.Write(this.options.JsonConversion(parameter.Value));
+                writer.Write(JavaScriptHelper.TranslateValue(parameter.Value) ?? this.options.JsonConversion(parameter.Value));
                 sep = ",";
             }
 

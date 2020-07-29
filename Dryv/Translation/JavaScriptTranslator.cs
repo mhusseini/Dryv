@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -157,13 +156,8 @@ namespace Dryv.Translation
 
         public override string TranslateValue(object value)
         {
-            return value switch
+            return JavaScriptHelper.TranslateValue(value) ?? value switch
             {
-                string txt => $"\"{txt}\"",
-                bool b => (b ? "true" : "false"),
-                null => "null",
-                DateTime dateTime => $@"""{dateTime.ToString(CultureInfo.CurrentCulture)}""",
-                DateTimeOffset dateTime => $@"""{dateTime.ToString(CultureInfo.CurrentCulture)}""",
                 DryvValidationResult result => this.TranslateValidationResultObject(result),
                 _ => (this.Options.JsonConversion == null ? value.ToString() : this.Options.JsonConversion(value))
             };
