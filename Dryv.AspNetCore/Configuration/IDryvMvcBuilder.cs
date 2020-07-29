@@ -1,10 +1,10 @@
 ﻿using Dryv.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Dryv.AspNetCore.Internal
+namespace Dryv.AspNetCore
 {
     public interface IDryvMvcBuilder : IDryvBuilder<IDryvMvcBuilder>
     {
-        public IServiceCollection Services { get; }
+        IMvcBuilder MvcBuilder { get; }
     }
 }

@@ -7,12 +7,12 @@ namespace Dryv.Translation.Visitors
     internal class AsyncBinaryFinder : ExpressionVisitor<object>
     {
         private readonly Dictionary<Expression, Expression> parents = new Dictionary<Expression, Expression>();
+        private readonly IReadOnlyCollection<IDryvMethodCallTranslator> methodCallTranslators;
         private readonly TranslationContext translationContext;
-        private readonly TranslatorProvider translatorProvider;
 
-        public AsyncBinaryFinder(TranslatorProvider translatorProvider, TranslationContext translationContext)
+        public AsyncBinaryFinder(IReadOnlyCollection<IDryvMethodCallTranslator> methodCallTranslators, TranslationContext translationContext)
         {
-            this.translatorProvider = translatorProvider;
+            this.methodCallTranslators = methodCallTranslators;
             this.translationContext = translationContext;
         }
 
@@ -43,8 +43,7 @@ namespace Dryv.Translation.Visitors
             context2.WhatIfMode = true;
             context2.IsAsync = false;
 
-            if (!this.translatorProvider
-                    .MethodCallTranslators
+            if (!this.methodCallTranslators
                     .Where(t => t.SupportsType(objectType))
                     .Any(t => t.Translate(context2)) ||
                 !context2.IsAsync)

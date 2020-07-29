@@ -106,11 +106,13 @@ namespace Dryv.Translation
             [ExpressionType.UnaryPlus] = "++",
         };
 
-        private readonly TranslatorProvider translatorProvider;
+        private readonly IReadOnlyCollection<IDryvCustomTranslator> customTranslators;
+        private readonly IReadOnlyCollection<IDryvMethodCallTranslator> methodCallTranslators;
 
-        public JavaScriptTranslator(TranslatorProvider translatorProvider, DryvOptions options) : base(options)
+        public JavaScriptTranslator(IReadOnlyCollection<IDryvCustomTranslator> customTranslators, IReadOnlyCollection<IDryvMethodCallTranslator> methodCallTranslators, DryvOptions options) : base(options)
         {
-            this.translatorProvider = translatorProvider;
+            this.customTranslators = customTranslators;
+            this.methodCallTranslators = methodCallTranslators;
         }
 
         public bool UseLowercaseMembers { get; set; }
@@ -138,7 +140,7 @@ namespace Dryv.Translation
             context2.Expression = expression;
             context2.Negated = negated;
 
-            if (!this.translatorProvider.GenericTranslators.Any(t => t.TryTranslate(context2)) &&
+            if (!this.customTranslators.Any(t => t.TryTranslate(context2)) &&
                 !context.DynamicTranslation.Any(t => t(expression, context2)))
             {
                 this.Visit((dynamic)expression, context2, negated);
@@ -335,13 +337,7 @@ namespace Dryv.Translation
 
         public override void Visit(ConditionalExpression expression, TranslationContext context, bool negated = false)
         {
-            //this.Translate(expression.Test, context);
-            //context.Writer.Write(" ? ");
-            //this.Translate(expression.IfTrue, context);
-            //context.Writer.Write(" : ");
-            //this.Translate(expression.IfFalse, context);
-
-            var finder = new AsyncBinaryFinder(this.translatorProvider, context);
+            var finder = new AsyncBinaryFinder(this.methodCallTranslators, context);
             finder.Visit(expression.Test);
 
             if (finder.AsyncBinaryExpressions.Any())
@@ -390,6 +386,7 @@ namespace Dryv.Translation
         {
             context.Writer.Write("= [");
             var sep = string.Empty;
+
             foreach (var initializer in expression.Initializers)
             {
                 context.Writer.Write(sep);
@@ -399,6 +396,7 @@ namespace Dryv.Translation
                 }
                 sep = ", ";
             }
+
             context.Writer.Write("]");
         }
 
@@ -632,7 +630,7 @@ namespace Dryv.Translation
                 MemberExpression _ => false,
                 UnaryExpression _ => false,
                 LambdaExpression _ => false,
-                _ => this.translatorProvider.GenericTranslators.All(t => t.AllowSurroundingBrackets(expression) != false)
+                _ => this.customTranslators.All(t => t.AllowSurroundingBrackets(expression) != false)
             };
         }
 
@@ -675,8 +673,7 @@ namespace Dryv.Translation
             context2.Expression = expression;
             context2.Negated = negated;
 
-            if (this.translatorProvider
-                .MethodCallTranslators
+            if (this.methodCallTranslators
                 .Where(t => t.SupportsType(objectType))
                 .Any(t => t.Translate(context2)))
             {

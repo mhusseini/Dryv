@@ -3,7 +3,6 @@ using Dryv.AspNetCore.DynamicControllers;
 using Dryv.AspNetCore.DynamicControllers.CodeGeneration;
 using Dryv.AspNetCore.DynamicControllers.Endpoints;
 using Dryv.AspNetCore.DynamicControllers.Translation;
-using Dryv.AspNetCore.Internal;
 using Dryv.Translation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
@@ -21,16 +20,16 @@ namespace Dryv.AspNetCore
 
         public static IDryvMvcBuilder AddDryvDynamicControllers(this IDryvMvcBuilder dryvBuilder, Action<DryvDynamicControllerOptions> setupAction = null)
         {
-            var services = dryvBuilder.Services;
+            dryvBuilder.Options.Translators.Add<DryvDynamicControllerTranslator>();
+            dryvBuilder.Options.Translators.Add<DryvDynamicControllerMethodTranslator>();
+
             var options = new DryvDynamicControllerOptions();
-            
             setupAction?.Invoke(options);
 
+            var services = dryvBuilder.MvcBuilder.Services;
             services.AddSingleton(Options.Create(options));
             services.AddSingleton<ControllerGenerator>();
             services.AddSingleton<DryvDynamicControllerRegistration>();
-            services.AddSingleton<IDryvMethodCallTranslator, DryvDynamicControllerTranslator>();
-            services.AddSingleton<IDryvCustomTranslator, DryvDynamicControllerTranslator>();
             services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.TryAddSingleton(typeof(IDryvClientServerCallWriter), options.DynamicControllerCallWriterType ?? typeof(DryvClientServerCallWriter));
 

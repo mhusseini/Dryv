@@ -8,11 +8,6 @@ namespace Dryv.Translation
     public interface IDryvCustomTranslator
     {
         /// <summary>
-        /// A number specifying the order in which tha translator is called. The higher the number, the later the translator will get called.
-        /// </summary>
-        int? OrderIndex { get; set; }
-
-        /// <summary>
         /// Determines whether the calling translator may surround the translation of specified expression with round brackets "(" and ")".
         /// </summary>
         /// <param name="expression"></param>

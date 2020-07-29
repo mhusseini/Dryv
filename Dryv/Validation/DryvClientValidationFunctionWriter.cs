@@ -1,11 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Dryv.Configuration;
+using Dryv.Extensions;
+using Dryv.Translation;
 
 namespace Dryv.Validation
 {
     public class DryvClientValidationFunctionWriter : IDryvClientValidationFunctionWriter
     {
+        private readonly DryvOptions options;
+
+        public DryvClientValidationFunctionWriter(DryvOptions options)
+        {
+            this.options = options;
+        }
+
         private string JavaScriptEscape(string text)
         {
             return text
@@ -44,11 +54,31 @@ namespace Dryv.Validation
 
                 writer.Write("\"validate\": ");
                 writer.Write(rule.ClientCode);
+                writer.Write(",\"annotations\": ");
+                this.WriteObject(writer, rule.Rule.Annotations);
 
                 writer.Write("}");
             }
 
             writer.Write("]");
         };
+
+        private void WriteObject(TextWriter writer, IDictionary<string, object> parameters)
+        {
+            var sep = string.Empty;
+            writer.Write("{");
+
+            foreach (var parameter in parameters)
+            {
+                writer.Write(sep);
+                writer.Write("\"");
+                writer.Write(parameter.Key.ToCamelCase());
+                writer.Write("\":");
+                writer.Write(JavaScriptHelper.TranslateValue(parameter.Value) ?? this.options.JsonConversion(parameter.Value));
+                sep = ",";
+            }
+
+            writer.Write("}");
+        }
     }
 }

@@ -26,7 +26,7 @@ namespace Dryv.Validation
             writer.Write("})(window.dryv || (window.dryv = {}));");
         }
 
-        public virtual void WriteValidationSet(TextWriter writer, string validationSetName, IDictionary<string, Action<TextWriter>> validators, IDictionary<string, Action<TextWriter>> disablers, Dictionary<string, object> parameters)
+        public virtual void WriteValidationSet(TextWriter writer, string validationSetName, IDictionary<string, Action<TextWriter>> validators, IDictionary<string, Action<TextWriter>> disablers, IDictionary<string, object> parameters)
         {
             writer.Write(@"dryv.v[""");
             writer.Write(validationSetName);
@@ -39,7 +39,7 @@ namespace Dryv.Validation
             writer.Write("};");
         }
 
-        private void WriteParameters(TextWriter writer, Dictionary<string, object> parameters)
+        private void WriteParameters(TextWriter writer, IDictionary<string, object> parameters)
         {
             var sep = string.Empty;
             writer.Write("{");

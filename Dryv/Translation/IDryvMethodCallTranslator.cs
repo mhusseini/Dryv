@@ -9,19 +9,14 @@ namespace Dryv.Translation
     public interface IDryvMethodCallTranslator
     {
         /// <summary>
-        /// A number specifying the order in which tha translator is called. The higher the number, the later the translator will get called.
-        /// </summary>
-        int? OrderIndex { get; set; }
-
-        /// <summary>
-        /// Returns a valud indicating whether the  specified type is supported by the translator.
+        /// Returns a value indicating whether the  specified type is supported by the translator.
         /// </summary>
         bool SupportsType(Type type);
 
         /// <summary>
-        /// Translates the specified methos call.
+        /// Translates the specified method call.
         /// </summary>
-        /// <param name="context">An object that contains the <see cref="MethodCallExpression"/> to be translated as well as soem context information.</param>
+        /// <param name="context">An object that contains the <see cref="MethodCallExpression"/> to be translated as well as some context information.</param>
         /// <returns><c>true</c>, if the method call could be translated; otherwise, <c>false</c>.</returns>
         bool Translate(MethodTranslationContext context);
     }

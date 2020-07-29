@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Dryv.AspNetCore.DynamicControllers.Endpoints;
 using Dryv.AspNetCore.Internal;
 using Dryv.Configuration;
 using Dryv.RuleDetection;
+using Dryv.Rules;
 using Dryv.Translation;
 using Dryv.Translation.Translators;
 using Dryv.Validation;
@@ -18,7 +22,16 @@ namespace Dryv.AspNetCore
     {
         public static IDryvMvcBuilder AddDryv(this IMvcBuilder mvcBuilder, Action<DryvOptions> setupAction = null)
         {
-            var options = new DryvOptions();
+            var options = new DryvMvcCoreOptions(t => mvcBuilder.Services.AddSingleton(t, t));
+
+            options.Translators.Add<DryvValidationResultTranslator>();
+            options.Translators.Add<DateTimeTranslator>();
+            options.Translators.Add<StringTranslator>();
+            options.Translators.Add<ToStringTranslator>();
+            options.Translators.Add<EnumerableTranslator>();
+            options.Translators.Add<RegexTranslator>();
+            options.Translators.Add<CustomCodeTranslator>();
+
             setupAction?.Invoke(options);
 
             if (options.JsonConversion == null)
@@ -37,34 +50,26 @@ namespace Dryv.AspNetCore
                 mvcBuilder.AddMvcOptions(opts => opts.Filters.Add<DryvValidationFilterAttribute>());
             }
 
-            return RegsterServices(mvcBuilder.Services, options);
-        }
+            var serviceCollection = mvcBuilder.Services;
 
-        private static IDryvMvcBuilder RegsterServices(this IServiceCollection services, DryvOptions options)
-        {
-            services.TryAddSingleton<DryvEndpointRouteBuilderProvider>();
-            services.TryAddSingleton(typeof(IDryvClientValidationFunctionWriter), options.ClientFunctionWriterType ?? DryvOptions.DefaultClientFunctionWriterType);
-            services.TryAddSingleton(typeof(IDryvClientValidationSetWriter), options.ClientValidationSetWriterType ?? DryvOptions.DefaultClientValidationSetWriterType);
-            services.TryAddSingleton<ITranslator, JavaScriptTranslator>();
-            services.TryAddSingleton<ModelTreeBuilder>();
-            services.TryAddSingleton<TranslatorProvider>();
-            services.TryAddSingleton<DryvValidator>();
-            services.TryAddSingleton<DryvCompiler>();
-            services.TryAddSingleton<DryvTranslator>();
-            services.TryAddSingleton<DryvRuleFinder>();
-            services.TryAddSingleton<DryvClientWriter>();
-            services.AddSingleton(Options.Create(options));
-            services.AddSingleton(options);
+            serviceCollection.TryAddSingleton<DryvEndpointRouteBuilderProvider>();
+            serviceCollection.TryAddSingleton(typeof(IDryvClientValidationFunctionWriter), options.ClientFunctionWriterType ?? DryvOptions.DefaultClientFunctionWriterType);
+            serviceCollection.TryAddSingleton(typeof(IDryvClientValidationSetWriter), options.ClientValidationSetWriterType ?? DryvOptions.DefaultClientValidationSetWriterType);
+            serviceCollection.TryAddSingleton<ITranslator, JavaScriptTranslator>();
+            serviceCollection.TryAddSingleton<ModelTreeBuilder>();
+            serviceCollection.TryAddSingleton<DryvValidator>();
+            serviceCollection.TryAddSingleton<DryvCompiler>();
+            serviceCollection.TryAddSingleton<DryvTranslator>();
+            serviceCollection.TryAddSingleton<DryvRuleFinder>();
+            serviceCollection.TryAddSingleton<DryvClientWriter>();
+            serviceCollection.AddSingleton(Options.Create((DryvOptions)options));
+            serviceCollection.AddSingleton(typeof(DryvOptions), options);
 
-            return new DryvMvcBuilder(services)
-                //.AddTranslator<ObjectTranslator>()
-                .AddTranslator<DryvValidationResultTranslator>()
-                .AddTranslator<DateTimeTranslator>()
-                .AddTranslator<StringTranslator>()
-                .AddTranslator<ToStringTranslator>()
-                .AddTranslator<EnumerableTranslator>()
-                .AddTranslator<RegexTranslator>()
-                .AddTranslator<CustomCodeTranslator>();
+            serviceCollection.AddSingleton<IReadOnlyCollection<IDryvRuleAnnotator>>(services => new ReadOnlyCollection<IDryvRuleAnnotator>(options.Annotators.Select(services.GetService).Cast<IDryvRuleAnnotator>().ToList()));
+            serviceCollection.AddSingleton<IReadOnlyCollection<IDryvMethodCallTranslator>>(services => new ReadOnlyCollection<IDryvMethodCallTranslator>(options.Translators.Where(t => typeof(IDryvMethodCallTranslator).IsAssignableFrom(t)).Select(services.GetService).Cast<IDryvMethodCallTranslator>().ToList()));
+            serviceCollection.AddSingleton<IReadOnlyCollection<IDryvCustomTranslator>>(services => new ReadOnlyCollection<IDryvCustomTranslator>(options.Translators.Where(t => typeof(IDryvCustomTranslator).IsAssignableFrom(t)).Select(services.GetService).Cast<IDryvCustomTranslator>().ToList()));
+
+            return new DryvMvcBuilder(options, mvcBuilder);
         }
     }
 }

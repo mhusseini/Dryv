@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Dryv.AspNetCore</RootNamespace>
-    <Version>6.0.0-pre.22</Version>
+    <Version>6.0.0-pre.23</Version>
     <Authors>Munir husseini</Authors>
     <Company>Munir husseini</Company>
     <Product>Dryv</Product>
@@ -18,6 +18,9 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <LangVersion>8</LangVersion>
     <IsPackable>true</IsPackable>
+    <ApplicationIcon />
+    <OutputType>Library</OutputType>
+    <StartupObject />
   </PropertyGroup>
 
   <ItemGroup>

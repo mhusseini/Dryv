@@ -6,12 +6,12 @@ namespace Dryv.Translation.Visitors
 {
     public class AsyncMethodCallFinder : ExpressionVisitor<object>
     {
+        private readonly IReadOnlyCollection<IDryvMethodCallTranslator> methodCallTranslators;
         private readonly TranslationContext translationContext;
-        private readonly TranslatorProvider translatorProvider;
 
-        public AsyncMethodCallFinder(TranslatorProvider translatorProvider, TranslationContext translationContext)
+        public AsyncMethodCallFinder(IReadOnlyCollection<IDryvMethodCallTranslator> methodCallTranslators, TranslationContext translationContext)
         {
-            this.translatorProvider = translatorProvider;
+            this.methodCallTranslators = methodCallTranslators;
             this.translationContext = translationContext;
         }
 
@@ -38,8 +38,7 @@ namespace Dryv.Translation.Visitors
             context2.WhatIfMode = true;
             context2.IsAsync = false;
 
-            if (this.translatorProvider
-                    .MethodCallTranslators
+            if (this.methodCallTranslators
                     .Where(t => t.SupportsType(objectType))
                     .Any(t => t.Translate(context2)) &&
                 context2.IsAsync)

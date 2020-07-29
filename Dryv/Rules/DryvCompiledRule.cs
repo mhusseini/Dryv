@@ -11,36 +11,27 @@ namespace Dryv.Rules
     [DebuggerDisplay("{" + nameof(ValidationExpression) + "}")]
     public sealed class DryvCompiledRule
     {
+        public Dictionary<string, object> Annotations { get; internal set; } = new Dictionary<string, object>();
         public string CodeTemplate { get; internal set; }
         public Func<object[], bool> CompiledEnablingExpression { get; internal set; }
         public Func<object, object[], object> CompiledValidationExpression { get; internal set; }
+        public LambdaExpression EnablingExpression { get; internal set; }
         public DryvRuleLocation EvaluationLocation { get; internal set; }
         public string GroupName { get; internal set; }
         public bool IsAsync { get; internal set; }
-        public RuleType RuleType { get; internal set; } = RuleType.Validation;
         public string ModelPath { get; internal set; }
         public Type ModelType { get; internal set; }
         public string Name { get; internal set; }
         public Type[] PreevaluationOptionTypes { get; internal set; }
         public PropertyInfo Property { get; internal set; }
+        public MemberExpression PropertyExpression { get; internal set; }
+        public RuleType RuleType { get; internal set; } = RuleType.Validation;
         public Func<Func<Type, object>, object[], string> TranslatedValidationExpression { get; internal set; }
         public Exception TranslationError { get; internal set; }
-        internal LambdaExpression EnablingExpression { get; set; }
-        internal MemberExpression PropertyExpression { get; set; }
-        internal string UniquePath { get; set; }
-        internal LambdaExpression ValidationExpression { get; set; }
+        public LambdaExpression ValidationExpression { get; internal set; }
         internal List<DryvCompiledRule> Parameters { get; set; }
+        internal string UniquePath { get; set; }
 
-        public static DryvCompiledRule CreateParameter(string name, Expression<Func<object, object[], object>> lambda, Type[] services)
-        {
-            return new DryvCompiledRule
-            {
-                RuleType = RuleType.Parameter,
-                Name = name,
-                PreevaluationOptionTypes = services,
-                CompiledValidationExpression = lambda.Compile()
-            };
-        }
         public static DryvCompiledRule Create<TModel, TProperty>(Expression<Func<TModel, TProperty>> propertyExpression, LambdaExpression validationExpression, LambdaExpression enablingExpression, DryvRuleLocation ruleLocation, string groupName)
         {
             var body = propertyExpression.Body is UnaryExpression unaryExpression
@@ -85,6 +76,17 @@ namespace Dryv.Rules
                 Property = propertyInfo,
                 PropertyExpression = memberExpression,
                 ValidationExpression = validationExpression,
+            };
+        }
+
+        public static DryvCompiledRule CreateParameter(string name, Expression<Func<object, object[], object>> lambda, Type[] services)
+        {
+            return new DryvCompiledRule
+            {
+                RuleType = RuleType.Parameter,
+                Name = name,
+                PreevaluationOptionTypes = services,
+                CompiledValidationExpression = lambda.Compile()
             };
         }
 

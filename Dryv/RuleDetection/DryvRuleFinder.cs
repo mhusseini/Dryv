@@ -31,13 +31,15 @@ namespace Dryv.RuleDetection
         private readonly DryvCompiler compiler;
         private readonly DryvOptions options;
         private readonly ITranslator translator;
+        private readonly IReadOnlyCollection<IDryvRuleAnnotator> annotators;
         private readonly ModelTreeBuilder treeBuilder;
 
-        public DryvRuleFinder(ModelTreeBuilder treeBuilder, DryvCompiler compiler, ITranslator translator, DryvOptions options)
+        public DryvRuleFinder(ModelTreeBuilder treeBuilder, DryvCompiler compiler, ITranslator translator, IReadOnlyCollection<IDryvRuleAnnotator> annotators, DryvOptions options)
         {
             this.compiler = compiler;
             this.treeBuilder = treeBuilder;
             this.translator = translator;
+            this.annotators = annotators;
             this.options = options;
         }
 
@@ -52,6 +54,11 @@ namespace Dryv.RuleDetection
 
                 foreach (var rule in rules)
                 {
+                    foreach (var annotator in this.annotators)
+                    {
+                        annotator.Annotate(rule, rule.ValidationExpression);
+                    }
+
                     var nodes = GetNodesForRule(flatTree, rule);
                     result.AddRange(nodes.Select(node => this.ApplyRuleToNode(node, rule)));
                 }
@@ -225,6 +232,7 @@ namespace Dryv.RuleDetection
                 Property = rule.Property,
                 UniquePath = rule.UniquePath,
                 Parameters = rule.Parameters,
+                Annotations = rule.Annotations,
             };
 
             this.Translate(transposedRule, transposedRule.ValidationExpression);

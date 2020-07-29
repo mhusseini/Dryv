@@ -10,6 +10,6 @@ namespace Dryv.Validation
 
         void WriteEnd(TextWriter writer);
 
-        void WriteValidationSet(TextWriter writer, string validationSetName, IDictionary<string, Action<TextWriter>> validators, IDictionary<string, Action<TextWriter>> disablers, Dictionary<string, object> parameters);
+        void WriteValidationSet(TextWriter writer, string validationSetName, IDictionary<string, Action<TextWriter>> validators, IDictionary<string, Action<TextWriter>> disablers, IDictionary<string, object> parameters);
     }
 }
