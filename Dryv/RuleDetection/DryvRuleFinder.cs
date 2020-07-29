@@ -39,7 +39,7 @@ namespace Dryv.RuleDetection
             this.compiler = compiler;
             this.treeBuilder = treeBuilder;
             this.translator = translator;
-            this.annotators = annotators;
+            this.annotators = annotators ?? new ArraySegment<IDryvRuleAnnotator>();
             this.options = options;
         }
 

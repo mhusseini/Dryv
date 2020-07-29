@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Dryv;
 using Dryv.Configuration;
 using Dryv.RuleDetection;
-using Dryv.Validation;
 using Dryv.SampleConsole.Models;
 
 internal class Program
@@ -20,7 +18,7 @@ internal class Program
         };
 
         var options = new DryvOptions();
-        var validator = new DryvValidator(new DryvRuleFinder(new ModelTreeBuilder(), new DryvCompiler(), null, options), options);
+        var validator = new DryvValidator(new DryvRuleFinder(new ModelTreeBuilder(), new DryvCompiler(), null, null, options), options);
 
         var errors = await validator.Validate(model, Activator.CreateInstance);
 

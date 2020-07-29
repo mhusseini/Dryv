@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Dryv.Configuration;
 using Dryv.Extensions;
@@ -57,23 +58,28 @@ namespace Dryv.Tests
 
         private static JavaScriptTranslator CreateTranslator(object[] translators)
         {
-            var translatorProvider = new TranslatorProvider();
+            var methodCallTranslators = new Collection<IDryvMethodCallTranslator>
+            {
+                new RegexTranslator(),
+                new DryvValidationResultTranslator(),
+                new StringTranslator(),
+                new EnumerableTranslator()
+            };
 
-            translatorProvider.MethodCallTranslators.Add(new RegexTranslator());
-            translatorProvider.MethodCallTranslators.Add(new DryvValidationResultTranslator());
-            translatorProvider.MethodCallTranslators.Add(new StringTranslator());
-            translatorProvider.MethodCallTranslators.Add(new EnumerableTranslator());
-            translatorProvider.GenericTranslators.Add(new RegexTranslator());
-            translatorProvider.GenericTranslators.Add(new DryvValidationResultTranslator());
-            translatorProvider.GenericTranslators.Add(new ObjectTranslator());
+            var customTranslators = new Collection<IDryvCustomTranslator>
+            {
+                new RegexTranslator(),
+                new DryvValidationResultTranslator(),
+                new ObjectTranslator()
+            };
 
             if (translators != null)
             {
-                translatorProvider.MethodCallTranslators.AddRange(translators.OfType<IDryvMethodCallTranslator>());
-                translatorProvider.GenericTranslators.AddRange(translators.OfType<IDryvCustomTranslator>());
+                methodCallTranslators.AddRange(translators.OfType<IDryvMethodCallTranslator>());
+                customTranslators.AddRange(translators.OfType<IDryvCustomTranslator>());
             }
 
-            return new JavaScriptTranslator(translatorProvider, new DryvOptions());
+            return new JavaScriptTranslator(customTranslators, methodCallTranslators, new DryvOptions());
         }
 
         protected abstract class TestModel

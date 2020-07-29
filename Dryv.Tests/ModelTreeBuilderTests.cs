@@ -1,4 +1,5 @@
 using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -41,21 +42,27 @@ namespace Dryv.Tests
                 }
             };
 
-            var translatorProvider = new TranslatorProvider();
+            var methodCallTranslators = new Collection<IDryvMethodCallTranslator>
+            {
+                new RegexTranslator(),
+                new DryvValidationResultTranslator(),
+                new StringTranslator(),
+                new EnumerableTranslator()
+            };
 
-            translatorProvider.MethodCallTranslators.Add(new RegexTranslator());
-            translatorProvider.MethodCallTranslators.Add(new DryvValidationResultTranslator());
-            translatorProvider.MethodCallTranslators.Add(new StringTranslator());
-            translatorProvider.MethodCallTranslators.Add(new EnumerableTranslator());
-            translatorProvider.GenericTranslators.Add(new RegexTranslator());
-            translatorProvider.GenericTranslators.Add(new DryvValidationResultTranslator());
-            translatorProvider.GenericTranslators.Add(new ObjectTranslator());
+            var customTranslators = new Collection<IDryvCustomTranslator>
+            {
+                new RegexTranslator(),
+                new DryvValidationResultTranslator(),
+                new ObjectTranslator()
+            };
+
 
             var options = new DryvOptions();
             var treeBuilder = new ModelTreeBuilder();
             var compiler = new DryvCompiler();
-            var javaScriptTranslator = new JavaScriptTranslator(translatorProvider, options);
-            var ruleFinder = new DryvRuleFinder(treeBuilder, compiler, javaScriptTranslator, options);
+            var javaScriptTranslator = new JavaScriptTranslator(customTranslators, methodCallTranslators, options);
+            var ruleFinder = new DryvRuleFinder(treeBuilder, compiler, javaScriptTranslator, null, options);
             var modelType = typeof(ParentModel);
             
             var validator = new DryvValidator(ruleFinder, options);
