@@ -8,9 +8,9 @@ namespace Dryv.AspNetCore
 {
     public static class DryvPreloaderBuilderExtensions
     {
-        public static IDryvMvcBuilder AddDryvPreloading(this IDryvMvcBuilder mvcBuilder, Action<DryvPreloaderOptions> setupAction = null)
+        public static IDryvMvcBuilder AddDryvPreloading(this IDryvMvcBuilder mvcBuilder, Action<DryvPreloadingOptions> setupAction = null)
         {
-            var options = new DryvPreloaderOptions { IsEnabled = true };
+            var options = new DryvPreloadingOptions { IsEnabled = true };
             setupAction?.Invoke(options);
 
             mvcBuilder.MvcBuilder.Services.AddSingleton(Options.Create(options));

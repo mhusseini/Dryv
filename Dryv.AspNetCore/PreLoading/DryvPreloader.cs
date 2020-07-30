@@ -9,11 +9,11 @@ namespace Dryv.AspNetCore.PreLoading
 {
     internal class DryvPreloader : IDisposable
     {
-        private readonly IOptions<DryvPreloaderOptions> options;
+        private readonly IOptions<DryvPreloadingOptions> options;
         private readonly DryvRuleFinder ruleFinder;
         private bool hasStarted;
 
-        public DryvPreloader(DryvRuleFinder ruleFinder, IOptions<DryvPreloaderOptions> options)
+        public DryvPreloader(DryvRuleFinder ruleFinder, IOptions<DryvPreloadingOptions> options)
         {
             this.ruleFinder = ruleFinder;
             this.options = options;

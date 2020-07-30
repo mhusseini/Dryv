@@ -42,11 +42,16 @@ namespace Dryv.Rules
             DryvRuleSettings settings,
             DryvRuleLocation ruleLocation)
         {
-            var ruleDefinition = DryvCompiledRule.Create(property, rule, enabled, ruleLocation, settings?.GroupName);
+            var ruleDefinition = DryvCompiledRule.Create(property, rule, enabled, ruleLocation, null);
             ruleDefinition.RuleType = RuleType.Validation;
-            ruleDefinition.Name = settings?.Name;
             ruleDefinition.Parameters = this.Parameters;
-            ruleDefinition.Annotations = settings;
+
+            if (settings != null)
+            {
+                ruleDefinition.Annotations = settings;
+                ruleDefinition.Name = settings.Name;
+                ruleDefinition.GroupName = settings.GroupName;
+            }
 
             this.ValidationRules.Add(ruleDefinition);
         }

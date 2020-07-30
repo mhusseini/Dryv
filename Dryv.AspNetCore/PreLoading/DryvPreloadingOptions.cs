@@ -1,6 +1,6 @@
 ﻿namespace Dryv.AspNetCore.PreLoading
 {
-    public class DryvPreloaderOptions
+    public class DryvPreloadingOptions
     {
         public bool IsEnabled { get; set; }
     }
