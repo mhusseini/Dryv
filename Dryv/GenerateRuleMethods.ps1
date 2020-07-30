@@ -60,39 +60,24 @@ function WriteMethod($propCount, $optionCount, $methodPrefix)
 
 		@"
 		public DryvRules<TModel> $($methodPrefix)Rule$gen(
-$parameters			Func<TModel, $($gen2)DryvValidationResult> rule$ruleSwitch, string ruleName = null)
+$parameters			Func<TModel, $($gen2)DryvValidationResult> rule$ruleSwitch, DryvRuleSettings settings = null)
         {
-			this.Add$($methodPrefix)(null, rule,
+			this.Add$($methodPrefix)(rule,
 				new[] { $properties},
 				$ruleSwitchArgument,
-				ruleName$gen3);
+				settings
+				$gen3);
 			return this;
         }
-		public DryvRules<TModel> $($methodPrefix)Rule$gen(string groupName,
-$parameters			Func<TModel, $($gen2)DryvValidationResult> rule$ruleSwitch, string ruleName = null)
-        {
-			this.Add$($methodPrefix)(groupName, rule,
-				new[] { $properties},
-				$ruleSwitchArgument,
-				ruleName$gen3);
-			return this;
-        }
+
 		public DryvRules<TModel> $($methodPrefix)Rule$gen(
-$parameters			Func<TModel, $($gen2)Task<DryvValidationResult>> rule$ruleSwitch, string ruleName = null)
+$parameters			Func<TModel, $($gen2)Task<DryvValidationResult>> rule$ruleSwitch, DryvRuleSettings settings = null)
         {
-			this.Add$($methodPrefix)(null, rule,
+			this.Add$($methodPrefix)(rule,
 				new[] { $properties},
 				$ruleSwitchArgument,
-				ruleName$gen3);
-			return this;
-        }
-		public DryvRules<TModel> $($methodPrefix)Rule$gen(string groupName,
-$parameters			Func<TModel, $($gen2)Task<DryvValidationResult>> rule$ruleSwitch, string ruleName = null)
-        {
-			this.Add$($methodPrefix)(groupName, rule,
-				new[] { $properties},
-				$ruleSwitchArgument,
-				ruleName$gen3);
+				settings
+				$gen3);
 			return this;
         }
 "@ | Add-Content $fn
@@ -107,7 +92,8 @@ $parameters			Expression<Func<TModel, $($gen2)bool>> rule$ruleSwitch)
         {
 			this.Disable(rule,
 				new[] { $properties},
-				$ruleSwitchArgument$gen3);
+				$ruleSwitchArgument
+				$gen3);
 			return this;
         }
 		
@@ -116,7 +102,8 @@ $parameters			Expression<Func<TModel, $($gen2)Task<bool>>> rule$ruleSwitch)
         {
 			this.Disable(rule,
 				new[] { $properties},
-				$ruleSwitchArgument$gen3);
+				$ruleSwitchArgument
+				$gen3);
 			return this;
         }
 "@ | Add-Content $fn
@@ -124,39 +111,23 @@ $parameters			Expression<Func<TModel, $($gen2)Task<bool>>> rule$ruleSwitch)
 
 	@"
 		public DryvRules<TModel> $($methodPrefix)Rule$gen(
-$parameters			Expression<Func<TModel, $($gen2)DryvValidationResult>> rule$ruleSwitch, string ruleName = null)
+$parameters			Expression<Func<TModel, $($gen2)DryvValidationResult>> rule$ruleSwitch, DryvRuleSettings settings = null)
         {
-			this.Add$($methodPrefix)(null, rule,
+			this.Add$($methodPrefix)(rule,
 				new[] { $properties},
 				$ruleSwitchArgument,
-				ruleName$gen3);
-			return this;
-        }
-		public DryvRules<TModel> $($methodPrefix)Rule$gen(string groupName,
-$parameters			Expression<Func<TModel, $($gen2)DryvValidationResult>> rule$ruleSwitch, string ruleName = null)
-        {
-			this.Add$($methodPrefix)(groupName, rule,
-				new[] { $properties},
-				$ruleSwitchArgument,
-				ruleName$gen3);
+				settings
+				$gen3);
 			return this;
         }
 		public DryvRules<TModel> $($methodPrefix)Rule$gen(
-$parameters			Expression<Func<TModel, $($gen2)Task<DryvValidationResult>>> rule$ruleSwitch, string ruleName = null)
+$parameters			Expression<Func<TModel, $($gen2)Task<DryvValidationResult>>> rule$ruleSwitch, DryvRuleSettings settings = null)
         {
-			this.Add$($methodPrefix)(null, rule,
+			this.Add$($methodPrefix)(rule,
 				new[] { $properties},
 				$ruleSwitchArgument,
-				ruleName$gen3);
-			return this;
-        }
-		public DryvRules<TModel> $($methodPrefix)Rule$gen(string groupName,
-$parameters			Expression<Func<TModel, $($gen2)Task<DryvValidationResult>>> rule$ruleSwitch, string ruleName = null)
-        {
-			this.Add$($methodPrefix)(groupName, rule,
-				new[] { $properties},
-				$ruleSwitchArgument,
-				ruleName$gen3);
+				settings
+				$gen3);
 			return this;
         }
 "@ | Add-Content $fn;

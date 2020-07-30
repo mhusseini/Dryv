@@ -36,50 +36,48 @@ namespace Dryv.Rules
         }
 
         private void Add<TProperty>(
-            string groupName,
             Expression<Func<TModel, TProperty>> property,
             LambdaExpression rule,
             LambdaExpression enabled,
-            string ruleName,
+            DryvRuleSettings settings,
             DryvRuleLocation ruleLocation)
         {
-            var ruleDefinition = DryvCompiledRule.Create(property, rule, enabled, ruleLocation, groupName);
+            var ruleDefinition = DryvCompiledRule.Create(property, rule, enabled, ruleLocation, settings?.GroupName);
             ruleDefinition.RuleType = RuleType.Validation;
-            ruleDefinition.Name = ruleName;
+            ruleDefinition.Name = settings?.Name;
             ruleDefinition.Parameters = this.Parameters;
+            ruleDefinition.Annotations = settings;
 
             this.ValidationRules.Add(ruleDefinition);
         }
 
         private void Add<TProperty>(
-            string groupName,
             LambdaExpression rule,
             IEnumerable<Expression<Func<TModel, TProperty>>> properties,
             Delegate ruleSwitch,
-            string ruleName,
+            DryvRuleSettings settings,
             params Type[] services)
         {
             var switchLambda = DelegateToLambda(ruleSwitch, services, true);
 
             foreach (var property in properties)
             {
-                this.Add(groupName, property, rule, switchLambda, ruleName, DryvRuleLocation.Server | DryvRuleLocation.Client);
+                this.Add(property, rule, switchLambda, settings, DryvRuleLocation.Server | DryvRuleLocation.Client);
             }
         }
 
         private void AddClient<TProperty>(
-            string groupName,
             LambdaExpression rule,
             IEnumerable<Expression<Func<TModel, TProperty>>> properties,
             Delegate ruleSwitch,
-            string ruleName,
+            DryvRuleSettings settings,
             params Type[] services)
         {
             var switchLambda = DelegateToLambda(ruleSwitch, services, true);
 
             foreach (var property in properties)
             {
-                this.Add(groupName, property, rule, switchLambda, ruleName, DryvRuleLocation.Client);
+                this.Add(property, rule, switchLambda, settings, DryvRuleLocation.Client);
             }
         }
 
@@ -100,11 +98,10 @@ namespace Dryv.Rules
         }
 
         private void AddServer<TProperty>(
-            string groupName,
             Delegate rule,
             IEnumerable<Expression<Func<TModel, TProperty>>> properties,
             Delegate ruleSwitch,
-            string ruleName,
+            DryvRuleSettings settings,
             params Type[] services)
         {
             var lambda = DelegateToLambda(rule, services);
@@ -112,7 +109,7 @@ namespace Dryv.Rules
 
             foreach (var property in properties)
             {
-                this.Add(groupName, property, lambda, switchLambda, ruleName, DryvRuleLocation.Server);
+                this.Add(property, lambda, switchLambda, settings, DryvRuleLocation.Server);
             }
         }
 

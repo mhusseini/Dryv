@@ -11,7 +11,7 @@ namespace Dryv.Rules
     [DebuggerDisplay("{" + nameof(ValidationExpression) + "}")]
     public sealed class DryvCompiledRule
     {
-        public Dictionary<string, object> Annotations { get; internal set; } = new Dictionary<string, object>();
+        public IDictionary<string, object> Annotations { get; internal set; } = new Dictionary<string, object>();
         public string CodeTemplate { get; internal set; }
         public Func<object[], bool> CompiledEnablingExpression { get; internal set; }
         public Func<object, object[], object> CompiledValidationExpression { get; internal set; }
@@ -32,7 +32,7 @@ namespace Dryv.Rules
         internal List<DryvCompiledRule> Parameters { get; set; }
         internal string UniquePath { get; set; }
 
-        public static DryvCompiledRule Create<TModel, TProperty>(Expression<Func<TModel, TProperty>> propertyExpression, LambdaExpression validationExpression, LambdaExpression enablingExpression, DryvRuleLocation ruleLocation, string groupName)
+        internal static DryvCompiledRule Create<TModel, TProperty>(Expression<Func<TModel, TProperty>> propertyExpression, LambdaExpression validationExpression, LambdaExpression enablingExpression, DryvRuleLocation ruleLocation, string groupName)
         {
             var body = propertyExpression.Body is UnaryExpression unaryExpression
                 ? unaryExpression.Operand
@@ -79,7 +79,7 @@ namespace Dryv.Rules
             };
         }
 
-        public static DryvCompiledRule CreateParameter(string name, Expression<Func<object, object[], object>> lambda, Type[] services)
+        internal static DryvCompiledRule CreateParameter(string name, Expression<Func<object, object[], object>> lambda, Type[] services)
         {
             return new DryvCompiledRule
             {

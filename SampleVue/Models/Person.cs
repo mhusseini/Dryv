@@ -14,7 +14,8 @@ namespace Dryv.SampleVue.Models
                 : m.Einzugsdatum >= p.Get<DateTimeOffset>("maxDatum")
                     ? $"Das Datum darf {p.Get<DateTimeOffset>("maxDatum"):d} nicht überschreiten."
                     : null,
-                    m => m.Get<string>("ha") == null)
+                    m => m.Get<string>("ha") == null,
+                    new DryvRuleSettings())
                 .ServerRule(m => m.FirstName, m => m.FirstName == "Munir" ? null : "haha");
 
         public DateTimeOffset Einzugsdatum { get; set; }

@@ -68,14 +68,17 @@ namespace Dryv.Validation
             var sep = string.Empty;
             writer.Write("{");
 
-            foreach (var parameter in parameters)
+            if (parameters != null)
             {
-                writer.Write(sep);
-                writer.Write("\"");
-                writer.Write(parameter.Key.ToCamelCase());
-                writer.Write("\":");
-                writer.Write(JavaScriptHelper.TranslateValue(parameter.Value) ?? this.options.JsonConversion(parameter.Value));
-                sep = ",";
+                foreach (var parameter in parameters)
+                {
+                    writer.Write(sep);
+                    writer.Write("\"");
+                    writer.Write(parameter.Key.ToCamelCase());
+                    writer.Write("\":");
+                    writer.Write(JavaScriptHelper.TranslateValue(parameter.Value) ?? this.options.JsonConversion(parameter.Value));
+                    sep = ",";
+                }
             }
 
             writer.Write("}");
