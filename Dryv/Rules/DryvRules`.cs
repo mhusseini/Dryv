@@ -12,20 +12,27 @@ namespace Dryv.Rules
         {
         }
 
-        private void AddParameter(string name, Delegate parameter, params Type[] services)
+        private static LambdaExpression DelegateToLambda(Delegate rule, Type[] services, bool ignoreModel = false)
         {
-            var m = parameter.GetMethodInfo();
-            var o = parameter.Target;
-            var u = Expression.Parameter(typeof(object), "unused");
-            var p = Expression.Parameter(typeof(object[]), "services");
-            var args = services.Select((type, i) => (Expression)Expression.Convert(Expression.ArrayAccess(p, Expression.Constant(i)), type)).ToArray();
+            if (rule == null)
+            {
+                return null;
+            }
+
+            var m = rule.GetMethodInfo();
+            var o = rule.Target;
+            var parameters = new List<ParameterExpression>();
+            if (!ignoreModel)
+            {
+                parameters.Add(Expression.Parameter(typeof(TModel), "m"));
+            }
+
+            parameters.AddRange(services.Select((type, i) => Expression.Parameter(type, "p" + i)));
 
             var lambda = o == null
-                ? Expression.Lambda<Func<object, object[], object>>(Expression.Convert(Expression.Call(m, args), typeof(object)), u, p)
-                : Expression.Lambda<Func<object, object[], object>>(Expression.Convert(Expression.Call(Expression.Constant(o), m, args), typeof(object)), u, p);
-
-            var ruleDefinition = DryvCompiledRule.CreateParameter(name, lambda, services);
-            this.Parameters.Add(ruleDefinition);
+                ? Expression.Lambda(Expression.Call(m, parameters), parameters)
+                : Expression.Lambda(Expression.Call(Expression.Constant(o), m, parameters), parameters);
+            return lambda;
         }
 
         private void Add<TProperty>(
@@ -44,13 +51,80 @@ namespace Dryv.Rules
             this.ValidationRules.Add(ruleDefinition);
         }
 
+        private void Add<TProperty>(
+            string groupName,
+            LambdaExpression rule,
+            IEnumerable<Expression<Func<TModel, TProperty>>> properties,
+            Delegate ruleSwitch,
+            string ruleName,
+            params Type[] services)
+        {
+            var switchLambda = DelegateToLambda(ruleSwitch, services, true);
+
+            foreach (var property in properties)
+            {
+                this.Add(groupName, property, rule, switchLambda, ruleName, DryvRuleLocation.Server | DryvRuleLocation.Client);
+            }
+        }
+
+        private void AddClient<TProperty>(
+            string groupName,
+            LambdaExpression rule,
+            IEnumerable<Expression<Func<TModel, TProperty>>> properties,
+            Delegate ruleSwitch,
+            string ruleName,
+            params Type[] services)
+        {
+            var switchLambda = DelegateToLambda(ruleSwitch, services, true);
+
+            foreach (var property in properties)
+            {
+                this.Add(groupName, property, rule, switchLambda, ruleName, DryvRuleLocation.Client);
+            }
+        }
+
+        private void AddParameter(string name, Delegate parameter, params Type[] services)
+        {
+            var m = parameter.GetMethodInfo();
+            var o = parameter.Target;
+            var u = Expression.Parameter(typeof(object), "unused");
+            var p = Expression.Parameter(typeof(object[]), "services");
+            var args = services.Select((type, i) => (Expression)Expression.Convert(Expression.ArrayAccess(p, Expression.Constant(i)), type)).ToArray();
+
+            var lambda = o == null
+                ? Expression.Lambda<Func<object, object[], object>>(Expression.Convert(Expression.Call(m, args), typeof(object)), u, p)
+                : Expression.Lambda<Func<object, object[], object>>(Expression.Convert(Expression.Call(Expression.Constant(o), m, args), typeof(object)), u, p);
+
+            var ruleDefinition = DryvCompiledRule.CreateParameter(name, lambda, services);
+            this.Parameters.Add(ruleDefinition);
+        }
+
+        private void AddServer<TProperty>(
+            string groupName,
+            Delegate rule,
+            IEnumerable<Expression<Func<TModel, TProperty>>> properties,
+            Delegate ruleSwitch,
+            string ruleName,
+            params Type[] services)
+        {
+            var lambda = DelegateToLambda(rule, services);
+            var switchLambda = DelegateToLambda(ruleSwitch, services, true);
+
+            foreach (var property in properties)
+            {
+                this.Add(groupName, property, lambda, switchLambda, ruleName, DryvRuleLocation.Server);
+            }
+        }
+
         private void Disable<TProperty>(
             Expression<Func<TModel, TProperty>> property,
             LambdaExpression rule,
-            LambdaExpression enabled,
-            DryvRuleLocation ruleLocation)
+            Delegate ruleSwitch,
+            DryvRuleLocation ruleLocation,
+            params Type[] services)
         {
-            var ruleDefinition = DryvCompiledRule.Create(property, rule, enabled, ruleLocation, null);
+            var switchLambda = DelegateToLambda(ruleSwitch, services, true);
+            var ruleDefinition = DryvCompiledRule.Create(property, rule, switchLambda, ruleLocation, null);
             ruleDefinition.RuleType = RuleType.Disabling;
             ruleDefinition.Parameters = this.Parameters;
 
@@ -60,50 +134,12 @@ namespace Dryv.Rules
         private void Disable<TProperty>(
             LambdaExpression rule,
             IEnumerable<Expression<Func<TModel, TProperty>>> properties,
-            LambdaExpression ruleSwitch)
+            Delegate ruleSwitch,
+            params Type[] services)
         {
             foreach (var property in properties)
             {
-                this.Disable(property, rule, ruleSwitch, DryvRuleLocation.Server | DryvRuleLocation.Client);
-            }
-        }
-
-        private void Add<TProperty>(
-            string groupName,
-            LambdaExpression rule,
-            IEnumerable<Expression<Func<TModel, TProperty>>> properties,
-            LambdaExpression ruleSwitch,
-            string ruleName)
-        {
-            foreach (var property in properties)
-            {
-                this.Add(groupName, property, rule, ruleSwitch, ruleName, DryvRuleLocation.Server | DryvRuleLocation.Client);
-            }
-        }
-
-        private void AddServer<TProperty>(
-            string groupName,
-            LambdaExpression rule,
-            IEnumerable<Expression<Func<TModel, TProperty>>> properties,
-            LambdaExpression ruleSwitch,
-            string ruleName)
-        {
-            foreach (var property in properties)
-            {
-                this.Add(groupName, property, rule, ruleSwitch, ruleName, DryvRuleLocation.Server);
-            }
-        }
-
-        private void AddClient<TProperty>(
-            string groupName,
-            LambdaExpression rule,
-            IEnumerable<Expression<Func<TModel, TProperty>>> properties,
-            LambdaExpression ruleSwitch,
-        string ruleName)
-        {
-            foreach (var property in properties)
-            {
-                this.Add(groupName, property, rule, ruleSwitch, ruleName, DryvRuleLocation.Client);
+                this.Disable(property, rule, ruleSwitch, DryvRuleLocation.Server | DryvRuleLocation.Client, services);
             }
         }
     }

@@ -152,7 +152,7 @@ namespace Dryv.RuleDetection
             return ruleType == RuleType.Disabling ? rules.DisablingRules : rules.ValidationRules;
         }
 
-        private static Type TransposeExpressions(ModelTreeNode node, DryvCompiledRule rule, out LambdaExpression newValidationExpression, out LambdaExpression newEnablingExpression, out string transposedPath)
+        private static Type TransposeExpressions(ModelTreeNode node, DryvCompiledRule rule, out LambdaExpression newValidationExpression, out string transposedPath)
         {
             var firstMember = node.Hierarchy.First();
             var modelType = firstMember.DeclaringType;
@@ -168,15 +168,11 @@ namespace Dryv.RuleDetection
             }
 
             var replacer = new NodeReplacer();
-            var body = replacer.Replace(
+            var validationBody = replacer.Replace(
                 rule.ValidationExpression.Body,
                 rule.ValidationExpression.Parameters.First(),
                 modelReplacement);
-
-            newValidationExpression = Expression.Lambda(body, parameters);
-            newEnablingExpression = rule.EnablingExpression != null
-                ? Expression.Lambda(body, parameters.Skip(1))
-                : null;
+            newValidationExpression = Expression.Lambda(validationBody, parameters);
 
             return modelType;
         }
@@ -200,27 +196,25 @@ namespace Dryv.RuleDetection
         private DryvCompiledRule ApplyRuleToNode(ModelTreeNode node, DryvCompiledRule rule)
         {
             LambdaExpression newValidationExpression;
-            LambdaExpression newEnablingExpression;
             Type modelType;
             string transposedPath = null;
 
             if (node.UniquePath != rule.UniquePath)
             {
-                modelType = TransposeExpressions(node, rule, out newValidationExpression, out newEnablingExpression, out transposedPath);
+                modelType = TransposeExpressions(node, rule, out newValidationExpression, out transposedPath);
             }
             else
             {
                 newValidationExpression = rule.ValidationExpression;
-                newEnablingExpression = rule.EnablingExpression;
                 modelType = rule.ModelType;
             }
 
             var transposedRule = new DryvCompiledRule
             {
                 ModelType = modelType,
-                CompiledEnablingExpression = this.compiler.CompileEnablingExpression(rule, newEnablingExpression),
+                CompiledEnablingExpression = this.compiler.CompileEnablingExpression(rule, rule.EnablingExpression),
                 CompiledValidationExpression = this.compiler.CompileValidationExpression(rule, newValidationExpression),
-                EnablingExpression = newEnablingExpression,
+                EnablingExpression = rule.EnablingExpression,
                 ValidationExpression = newValidationExpression,
                 EvaluationLocation = rule.EvaluationLocation,
                 PropertyExpression = rule.PropertyExpression,

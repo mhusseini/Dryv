@@ -13,7 +13,9 @@ namespace Dryv.SampleVue.Models
                 ? $"Das Datum darf {p.Get<DateTimeOffset>("minDatum"):d} nicht unterschreiten."
                 : m.Einzugsdatum >= p.Get<DateTimeOffset>("maxDatum")
                     ? $"Das Datum darf {p.Get<DateTimeOffset>("maxDatum"):d} nicht überschreiten."
-                    : null);
+                    : null,
+                    m => m.Get<string>("ha") == null)
+                .ServerRule(m => m.FirstName, m => m.FirstName == "Munir" ? null : "haha");
 
         public DateTimeOffset Einzugsdatum { get; set; }
         //    .Rule(m => m.FirstName, m => string.IsNullOrWhiteSpace(m.FirstName) ? "Please enter first name." : null)

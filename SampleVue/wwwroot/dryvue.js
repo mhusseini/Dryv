@@ -13,8 +13,9 @@ function hashCode(text) {
     return hash;
 }
 
-async function validate(component, dryv, context) {
+async function validate(component, clientContext) {
     const $dryv = component.$dryv;
+    const context = Object.assign({ dryv: $dryv }, clientContext);
     const formValidators = $dryv.formValidators;
     if (!formValidators) {
         return true;
@@ -24,7 +25,7 @@ async function validate(component, dryv, context) {
         $dryv.groupComponents.forEach(c => c.clear());
     }
 
-    const disablers = dryv.disablers;
+    const disablers = $dryv.v.disablers;
     const disabledFields = [];
 
     if (disablers) {
@@ -127,9 +128,11 @@ function findModelExpression(vnode) {
     return null;
 }
 
-function initializeFormComponent(component, name, path, options) {
+function initializeFormComponent(component, name, path, options, Vue) {
     if (!component.$dryv) {
-        component.$dryv = {};
+        const $dryv = Object.assign({}, options);
+        component.$dryv = $dryv;
+        (component.methods || (component.methods = {}))["$dryvParam"] = () => $dryv.params || {};
     }
 
     const d = component.$dryv;
@@ -142,7 +145,7 @@ function initializeFormComponent(component, name, path, options) {
         }
 
         d.v = validationSet;
-        d.parameters = d.v.parameters;
+        d.params = d.v.parameters;
     }
 
     if (!d.formValidators) {
@@ -150,7 +153,7 @@ function initializeFormComponent(component, name, path, options) {
     }
 
     if (!d.validate) {
-        d.validate = validate.bind(component, component, d.v);
+        d.validate = validate.bind(component, component);
     }
 
     if (!d.setValidationResult) {
@@ -201,16 +204,26 @@ function runValidation(v, m, context) {
     }, Promise.resolve());
 }
 
-const Dryvue = {
-    install(Vue, options) {
-        if (!options) options = {};
-        if (!options.get) options.get = axios.get;
-        if (!options.post) options.post = axios.post;
-        if (!options.errorField) options.errorField = "error";
-        if (!options.warningField) options.warningField = "warning";
-        if (!options.dryv) options.dryv = window.dryv;
+function valueOfDate(value, locale, format) {
+    throw "Please specify the 'valueOfDate' field of the Dryvue options.";
+}
 
-        dryv.validateAsync = async function (baseUrl, method, data) {
+const defaultOptions = {
+    valueOfDate: valueOfDate,
+    get: fetch,
+    post: (url, data) => fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+        body: JSON.stringify(data),
+    }),
+    errorField: "error",
+    warningField: "warning",
+    dryv: window.dryv
+};
+const Dryvue = {
+    install(Vue, o) {
+        const options = Object.assign({}, defaultOptions, o);
+        options.callServer = async function (baseUrl, method, data) {
             const isGet = method === "GET";
             const url = isGet ? baseUrl + "?" + Object.keys(data).map(k => `${k}=${encodeURIComponent(data[k])}`).join('&') : baseUrl;
             const response = isGet
@@ -228,16 +241,15 @@ const Dryvue = {
             const texts = items[groupName];
             if (texts.indexOf(text) < 0) {
                 texts.push(text);
-                // Vue.set(texts, texts.length, text);
             }
         }
 
         function flattenItems(items) {
-            return [].concat.apply([], Object.keys(items).map(g => items[g]));
+            return [].concat.apply([], Object.entries(items));
         }
 
         function clearItems(items) {
-            Object.keys(items).map(g => items[g]).forEach(l => l.splice(0));
+            Object.entries(items).forEach(l => l.splice(0));
         }
 
         Vue.component(dryvGroupTag,
@@ -288,15 +300,13 @@ const Dryvue = {
                     }
 
                     if (!formComponent.$dryv) {
-                        formComponent.$dryv = {
+                        formComponent.$dryv = Object.assign({
                             formValidators: []
-                        };
-
+                        }, options);
                         const directive = formComponent._vnode.data.directives.filter(d => d.name === dryvSetDirective)[0].value;
-
-                        if (typeof directive === "object") {
-                            formComponent.$dryv.path = directive.path;
-                        }
+                        const setName = typeof directive === "object" ? directive.path : directive;
+                        formComponent.$dryv.path = setName;
+                        formComponent.$dryv.v = formComponent.$dryv.dryv.v[setName];
                     }
 
                     const $dryv = formComponent.$dryv;
@@ -338,21 +348,48 @@ const Dryvue = {
                         path = path.substr($dryv.path.length + 1);
                     }
 
-                    Vue.set(component, errorField, null);
-                    Vue.set(component, warningField, null);
+                    const validators = $dryv.v.validators[path];
+                    if (!validators) {
+                        return;
+                    }
 
-                    let validator = undefined;
+                    const v1 = validators.map(v => v.annotations);
+                    v1.splice(0, 0, {});
+                    const annotations = v1.reduce((t, s) => Object.assign(t, s));
+
+                    for (let annotationName in annotations) {
+                        if (!component.$data.hasOwnProperty(annotationName)) {
+                            continue;
+                        }
+
+                        Vue.set(component, annotationName, annotations[annotationName]);
+                    }
+
+                    if (component.$data.hasOwnProperty(errorField)) {
+                        Vue.set(component, errorField, null);
+                    }
+                    else {
+                        throw new `Please specify the data property ${errorField} on the form input component.`;
+                    }
+
+                    if (component.$data.hasOwnProperty(warningField)) {
+                        Vue.set(component, warningField, null);
+                    }
+                    else {
+                        throw new `Please specify the data property ${warningField} on the form input component.`;
+                    }
+
                     let lastDisabledFields = undefined;
 
                     const fieldValidator = {
                         isValidating: false,
                         path,
                         validate: async (disabledFields, context) => {
-                            if (validator === undefined) {
-                                validator = $dryv.v.validators[path];
+                            if (validators === undefined) {
+                                return null;
                             }
 
-                            if (!validator) {
+                            if (!validators) {
                                 return null;
                             }
 
@@ -373,7 +410,7 @@ const Dryvue = {
                                 let result = null;
                                 const isEnabled = !disabledFields || disabledFields.filter(f => path.indexOf(f) >= 0).length === 0;
                                 if (isEnabled) {
-                                    const validationFunctions = validator.map(v => v.validate);
+                                    const validationFunctions = validators.map(v => v.validate);
                                     result = await runValidation(validationFunctions, data, context2);
                                 }
                                 return handleValidationResult(Vue, component, result, errorField, warningField, groupComponent);
@@ -424,8 +461,19 @@ const Dryvue = {
                     throw `Form name is missing. Please specify a value for the ${dryvSetDirective} attribute.`;
                 }
 
-                initializeFormComponent(component, name, path, options);
+                initializeFormComponent(component, name, path, options, Vue);
             }
         });
+    }
+};
+
+Dryvue.mixin = {
+    data() {
+        return { dryv: { params: {} } };
+    },
+    mounted() {
+        if (this.$dryv) {
+            this.$set(this.$data, "dryv", { params: this.$dryv.params });
+        }
     }
 };
