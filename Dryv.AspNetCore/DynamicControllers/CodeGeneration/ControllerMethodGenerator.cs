@@ -119,9 +119,9 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
 
         private static void AddRoutingAttribute(MethodBuilder methodBuilder, DryvControllerGenerationContext context, DryvDynamicControllerOptions options)
         {
-            if (options.MapRouteTemplate != null)
+            if (options.GetRoute != null)
             {
-                ControllerAttributeGenerator.SetAttribute<RouteAttribute>(methodBuilder, options.MapRouteTemplate(context));
+                ControllerAttributeGenerator.SetAttribute<RouteAttribute>(methodBuilder, options.GetRoute(context));
             }
         }
 
@@ -129,7 +129,7 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
         {
             var methodBuilder = typeBuilder.DefineMethod(methodName, MethodAttributes.Public, returnType, parameterTypes);
 
-            ControllerAttributeGenerator.AddCustomAttributes(context, methodBuilder.SetCustomAttribute, options.MapActionFilters);
+            ControllerAttributeGenerator.AddCustomAttributes(context, methodBuilder.SetCustomAttribute, options.GetActionFilters);
 
             return methodBuilder;
         }

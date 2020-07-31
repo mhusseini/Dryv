@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using Dryv.Rules;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.Options;
@@ -22,18 +23,18 @@ namespace Dryv.AspNetCore.DynamicControllers.Endpoints
             this.options = options;
         }
 
-        public void Register(Assembly assembly, string action)
+        public void Register(Assembly assembly, string action, DryvCompiledRule rule)
         {
             var assemblyPart = new AssemblyPart(assembly);
             this.partManager.ApplicationParts.Add(assemblyPart);
 
-            if (this.options.Value.MapEndpoint != null)
+            if (this.options.Value.GetEndpoint != null)
             {
                 foreach (var type in from t in assembly.DefinedTypes
                                      where typeof(Controller).IsAssignableFrom(t)
                                      select t)
                 {
-                    this.MapEndpoint(type, action);
+                    this.MapEndpoint(type, action, rule);
                 }
             }
 
@@ -41,10 +42,10 @@ namespace Dryv.AspNetCore.DynamicControllers.Endpoints
             this.actionDescriptorChangeProvider.TokenSource?.Cancel();
         }
 
-        private void MapEndpoint(Type controllerTyp, string action)
+        private void MapEndpoint(Type controllerTyp, string action, DryvCompiledRule rule)
         {
-            var context = new DryvControllerGenerationContext(controllerTyp, action);
-            this.options.Value.MapEndpoint(context, this.routeBuilderProvider.RouteBuilder);
+            var context = new DryvControllerGenerationContext(controllerTyp, action, rule);
+            this.options.Value.GetEndpoint(context, this.routeBuilderProvider.RouteBuilder);
         }
     }
 }

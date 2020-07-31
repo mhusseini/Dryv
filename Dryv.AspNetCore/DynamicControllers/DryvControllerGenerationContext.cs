@@ -1,5 +1,6 @@
-﻿using System.Linq;
-using System.Reflection;
+﻿using System;
+using System.Linq;
+using Dryv.Rules;
 
 namespace Dryv.AspNetCore.DynamicControllers
 {
@@ -7,7 +8,7 @@ namespace Dryv.AspNetCore.DynamicControllers
     {
         private static readonly int ControllerLength = "controller".Length;
 
-        internal DryvControllerGenerationContext(MemberInfo type, string action)
+        internal DryvControllerGenerationContext(Type type, string action, DryvCompiledRule rule)
         {
             var typeName = type.Name.Split('.').Last();
             var controller = typeName.Substring(0, typeName.Length - ControllerLength);
@@ -15,6 +16,7 @@ namespace Dryv.AspNetCore.DynamicControllers
             this.ControllerFullName = type.Name;
             this.Controller = controller;
             this.Action = action;
+            this.Rule = rule;
         }
 
         public DryvControllerGenerationContext()
@@ -25,6 +27,8 @@ namespace Dryv.AspNetCore.DynamicControllers
         /// The name of the generated action.
         /// </summary>
         public string Action { get; set; }
+
+        public DryvCompiledRule Rule { get; set; }
 
         /// <summary>
         /// The short name of the generated controller.

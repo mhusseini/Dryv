@@ -45,7 +45,7 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
 
             var controller = this.GenerateController(context, expression.ToString(), expression, action);
             var url = this.mvcOptions.Value.EnableEndpointRouting ? this.GetUrlFromEndpoint(controller) : GetUrlFromAttributes(controller);
-            var httpMethod = this.options.Value.HttpMethod.ToString().ToUpper();
+            var httpMethod = this.options.Value.GetHttpMethod(new DryvControllerGenerationContext(controller, action, context.Rule)).ToString().ToUpper();
             var modelProperties = FindModelPropertiesInExpression(context, expression);
 
             this.controllerCallWriter.Write(context, translator, url, httpMethod, modelProperties);
@@ -82,7 +82,7 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
             return Controllers.GetOrAdd(key, _ => new Lazy<TypeInfo>(() =>
             {
                 var assembly = this.codeGenerator.CreateControllerAssembly(expression, context.ModelType, action, context.Rule);
-                this.controllerRegistration.Register(assembly, action);
+                this.controllerRegistration.Register(assembly, action, context.Rule);
 
                 return assembly.DefinedTypes.FirstOrDefault(typeof(Controller).IsAssignableFrom);
             })).Value;

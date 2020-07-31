@@ -61,23 +61,23 @@ namespace Dryv.AspNetCore
             var mvcOptions = serviceProvider.GetService<IOptions<MvcOptions>>().Value;
             var dynamicControllerOptions = serviceProvider.GetService<IOptions<DryvDynamicControllerOptions>>().Value;
 
-            if (mvcOptions.EnableEndpointRouting && dynamicControllerOptions.MapEndpoint == null && dynamicControllerOptions.MapRouteTemplate != null)
+            if (mvcOptions.EnableEndpointRouting && dynamicControllerOptions.GetEndpoint == null && dynamicControllerOptions.GetRoute != null)
             {
                 throw new DryvConfigurationException("When MvcOptions.EnableEndpointRouting is true, DryvDynamicControllerOptions.MapRouteTemplate cannot be used. Instead, please specify DryvDynamicControllerOptions.MapEndpoint or leave DryvDynamicControllerOptions.MapTemplate and DryvDynamicControllerOptions.MapEndpoint empty for default values.");
             }
 
-            if (!mvcOptions.EnableEndpointRouting && dynamicControllerOptions.MapEndpoint != null && dynamicControllerOptions.MapRouteTemplate == null)
+            if (!mvcOptions.EnableEndpointRouting && dynamicControllerOptions.GetEndpoint != null && dynamicControllerOptions.GetRoute == null)
             {
                 throw new DryvConfigurationException("When MvcOptions.EnableEndpointRouting is false, DryvDynamicControllerOptions.MapEndpoint cannot be used. Instead, please specify DryvDynamicControllerOptions.MapRouteTemplate or leave DryvDynamicControllerOptions.MapTemplate and DryvDynamicControllerOptions.MapEndpoint empty for default values.");
             }
 
-            if (mvcOptions.EnableEndpointRouting && dynamicControllerOptions.MapEndpoint == null)
+            if (mvcOptions.EnableEndpointRouting && dynamicControllerOptions.GetEndpoint == null)
             {
-                dynamicControllerOptions.MapEndpoint = DefaultEndpointMapping;
+                dynamicControllerOptions.GetEndpoint = DefaultEndpointMapping;
             }
-            else if (!mvcOptions.EnableEndpointRouting && dynamicControllerOptions.MapRouteTemplate == null)
+            else if (!mvcOptions.EnableEndpointRouting && dynamicControllerOptions.GetRoute == null)
             {
-                dynamicControllerOptions.MapRouteTemplate = DefaultTemplateMapping;
+                dynamicControllerOptions.GetRoute = DefaultTemplateMapping;
             }
         }
     }

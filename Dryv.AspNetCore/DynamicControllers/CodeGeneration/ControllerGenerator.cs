@@ -48,8 +48,8 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
             var moduleBuilder = assemblyBuilder.DefineDynamicModule(assemblyName.Name);
             var typeBuilder = moduleBuilder.DefineType($"{NameSpace}.{typeNameBase}Controller", TypeAttributes.Class | TypeAttributes.Public, baseType);
 
-            var context = new DryvControllerGenerationContext(typeBuilder, action);
-            ControllerAttributeGenerator.AddCustomAttributes(context, typeBuilder.SetCustomAttribute, this.options.Value.MapControllerFilters);
+            var context = new DryvControllerGenerationContext(typeBuilder, action, rule);
+            ControllerAttributeGenerator.AddCustomAttributes(context, typeBuilder.SetCustomAttribute, this.options.Value.GetControllerFilters);
             ControllerAttributeGenerator.AddCustomAttributes(context, typeBuilder.SetCustomAttribute, () => new DryvDisableAttribute());
             
             if (!string.IsNullOrWhiteSpace(rule.Name))
@@ -72,7 +72,7 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
 
             ControllerCtorGenerator.GenerateConstructor(typeBuilder, baseType, innerFields.Values.ToList());
 
-            if (this.options.Value.HttpMethod == DryvDynamicControllerMethods.Post)
+            if (this.options.Value.GetHttpMethod(context) == DryvDynamicControllerMethods.Post)
             {
                 ControllerMethodGenerator.GenerateWrapperMethodPost(modelType, action, lambda, typeBuilder, delegateField, innerFields, context, this.options.Value);
             }
