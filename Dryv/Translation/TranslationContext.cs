@@ -16,7 +16,7 @@ namespace Dryv.Translation
         public Dictionary<object, object> CustomData { get; private set; } = new Dictionary<object, object>();
         private string DebugView => this.StringBuilder?.Length > 0 ? this.StringBuilder.ToString() : "PARENT: " + this.ParentContext?.DebugView;
         public List<Func<Expression, TranslationContext, bool>> DynamicTranslation { get; private set; } = new List<Func<Expression, TranslationContext, bool>>();
-        public string GroupName { get; set; }
+        public string Group { get; set; }
 
         public bool IsAsync
         {
@@ -49,7 +49,7 @@ namespace Dryv.Translation
             return new T
             {
                 ParentContext = this,
-                GroupName = this.GroupName,
+                Group = this.Group,
                 ModelType = this.ModelType,
                 OptionDelegates = this.OptionDelegates,
                 OptionsTypes = this.OptionsTypes,

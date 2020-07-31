@@ -572,7 +572,7 @@ namespace Dryv.Translation
                     break;
 
                 case ExpressionType.Convert:
-                    if (string.IsNullOrWhiteSpace(context.GroupName) || !Equals(expression.Method, DryvValidationResultImplicitConvert) ||
+                    if (string.IsNullOrWhiteSpace(context.Group) || !Equals(expression.Method, DryvValidationResultImplicitConvert) ||
                         expression.Operand is ConstantExpression constant && constant.Value == null)
                     {
                         break;
@@ -580,8 +580,8 @@ namespace Dryv.Translation
 
                     context.Writer.Write("{ type:\"error\", text:");
                     this.Translate(expression.Operand, context);
-                    context.Writer.Write(", groupName: ");
-                    context.Writer.Write(MethodCallTranslator.QuoteValue(context.GroupName));
+                    context.Writer.Write(", group: ");
+                    context.Writer.Write(MethodCallTranslator.QuoteValue(context.Group));
                     context.Writer.Write("}");
 
                     return;
@@ -692,10 +692,10 @@ namespace Dryv.Translation
 
             var sb = new StringBuilder("{");
 
-            if (!string.IsNullOrWhiteSpace(result.GroupName))
+            if (!string.IsNullOrWhiteSpace(result.Group))
             {
-                sb.Append("groupName:\"");
-                sb.Append(result.GroupName);
+                sb.Append("group:\"");
+                sb.Append(result.Group);
                 sb.Append("\",");
             }
 

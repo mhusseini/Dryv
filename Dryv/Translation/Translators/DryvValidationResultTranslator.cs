@@ -44,10 +44,10 @@ namespace Dryv.Translation.Translators
             context.Writer.Write(resultType);
             context.Writer.Write("\", text:");
             context.Translator.Translate(context.Expression.Arguments.First(), context);
-            if (!string.IsNullOrWhiteSpace(context.GroupName))
+            if (!string.IsNullOrWhiteSpace(context.Group))
             {
-                context.Writer.Write(", groupName: ");
-                context.Writer.Write(QuoteValue(context.GroupName));
+                context.Writer.Write(", group: ");
+                context.Writer.Write(QuoteValue(context.Group));
             }
 
             if (data != null)

@@ -17,7 +17,7 @@ namespace Dryv.Rules
         public Func<object, object[], object> CompiledValidationExpression { get; internal set; }
         public LambdaExpression EnablingExpression { get; internal set; }
         public DryvRuleLocation EvaluationLocation { get; internal set; }
-        public string GroupName { get; internal set; }
+        public string Group { get; internal set; }
         public bool IsAsync { get; internal set; }
         public string ModelPath { get; internal set; }
         public Type ModelType { get; internal set; }
@@ -31,34 +31,23 @@ namespace Dryv.Rules
         public LambdaExpression ValidationExpression { get; internal set; }
         internal IReadOnlyList<DryvCompiledRule> Parameters { get; set; }
         internal string UniquePath { get; set; }
+        internal IDictionary<PropertyInfo, string> RelatedProperties { get; set; }
 
-        internal static DryvCompiledRule Create<TModel, TProperty>(Expression<Func<TModel, TProperty>> propertyExpression, LambdaExpression validationExpression, LambdaExpression enablingExpression, DryvRuleLocation ruleLocation, string groupName)
+        internal static DryvCompiledRule Create<TModel, TProperty>(Expression<Func<TModel, TProperty>> propertyExpression, LambdaExpression validationExpression, LambdaExpression enablingExpression, DryvRuleLocation ruleLocation, string group)
         {
-            var body = propertyExpression.Body is UnaryExpression unaryExpression
-                ? unaryExpression.Operand
-                : propertyExpression.Body;
-
-            if (!(body is MemberExpression memberExpression) ||
-                !(memberExpression.Member is PropertyInfo propertyInfo))
+            var memberExpression = propertyExpression.GetMemberExpression();
+            if (memberExpression == null)
             {
                 return null;
             }
 
-            var members = memberExpression.Iterate(e => e.Expression as MemberExpression)
-                .ToList();
-
-            var parameter = (ParameterExpression)members.Last().Expression;
-
-            var modelPath = string.Join(".", members
-                .Skip(1)
-                .Select(e => e.Member.Name.ToCamelCase())
-                .Reverse());
-
+            var modelPath = memberExpression.GetModelPath(true, out var members);
             var propertyPath = string.Join(".", members
                 .Skip(1)
                 .Select(e => e.Member.Name + ":" + GetMemberType(e).FullName)
                 .Reverse());
 
+            var parameter = (ParameterExpression)members.Last().Expression;
             var uniquePath = ":" + parameter.Type.FullName;
             if (!string.IsNullOrWhiteSpace(propertyPath))
             {
@@ -69,11 +58,11 @@ namespace Dryv.Rules
             {
                 EnablingExpression = enablingExpression,
                 EvaluationLocation = ruleLocation,
-                GroupName = groupName,
+                Group = group,
                 UniquePath = uniquePath,
                 ModelPath = modelPath,
                 ModelType = parameter.Type,
-                Property = propertyInfo,
+                Property = (PropertyInfo)memberExpression.Member,
                 PropertyExpression = memberExpression,
                 ValidationExpression = validationExpression,
             };

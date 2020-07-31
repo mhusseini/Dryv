@@ -8,34 +8,34 @@ namespace Dryv
         {
         }
 
-        public DryvRuleSettings(string groupName) : this(groupName, default(string))
+        public DryvRuleSettings(string group) : this(group, default(string))
         {
         }
 
-        public DryvRuleSettings(string groupName, string ruleName)
+        public DryvRuleSettings(string group, string ruleName)
         {
             this.Name = ruleName;
-            this.GroupName = groupName;
+            this.Group = group;
         }
 
         public DryvRuleSettings(IDictionary<string, object> annotations) : base(annotations)
         {
         }
 
-        public DryvRuleSettings(string groupName, IDictionary<string, object> annotations) : base(annotations)
+        public DryvRuleSettings(string group, IDictionary<string, object> annotations) : base(annotations)
         {
-            this.GroupName = groupName;
+            this.Group = group;
         }
 
-        public DryvRuleSettings(string groupName, string ruleName, IDictionary<string, object> annotations) : base(annotations)
+        public DryvRuleSettings(string group, string ruleName, IDictionary<string, object> annotations) : base(annotations)
         {
             this.Name = ruleName;
-            this.GroupName = groupName;
+            this.Group = group;
         }
 
-        public string GroupName { get; set; }
+        public string Group { get; set; }
         public string Name { get; set; }
 
-        public static implicit operator DryvRuleSettings(string groupName) => new DryvRuleSettings(groupName);
+        public static implicit operator DryvRuleSettings(string group) => new DryvRuleSettings(group);
     }
 }

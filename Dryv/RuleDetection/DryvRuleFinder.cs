@@ -209,6 +209,14 @@ namespace Dryv.RuleDetection
                 modelType = rule.ModelType;
             }
 
+            if (rule.RelatedProperties != null)
+            {
+                foreach (var relatedProperty in rule.RelatedProperties)
+                {
+
+                }
+            }
+
             var transposedRule = new DryvCompiledRule
             {
                 ModelType = modelType,
@@ -219,7 +227,7 @@ namespace Dryv.RuleDetection
                 EvaluationLocation = rule.EvaluationLocation,
                 PropertyExpression = rule.PropertyExpression,
                 PreevaluationOptionTypes = rule.PreevaluationOptionTypes,
-                GroupName = rule.GroupName,
+                Group = rule.Group,
                 Name = rule.Name,
                 RuleType = rule.RuleType,
                 ModelPath = GetEffectiveModelPath(rule.ModelPath, transposedPath, rule.Property),
@@ -227,6 +235,9 @@ namespace Dryv.RuleDetection
                 UniquePath = rule.UniquePath,
                 Parameters = rule.Parameters,
                 Annotations = rule.Annotations,
+                RelatedProperties = rule.RelatedProperties?.ToDictionary(
+                    p => p.Key,
+                    p => GetEffectiveModelPath(p.Value, transposedPath, p.Key)),
             };
 
             this.Translate(transposedRule, transposedRule.ValidationExpression);

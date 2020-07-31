@@ -67,6 +67,28 @@ namespace Dryv.Extensions
             }
         }
 
+        public static MemberExpression GetMemberExpression(this LambdaExpression propertyExpression)
+        {
+            var body = propertyExpression.Body is UnaryExpression unaryExpression
+                ? unaryExpression.Operand
+                : propertyExpression.Body;
+
+            return !(body is MemberExpression memberExpression) || !(memberExpression.Member is PropertyInfo)
+                ? null
+                : memberExpression;
+        }
+
+        public static string GetModelPath(this MemberExpression memberExpression, bool skipFirst, out List<MemberExpression> members)
+        {
+            members = memberExpression.Iterate(e => e.Expression as MemberExpression)
+                .ToList();
+
+            return string.Join(".", members
+                .Skip(skipFirst ? 1 : 0)
+                .Select(e => e.Member.Name.ToCamelCase())
+                .Reverse());
+        }
+
         public static List<Type> GetOptionTypes(this LambdaExpression expression)
         {
             var genericArguments = expression.Type.GetGenericArguments();

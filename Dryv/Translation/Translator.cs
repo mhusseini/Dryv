@@ -178,7 +178,7 @@ namespace Dryv.Translation
                 OptionDelegates = optionDelegates,
                 ModelType = rule.ModelType,
                 PropertyExpression = propertyExpression?.Expression,
-                GroupName = rule.GroupName,
+                Group = rule.Group,
                 StringBuilder = sb,
                 Rule = rule,
             };

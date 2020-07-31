@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Dryv.Extensions;
 
 namespace Dryv.Rules
 {
@@ -40,17 +41,23 @@ namespace Dryv.Rules
             LambdaExpression rule,
             LambdaExpression enabled,
             DryvRuleSettings settings,
-            DryvRuleLocation ruleLocation)
+            DryvRuleLocation ruleLocation,
+            IEnumerable<Expression<Func<TModel, TProperty>>> relatedProperties)
         {
             var ruleDefinition = DryvCompiledRule.Create(property, rule, enabled, ruleLocation, null);
             ruleDefinition.RuleType = RuleType.Validation;
             ruleDefinition.Parameters = this.InternalParameters;
+            ruleDefinition.RelatedProperties = relatedProperties.Select(p => p.GetMemberExpression())
+                .Where(e => e != null)
+                .ToDictionary(
+                    e => (PropertyInfo)e.Member,
+                    e => e.GetModelPath(false, out _));
 
             if (settings != null)
             {
                 ruleDefinition.Annotations = settings;
                 ruleDefinition.Name = settings.Name;
-                ruleDefinition.GroupName = settings.GroupName;
+                ruleDefinition.Group = settings.Group;
             }
 
             this.InternalValidationRules.Add(ruleDefinition);
@@ -58,7 +65,7 @@ namespace Dryv.Rules
 
         private void Add<TProperty>(
             LambdaExpression rule,
-            IEnumerable<Expression<Func<TModel, TProperty>>> properties,
+            IList<Expression<Func<TModel, TProperty>>> properties,
             Delegate ruleSwitch,
             DryvRuleSettings settings,
             params Type[] services)
@@ -67,13 +74,14 @@ namespace Dryv.Rules
 
             foreach (var property in properties)
             {
-                this.Add(property, rule, switchLambda, settings, DryvRuleLocation.Server | DryvRuleLocation.Client);
+                var relatedProperties = properties.Except(new[] { property }).ToList();
+                this.Add(property, rule, switchLambda, settings, DryvRuleLocation.Server | DryvRuleLocation.Client, relatedProperties);
             }
         }
 
         private void AddClient<TProperty>(
             LambdaExpression rule,
-            IEnumerable<Expression<Func<TModel, TProperty>>> properties,
+            IList<Expression<Func<TModel, TProperty>>> properties,
             Delegate ruleSwitch,
             DryvRuleSettings settings,
             params Type[] services)
@@ -82,7 +90,8 @@ namespace Dryv.Rules
 
             foreach (var property in properties)
             {
-                this.Add(property, rule, switchLambda, settings, DryvRuleLocation.Client);
+                var relatedProperties = properties.Except(new[] { property }).ToList();
+                this.Add(property, rule, switchLambda, settings, DryvRuleLocation.Client, relatedProperties);
             }
         }
 
@@ -104,7 +113,7 @@ namespace Dryv.Rules
 
         private void AddServer<TProperty>(
             Delegate rule,
-            IEnumerable<Expression<Func<TModel, TProperty>>> properties,
+            IList<Expression<Func<TModel, TProperty>>> properties,
             Delegate ruleSwitch,
             DryvRuleSettings settings,
             params Type[] services)
@@ -114,7 +123,8 @@ namespace Dryv.Rules
 
             foreach (var property in properties)
             {
-                this.Add(property, lambda, switchLambda, settings, DryvRuleLocation.Server);
+                var relatedProperties = properties.Except(new[] { property }).ToList();
+                this.Add(property, lambda, switchLambda, settings, DryvRuleLocation.Server, relatedProperties);
             }
         }
 
@@ -135,7 +145,7 @@ namespace Dryv.Rules
 
         private void Disable<TProperty>(
             LambdaExpression rule,
-            IEnumerable<Expression<Func<TModel, TProperty>>> properties,
+            IList<Expression<Func<TModel, TProperty>>> properties,
             Delegate ruleSwitch,
             params Type[] services)
         {

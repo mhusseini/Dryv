@@ -8,7 +8,7 @@ namespace Dryv
     {
         public static readonly DryvValidationResult Success = new DryvValidationResult(DryvResultType.Success, null);
 
-        public DryvValidationResult(string text, DryvResultType type, object data, string groupName) : this(text, type, data) => this.GroupName = groupName;
+        public DryvValidationResult(string text, DryvResultType type, object data, string group) : this(text, type, data) => this.Group = group;
 
         public DryvValidationResult(string text, DryvResultType type, object data) : this(type, data) => this.Text = text;
 
@@ -21,7 +21,7 @@ namespace Dryv
         }
 
         public object Data { get; }
-        public string GroupName { get; internal set; }
+        public string Group { get; internal set; }
 
         public string Text { get; }
 

@@ -83,7 +83,7 @@ namespace Dryv
                         return null;
                     }
 
-                    result.GroupName = rule.GroupName;
+                    result.Group = rule.Group;
 
                     return new KeyValuePair<string, DryvValidationResult>(kvp.Key, result);
                 }

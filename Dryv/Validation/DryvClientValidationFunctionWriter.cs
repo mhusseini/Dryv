@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Dryv.Configuration;
 using Dryv.Extensions;
 using Dryv.Translation;
@@ -40,6 +41,13 @@ namespace Dryv.Validation
                 sep = ",";
                 writer.Write("{");
 
+                if (!string.IsNullOrWhiteSpace(rule.Rule.Group))
+                {
+                    writer.Write("\"group\": \"");
+                    writer.Write(this.JavaScriptEscape(rule.Rule.Group));
+                    writer.Write("\",");
+                }
+
                 if (!string.IsNullOrWhiteSpace(rule.Rule.Name))
                 {
                     writer.Write("\"name\": \"");
@@ -52,6 +60,13 @@ namespace Dryv.Validation
                     writer.Write("\"async\": true,");
                 }
 
+                if (rule.Rule.RelatedProperties?.Any() == true)
+                {
+                    writer.Write("\"related\": ");
+                    this.WriteArray(writer, rule.Rule.RelatedProperties.Values);
+                    writer.Write(",");
+                }
+
                 writer.Write("\"validate\": ");
                 writer.Write(rule.ClientCode);
                 writer.Write(",\"annotations\": ");
@@ -62,6 +77,24 @@ namespace Dryv.Validation
 
             writer.Write("]");
         };
+
+        private void WriteArray(TextWriter writer, ICollection<string> items)
+        {
+            var sep = string.Empty;
+            writer.Write("[");
+
+            if (items != null)
+            {
+                foreach (var item in items)
+                {
+                    writer.Write(sep);
+                    writer.Write(JavaScriptHelper.TranslateValue(item) ?? this.options.JsonConversion(item));
+                    sep = ",";
+                }
+            }
+
+            writer.Write("]");
+        }
 
         private void WriteObject(TextWriter writer, IDictionary<string, object> parameters)
         {
