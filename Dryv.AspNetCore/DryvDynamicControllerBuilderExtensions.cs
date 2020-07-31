@@ -4,10 +4,8 @@ using Dryv.AspNetCore.DynamicControllers.CodeGeneration;
 using Dryv.AspNetCore.DynamicControllers.Endpoints;
 using Dryv.AspNetCore.DynamicControllers.Translation;
 using Dryv.Translation;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -16,8 +14,6 @@ namespace Dryv.AspNetCore
 {
     public static class DryvDynamicControllerBuilderExtensions
     {
-        private static int controllerCount;
-
         public static IDryvMvcBuilder AddDryvDynamicControllers(this IDryvMvcBuilder dryvBuilder, Action<DryvDynamicControllerOptions> setupAction = null)
         {
             dryvBuilder.Options.Translators.Add<DryvDynamicControllerTranslator>();
@@ -37,25 +33,12 @@ namespace Dryv.AspNetCore
             services.AddSingleton<IActionDescriptorChangeProvider>(actionDescriptorChangeProvider);
             services.AddSingleton(actionDescriptorChangeProvider);
 
-            SetupEndpointMapping(services);
+            SetupEndpoints(services);
 
             return dryvBuilder;
         }
 
-        private static void DefaultEndpointMapping(DryvControllerGenerationContext context, IEndpointRouteBuilder builder)
-        {
-            builder.MapControllerRoute(
-                context.ControllerFullName,
-                $"validation/{context.Controller}/{context.Action}",
-                new { controller = context.Controller, action = context.Action });
-        }
-
-        private static string DefaultTemplateMapping(DryvControllerGenerationContext context)
-        {
-            return $"_v/c{++controllerCount}";
-        }
-
-        private static void SetupEndpointMapping(IServiceCollection serviceCollection)
+        private static void SetupEndpoints(IServiceCollection serviceCollection)
         {
             var serviceProvider = serviceCollection.BuildServiceProvider();
             var mvcOptions = serviceProvider.GetService<IOptions<MvcOptions>>().Value;
@@ -73,11 +56,16 @@ namespace Dryv.AspNetCore
 
             if (mvcOptions.EnableEndpointRouting && dynamicControllerOptions.GetEndpoint == null)
             {
-                dynamicControllerOptions.GetEndpoint = DefaultEndpointMapping;
+                dynamicControllerOptions.GetEndpoint = CustomizationDefaults.DefaultEndpoint;
             }
             else if (!mvcOptions.EnableEndpointRouting && dynamicControllerOptions.GetRoute == null)
             {
-                dynamicControllerOptions.GetRoute = DefaultTemplateMapping;
+                dynamicControllerOptions.GetRoute = CustomizationDefaults.DefaultRoute;
+            }
+
+            if (dynamicControllerOptions.GetHttpMethod == null)
+            {
+                dynamicControllerOptions.GetHttpMethod = CustomizationDefaults.DefaultHttpMethod;
             }
         }
     }

@@ -41,13 +41,13 @@ namespace Dryv
             };
         }
 
-        private static bool IsRuleEnabled(DryvCompiledRule rule, Func<Type, object> serviceProvider, IReadOnlyDictionary<List<DryvCompiledRule>, DryvParameters> parameters)
+        private static bool IsRuleEnabled(DryvCompiledRule rule, Func<Type, object> serviceProvider, IReadOnlyDictionary<IReadOnlyList<DryvCompiledRule>, DryvParameters> parameters)
         {
             var arguments = serviceProvider.GetServices(rule, parameters);
             return rule.CompiledEnablingExpression(arguments);
         }
 
-        private static TranslatedRule Translate(DryvCompiledRule rule, Func<Type, object> serviceProvider, IReadOnlyDictionary<List<DryvCompiledRule>, DryvParameters> parameters)
+        private static TranslatedRule Translate(DryvCompiledRule rule, Func<Type, object> serviceProvider, IReadOnlyDictionary<IReadOnlyList<DryvCompiledRule>, DryvParameters> parameters)
         {
             var services = serviceProvider.GetServices(rule, parameters);
 

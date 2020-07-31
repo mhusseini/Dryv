@@ -6,7 +6,7 @@ namespace Dryv.Extensions
 {
     internal static class ServiceProviderExtensions
     {
-        public static object[] GetServices(this Func<Type, object> serviceProvider, DryvCompiledRule rule, IReadOnlyDictionary<List<DryvCompiledRule>, DryvParameters> parameters)
+        public static object[] GetServices(this Func<Type, object> serviceProvider, DryvCompiledRule rule, IReadOnlyDictionary<IReadOnlyList<DryvCompiledRule>, DryvParameters> parameters)
         {
             parameters.TryGetValue(rule.Parameters, out var dryvParameters);
             return GetServices(serviceProvider, rule.PreevaluationOptionTypes, dryvParameters);

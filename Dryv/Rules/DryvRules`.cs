@@ -44,7 +44,7 @@ namespace Dryv.Rules
         {
             var ruleDefinition = DryvCompiledRule.Create(property, rule, enabled, ruleLocation, null);
             ruleDefinition.RuleType = RuleType.Validation;
-            ruleDefinition.Parameters = this.Parameters;
+            ruleDefinition.Parameters = this.InternalParameters;
 
             if (settings != null)
             {
@@ -53,7 +53,7 @@ namespace Dryv.Rules
                 ruleDefinition.GroupName = settings.GroupName;
             }
 
-            this.ValidationRules.Add(ruleDefinition);
+            this.InternalValidationRules.Add(ruleDefinition);
         }
 
         private void Add<TProperty>(
@@ -99,7 +99,7 @@ namespace Dryv.Rules
                 : Expression.Lambda<Func<object, object[], object>>(Expression.Convert(Expression.Call(Expression.Constant(o), m, args), typeof(object)), u, p);
 
             var ruleDefinition = DryvCompiledRule.CreateParameter(name, lambda, services);
-            this.Parameters.Add(ruleDefinition);
+            this.InternalParameters.Add(ruleDefinition);
         }
 
         private void AddServer<TProperty>(
@@ -130,7 +130,7 @@ namespace Dryv.Rules
             ruleDefinition.RuleType = RuleType.Disabling;
             ruleDefinition.Parameters = this.Parameters;
 
-            this.DisablingRules.Add(ruleDefinition);
+            this.InternalDisablingRules.Add(ruleDefinition);
         }
 
         private void Disable<TProperty>(

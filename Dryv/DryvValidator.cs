@@ -65,7 +65,7 @@ namespace Dryv
             }
         }
 
-        private async Task<KeyValuePair<string, DryvValidationResult>?> GetFirstValidationError(object model, Func<Type, object> serviceProvider, KeyValuePair<string, List<DryvCompiledRule>> kvp, Dictionary<List<DryvCompiledRule>, DryvParameters> parameters)
+        private async Task<KeyValuePair<string, DryvValidationResult>?> GetFirstValidationError(object model, Func<Type, object> serviceProvider, KeyValuePair<string, List<DryvCompiledRule>> kvp, Dictionary<IReadOnlyList<DryvCompiledRule>, DryvParameters> parameters)
         {
             foreach (var rule in kvp.Value)
             {
@@ -110,7 +110,7 @@ namespace Dryv
             };
         }
 
-        private bool IsSubtreeDisabled(object model, string modelPath, IReadOnlyDictionary<string, List<DryvCompiledRule>> disablingRules, Func<Type, object> serviceProvider, Dictionary<List<DryvCompiledRule>, DryvParameters> parameters)
+        private bool IsSubtreeDisabled(object model, string modelPath, IReadOnlyDictionary<string, List<DryvCompiledRule>> disablingRules, Func<Type, object> serviceProvider, Dictionary<IReadOnlyList<DryvCompiledRule>, DryvParameters> parameters)
         {
             return disablingRules.TryGetValue(modelPath, out var disablers) && disablers.Any(rule =>
             {

@@ -29,7 +29,7 @@ namespace Dryv.Rules
         public Func<Func<Type, object>, object[], string> TranslatedValidationExpression { get; internal set; }
         public Exception TranslationError { get; internal set; }
         public LambdaExpression ValidationExpression { get; internal set; }
-        internal List<DryvCompiledRule> Parameters { get; set; }
+        internal IReadOnlyList<DryvCompiledRule> Parameters { get; set; }
         internal string UniquePath { get; set; }
 
         internal static DryvCompiledRule Create<TModel, TProperty>(Expression<Func<TModel, TProperty>> propertyExpression, LambdaExpression validationExpression, LambdaExpression enablingExpression, DryvRuleLocation ruleLocation, string groupName)

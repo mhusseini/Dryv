@@ -8,7 +8,7 @@ namespace Dryv
 {
     public class DryvParametersHelper
     {
-        public static Dictionary<List<DryvCompiledRule>, DryvParameters> GetDryvParameters(IEnumerable<DryvCompiledRule> rules, Func<Type, object> serviceProvider)
+        public static Dictionary<IReadOnlyList<DryvCompiledRule>, DryvParameters> GetDryvParameters(IEnumerable<DryvCompiledRule> rules, Func<Type, object> serviceProvider)
         {
             return rules
                 .Select(r => r.Parameters)
