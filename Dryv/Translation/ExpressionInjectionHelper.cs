@@ -24,7 +24,7 @@ namespace Dryv.Translation
             }
 
             parameters = ExpressionNodeFinder<ParameterExpression>.FindChildrenStatic(expression.Object);
-            if (parameters.Any(p => !context.OptionsTypes.Contains(p.Type)))
+            if (parameters.Any(p => !context.InjectedServiceTypes.Contains(p.Type)))
             {
                 return false;
             }
@@ -47,7 +47,7 @@ namespace Dryv.Translation
 
             if (!parameters.Any() && parameterExpressions.Any())
             {
-                parameters = parameterExpressions.Where(p => context.OptionsTypes.Contains(p.Type)).ToList();
+                parameters = parameterExpressions.Where(p => context.InjectedServiceTypes.Contains(p.Type)).ToList();
             }
 
             return parameters.Any();

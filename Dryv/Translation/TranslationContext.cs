@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -33,8 +34,8 @@ namespace Dryv.Translation
         }
 
         public Type ModelType { get; set; }
-        public IDictionary<int, OptionDelegate> OptionDelegates { get; set; }
-        public IList<Type> OptionsTypes { get; set; }
+        public IDictionary<int, InjectedExpression> InjectedExpressions { get; set; }
+        public IList<Type> InjectedServiceTypes { get; set; }
         public TranslationContext ParentContext { get; set; }
         public Expression PropertyExpression { get; set; }
         public DryvCompiledRule Rule { get; set; }
@@ -51,8 +52,8 @@ namespace Dryv.Translation
                 ParentContext = this,
                 Group = this.Group,
                 ModelType = this.ModelType,
-                OptionDelegates = this.OptionDelegates,
-                OptionsTypes = this.OptionsTypes,
+                InjectedExpressions = this.InjectedExpressions,
+                InjectedServiceTypes = this.InjectedServiceTypes,
                 PropertyExpression = this.PropertyExpression,
                 Writer = sb == null ? this.Writer : new StringWriter(sb),
                 StringBuilder = sb,

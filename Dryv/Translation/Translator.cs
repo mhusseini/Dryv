@@ -32,7 +32,7 @@ namespace Dryv.Translation
         public virtual TranslationResult Translate(Expression expression, MemberExpression propertyExpression, DryvCompiledRule rule)
         {
             var result = this.GenerateJavaScriptCode(expression, propertyExpression, rule);
-            return this.translationCompiler.GenerateTranslationDelegate(result.Code, result.OptionDelegates, result.OptionTypes);
+            return this.translationCompiler.GenerateTranslationDelegate(result.Code, result.OptionDelegates, result.InjectedServiceTypes);
         }
 
         public virtual void Translate(Expression expression, TranslationContext context, bool negated = false)
@@ -164,18 +164,18 @@ namespace Dryv.Translation
             MemberExpression propertyExpression,
             DryvCompiledRule rule)
         {
-            // Find all option types used in the validation expression.
-            var optionTypes = ((LambdaExpression)expression).GetOptionTypes();
+            // Find all service types used in the validation expression.
+            var serviceTypes = ((LambdaExpression)expression).GetInjectedServiceTypes();
             // Collect delegates that use options from withing the validation expression.
-            var optionDelegates = new Dictionary<int, OptionDelegate>();
+            var optionDelegates = new Dictionary<int, InjectedExpression>();
             var sb = new StringBuilder();
 
             using var writer = new StringWriter(sb);
             var context = new TranslationContext
             {
-                OptionsTypes = optionTypes,
+                InjectedServiceTypes = serviceTypes,
                 Writer = writer,
-                OptionDelegates = optionDelegates,
+                InjectedExpressions = optionDelegates,
                 ModelType = rule.ModelType,
                 PropertyExpression = propertyExpression?.Expression,
                 Group = rule.Group,
@@ -190,23 +190,23 @@ namespace Dryv.Translation
             return new GeneratedJavaScriptCode
             (
                 sb.ToString(),
-                optionTypes,
-                context.OptionDelegates.Values.ToList()
+                serviceTypes,
+                context.InjectedExpressions.Values.ToList()
             );
         }
 
         private struct GeneratedJavaScriptCode
         {
-            public GeneratedJavaScriptCode(string code, IList<Type> optionTypes, IList<OptionDelegate> optionDelegates)
+            public GeneratedJavaScriptCode(string code, IList<Type> injectedServiceTypes, IList<InjectedExpression> optionDelegates)
             {
                 this.Code = code;
-                this.OptionTypes = optionTypes;
+                this.InjectedServiceTypes = injectedServiceTypes;
                 this.OptionDelegates = optionDelegates;
             }
 
             public string Code { get; }
-            public IList<OptionDelegate> OptionDelegates { get; }
-            public IList<Type> OptionTypes { get; }
+            public IList<InjectedExpression> OptionDelegates { get; }
+            public IList<Type> InjectedServiceTypes { get; }
         }
     }
 }

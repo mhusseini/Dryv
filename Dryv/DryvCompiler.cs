@@ -70,9 +70,9 @@ namespace Dryv
 
         private static void EnsurePreevaluationOptionTypes(DryvCompiledRule rule)
         {
-            if (rule.PreevaluationOptionTypes?.Any() != true)
+            if (rule.ServiceTypes?.Any() != true)
             {
-                rule.PreevaluationOptionTypes = (from p in rule.ValidationExpression.Parameters.Skip(1)
+                rule.ServiceTypes = (from p in rule.ValidationExpression.Parameters.Skip(1)
                                                  select p.Type).ToArray();
             }
         }

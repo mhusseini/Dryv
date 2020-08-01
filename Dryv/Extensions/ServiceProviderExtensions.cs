@@ -9,7 +9,7 @@ namespace Dryv.Extensions
         public static object[] GetServices(this Func<Type, object> serviceProvider, DryvCompiledRule rule, IReadOnlyDictionary<IReadOnlyList<DryvCompiledRule>, DryvParameters> parameters)
         {
             parameters.TryGetValue(rule.Parameters, out var dryvParameters);
-            return GetServices(serviceProvider, rule.PreevaluationOptionTypes, dryvParameters);
+            return GetServices(serviceProvider, rule.ServiceTypes, dryvParameters);
         }
 
         public static object[] GetServices(this Func<Type, object> serviceProvider, IList<Type> types, DryvParameters parameters = null)

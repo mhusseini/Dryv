@@ -2,7 +2,7 @@
 
 namespace Dryv.Translation
 {
-    public class OptionDelegate
+    public class InjectedExpression
     {
         public LambdaExpression LambdaExpression { get; set; }
 

@@ -22,16 +22,16 @@ namespace Dryv.Rules
         public string ModelPath { get; internal set; }
         public Type ModelType { get; internal set; }
         public string Name { get; internal set; }
-        public Type[] PreevaluationOptionTypes { get; internal set; }
+        public IReadOnlyList<DryvCompiledRule> Parameters { get; internal set; }
         public PropertyInfo Property { get; internal set; }
         public MemberExpression PropertyExpression { get; internal set; }
+        public IDictionary<PropertyInfo, string> RelatedProperties { get; internal set; }
         public RuleType RuleType { get; internal set; } = RuleType.Validation;
+        public Type[] ServiceTypes { get; internal set; }
         public Func<Func<Type, object>, object[], string> TranslatedValidationExpression { get; internal set; }
         public Exception TranslationError { get; internal set; }
         public LambdaExpression ValidationExpression { get; internal set; }
-        internal IReadOnlyList<DryvCompiledRule> Parameters { get; set; }
         internal string UniquePath { get; set; }
-        internal IDictionary<PropertyInfo, string> RelatedProperties { get; set; }
 
         internal static DryvCompiledRule Create<TModel, TProperty>(Expression<Func<TModel, TProperty>> propertyExpression, LambdaExpression validationExpression, LambdaExpression enablingExpression, DryvEvaluationLocation ruleLocation, string group)
         {
@@ -74,7 +74,7 @@ namespace Dryv.Rules
             {
                 RuleType = RuleType.Parameter,
                 Name = name,
-                PreevaluationOptionTypes = services,
+                ServiceTypes = services,
                 CompiledValidationExpression = lambda.Compile()
             };
         }

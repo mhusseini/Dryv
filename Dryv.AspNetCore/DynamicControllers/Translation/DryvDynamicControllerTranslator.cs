@@ -43,8 +43,9 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
             var expression = context.Expression;
             if (expression is LambdaExpression lambda)
             {
-                expression = lambda.Body;
+                return false;
             }
+
             var finder = new AsyncMethodCallFinder(this.methodCallTranslators, context);
 
             if (expression is ConditionalExpression conditional)

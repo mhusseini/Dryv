@@ -29,7 +29,7 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
             var visitor = new ObjectWriter(translator, context, members.ToDictionary(m => m.Member, m => (Expression)m), w);
             visitor.Write(parameter.Type);
 
-            w.Write(@").then(function($r){$ctx.dryv.handleResult($ctx,");
+            w.Write(@").then(function($r){return $ctx.dryv.handleResult($ctx,");
             w.Write(parameter.Name);
             w.Write(",");
             w.Write(context.Translator.TranslateValue(context.Rule.ModelPath));

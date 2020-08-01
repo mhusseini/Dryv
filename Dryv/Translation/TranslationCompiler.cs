@@ -21,7 +21,7 @@ namespace Dryv.Translation
             this.translator = translator;
         }
 
-        public TranslationResult GenerateTranslationDelegate(string code, IEnumerable<OptionDelegate> optionDelegates, IList<Type> optionTypes)
+        public TranslationResult GenerateTranslationDelegate(string code, IEnumerable<InjectedExpression> optionDelegates, IList<Type> serviceTypes)
         {
             // Escape curly braces for usage within string.Format().
             code = code
@@ -32,7 +32,7 @@ namespace Dryv.Translation
             var parameter = Expression.Parameter(typeof(object[]));
 
             // Create an array that will be used as parameters for string.Format().
-            var arrayItems = this.GenerateFormatArgumentExpressions(optionDelegates, optionTypes, parameter, ref code);
+            var arrayItems = this.GenerateFormatArgumentExpressions(optionDelegates, serviceTypes, parameter, ref code);
 
             // create the following code: string.Format("...", new[]{ ... })
             var pattern = Expression.Constant(code);
@@ -49,7 +49,7 @@ namespace Dryv.Translation
             return new TranslationResult
             {
                 Factory = result.Compile(),
-                OptionTypes = optionTypes.ToArray(),
+                InjectedServiceTypes = serviceTypes.ToArray(),
                 CodeTemplate = code,
             };
         }
@@ -79,8 +79,8 @@ namespace Dryv.Translation
         }
 
         private IEnumerable<Expression> GenerateFormatArgumentExpressions(
-            IEnumerable<OptionDelegate> optionDelegates,
-            IList<Type> optionTypes,
+            IEnumerable<InjectedExpression> injectedExpressions,
+            IList<Type> serviceTypes,
             Expression parameter,
             ref string code)
         {
@@ -91,25 +91,26 @@ namespace Dryv.Translation
             arrayItems.Add(Expression.ArrayAccess(parameter, Expression.Constant(0)));
 
             // Replace all occurrences of $$MODELPATH$$ with the appropriate formatting placeholder
+            // TODO: remove "$$MODELPATH$$" from all code.
             code = code.Replace("$$MODELPATH$$", string.Empty);
 
-            foreach (var optionDelegate in optionDelegates)
+            foreach (var injectedExpression in injectedExpressions)
             {
-                var optionType = GetTypeChain(optionDelegate.LambdaExpression.Body).LastOrDefault();
-                var key = optionType?.Name ?? optionDelegate.Index.ToString();
+                var optionType = GetTypeChain(injectedExpression.LambdaExpression.Body).LastOrDefault();
+                var key = optionType?.Name ?? injectedExpression.Index.ToString();
 
                 var index = arrayIndexes.GetOrAdd(key, t =>
                 {
                     // get item from input array (properly casted)
-                    var arguments = from p2 in optionDelegate.LambdaExpression.Parameters
-                                    let idx2 = Expression.Constant(optionTypes.IndexOf(p2.Type) + 1)
+                    var arguments = from p2 in injectedExpression.LambdaExpression.Parameters
+                                    let idx2 = Expression.Constant(serviceTypes.IndexOf(p2.Type) + 1)
                                     let arrayAccess = Expression.ArrayAccess(parameter, idx2)
                                     select Expression.Convert(arrayAccess, p2.Type);
 
                     // invoke lambda with item as argument
-                    Expression optionValue = Expression.Convert(Expression.Invoke(optionDelegate.LambdaExpression, arguments), typeof(object));
+                    Expression optionValue = Expression.Convert(Expression.Invoke(injectedExpression.LambdaExpression, arguments), typeof(object));
 
-                    if (!optionDelegate.IsRawOutput)
+                    if (!injectedExpression.IsRawOutput)
                     {
                         // translate result of lambda to JavaScript
                         optionValue = Expression.Call(Expression.Constant(this.translator), TranslateValueMethod, optionValue);
@@ -122,7 +123,7 @@ namespace Dryv.Translation
                 });
 
                 // Replace all occurrences of $$...$$ with the appropriate formatting placeholder
-                code = code.Replace($"$${optionDelegate.Index}$$", $"{{{index}}}");
+                code = code.Replace($"$${injectedExpression.Index}$$", $"{{{index}}}");
             }
 
             return arrayItems;

@@ -162,9 +162,9 @@ namespace Dryv.RuleDetection
             var parameters = new List<ParameterExpression> { modelParameter };
             parameters.AddRange(rule.ValidationExpression.Parameters.Skip(1));
 
-            if (rule.PreevaluationOptionTypes == null)
+            if (rule.ServiceTypes == null)
             {
-                rule.PreevaluationOptionTypes = parameters.Skip(1).Select(p => p.Type).ToArray();
+                rule.ServiceTypes = parameters.Skip(1).Select(p => p.Type).ToArray();
             }
 
             var replacer = new NodeReplacer();
@@ -226,7 +226,7 @@ namespace Dryv.RuleDetection
                 ValidationExpression = newValidationExpression,
                 EvaluationLocation = rule.EvaluationLocation,
                 PropertyExpression = rule.PropertyExpression,
-                PreevaluationOptionTypes = rule.PreevaluationOptionTypes,
+                ServiceTypes = rule.ServiceTypes,
                 Group = rule.Group,
                 Name = rule.Name,
                 RuleType = rule.RuleType,
@@ -256,7 +256,7 @@ namespace Dryv.RuleDetection
             {
                 var translation = this.translator.Translate(validationExpression, rule.PropertyExpression, rule);
                 rule.TranslatedValidationExpression = translation.Factory;
-                rule.PreevaluationOptionTypes = translation.OptionTypes;
+                rule.ServiceTypes = translation.InjectedServiceTypes;
                 rule.CodeTemplate = translation.CodeTemplate;
             }
             catch (DryvException ex)
@@ -267,7 +267,7 @@ namespace Dryv.RuleDetection
                 }
 
                 rule.TranslatedValidationExpression = null;
-                rule.PreevaluationOptionTypes = null;
+                rule.ServiceTypes = null;
                 rule.TranslationError = ex;
             }
         }

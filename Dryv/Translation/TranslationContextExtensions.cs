@@ -37,9 +37,9 @@ namespace Dryv.Translation
 
             var hash = expression.ToString().GetHashCode();
 
-            if (!context.OptionDelegates.ContainsKey(hash))
+            if (!context.InjectedExpressions.ContainsKey(hash))
             {
-                context.OptionDelegates.Add(hash, new OptionDelegate
+                context.InjectedExpressions.Add(hash, new InjectedExpression
                 {
                     LambdaExpression = Expression.Lambda(expression, parameters),
                     IsRawOutput = isRawOutput,

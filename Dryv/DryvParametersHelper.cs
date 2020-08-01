@@ -15,7 +15,7 @@ namespace Dryv
                 .Distinct()
                 .ToDictionary(ps => ps, ps => new DryvParameters(ps.ToDictionary(p => p.Name, p =>
                 {
-                    var services = serviceProvider.GetServices(p.PreevaluationOptionTypes);
+                    var services = serviceProvider.GetServices(p.ServiceTypes);
                     return p.CompiledValidationExpression(null, services);
                 })));
         }

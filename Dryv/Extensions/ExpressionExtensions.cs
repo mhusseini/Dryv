@@ -89,7 +89,7 @@ namespace Dryv.Extensions
                 .Reverse());
         }
 
-        public static List<Type> GetOptionTypes(this LambdaExpression expression)
+        public static List<Type> GetInjectedServiceTypes(this LambdaExpression expression)
         {
             var genericArguments = expression.Type.GetGenericArguments();
             return genericArguments
