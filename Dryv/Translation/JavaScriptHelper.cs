@@ -9,13 +9,26 @@ namespace Dryv.Translation
         {
             return value switch
             {
-                string txt => $"\"{txt}\"",
+                string txt => $"\"{JavaScriptEscape(txt)}\"",
                 bool b => (b ? "true" : "false"),
                 null => "null",
                 DateTime dateTime => $@"""{dateTime.ToString(CultureInfo.CurrentCulture)}""",
                 DateTimeOffset dateTime => $@"""{dateTime.ToString(CultureInfo.CurrentCulture)}""",
                 _ => null
             };
+        }
+
+        public  static string JavaScriptEscape(string text)
+        {
+            return text
+                .Replace("\n", string.Empty)
+                .Replace("\r", string.Empty)
+                .Replace("\\", @"\u005c")  // Because it's JS string escape character
+                .Replace("\"", @"\u0022")  // Because it may be string delimiter
+                .Replace("'", @"\u0027")   // Because it may be string delimiter
+                .Replace("&", @"\u0026")   // Because it may interfere with HTML parsing
+                .Replace("<", @"\u003c")   // Because it may interfere with HTML parsing
+                .Replace(">", @"\u003e");  // Because it may interfere with HTML parsing
         }
     }
 }

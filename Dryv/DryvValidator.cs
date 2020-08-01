@@ -101,10 +101,12 @@ namespace Dryv
             return new GroupedValidation
             {
                 ValidationRules = this.ruleFinder.FindValidationRulesInTree(type, RuleType.Validation)
+                    .Where(r => r.EvaluationLocation.HasFlag(DryvEvaluationLocation.Server))
                     .GroupBy(r => r.ModelPath)
                     .ToDictionary(g => g.Key, g => g.ToList()),
 
                 DisablingRules = this.ruleFinder.FindValidationRulesInTree(type, RuleType.Disabling)
+                    .Where(r => r.EvaluationLocation.HasFlag(DryvEvaluationLocation.Server))
                     .GroupBy(r => r.ModelPath)
                     .ToDictionary(g => g.Key, g => g.ToList())
             };

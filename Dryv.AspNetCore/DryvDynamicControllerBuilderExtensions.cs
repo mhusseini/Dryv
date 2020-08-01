@@ -44,19 +44,19 @@ namespace Dryv.AspNetCore
             var mvcOptions = serviceProvider.GetService<IOptions<MvcOptions>>().Value;
             var dynamicControllerOptions = serviceProvider.GetService<IOptions<DryvDynamicControllerOptions>>().Value;
 
-            if (mvcOptions.EnableEndpointRouting && dynamicControllerOptions.GetEndpoint == null && dynamicControllerOptions.GetRoute != null)
+            if (mvcOptions.EnableEndpointRouting && dynamicControllerOptions.SetEndpoint == null && dynamicControllerOptions.GetRoute != null)
             {
-                throw new DryvConfigurationException("When MvcOptions.EnableEndpointRouting is true, DryvDynamicControllerOptions.MapRouteTemplate cannot be used. Instead, please specify DryvDynamicControllerOptions.MapEndpoint or leave DryvDynamicControllerOptions.MapTemplate and DryvDynamicControllerOptions.MapEndpoint empty for default values.");
+                throw new DryvConfigurationException($"When MvcOptions.EnableEndpointRouting is true, {nameof(DryvDynamicControllerOptions)}.{nameof(DryvDynamicControllerOptions.GetRoute)} cannot be used. Instead, please use {nameof(DryvDynamicControllerOptions)}.{nameof(DryvDynamicControllerOptions.SetEndpoint)} instead.");
             }
 
-            if (!mvcOptions.EnableEndpointRouting && dynamicControllerOptions.GetEndpoint != null && dynamicControllerOptions.GetRoute == null)
+            if (!mvcOptions.EnableEndpointRouting && dynamicControllerOptions.SetEndpoint != null && dynamicControllerOptions.GetRoute == null)
             {
-                throw new DryvConfigurationException("When MvcOptions.EnableEndpointRouting is false, DryvDynamicControllerOptions.MapEndpoint cannot be used. Instead, please specify DryvDynamicControllerOptions.MapRouteTemplate or leave DryvDynamicControllerOptions.MapTemplate and DryvDynamicControllerOptions.MapEndpoint empty for default values.");
+                throw new DryvConfigurationException($"When MvcOptions.EnableEndpointRouting is false, {nameof(DryvDynamicControllerOptions)}.{nameof(DryvDynamicControllerOptions.SetEndpoint)} cannot be used. Instead, please use {nameof(DryvDynamicControllerOptions)}.{nameof(DryvDynamicControllerOptions.GetRoute)} instead.");
             }
 
-            if (mvcOptions.EnableEndpointRouting && dynamicControllerOptions.GetEndpoint == null)
+            if (mvcOptions.EnableEndpointRouting && dynamicControllerOptions.SetEndpoint == null)
             {
-                dynamicControllerOptions.GetEndpoint = CustomizationDefaults.DefaultEndpoint;
+                dynamicControllerOptions.SetEndpoint = CustomizationDefaults.DefaultEndpoint;
             }
             else if (!mvcOptions.EnableEndpointRouting && dynamicControllerOptions.GetRoute == null)
             {

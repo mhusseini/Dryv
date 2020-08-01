@@ -23,6 +23,8 @@ namespace Dryv.SampleVue.CustomValidation
                 : await this.ValidateZipCode(zipCode, city);
         }
 
+        public bool IsValid(string zipCode) => false;
+
         public async Task<DryvValidationResult> ValidateZipCode(string zipCode, string city)
         {
             return string.IsNullOrWhiteSpace(zipCode)

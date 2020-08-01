@@ -17,7 +17,7 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
         {
             var w = context.Writer;
 
-            w.Write("$context.dryv.callServer('");
+            w.Write("$ctx.dryv.callServer('");
             w.Write(url);
             w.Write("','");
             w.Write(httpMethod);
@@ -29,13 +29,13 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
             var visitor = new ObjectWriter(translator, context, members.ToDictionary(m => m.Member, m => (Expression)m), w);
             visitor.Write(parameter.Type);
 
-            w.Write(@").then(function($result){ return $context && $context.onServerResult ? $context.onServerResult($context, ");
-            w.Write(context.Translator.TranslateValue(parameter.Name));
-            w.Write(", ");
+            w.Write(@").then(function($r){$ctx.dryv.handleResult($ctx,");
+            w.Write(parameter.Name);
+            w.Write(",");
             w.Write(context.Translator.TranslateValue(context.Rule.ModelPath));
-            w.Write(", ");
+            w.Write(",");
             w.Write(context.Translator.TranslateValue(context.Rule.Name));
-            w.Write(", $result) : $result;})");
+            w.Write(",$r);})");
         }
 
         private class ObjectWriter

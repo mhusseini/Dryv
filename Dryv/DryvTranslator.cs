@@ -22,10 +22,12 @@ namespace Dryv
         {
             var validationRules = this.ruleFinder
                 .FindValidationRulesInTree(modelType, RuleType.Validation)
+                .Where(r=>r.EvaluationLocation.HasFlag(DryvEvaluationLocation.Client))
                 .ToList();
 
             var disablingRules = this.ruleFinder
                 .FindValidationRulesInTree(modelType, RuleType.Disabling)
+                .Where(r => r.EvaluationLocation.HasFlag(DryvEvaluationLocation.Client))
                 .ToList();
 
             var parameters = DryvParametersHelper.GetDryvParameters(validationRules.Union(disablingRules), serviceProvider);

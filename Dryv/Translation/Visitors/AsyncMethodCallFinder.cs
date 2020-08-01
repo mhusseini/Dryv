@@ -17,10 +17,12 @@ namespace Dryv.Translation.Visitors
 
         public List<MethodCallExpression> AsyncMethodCallsExpressions { get; } = new List<MethodCallExpression>();
 
-        public void FindAsyncMethodCalls(Expression node)
+        public List<MethodCallExpression> FindAsyncMethodCalls(Expression node)
         {
             this.AsyncMethodCallsExpressions.Clear();
             this.Visit(node);
+
+            return this.AsyncMethodCallsExpressions;
         }
 
         protected override void VisitMethodCall(Context context, MethodCallExpression node)

@@ -38,7 +38,10 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
             }
             else
             {
-                this.TranslateToServerCall(context, context.Translator, methodCallExpression, methodCallExpression.Method.Name);
+                var action = methodCallExpression.Method.IsHideBySig
+                    ? string.IsNullOrWhiteSpace(context.Rule.Name) ? "auto" : context.Rule.Name 
+                    : methodCallExpression.Method.Name;
+                this.TranslateToServerCall(context, context.Translator, methodCallExpression, action);
             }
 
             return true;

@@ -41,7 +41,7 @@ namespace Dryv.Rules
             LambdaExpression rule,
             LambdaExpression enabled,
             DryvRuleSettings settings,
-            DryvRuleLocation ruleLocation,
+            DryvEvaluationLocation ruleLocation,
             IEnumerable<Expression<Func<TModel, TProperty>>> relatedProperties)
         {
             var ruleDefinition = DryvCompiledRule.Create(property, rule, enabled, ruleLocation, null);
@@ -75,7 +75,7 @@ namespace Dryv.Rules
             foreach (var property in properties)
             {
                 var relatedProperties = properties.Except(new[] { property }).ToList();
-                this.Add(property, rule, switchLambda, settings, DryvRuleLocation.Server | DryvRuleLocation.Client, relatedProperties);
+                this.Add(property, rule, switchLambda, settings, DryvEvaluationLocation.Server | DryvEvaluationLocation.Client, relatedProperties);
             }
         }
 
@@ -91,7 +91,7 @@ namespace Dryv.Rules
             foreach (var property in properties)
             {
                 var relatedProperties = properties.Except(new[] { property }).ToList();
-                this.Add(property, rule, switchLambda, settings, DryvRuleLocation.Client, relatedProperties);
+                this.Add(property, rule, switchLambda, settings, DryvEvaluationLocation.Client, relatedProperties);
             }
         }
 
@@ -124,7 +124,7 @@ namespace Dryv.Rules
             foreach (var property in properties)
             {
                 var relatedProperties = properties.Except(new[] { property }).ToList();
-                this.Add(property, lambda, switchLambda, settings, DryvRuleLocation.Server, relatedProperties);
+                this.Add(property, lambda, switchLambda, settings, DryvEvaluationLocation.Server, relatedProperties);
             }
         }
 
@@ -132,7 +132,7 @@ namespace Dryv.Rules
             Expression<Func<TModel, TProperty>> property,
             LambdaExpression rule,
             Delegate ruleSwitch,
-            DryvRuleLocation ruleLocation,
+            DryvEvaluationLocation ruleLocation,
             params Type[] services)
         {
             var switchLambda = DelegateToLambda(ruleSwitch, services, true);
@@ -151,7 +151,7 @@ namespace Dryv.Rules
         {
             foreach (var property in properties)
             {
-                this.Disable(property, rule, ruleSwitch, DryvRuleLocation.Server | DryvRuleLocation.Client, services);
+                this.Disable(property, rule, ruleSwitch, DryvEvaluationLocation.Server | DryvEvaluationLocation.Client, services);
             }
         }
     }

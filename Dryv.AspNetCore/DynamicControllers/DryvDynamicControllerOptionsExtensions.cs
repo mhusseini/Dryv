@@ -29,7 +29,7 @@ namespace Dryv.AspNetCore.DynamicControllers
 
         public static void WithEndpoint(this DryvDynamicControllerOptions options, Action<DryvControllerGenerationContext, IEndpointRouteBuilder> mapper)
         {
-            options.GetEndpoint = mapper;
+            options.SetEndpoint = mapper;
         }
 
         public static void WithRoute(this DryvDynamicControllerOptions options, Func<DryvControllerGenerationContext, string> template)

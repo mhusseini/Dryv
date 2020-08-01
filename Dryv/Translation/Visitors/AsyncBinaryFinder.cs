@@ -71,6 +71,10 @@ namespace Dryv.Translation.Visitors
                     this.AsyncBinaryExpressions.Add(binary);
                 }
             }
+            else
+            {
+                this.AsyncPath.Add(node);
+            }
 
             base.VisitMethodCall(context, node);
         }

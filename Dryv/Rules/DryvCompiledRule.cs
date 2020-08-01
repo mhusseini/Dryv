@@ -16,7 +16,7 @@ namespace Dryv.Rules
         public Func<object[], bool> CompiledEnablingExpression { get; internal set; }
         public Func<object, object[], object> CompiledValidationExpression { get; internal set; }
         public LambdaExpression EnablingExpression { get; internal set; }
-        public DryvRuleLocation EvaluationLocation { get; internal set; }
+        public DryvEvaluationLocation EvaluationLocation { get; internal set; }
         public string Group { get; internal set; }
         public bool IsAsync { get; internal set; }
         public string ModelPath { get; internal set; }
@@ -33,7 +33,7 @@ namespace Dryv.Rules
         internal string UniquePath { get; set; }
         internal IDictionary<PropertyInfo, string> RelatedProperties { get; set; }
 
-        internal static DryvCompiledRule Create<TModel, TProperty>(Expression<Func<TModel, TProperty>> propertyExpression, LambdaExpression validationExpression, LambdaExpression enablingExpression, DryvRuleLocation ruleLocation, string group)
+        internal static DryvCompiledRule Create<TModel, TProperty>(Expression<Func<TModel, TProperty>> propertyExpression, LambdaExpression validationExpression, LambdaExpression enablingExpression, DryvEvaluationLocation ruleLocation, string group)
         {
             var memberExpression = propertyExpression.GetMemberExpression();
             if (memberExpression == null)

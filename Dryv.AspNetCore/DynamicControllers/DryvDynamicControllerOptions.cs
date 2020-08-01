@@ -13,7 +13,7 @@ namespace Dryv.AspNetCore.DynamicControllers
 
         internal Func<DryvControllerGenerationContext, IEnumerable<Expression<Func<Attribute>>>> GetActionFilters { get; set; }
         internal Func<DryvControllerGenerationContext, IEnumerable<Expression<Func<Attribute>>>> GetControllerFilters { get; set; }
-        internal Action<DryvControllerGenerationContext, IEndpointRouteBuilder> GetEndpoint { get; set; }
+        internal Action<DryvControllerGenerationContext, IEndpointRouteBuilder> SetEndpoint { get; set; }
         internal Func<DryvControllerGenerationContext, DryvDynamicControllerMethods> GetHttpMethod { get; set; }
         internal Func<DryvControllerGenerationContext, string> GetRoute { get; set; }
     }

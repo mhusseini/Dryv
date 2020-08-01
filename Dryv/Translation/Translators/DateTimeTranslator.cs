@@ -47,7 +47,7 @@ namespace Dryv.Translation.Translators
             
             var format = $"{culture.DateTimeFormat.ShortDatePattern} {culture.DateTimeFormat.LongTimePattern}{timeZone}";
 
-            context.Writer.Write("$context.dryv.valueOfDate(");
+            context.Writer.Write("$ctx.dryv.valueOfDate(");
             context.Translator.Translate(node, context);
             context.Writer.Write(",\"");
             context.Writer.Write(culture.Name);

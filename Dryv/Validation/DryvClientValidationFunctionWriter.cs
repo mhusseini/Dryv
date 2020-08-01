@@ -17,21 +17,9 @@ namespace Dryv.Validation
             this.options = options;
         }
 
-        private string JavaScriptEscape(string text)
-        {
-            return text
-                .Replace("\n", string.Empty)
-                .Replace("\r", string.Empty)
-                .Replace("\\", @"\u005c")  // Because it's JS string escape character
-                .Replace("\"", @"\u0022")  // Because it may be string delimiter
-                .Replace("'", @"\u0027")   // Because it may be string delimiter
-                .Replace("&", @"\u0026")   // Because it may interfere with HTML parsing
-                .Replace("<", @"\u003c")   // Because it may interfere with HTML parsing
-                .Replace(">", @"\u003e");  // Because it may interfere with HTML parsing
-        }
-
         public Action<TextWriter> GetValidationFunction(IEnumerable<TranslatedRule> translatedRules) => writer =>
         {
+            var keyWriter = new KeyWriter(writer);
             var sep = string.Empty;
             writer.Write("[");
 
@@ -39,44 +27,66 @@ namespace Dryv.Validation
             {
                 writer.Write(sep);
                 sep = ",";
+                keyWriter.Reset();
                 writer.Write("{");
-
-                if (!string.IsNullOrWhiteSpace(rule.Rule.Group))
-                {
-                    writer.Write("\"group\": \"");
-                    writer.Write(this.JavaScriptEscape(rule.Rule.Group));
-                    writer.Write("\",");
-                }
 
                 if (!string.IsNullOrWhiteSpace(rule.Rule.Name))
                 {
-                    writer.Write("\"name\": \"");
-                    writer.Write(this.JavaScriptEscape(rule.Rule.Name));
-                    writer.Write("\",");
+                    keyWriter.Write("name:");
+                    writer.Write(JavaScriptHelper.TranslateValue(rule.Rule.Name));
+                }
+
+                if (!string.IsNullOrWhiteSpace(rule.Rule.Group))
+                {
+                    keyWriter.Write("group:");
+                    writer.Write(JavaScriptHelper.TranslateValue(rule.Rule.Group));
                 }
 
                 if (rule.Rule.IsAsync)
                 {
-                    writer.Write("\"async\": true,");
+                    keyWriter.Write("async:true");
                 }
 
                 if (rule.Rule.RelatedProperties?.Any() == true)
                 {
-                    writer.Write("\"related\": ");
+                    keyWriter.Write("related:");
                     this.WriteArray(writer, rule.Rule.RelatedProperties.Values);
-                    writer.Write(",");
                 }
 
-                writer.Write("\"validate\": ");
+                if (rule.Rule.Annotations?.Any() == true)
+                {
+                    keyWriter.Write("annotations:");
+                    this.WriteObject(writer, rule.Rule.Annotations);
+                }
+
+                keyWriter.Write("validate:");
                 writer.Write(rule.ClientCode);
-                writer.Write(",\"annotations\": ");
-                this.WriteObject(writer, rule.Rule.Annotations);
 
                 writer.Write("}");
             }
 
             writer.Write("]");
         };
+
+        private class KeyWriter
+        {
+            private readonly TextWriter writer;
+            private bool hasKey;
+
+            public KeyWriter(TextWriter writer) => this.writer = writer;
+
+            public void Reset() => this.hasKey = false;
+            public void Write(string text)
+            {
+                if (this.hasKey)
+                {
+                    this.writer.Write(",");
+                }
+
+                this.writer.Write(text);
+                this.hasKey = true;
+            }
+        }
 
         private void WriteArray(TextWriter writer, ICollection<string> items)
         {

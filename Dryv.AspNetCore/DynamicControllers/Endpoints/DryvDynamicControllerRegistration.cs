@@ -28,7 +28,7 @@ namespace Dryv.AspNetCore.DynamicControllers.Endpoints
             var assemblyPart = new AssemblyPart(assembly);
             this.partManager.ApplicationParts.Add(assemblyPart);
 
-            if (this.options.Value.GetEndpoint != null)
+            if (this.options.Value.SetEndpoint != null)
             {
                 foreach (var type in from t in assembly.DefinedTypes
                                      where typeof(Controller).IsAssignableFrom(t)
@@ -45,7 +45,7 @@ namespace Dryv.AspNetCore.DynamicControllers.Endpoints
         private void MapEndpoint(Type controllerTyp, string action, DryvCompiledRule rule)
         {
             var context = new DryvControllerGenerationContext(controllerTyp, action, rule);
-            this.options.Value.GetEndpoint(context, this.routeBuilderProvider.RouteBuilder);
+            this.options.Value.SetEndpoint(context, this.routeBuilderProvider.RouteBuilder);
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿//
 // Diese Datei wird beizeiten durch ein NPM-Paket ausgetauscht.
 //
-const dryv = window.dryv || (window.dryv = {});
+const dryvRoot = window.dryv || (window.dryv = {});
 
 function hashCode(text) {
     var hash = 0, i, chr;
@@ -69,6 +69,9 @@ async function validate(component, clientContext) {
         }
     }
 
+    $dryv._lastDisabledFields = disabledFields || null;
+    $dryv._lastContext = context;
+
     return {
         hasErrors: errors.length > 0,
         errorHash: hashCode(errors),
@@ -89,6 +92,23 @@ const dryvGroupTag = "dryv-group";
 const dryvSetDirective = "dryv-set";
 const dryvFieldDirective = "dryv";
 
+function initializeFieldComponent(formComponent, component, path) {
+    if (component.$dryv) {
+        return;
+    }
+
+    component.$dryv = { path, formValidators: [] };
+    formComponent.$watch(path, (newValue, oldValue) => {
+        const d = formComponent.$dryv;
+        if (d._lastDisabledFields === undefined) {
+            return;
+        }
+
+        component.$dryv.formValidators
+            .filter(v => !v.isValidating && v.path === path)
+            .forEach(v => v.validate(d._lastDisabledFields, d._lastContext, true));
+    });
+}
 function findFormComponent(vnode) {
     let component = vnode.context;
     let formComponent = null;
@@ -127,26 +147,30 @@ function findModelExpression(vnode) {
 
     return null;
 }
+function copyRules($dryv, name) {
+    const validationSet = dryvRoot.v[name];
+    if (!validationSet) {
+        if ($dryv.v) {
+            return;
+        }
 
-function initializeFormComponent(component, name, path, options, Vue) {
+        throw `No validation set with name '${name}' was found on the Dryv object supplied with the options.`;
+    }
+
+    $dryv.v = validationSet;
+    $dryv.params = validationSet.parameters;
+}
+
+function initializeFormComponent(component, name, path, options) {
     if (!component.$dryv) {
-        const $dryv = Object.assign({}, options);
+        const $dryv = Object.assign({}, { fieldValidators: [], namedValidators: {} }, options);
         component.$dryv = $dryv;
         (component.methods || (component.methods = {}))["$dryvParam"] = () => $dryv.params || {};
     }
 
     const d = component.$dryv;
     d.path = path;
-
-    if (!d.v) {
-        const validationSet = options.dryv.v[name];
-        if (!validationSet) {
-            throw `No validation set with name '${name}' was found on the Dryv object supplied with the options.`;
-        }
-
-        d.v = validationSet;
-        d.params = d.v.parameters;
-    }
+    copyRules(d, name);
 
     if (!d.formValidators) {
         d.formValidators = [];
@@ -161,16 +185,16 @@ function initializeFormComponent(component, name, path, options, Vue) {
     }
 }
 
-function handleValidationResult(Vue, component, result, errorField, warningField, groupComponent) {
+function handleValidationResult(Vue, component, result, errorField, warningField, hasGroupErrorField, groupComponent) {
     let type = null;
-    let groupName = null;
+    let group = null;
     let text = null;
 
     if (result) {
         switch (typeof result) {
             case "object":
                 type = result.type;
-                groupName = result.groupName;
+                group = result.group;
                 text = result.text;
                 break;
             case "string":
@@ -183,17 +207,19 @@ function handleValidationResult(Vue, component, result, errorField, warningField
     const error = type === "error" && text;
     const warning = type === "warning" && text;
 
-    if (groupName && groupComponent) {
-        error && groupComponent.addError(error, groupName);
-        warning && groupComponent.addWarning(warning, groupName);
+    if (group && groupComponent) {
+        error && groupComponent.addError(error, group);
+        warning && groupComponent.addWarning(warning, group, this);
         Vue.set(component, errorField, null);
         Vue.set(component, warningField, null);
+        Vue.set(component, hasGroupErrorField, true);
     } else {
         Vue.set(component, errorField, error);
         Vue.set(component, warningField, warning);
+        Vue.set(component, hasGroupErrorField, false);
     }
 
-    return text && { type, text, groupName };
+    return text && { type, text, group };
 }
 
 function runValidation(v, m, context) {
@@ -218,8 +244,9 @@ const defaultOptions = {
     }),
     errorField: "error",
     warningField: "warning",
-    dryv: window.dryv
+    hasGroupErrorField: "hasError"
 };
+
 const Dryvue = {
     install(Vue, o) {
         const options = Object.assign({}, defaultOptions, o);
@@ -233,23 +260,23 @@ const Dryvue = {
             return response.data;
         };
 
-        function addResultItem(items, text, groupName) {
-            if (!items[groupName]) {
-                Vue.set(items, groupName, []);
+        function addResultItem(items, text, group) {
+            if (!items[group]) {
+                Vue.set(items, group, []);
             }
 
-            const texts = items[groupName];
+            const texts = items[group];
             if (texts.indexOf(text) < 0) {
                 texts.push(text);
             }
         }
 
         function flattenItems(items) {
-            return [].concat.apply([], Object.entries(items));
+            return [].concat.apply([], Object.keys(items).map(k => items[k]));
         }
 
-        function clearItems(items) {
-            Object.entries(items).forEach(l => l.splice(0));
+        function clearItems(items, group) {
+            Object.keys(items).filter(k => !!group || k === group).map(k => items[k]).forEach(l => l.splice(0));
         }
 
         Vue.component(dryvGroupTag,
@@ -269,15 +296,15 @@ const Dryvue = {
                     }
                 },
                 methods: {
-                    clear() {
-                        clearItems(this.errors);
-                        clearItems(this.warnings);
+                    clear(group) {
+                        clearItems(this.errors, group);
+                        clearItems(this.warnings, group);
                     },
-                    addError(text, groupName) {
-                        addResultItem(this.errors, text, groupName);
+                    addError(text, group) {
+                        addResultItem(this.errors, text, group);
                     },
-                    addWarning(text, groupName) {
-                        addResultItem(this.warnings, text, groupName);
+                    addWarning(text, group) {
+                        addResultItem(this.warnings, text, group);
                     }
                 },
                 template: "<div><slot :errors='errors' :warnings='warnings' :allErrors='allErrors' :allWarnings='allWarnings'></slot></div>"
@@ -290,7 +317,6 @@ const Dryvue = {
                     if (!component) {
                         throw `The '${dryvFieldDirective}' directive can only be applied to components.`;
                     }
-
                     const components = findFormComponent(vnode);
                     const formComponent = components.formComponent;
 
@@ -301,12 +327,20 @@ const Dryvue = {
 
                     if (!formComponent.$dryv) {
                         formComponent.$dryv = Object.assign({
-                            formValidators: []
+                            formValidators: [],
+                            namedValidators: {}
                         }, options);
+                        
                         const directive = formComponent._vnode.data.directives.filter(d => d.name === dryvSetDirective)[0].value;
-                        const setName = typeof directive === "object" ? directive.path : directive;
-                        formComponent.$dryv.path = setName;
-                        formComponent.$dryv.v = formComponent.$dryv.dryv.v[setName];
+
+                        if (typeof directive === "object") {
+                            formComponent.$dryv.path = directive.path;
+                        }
+                        else if (typeof directive === "string") {
+                            formComponent.$dryv.path = directive;
+                        }
+
+                        copyRules(formComponent.$dryv, formComponent.$dryv.path);
                     }
 
                     const $dryv = formComponent.$dryv;
@@ -324,6 +358,7 @@ const Dryvue = {
                     let path = null;
                     let errorField = options.errorField;
                     let warningField = options.warningField;
+                    let hasGroupErrorField = options.hasGroupErrorField;
 
                     switch (typeof binding.value) {
                         case "object":
@@ -347,6 +382,8 @@ const Dryvue = {
                     if ($dryv.path) {
                         path = path.substr($dryv.path.length + 1);
                     }
+
+                    initializeFieldComponent(formComponent, component, path);
 
                     const validators = $dryv.v.validators[path];
                     if (!validators) {
@@ -379,12 +416,10 @@ const Dryvue = {
                         throw new `Please specify the data property ${warningField} on the form input component.`;
                     }
 
-                    let lastDisabledFields = undefined;
-
                     const fieldValidator = {
                         isValidating: false,
                         path,
-                        validate: async (disabledFields, context) => {
+                        validate: async (disabledFields, context, validateRelated) => {
                             if (validators === undefined) {
                                 return null;
                             }
@@ -393,11 +428,9 @@ const Dryvue = {
                                 return null;
                             }
 
-                            fieldValidator.lastContext = context;
                             fieldValidator.isValidating = true;
 
                             try {
-                                lastDisabledFields = disabledFields || null;
                                 let data = formComponent.$data;
 
                                 if ($dryv.path) {
@@ -410,10 +443,19 @@ const Dryvue = {
                                 let result = null;
                                 const isEnabled = !disabledFields || disabledFields.filter(f => path.indexOf(f) >= 0).length === 0;
                                 if (isEnabled) {
+                                    if (validateRelated) {
+                                        const groups = validators.map(v => v.group).filter(g => !!g);
+                                        groups.forEach(g => groupComponent.clear(g));
+                                    }
                                     const validationFunctions = validators.map(v => v.validate);
                                     result = await runValidation(validationFunctions, data, context2);
+                                    if (validateRelated) {
+                                        const related = [].concat.apply([], validators.map(v => v.related));
+                                        related.forEach(path => $dryv.namedValidators[path].validate(disabledFields, context));
+                                    }
                                 }
-                                return handleValidationResult(Vue, component, result, errorField, warningField, groupComponent);
+
+                                return handleValidationResult(Vue, component, result, errorField, warningField, hasGroupErrorField, groupComponent);
                             }
                             finally {
                                 fieldValidator.isValidating = false;
@@ -421,17 +463,13 @@ const Dryvue = {
                         },
                         setResults: results => {
                             const result = results && results[path];
-                            return handleValidationResult(Vue, component, result, errorField, warningField, groupComponent);
+                            return handleValidationResult(Vue, component, result, errorField, warningField, hasGroupErrorField, groupComponent);
                         }
                     };
 
+                    component.$dryv.formValidators.push(fieldValidator);
+                    $dryv.namedValidators[path] = fieldValidator;
                     $dryv.formValidators.push(fieldValidator);
-
-                    formComponent.$watch(path, (newValue, oldValue) => {
-                        if (lastDisabledFields !== undefined && !fieldValidator.isValidating) {
-                            fieldValidator.validate(lastDisabledFields, fieldValidator.lastContext);
-                        }
-                    });
                 }
             });
 
