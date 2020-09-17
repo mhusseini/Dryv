@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Dryv.Extensions;
 using Dryv.Reflection;
 
 namespace Dryv.RuleDetection
@@ -28,7 +29,7 @@ namespace Dryv.RuleDetection
 
             var node = new ModelTreeNode
             {
-                UniquePath = uniquePath + ":" + type.FullName,
+                UniquePath = uniquePath + ":" + type.GetNonGenericName(),
                 ModelPath = modelPath,
                 ModelType = type,
                 IsRecursive = isRecursive,
@@ -53,11 +54,15 @@ namespace Dryv.RuleDetection
 
         private ModelTreeEdge BuildEdge(ModelTreeNode parent, PropertyInfo property, ICollection<Type> processed, Stack<MemberInfo> hierarchy)
         {
+            var index = parent.UniquePath.LastIndexOf(":", StringComparison.OrdinalIgnoreCase);
+            if (index < 0) index = 0;
+            var uniquePath = parent.UniquePath.Substring(0, index) + ":" + property.DeclaringType.GetNonGenericName();
+            
             return new ModelTreeEdge
             {
                 Parent = parent,
                 Property = property,
-                Child = this.Build(property.PropertyType, parent.UniquePath + "." + property.Name, parent.ModelPath + "." + property.Name, processed, hierarchy)
+                Child = this.Build(property.PropertyType, uniquePath + "." + property.Name, parent.ModelPath + "." + property.Name, processed, hierarchy)
             };
         }
     }

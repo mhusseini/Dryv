@@ -81,25 +81,25 @@ namespace Dryv.RuleDetection
                 .ToList();
 
             foreach (var rule in from type in baseTypes
-                                 from rule in FindRulesOnType(type, ruleType)
-                                 select rule)
+                from rule in FindRulesOnType(type, ruleType)
+                select rule)
             {
                 yield return rule;
             }
 
             foreach (var rule in from type in baseTypes
-                                 from attribute in type.GetTypeInfo().GetCustomAttributes<DryvValidationAttribute>()
-                                 where attribute.RuleContainerType != null
-                                 from rule in FindRulesInModelTree(attribute.RuleContainerType, ruleType, processed)
-                                 select rule)
+                from attribute in type.GetTypeInfo().GetCustomAttributes<DryvValidationAttribute>()
+                where attribute.RuleContainerType != null
+                from rule in FindRulesInModelTree(attribute.RuleContainerType, ruleType, processed)
+                select rule)
             {
                 yield return rule;
             }
 
             foreach (var rule in from property in rootType.GetProperties(BindingFlagsForProperties)
-                                 where property.PropertyType.Namespace != typeof(object).Namespace
-                                 from rule in FindRulesInModelTree(property.PropertyType, ruleType, processed)
-                                 select rule)
+                where property.PropertyType.Namespace != typeof(object).Namespace
+                from rule in FindRulesInModelTree(property.PropertyType, ruleType, processed)
+                select rule)
             {
                 yield return rule;
             }
@@ -112,23 +112,23 @@ namespace Dryv.RuleDetection
                 var typeInfo = type.GetTypeInfo();
 
                 var fromFields = from p in typeInfo.GetFields(BindingFlagsForRules)
-                                 where typeof(DryvRules).IsAssignableFrom(p.FieldType)
-                                 select p.GetValue(null) as DryvRules;
+                    where typeof(DryvRules).IsAssignableFrom(p.FieldType)
+                    select p.GetValue(null) as DryvRules;
 
                 var fromProperties = from p in typeInfo.GetProperties(BindingFlagsForRules)
-                                     where typeof(DryvRules).IsAssignableFrom(p.PropertyType)
-                                     select p.GetValue(null) as DryvRules;
+                    where typeof(DryvRules).IsAssignableFrom(p.PropertyType)
+                    select p.GetValue(null) as DryvRules;
 
                 var fromMethods = from m in typeInfo.GetMethods(BindingFlagsForRules)
-                                  where m.IsStatic
-                                        && !m.GetParameters().Any()
-                                        && typeof(DryvRules).IsAssignableFrom(m.ReturnType)
-                                        && !m.ContainsGenericParameters
-                                  select m.Invoke(null, null) as DryvRules;
+                    where m.IsStatic
+                          && !m.GetParameters().Any()
+                          && typeof(DryvRules).IsAssignableFrom(m.ReturnType)
+                          && !m.ContainsGenericParameters
+                    select m.Invoke(null, null) as DryvRules;
 
                 return (from rules in fromFields.Union(fromProperties).Union(fromMethods)
-                        from rule in GetRulesOfType(rules, ruleType)
-                        select rule).ToList();
+                    from rule in GetRulesOfType(rules, ruleType)
+                    select rule).ToList();
             });
         }
 
@@ -144,7 +144,8 @@ namespace Dryv.RuleDetection
 
         private static IEnumerable<ModelTreeNode> GetNodesForRule(List<ModelTreeNode> flatTree, DryvCompiledRule rule)
         {
-            return flatTree.FindAll(n => n.UniquePath.EndsWith(rule.UniquePath));
+            var path = rule.UniquePath + ":" + rule.Property.PropertyType.GetNonGenericName();
+            return flatTree.FindAll(n => n.UniquePath.EndsWith(path));
         }
 
         private static IEnumerable<DryvCompiledRule> GetRulesOfType(DryvRules rules, RuleType ruleType)
@@ -159,7 +160,7 @@ namespace Dryv.RuleDetection
             var modelParameter = Expression.Parameter(modelType, "$m");
             var modelReplacement = TransposePath(modelParameter, node, out transposedPath);
 
-            var parameters = new List<ParameterExpression> { modelParameter };
+            var parameters = new List<ParameterExpression> {modelParameter};
             parameters.AddRange(rule.ValidationExpression.Parameters.Skip(1));
 
             if (rule.ServiceTypes == null)
@@ -182,7 +183,7 @@ namespace Dryv.RuleDetection
             Expression modelReplacement = modelParameter;
             var sb = new StringBuilder(modelParameter.Name);
 
-            foreach (var memberInfo in node.Hierarchy)
+            foreach (var memberInfo in node.Hierarchy.Take(node.Hierarchy.Count - 1))
             {
                 sb.Append(".");
                 sb.Append(memberInfo.Name.ToCamelCase());
@@ -213,7 +214,6 @@ namespace Dryv.RuleDetection
             {
                 foreach (var relatedProperty in rule.RelatedProperties)
                 {
-
                 }
             }
 

@@ -53,6 +53,10 @@ namespace Dryv.Rules
             {
                 uniquePath += "." + propertyPath;
             }
+            else
+            {
+                uniquePath += "." + memberExpression.Member.Name;
+            }
 
             return new DryvCompiledRule
             {
