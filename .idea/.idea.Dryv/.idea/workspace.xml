@@ -31,13 +31,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="81fd7ff9-3930-4c09-a8cb-036017f14ba0" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/projectSettingsUpdater.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Dryv/DryvSetAttribute.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/contentModel.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/contentModel.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/PreLoading/DryvPreloadAttribute.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/PreLoading/DryvPreloader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv.AspNetCore/PreLoading/DryvPreloader.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/CustomizationDefaults.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv.AspNetCore/CustomizationDefaults.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -83,11 +78,13 @@
         <option value="$PROJECT_DIR$/SampleConsole/Program.cs" />
         <option value="$PROJECT_DIR$/SampleVue/Views/Home/Index.cshtml" />
         <option value="$PROJECT_DIR$/SampleVue/wwwroot/demo.js" />
-        <option value="$PROJECT_DIR$/Dryv/Dryv.csproj" />
         <option value="$PROJECT_DIR$/Dryv/RuleDetection/DryvRuleFinder.cs" />
         <option value="$PROJECT_DIR$/Dryv.AspNetCore/PreLoading/DryvPreloadAttribute.cs" />
         <option value="$PROJECT_DIR$/Dryv.AspNetCore/PreLoading/DryvSetAttribute.cs" />
         <option value="$PROJECT_DIR$/Dryv/DryvSetAttribute.cs" />
+        <option value="$PROJECT_DIR$/Dryv.AspNetCore/Dryv.AspNetCore.csproj" />
+        <option value="$PROJECT_DIR$/Dryv/Dryv.csproj" />
+        <option value="$PROJECT_DIR$/Dryv.AspNetCore/CustomizationDefaults.cs" />
       </list>
     </option>
   </component>
@@ -185,7 +182,16 @@
       <workItem from="1591054743036" duration="9345000" />
       <workItem from="1599739853160" duration="1092000" />
       <workItem from="1600873510355" duration="1061000" />
+      <workItem from="1601042112553" duration="1877000" />
     </task>
+    <task id="LOCAL-00001" summary="Renamed and moved DryvPreloadAttribute (now DryvSetAttribute).">
+      <created>1601042302266</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1601042302266</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -203,14 +209,25 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+    <MESSAGE value="Renamed and moved DryvPreloadAttribute (now DryvSetAttribute)." />
+    <option name="LAST_COMMIT_MESSAGE" value="Renamed and moved DryvPreloadAttribute (now DryvSetAttribute)." />
   </component>
   <component name="WindowStateProjectService">
     <state x="100" y="123" width="1592" height="843" key="VCS.FileHistoryDialog" timestamp="1600945377872">
       <screen x="0" y="23" width="1792" height="1043" />
     </state>
     <state x="100" y="123" width="1592" height="843" key="VCS.FileHistoryDialog/0.23.1792.1043@0.23.1792.1043" timestamp="1600945377872" />
+    <state x="496" y="271" key="Vcs.Push.Dialog.v2" timestamp="1601042305376">
+      <screen x="0" y="23" width="1792" height="1043" />
+    </state>
+    <state x="496" y="271" key="Vcs.Push.Dialog.v2/0.23.1792.1043@0.23.1792.1043" timestamp="1601042305375" />
+    <state x="559" y="252" width="672" height="678" key="search.everywhere.popup" timestamp="1601044541633">
+      <screen x="0" y="23" width="1792" height="1043" />
+    </state>
+    <state x="559" y="252" width="672" height="678" key="search.everywhere.popup/0.23.1792.1043@0.23.1792.1043" timestamp="1601044541633" />
   </component>
 </project>
