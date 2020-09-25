@@ -47,7 +47,7 @@ namespace Dryv.AspNetCore.PreLoading
             foreach (var type in from a in assemblies
                                  from t in a.GetTypes()
                                  orderby t.FullName
-                                 where t.GetCustomAttribute<DryvPreloadAttribute>() != null
+                                 where t.GetCustomAttribute<DryvSetAttribute>() != null
                                  select t)
             {
                 this.ruleFinder.FindValidationRulesInTree(type, RuleType.Validation);

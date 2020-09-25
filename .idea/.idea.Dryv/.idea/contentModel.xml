@@ -30,6 +30,7 @@
         <e p="DryvRules.cs" t="Include" />
         <e p="DryvRules`.g.cs" t="Include" />
         <e p="DryvRuleSettings.cs" t="Include" />
+        <e p="DryvSetAttribute.cs" t="Include" />
         <e p="DryvTranslator.cs" t="Include" />
         <e p="DryvValidationAttribute.cs" t="Include" />
         <e p="DryvValidationResult.cs" t="Include" />
@@ -39,9 +40,11 @@
           <e p="DictionaryExtensions.cs" t="Include" />
           <e p="ExpressionExtensions.cs" t="Include" />
           <e p="IterationExtensions.cs" t="Include" />
+          <e p="MemberInfoExtensions.cs" t="Include" />
           <e p="ResultExtensions.cs" t="Include" />
           <e p="ServiceProviderExtensions.cs" t="Include" />
           <e p="StringExtensions.cs" t="Include" />
+          <e p="TypeExtensions.cs" t="Include" />
         </e>
         <e p="GenerateRuleMethods.ps1" t="Include" />
         <e p="obj" t="ExcludeRecursive">
@@ -197,7 +200,6 @@
           </e>
         </e>
         <e p="PreLoading" t="Include">
-          <e p="DryvPreloadAttribute.cs" t="Include" />
           <e p="DryvPreloader.cs" t="Include" />
           <e p="DryvPreloadingOptions.cs" t="Include" />
         </e>

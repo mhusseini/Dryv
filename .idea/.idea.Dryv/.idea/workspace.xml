@@ -5,13 +5,39 @@
     <projectFile>SampleVue/SampleVue.csproj</projectFile>
     <projectFile>SampleConsole/SampleConsole.csproj</projectFile>
   </component>
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:feature" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="81fd7ff9-3930-4c09-a8cb-036017f14ba0" name="Default" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/projectSettingsUpdater.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Dryv/DryvSetAttribute.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/contentModel.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/contentModel.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Dryv/riderModule.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Dryv/riderModule.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Dryv.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/Dryv.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/RuleDetection/DryvRuleFinder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/RuleDetection/DryvRuleFinder.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/PreLoading/DryvPreloadAttribute.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/PreLoading/DryvPreloader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv.AspNetCore/PreLoading/DryvPreloader.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,6 +85,9 @@
         <option value="$PROJECT_DIR$/SampleVue/wwwroot/demo.js" />
         <option value="$PROJECT_DIR$/Dryv/Dryv.csproj" />
         <option value="$PROJECT_DIR$/Dryv/RuleDetection/DryvRuleFinder.cs" />
+        <option value="$PROJECT_DIR$/Dryv.AspNetCore/PreLoading/DryvPreloadAttribute.cs" />
+        <option value="$PROJECT_DIR$/Dryv.AspNetCore/PreLoading/DryvSetAttribute.cs" />
+        <option value="$PROJECT_DIR$/Dryv/DryvSetAttribute.cs" />
       </list>
     </option>
   </component>
@@ -82,6 +111,7 @@
   <component name="PropertiesComponent">
     <property name="JavaScriptWeakerCompletionTypeGuess" value="true" />
     <property name="Rider.ProjectViewActivator.IsNotFirstRun" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="C:/kundenprojekte/enbw/src/VTP/Yello/VTP-Yello.sln" />
     <property name="node.js.detected.package.eslint" value="true" />
@@ -92,6 +122,7 @@
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="Settings.JavaScript" />
+    <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RunManager" selected=".NET Project.SampleVue">
     <configuration name="Default" type="DotNetProject" factoryName=".NET Project">
@@ -153,15 +184,33 @@
       <updated>1591054740112</updated>
       <workItem from="1591054743036" duration="9345000" />
       <workItem from="1599739853160" duration="1092000" />
+      <workItem from="1600873510355" duration="1061000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
-  <component name="UnityProjectConfiguration" hasMinimizedUI="null" />
+  <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="UnityUnitTestConfiguration" currentTestLauncher="NUnit" />
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="100" y="123" width="1592" height="843" key="VCS.FileHistoryDialog" timestamp="1600945377872">
+      <screen x="0" y="23" width="1792" height="1043" />
+    </state>
+    <state x="100" y="123" width="1592" height="843" key="VCS.FileHistoryDialog/0.23.1792.1043@0.23.1792.1043" timestamp="1600945377872" />
   </component>
 </project>
