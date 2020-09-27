@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
 using Dryv.AspNetCore.DynamicControllers.Runtime;
+using Dryv.AspNetCore.Internal;
 using Dryv.Rules;
 using Microsoft.Extensions.Options;
 
@@ -14,7 +15,6 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
     public class ControllerGenerator
     {
         private const string NameSpace = "Dryv.Dynamic";
-        private static int assemblyCount;
         private readonly IOptions<DryvDynamicControllerOptions> options;
 
         public ControllerGenerator(IOptions<DryvDynamicControllerOptions> options)
@@ -35,7 +35,7 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
 
         private Assembly CreateAssembly(Expression expression, Type modelType, string action, DryvCompiledRule rule)
         {
-            var assemblyIndex = ++assemblyCount;
+            var assemblyIndex = Md5Helper.CreateMd5(expression.ToString());
             var typeNameBase = $"DryvDynamic{assemblyIndex}";
             var baseType = typeof(DryvDynamicController);
             var currentAssembly = Assembly.GetExecutingAssembly();

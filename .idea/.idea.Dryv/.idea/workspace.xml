@@ -31,8 +31,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="81fd7ff9-3930-4c09-a8cb-036017f14ba0" name="Default" comment="">
+      <change afterPath="$PROJECT_DIR$/Dryv.AspNetCore/Internal/Md5Helper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/contentModel.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/contentModel.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Dryv/riderModule.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Dryv/riderModule.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/CustomizationDefaults.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv.AspNetCore/CustomizationDefaults.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/Dryv.AspNetCore.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv.AspNetCore/Dryv.AspNetCore.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/CodeGeneration/ControllerGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/CodeGeneration/ControllerGenerator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/Properties/AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv.AspNetCore/Properties/AssemblyInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv.sln" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv.sln" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,6 +77,8 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/Dryv.AspNetCore/HtmlExtension.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/SampleVue/Views/Home/Index.cshtml" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/munirhusseini/Development/Projects/Dryv/Dryv.AspNetCore/Properties/AssemblyInfo.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/munirhusseini/Development/Projects/Dryv/Dryv.AspNetCore/CustomizationDefaults.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/SampleConsole/Program.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="IdeDocumentHistory">
@@ -82,9 +91,17 @@
         <option value="$PROJECT_DIR$/Dryv.AspNetCore/PreLoading/DryvPreloadAttribute.cs" />
         <option value="$PROJECT_DIR$/Dryv.AspNetCore/PreLoading/DryvSetAttribute.cs" />
         <option value="$PROJECT_DIR$/Dryv/DryvSetAttribute.cs" />
-        <option value="$PROJECT_DIR$/Dryv.AspNetCore/Dryv.AspNetCore.csproj" />
         <option value="$PROJECT_DIR$/Dryv/Dryv.csproj" />
+        <option value="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/FilterExpressionValidator.cs" />
+        <option value="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/ExpressionHashCodeHelper.cs" />
         <option value="$PROJECT_DIR$/Dryv.AspNetCore/CustomizationDefaults.cs" />
+        <option value="$PROJECT_DIR$/Dryv.AspNetCore/Internal/Md5Helper.cs" />
+        <option value="$PROJECT_DIR$/Dryv.AspNetCore/Internal/ExpressionHashCodeHelper.cs" />
+        <option value="$PROJECT_DIR$/Dryv.AspNetCore/Properties/AssemblyInfo.cs" />
+        <option value="$PROJECT_DIR$/Dryv.AspNetCore.Tests/UnitTest1.cs" />
+        <option value="$PROJECT_DIR$/Dryv.AspNetCore.Tests/ExpressionHashCodeHelperTests.cs" />
+        <option value="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/CodeGeneration/ControllerGenerator.cs" />
+        <option value="$PROJECT_DIR$/Dryv.AspNetCore/Dryv.AspNetCore.csproj" />
       </list>
     </option>
   </component>
@@ -106,6 +123,8 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="DebuggerViewTab_PTCS_FirstProportionKey" value="0.34952608" />
+    <property name="DebuggerViewTab_PTCS_LastProportionKey" value="0.29976302" />
     <property name="JavaScriptWeakerCompletionTypeGuess" value="true" />
     <property name="Rider.ProjectViewActivator.IsNotFirstRun" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
@@ -182,7 +201,7 @@
       <workItem from="1591054743036" duration="9345000" />
       <workItem from="1599739853160" duration="1092000" />
       <workItem from="1600873510355" duration="1061000" />
-      <workItem from="1601042112553" duration="1877000" />
+      <workItem from="1601042112553" duration="3940000" />
     </task>
     <task id="LOCAL-00001" summary="Renamed and moved DryvPreloadAttribute (now DryvSetAttribute).">
       <created>1601042302266</created>
@@ -191,7 +210,14 @@
       <option name="project" value="LOCAL" />
       <updated>1601042302266</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Using MD5 for default controller URLs.">
+      <created>1601045535345</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1601045535345</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -214,17 +240,106 @@
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="Renamed and moved DryvPreloadAttribute (now DryvSetAttribute)." />
-    <option name="LAST_COMMIT_MESSAGE" value="Renamed and moved DryvPreloadAttribute (now DryvSetAttribute)." />
+    <MESSAGE value="Using MD5 for default controller URLs." />
+    <option name="LAST_COMMIT_MESSAGE" value="Using MD5 for default controller URLs." />
   </component>
   <component name="WindowStateProjectService">
+    <state width="875" height="379" key="GridCell.Tab.0.bottom" timestamp="1601238389388">
+      <screen x="0" y="23" width="1792" height="1043" />
+    </state>
+    <state width="875" height="379" key="GridCell.Tab.0.bottom/0.23.1792.1043@0.23.1792.1043" timestamp="1601238389388" />
+    <state width="875" height="379" key="GridCell.Tab.0.center" timestamp="1601238389387">
+      <screen x="0" y="23" width="1792" height="1043" />
+    </state>
+    <state width="875" height="379" key="GridCell.Tab.0.center/0.23.1792.1043@0.23.1792.1043" timestamp="1601238389387" />
+    <state width="875" height="379" key="GridCell.Tab.0.left" timestamp="1601238389387">
+      <screen x="0" y="23" width="1792" height="1043" />
+    </state>
+    <state width="875" height="379" key="GridCell.Tab.0.left/0.23.1792.1043@0.23.1792.1043" timestamp="1601238389387" />
+    <state width="875" height="379" key="GridCell.Tab.0.right" timestamp="1601238389387">
+      <screen x="0" y="23" width="1792" height="1043" />
+    </state>
+    <state width="875" height="379" key="GridCell.Tab.0.right/0.23.1792.1043@0.23.1792.1043" timestamp="1601238389387" />
+    <state width="875" height="379" key="GridCell.Tab.1.bottom" timestamp="1601238389388">
+      <screen x="0" y="23" width="1792" height="1043" />
+    </state>
+    <state width="875" height="379" key="GridCell.Tab.1.bottom/0.23.1792.1043@0.23.1792.1043" timestamp="1601238389388" />
+    <state width="875" height="379" key="GridCell.Tab.1.center" timestamp="1601238389388">
+      <screen x="0" y="23" width="1792" height="1043" />
+    </state>
+    <state width="875" height="379" key="GridCell.Tab.1.center/0.23.1792.1043@0.23.1792.1043" timestamp="1601238389388" />
+    <state width="875" height="379" key="GridCell.Tab.1.left" timestamp="1601238389388">
+      <screen x="0" y="23" width="1792" height="1043" />
+    </state>
+    <state width="875" height="379" key="GridCell.Tab.1.left/0.23.1792.1043@0.23.1792.1043" timestamp="1601238389388" />
+    <state width="875" height="379" key="GridCell.Tab.1.right" timestamp="1601238389388">
+      <screen x="0" y="23" width="1792" height="1043" />
+    </state>
+    <state width="875" height="379" key="GridCell.Tab.1.right/0.23.1792.1043@0.23.1792.1043" timestamp="1601238389388" />
+    <state width="875" height="379" key="GridCell.Tab.2.bottom" timestamp="1601238389389">
+      <screen x="0" y="23" width="1792" height="1043" />
+    </state>
+    <state width="875" height="379" key="GridCell.Tab.2.bottom/0.23.1792.1043@0.23.1792.1043" timestamp="1601238389389" />
+    <state width="875" height="379" key="GridCell.Tab.2.center" timestamp="1601238389389">
+      <screen x="0" y="23" width="1792" height="1043" />
+    </state>
+    <state width="875" height="379" key="GridCell.Tab.2.center/0.23.1792.1043@0.23.1792.1043" timestamp="1601238389389" />
+    <state width="875" height="379" key="GridCell.Tab.2.left" timestamp="1601238389389">
+      <screen x="0" y="23" width="1792" height="1043" />
+    </state>
+    <state width="875" height="379" key="GridCell.Tab.2.left/0.23.1792.1043@0.23.1792.1043" timestamp="1601238389389" />
+    <state width="875" height="379" key="GridCell.Tab.2.right" timestamp="1601238389389">
+      <screen x="0" y="23" width="1792" height="1043" />
+    </state>
+    <state width="875" height="379" key="GridCell.Tab.2.right/0.23.1792.1043@0.23.1792.1043" timestamp="1601238389389" />
+    <state width="875" height="379" key="GridCell.Tab.3.bottom" timestamp="1601238389390">
+      <screen x="0" y="23" width="1792" height="1043" />
+    </state>
+    <state width="875" height="379" key="GridCell.Tab.3.bottom/0.23.1792.1043@0.23.1792.1043" timestamp="1601238389390" />
+    <state width="875" height="379" key="GridCell.Tab.3.center" timestamp="1601238389390">
+      <screen x="0" y="23" width="1792" height="1043" />
+    </state>
+    <state width="875" height="379" key="GridCell.Tab.3.center/0.23.1792.1043@0.23.1792.1043" timestamp="1601238389390" />
+    <state width="875" height="379" key="GridCell.Tab.3.left" timestamp="1601238389389">
+      <screen x="0" y="23" width="1792" height="1043" />
+    </state>
+    <state width="875" height="379" key="GridCell.Tab.3.left/0.23.1792.1043@0.23.1792.1043" timestamp="1601238389389" />
+    <state width="875" height="379" key="GridCell.Tab.3.right" timestamp="1601238389390">
+      <screen x="0" y="23" width="1792" height="1043" />
+    </state>
+    <state width="875" height="379" key="GridCell.Tab.3.right/0.23.1792.1043@0.23.1792.1043" timestamp="1601238389390" />
+    <state width="875" height="379" key="GridCell.Tab.4.bottom" timestamp="1601238389391">
+      <screen x="0" y="23" width="1792" height="1043" />
+    </state>
+    <state width="875" height="379" key="GridCell.Tab.4.bottom/0.23.1792.1043@0.23.1792.1043" timestamp="1601238389391" />
+    <state width="875" height="379" key="GridCell.Tab.4.center" timestamp="1601238389390">
+      <screen x="0" y="23" width="1792" height="1043" />
+    </state>
+    <state width="875" height="379" key="GridCell.Tab.4.center/0.23.1792.1043@0.23.1792.1043" timestamp="1601238389390" />
+    <state width="875" height="379" key="GridCell.Tab.4.left" timestamp="1601238389390">
+      <screen x="0" y="23" width="1792" height="1043" />
+    </state>
+    <state width="875" height="379" key="GridCell.Tab.4.left/0.23.1792.1043@0.23.1792.1043" timestamp="1601238389390" />
+    <state width="875" height="379" key="GridCell.Tab.4.right" timestamp="1601238389391">
+      <screen x="0" y="23" width="1792" height="1043" />
+    </state>
+    <state width="875" height="379" key="GridCell.Tab.4.right/0.23.1792.1043@0.23.1792.1043" timestamp="1601238389391" />
+    <state x="496" y="283" key="Rider.ProjectTemplateDialog.Size" timestamp="1601237759448">
+      <screen x="0" y="23" width="1792" height="1043" />
+    </state>
+    <state x="496" y="283" key="Rider.ProjectTemplateDialog.Size/0.23.1792.1043@0.23.1792.1043" timestamp="1601237759448" />
     <state x="100" y="123" width="1592" height="843" key="VCS.FileHistoryDialog" timestamp="1600945377872">
       <screen x="0" y="23" width="1792" height="1043" />
     </state>
     <state x="100" y="123" width="1592" height="843" key="VCS.FileHistoryDialog/0.23.1792.1043@0.23.1792.1043" timestamp="1600945377872" />
-    <state x="496" y="271" key="Vcs.Push.Dialog.v2" timestamp="1601042305376">
+    <state x="496" y="271" key="Vcs.Push.Dialog.v2" timestamp="1601045537535">
       <screen x="0" y="23" width="1792" height="1043" />
     </state>
-    <state x="496" y="271" key="Vcs.Push.Dialog.v2/0.23.1792.1043@0.23.1792.1043" timestamp="1601042305375" />
+    <state x="496" y="271" key="Vcs.Push.Dialog.v2/0.23.1792.1043@0.23.1792.1043" timestamp="1601045537535" />
+    <state width="896" height="521" key="XDebugger.FullValuePopup" timestamp="1601238388601">
+      <screen x="0" y="23" width="1792" height="1043" />
+    </state>
+    <state width="896" height="521" key="XDebugger.FullValuePopup/0.23.1792.1043@0.23.1792.1043" timestamp="1601238388601" />
     <state x="559" y="252" width="672" height="678" key="search.everywhere.popup" timestamp="1601044541633">
       <screen x="0" y="23" width="1792" height="1043" />
     </state>

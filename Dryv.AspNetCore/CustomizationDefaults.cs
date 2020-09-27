@@ -1,6 +1,5 @@
-﻿using System.Security.Cryptography;
-using System.Text;
-using Dryv.AspNetCore.DynamicControllers;
+﻿using Dryv.AspNetCore.DynamicControllers;
+using Dryv.AspNetCore.Internal;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 
@@ -16,22 +15,6 @@ namespace Dryv.AspNetCore
 
         public static DryvDynamicControllerMethods DefaultHttpMethod(DryvControllerGenerationContext context) => DryvDynamicControllerMethods.Post;
 
-        public static string DefaultRoute(DryvControllerGenerationContext context) => $"_v/c{CreateMd5(context.ControllerFullName)}";
-
-        private static string CreateMd5(string input)
-        {
-            using var md5 = MD5.Create();
-            var inputBytes = Encoding.ASCII.GetBytes(input);
-            var hashBytes = md5.ComputeHash(inputBytes);
-
-            var sb = new StringBuilder();
-            
-            foreach (var b in hashBytes)
-            {
-                sb.Append(b.ToString());
-            }
-            
-            return sb.ToString();
-        }
+        public static string DefaultRoute(DryvControllerGenerationContext context) => $"_v/c{Md5Helper.CreateMd5(context.ControllerFullName)}";
     }
 }
