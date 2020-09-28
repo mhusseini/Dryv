@@ -5,6 +5,9 @@
     <projectFile>SampleVue/SampleVue.csproj</projectFile>
     <projectFile>SampleConsole/SampleConsole.csproj</projectFile>
   </component>
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="BranchesTreeState">
     <expand>
       <path>
@@ -31,9 +34,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="81fd7ff9-3930-4c09-a8cb-036017f14ba0" name="Default" comment="">
+      <change afterPath="$PROJECT_DIR$/Dryv/DryvSets.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/CustomizationDefaults.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv.AspNetCore/CustomizationDefaults.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/Internal/Md5Helper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv.AspNetCore/Internal/Md5Helper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/Translation/DryvClientServerCallWriter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/Translation/DryvClientServerCallWriter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/PreLoading/DryvPreloader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv.AspNetCore/PreLoading/DryvPreloader.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,8 +62,10 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="mock:///Users/munirhusseini/Development/Projects/Dryv/Dryv.AspNetCore/CustomizationDefaults.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Dryv.AspNetCore/HtmlExtension.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/SampleVue/Views/Home/Index.cshtml" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/munirhusseini/Development/Projects/Dryv/Dryv.AspNetCore/Internal/Md5Helper.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/munirhusseini/Development/Projects/Dryv/Dryv.AspNetCore/Properties/AssemblyInfo.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/munirhusseini/Development/Projects/Dryv/Dryv.AspNetCore/CustomizationDefaults.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/SampleConsole/Program.cs" root0="FORCE_HIGHLIGHTING" />
@@ -82,10 +88,12 @@
         <option value="$PROJECT_DIR$/Dryv.AspNetCore.Tests/UnitTest1.cs" />
         <option value="$PROJECT_DIR$/Dryv.AspNetCore.Tests/ExpressionHashCodeHelperTests.cs" />
         <option value="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/CodeGeneration/ControllerGenerator.cs" />
-        <option value="$PROJECT_DIR$/Dryv.AspNetCore/Dryv.AspNetCore.csproj" />
-        <option value="$USER_HOME$/.nuget/NuGet/NuGet.Config" />
         <option value="$PROJECT_DIR$/Dryv.AspNetCore/CustomizationDefaults.cs" />
         <option value="$PROJECT_DIR$/Dryv.AspNetCore/Internal/Md5Helper.cs" />
+        <option value="$PROJECT_DIR$/Dryv.AspNetCore/Dryv.AspNetCore.csproj" />
+        <option value="$USER_HOME$/.nuget/NuGet/NuGet.Config" />
+        <option value="$PROJECT_DIR$/Dryv.AspNetCore/PreLoading/DryvPreloader.cs" />
+        <option value="$PROJECT_DIR$/Dryv/TranslationResult.cs" />
       </list>
     </option>
   </component>
@@ -94,12 +102,6 @@
     <exe-path />
     <other-services-enabled>true</other-services-enabled>
     <auto-save>true</auto-save>
-  </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="1908" />
-    <option name="y" value="-12" />
-    <option name="width" value="1946" />
-    <option name="height" value="2106" />
   </component>
   <component name="ProjectId" id="1hJr3vCKOvQ4SvJPUHPYzuMKTG2" />
   <component name="ProjectViewState">
@@ -185,7 +187,7 @@
       <workItem from="1591054743036" duration="9345000" />
       <workItem from="1599739853160" duration="1092000" />
       <workItem from="1600873510355" duration="1061000" />
-      <workItem from="1601042112553" duration="8270000" />
+      <workItem from="1601042112553" duration="10730000" />
     </task>
     <task id="LOCAL-00001" summary="Renamed and moved DryvPreloadAttribute (now DryvSetAttribute).">
       <created>1601042302266</created>
@@ -208,7 +210,14 @@
       <option name="project" value="LOCAL" />
       <updated>1601238573402</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Added configurateble md5 hash length.">
+      <created>1601246662045</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1601246662045</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -233,7 +242,8 @@
     <MESSAGE value="Renamed and moved DryvPreloadAttribute (now DryvSetAttribute)." />
     <MESSAGE value="Using MD5 for default controller URLs." />
     <MESSAGE value="Dynamic type and assembly names now using MD5 of expression." />
-    <option name="LAST_COMMIT_MESSAGE" value="Dynamic type and assembly names now using MD5 of expression." />
+    <MESSAGE value="Added configurateble md5 hash length." />
+    <option name="LAST_COMMIT_MESSAGE" value="Added configurateble md5 hash length." />
   </component>
   <component name="WindowStateProjectService">
     <state width="1750" height="379" key="GridCell.Tab.0.bottom" timestamp="1601242619656">
@@ -328,10 +338,10 @@
       <screen x="0" y="23" width="1792" height="1043" />
     </state>
     <state x="100" y="123" width="1592" height="843" key="VCS.FileHistoryDialog/0.23.1792.1043@0.23.1792.1043" timestamp="1600945377872" />
-    <state x="496" y="271" key="Vcs.Push.Dialog.v2" timestamp="1601238585493">
+    <state x="496" y="271" key="Vcs.Push.Dialog.v2" timestamp="1601246666351">
       <screen x="0" y="23" width="1792" height="1043" />
     </state>
-    <state x="496" y="271" key="Vcs.Push.Dialog.v2/0.23.1792.1043@0.23.1792.1043" timestamp="1601238585493" />
+    <state x="496" y="271" key="Vcs.Push.Dialog.v2/0.23.1792.1043@0.23.1792.1043" timestamp="1601246666351" />
     <state width="896" height="521" key="XDebugger.FullValuePopup" timestamp="1601238388601">
       <screen x="0" y="23" width="1792" height="1043" />
     </state>
@@ -340,9 +350,10 @@
       <screen x="0" y="23" width="1792" height="1043" />
     </state>
     <state x="533" y="299" width="726" height="490" key="find.popup/0.23.1792.1043@0.23.1792.1043" timestamp="1601239207610" />
-    <state x="559" y="252" width="672" height="678" key="search.everywhere.popup" timestamp="1601044541633">
-      <screen x="0" y="23" width="1792" height="1043" />
+    <state x="559" y="252" width="672" height="677" key="search.everywhere.popup" timestamp="1601304692857">
+      <screen x="0" y="23" width="1792" height="1041" />
     </state>
+    <state x="559" y="252" width="672" height="677" key="search.everywhere.popup/0.23.1792.1041@0.23.1792.1041" timestamp="1601304692857" />
     <state x="559" y="252" width="672" height="678" key="search.everywhere.popup/0.23.1792.1043@0.23.1792.1043" timestamp="1601044541633" />
   </component>
 </project>

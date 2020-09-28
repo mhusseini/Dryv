@@ -26,7 +26,7 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
             var parameter = members
                 .SelectMany(ExpressionNodeFinder<ParameterExpression>.FindChildrenStatic)
                 .First(p => p.Type == context.ModelType);
-            var visitor = new ObjectWriter(translator, context, members.ToDictionary(m => m.Member, m => (Expression)m), w);
+            var visitor = new ObjectWriter(translator, context, members.ToDictionary(m => m.Member, m => (Expression) m), w);
             visitor.Write(parameter.Type);
 
             w.Write(@").then(function($r){return $ctx.dryv.handleResult($ctx,");
@@ -41,19 +41,24 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
         private class ObjectWriter
         {
             private readonly TranslationContext context;
-            private readonly IDictionary<MemberInfo, Expression> members;
+            private readonly IDictionary<string, Expression> members;
             private readonly ITranslator translator;
             private readonly Dictionary<Expression, List<Expression>> usedObjects;
             private readonly TextWriter writer;
 
             public ObjectWriter(ITranslator translator, TranslationContext context, IDictionary<MemberInfo, Expression> members, TextWriter writer)
             {
-                this.usedObjects = (from expression in members.Values
-                                    from outer in expression.GetOuterExpressions<ParameterExpression>().Select(containingExpression => (expression, containingExpression))
-                                    group outer.containingExpression by outer.expression)
+                this.usedObjects = (
+                        from expression in members.Values
+                        from outer in expression.GetOuterExpressions<ParameterExpression>().Select(containingExpression => (expression, containingExpression))
+                        group outer.containingExpression by outer.expression)
                     .ToDictionary(g => g.Key, g => g.ToList());
 
-                this.members = members;
+                this.members = members.ToDictionary(
+                    m => GetMemberKey(m.Key),
+                    m => m.Value,
+                    StringComparer.OrdinalIgnoreCase);
+                
                 this.translator = translator;
                 this.context = context;
                 this.writer = writer;
@@ -67,7 +72,7 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
 
                 foreach (var member in type.GetPropertiesAndFields())
                 {
-                    if (!this.members.TryGetValue(member, out var expression))
+                    if (!this.members.TryGetValue(GetMemberKey(member), out var expression))
                     {
                         continue;
                     }
@@ -95,6 +100,8 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
 
                 this.writer.Write("}");
             }
+
+            private static string GetMemberKey(MemberInfo member) => member.DeclaringType.FullName + ":" + member.Name;
         }
     }
 }

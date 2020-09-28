@@ -37,6 +37,7 @@
         <e p="DryvRules`.g.cs" t="Include" />
         <e p="DryvRuleSettings.cs" t="Include" />
         <e p="DryvSetAttribute.cs" t="Include" />
+        <e p="DryvSets.cs" t="Include" />
         <e p="DryvTranslator.cs" t="Include" />
         <e p="DryvValidationAttribute.cs" t="Include" />
         <e p="DryvValidationResult.cs" t="Include" />
