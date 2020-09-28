@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Dryv.RuleDetection;
@@ -38,18 +37,14 @@ namespace Dryv.AspNetCore.PreLoading
             this.Preload(AppDomain.CurrentDomain.GetAssemblies());
         }
 
-        public void Preload(params Assembly[] assemblies)
+        private void Preload(params Assembly[] assemblies)
         {
             if (!this.options.Value.IsEnabled)
             {
                 return;
             }
 
-            foreach (var type in from a in assemblies
-                from t in a.GetTypes()
-                orderby t.FullName
-                where t.GetCustomAttribute<DryvSetAttribute>() != null
-                select t)
+            foreach (var (type, _) in DryvSets.GetDryvSets())
             {
                 this.ruleFinder.FindValidationRulesInTree(type, RuleType.Validation);
                 this.ruleFinder.FindValidationRulesInTree(type, RuleType.Disabling);
@@ -61,5 +56,4 @@ namespace Dryv.AspNetCore.PreLoading
             this.Preload(args.LoadedAssembly);
         }
     }
-
 }

@@ -35,7 +35,7 @@ namespace Dryv
             var validation = Cache.GetOrAdd(modelType, this.GroupValidation);
 
             var rules = validation.ValidationRules.SelectMany(i => i.Value).Union(validation.DisablingRules.SelectMany(i => i.Value));
-            var parameters = DryvParametersHelper.GetDryvParameters(rules, serviceProvider);
+            var parameters = await DryvParametersHelper.GetDryvParameters(rules, serviceProvider);
             var taskResults = await Task.WhenAll(from kvp in validation.ValidationRules
                                                  where !this.IsSubtreeDisabled(model, kvp.Key, validation.DisablingRules, serviceProvider, parameters)
                                                  select this.GetFirstValidationError(model, serviceProvider, kvp, parameters));

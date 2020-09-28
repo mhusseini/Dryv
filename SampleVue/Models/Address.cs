@@ -16,7 +16,7 @@ namespace Dryv.SampleVue.Models
     internal static class AddressValidation
     {
         public static DryvRules<Address> ValidationRules = DryvRules.For<Address>()
-            .Parameter<AsyncValidator, string>("A", v => v.GetSomeString("A"))
+            .Parameter<AsyncValidator, DryvValidationResult>("A", v => v.ValidateZipCode("A", "B"))
             //.Rule(a => a.City, a => string.IsNullOrWhiteSpace(a.City) ? "Please enter a city." : null)
             //.Rule(a => a.ZipCode, a => string.IsNullOrWhiteSpace(a.ZipCode) ? "Please enter a ZIP code." : null)
             //.Rule<IOptions<SampleOptions>>(a => a.ZipCode, (a, o) => a.ZipCode.Trim().Length < o.Value.ZipCodeLength ? $"ZIP code must have at least {o.Value.ZipCodeLength} characters." : null)

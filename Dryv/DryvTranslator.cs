@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Dryv.Extensions;
 using Dryv.RuleDetection;
 using Dryv.Rules;
@@ -18,7 +19,7 @@ namespace Dryv
             this.ruleFinder = ruleFinder;
         }
 
-        public TranslationResult TranslateValidationRules(Type modelType, Func<Type, object> serviceProvider)
+        public async Task<TranslationResult> TranslateValidationRules(Type modelType, Func<Type, object> serviceProvider)
         {
             var validationRules = this.ruleFinder
                 .FindValidationRulesInTree(modelType, RuleType.Validation)
@@ -30,7 +31,7 @@ namespace Dryv
                 .Where(r => r.EvaluationLocation.HasFlag(DryvEvaluationLocation.Client))
                 .ToList();
 
-            var parameters = DryvParametersHelper.GetDryvParameters(validationRules.Union(disablingRules), serviceProvider);
+            var parameters = await DryvParametersHelper.GetDryvParameters(validationRules.Union(disablingRules), serviceProvider);
 
             var clientValidation = validationRules.Where(rule => IsRuleEnabled(rule, serviceProvider, parameters)).Select(r => Translate(r, serviceProvider, parameters));
             var clientDisablers = disablingRules.Where(rule => IsRuleEnabled(rule, serviceProvider, parameters)).Select(r => Translate(r, serviceProvider, parameters));

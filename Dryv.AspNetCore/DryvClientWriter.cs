@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Dryv.AspNetCore.Razor;
 using Dryv.Validation;
 using Microsoft.AspNetCore.Html;
@@ -21,9 +22,9 @@ namespace Dryv.AspNetCore
             this.setWriter = setWriter ?? throw new ArgumentNullException(nameof(setWriter));
         }
 
-        public IHtmlContent WriteDryvValidation<TModel>(string validationSetName, Func<Type, object> serviceProvider)
+        public async Task<IHtmlContent> WriteDryvValidation<TModel>(string validationSetName, Func<Type, object> serviceProvider)
         {
-            var translation = this.translator.TranslateValidationRules(typeof(TModel), serviceProvider);
+            var translation = await this.translator.TranslateValidationRules(typeof(TModel), serviceProvider);
             var parameters = translation.Parameters;
             var validators = translation.ValidationFunctions.ToDictionary(i => i.Key, i => this.functionWriter.GetValidationFunction(i.Value));
             var disablers = translation.DisablingFunctions.ToDictionary(i => i.Key, i => this.functionWriter.GetValidationFunction(i.Value));
@@ -36,13 +37,13 @@ namespace Dryv.AspNetCore
             });
         }
 
-        public IHtmlContent WriteDryvValidation(IEnumerable<KeyValuePair<string, Type>> validationSets, Func<Type, object> serviceProvider)
+        public async Task<IHtmlContent> WriteDryvValidation(IEnumerable<KeyValuePair<string, Type>> validationSets, Func<Type, object> serviceProvider)
         {
             var resultSet = new Dictionary<string, (Dictionary<string, Action<TextWriter>> validators, Dictionary<string, Action<TextWriter>> disablers, Dictionary<string, object> parameters)>();
 
             foreach (var (setName, type) in validationSets)
             {
-                var translation = this.translator.TranslateValidationRules(type, serviceProvider);
+                var translation = await this.translator.TranslateValidationRules(type, serviceProvider);
                 var parameters = translation.Parameters;
                 var validators = translation.ValidationFunctions.ToDictionary(i => i.Key, i => this.functionWriter.GetValidationFunction(i.Value));
                 var disablers = translation.DisablingFunctions.ToDictionary(i => i.Key, i => this.functionWriter.GetValidationFunction(i.Value));

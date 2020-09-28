@@ -35,9 +35,10 @@
         <e p="DryvResultType.cs" t="Include" />
         <e p="DryvRules.cs" t="Include" />
         <e p="DryvRules`.g.cs" t="Include" />
+        <e p="DryvRules`.parameters.g.cs" t="Include" />
+        <e p="DryvRules`.server.g.cs" t="Include" />
         <e p="DryvRuleSettings.cs" t="Include" />
         <e p="DryvSetAttribute.cs" t="Include" />
-        <e p="DryvSets.cs" t="Include" />
         <e p="DryvTranslator.cs" t="Include" />
         <e p="DryvValidationAttribute.cs" t="Include" />
         <e p="DryvValidationResult.cs" t="Include" />
@@ -54,6 +55,8 @@
           <e p="TypeExtensions.cs" t="Include" />
         </e>
         <e p="GenerateRuleMethods.ps1" t="Include" />
+        <e p="GenerateRuleParameters.ps1" t="Include" />
+        <e p="GenerateRuleServer.ps1" t="Include" />
         <e p="obj" t="ExcludeRecursive">
           <e p="Debug" t="Include">
             <e p="netstandard1.2" t="Include">
@@ -82,6 +85,8 @@
           <e p="IDryvRuleAnnotator.cs" t="Include" />
           <e p="RuleType.cs" t="Include" />
         </e>
+        <e p="TaskRetype.cs" t="Include" />
+        <e p="TaskValueHelper.cs" t="Include" />
         <e p="TranslatedRule.cs" t="Include" />
         <e p="Translation" t="Include">
           <e p="CustomTranslationContext.cs" t="Include" />
@@ -151,6 +156,7 @@
         <e p="DryvDynamicControllerBuilderExtensions.cs" t="Include" />
         <e p="DryvMvcBuilderExtensions.cs" t="Include" />
         <e p="DryvPreloaderBuilderExtensions.cs" t="Include" />
+        <e p="DryvSets.cs" t="Include" />
         <e p="DryvValidationFilterAttribute.cs" t="Include" />
         <e p="DynamicControllers" t="Include">
           <e p="CodeGeneration" t="Include">
@@ -199,6 +205,9 @@
           <e p="DryvMvcInitializer.cs" t="Include" />
           <e p="Md5Helper.cs" t="Include" />
           <e p="RegisteringDryvServiceCollection.cs" t="Include" />
+        </e>
+        <e p="Middlewares" t="Include">
+          <e p="DryvClientCodeMiddleware.cs" t="Include" />
         </e>
         <e p="obj" t="ExcludeRecursive">
           <e p="Debug" t="Include">
@@ -260,6 +269,7 @@
         <e p="RuleDiscoveryTests.cs" t="Include" />
         <e p="StringFormatDissectorTests.cs" t="Include" />
         <e p="StringTests.cs" t="Include" />
+        <e p="TaskValueHelperTests.cs" t="Include" />
       </e>
       <e p="LICENSE" t="Include" />
       <e p="packages" t="ExcludeRecursive" />

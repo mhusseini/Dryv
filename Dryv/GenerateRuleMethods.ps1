@@ -38,53 +38,6 @@ function WriteMethod($propCount, $optionCount, $methodPrefix)
 		$gen3 += ", typeof(TOptions$i)";
 	}
 
-	if($methodPrefix -eq "Parameter"){
-		$gen3 = "";
-		for($i = 1; $i -le $optionCount; $i++)
-		{
-			$gen3 += ", typeof(TOptions$i)";
-		}
-	
-		@"
-		public DryvRules<TModel> Parameter<$($gen2)TResult>(string name, Func<$($gen2)TResult> parameter)
-        {
-			this.AddParameter(name, parameter$gen3);
-			return this;
-        }
-"@ | Add-Content $fn
-
-		return;
-	}
-
-	if($methodPrefix -eq "Server"){
-
-		@"
-		public DryvRules<TModel> $($methodPrefix)Rule$gen(
-$parameters			Func<TModel, $($gen2)DryvValidationResult> rule$ruleSwitch, DryvRuleSettings settings = null)
-        {
-			this.Add$($methodPrefix)(rule,
-				new[] { $properties},
-				$ruleSwitchArgument,
-				settings
-				$gen3);
-			return this;
-        }
-
-		public DryvRules<TModel> $($methodPrefix)Rule$gen(
-$parameters			Func<TModel, $($gen2)Task<DryvValidationResult>> rule$ruleSwitch, DryvRuleSettings settings = null)
-        {
-			this.Add$($methodPrefix)(rule,
-				new[] { $properties},
-				$ruleSwitchArgument,
-				settings
-				$gen3);
-			return this;
-        }
-"@ | Add-Content $fn
-
-		return;
-	}
-
 	if(-Not($methodPrefix)){
 		@"
 		public DryvRules<TModel> DisableRules$gen(
@@ -144,12 +97,10 @@ namespace Dryv.Rules
     {
 ' | Out-File $fn
 
-$prefixes = @("","Server","Client")
+$prefixes = @("","Client")
 
-for($o = 0; $o -lt 6; $o++)	{
-	WriteMethod -propCount 0 -optionCount $o -methodPrefix "Parameter";
-
-	foreach ($prefix in $prefixes) {
+foreach ($prefix in $prefixes) {
+    for($o = 0; $o -lt 6; $o++)	{
 		for($i = 1; $i -lt 6; $i++) {
 			WriteMethod -propCount $i -optionCount $o -methodPrefix $prefix;
 		}

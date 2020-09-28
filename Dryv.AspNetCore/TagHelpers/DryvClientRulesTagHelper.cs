@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Dryv.Extensions;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -28,7 +29,7 @@ namespace Dryv.AspNetCore.TagHelpers
         [HtmlAttributeNotBound]
         public ViewContext ViewContext { get; set; }
 
-        public override void Process(TagHelperContext context, TagHelperOutput output)
+        public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
         {
             var modelTypes = this.GetModelTypes();
             if (!modelTypes.Any())
@@ -39,7 +40,7 @@ namespace Dryv.AspNetCore.TagHelpers
             output.TagName = "script";
             output.TagMode = TagMode.StartTagAndEndTag;
 
-            var content = this.clientWriter.WriteDryvValidation(modelTypes, this.ViewContext.HttpContext.RequestServices.GetService);
+            var content = await this.clientWriter.WriteDryvValidation(modelTypes, this.ViewContext.HttpContext.RequestServices.GetService);
             output.Content.AppendHtml(content);
         }
 
