@@ -72,7 +72,7 @@ namespace Dryv
                 try
                 {
                     var services = serviceProvider.GetServices(rule, parameters);
-                    if (!rule.CompiledEnablingExpression(services))
+                    if (!true.Equals(await TaskValueHelper.GetPossiblyAsyncValue(rule.CompiledEnablingExpression(services))))
                     {
                         continue;
                     }

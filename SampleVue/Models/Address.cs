@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Dryv.Rules;
 using Dryv.SampleVue.CustomValidation;
 using Dryv.Validation;
@@ -23,10 +24,11 @@ namespace Dryv.SampleVue.Models
             //.Rule<AsyncValidator, IOptions<SampleOptions>>(a => a.ZipCode, (a, v, o) => v.ValidateZipCode(a.ZipCode, a.City, o.Value.ZipCodeLength))
             //.Rule(a => a.City, a => a.City.Contains("ass", StringComparison.OrdinalIgnoreCase) ? DryvValidationResult.Warning("Are you sure about this name?") : DryvValidationResult.Success)
             //.Rule<DryvParameters>(a => a.ZipCode, (a, p) => p.Get<string>("A") == a.ZipCode ? "error" : null)
-            .Rule<AsyncValidator>(a => a.ZipCode, (a, v) => a.City == null ? null : v.IsValid(a.ZipCode) ? null : "error")
+            .Rule<AsyncValidator>(a => a.ZipCode, (a, v) => a.City == null ? null : v.IsValid(a.ZipCode) ? null : "error",
+                async svc => await svc.ValidateZipCode("123", "xyz") == null)
             ;
     }
-
+    
     [DryvValidation(typeof(AddressValidation))]
     public class Address
     {

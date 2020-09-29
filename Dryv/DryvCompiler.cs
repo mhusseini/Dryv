@@ -8,7 +8,7 @@ namespace Dryv
 {
     public class DryvCompiler
     {
-        public Func<object[], bool> CompileEnablingExpression(DryvCompiledRule rule, LambdaExpression lambdaExpression)
+        public Func<object[], object> CompileEnablingExpression(DryvCompiledRule rule, LambdaExpression lambdaExpression)
         {
             EnsurePreevaluationOptionTypes(rule);
 
@@ -54,18 +54,18 @@ namespace Dryv
                                      select Expression.Convert(arrayAccess, options.Type));
         }
 
-        private static Expression<Func<object[], bool>> CreateAlwaysTrueLambda(ParameterExpression optionsParameter)
+        private static Expression<Func<object[], object>> CreateAlwaysTrueLambda(ParameterExpression optionsParameter)
         {
-            return Expression.Lambda<Func<object[], bool>>(Expression.Constant(true), optionsParameter);
+            return Expression.Lambda<Func<object[], object>>(Expression.Convert(Expression.Constant(true), typeof(object)), optionsParameter);
         }
 
-        private static Expression<Func<object[], bool>> CreateInvokingLambda(LambdaExpression lambdaExpression, ParameterExpression optionsParameter)
+        private static Expression<Func<object[], object>> CreateInvokingLambda(LambdaExpression lambdaExpression, ParameterExpression optionsParameter)
         {
             var invokeArguments = new List<Expression>();
             AddOptionParameters(invokeArguments, lambdaExpression, optionsParameter);
             var invokeExpression = Expression.Invoke(lambdaExpression, invokeArguments);
 
-            return Expression.Lambda<Func<object[], bool>>(invokeExpression, optionsParameter);
+            return Expression.Lambda<Func<object[], object>>(Expression.Convert(invokeExpression, typeof(object)), optionsParameter);
         }
 
         private static void EnsurePreevaluationOptionTypes(DryvCompiledRule rule)

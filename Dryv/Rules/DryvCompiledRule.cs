@@ -13,7 +13,7 @@ namespace Dryv.Rules
     {
         public IDictionary<string, object> Annotations { get; internal set; } = new Dictionary<string, object>();
         public string CodeTemplate { get; internal set; }
-        public Func<object[], bool> CompiledEnablingExpression { get; internal set; }
+        public Func<object[], object> CompiledEnablingExpression { get; internal set; }
         public Func<object, object[], object> CompiledValidationExpression { get; internal set; }
         public LambdaExpression EnablingExpression { get; internal set; }
         public DryvEvaluationLocation EvaluationLocation { get; internal set; }
