@@ -25,7 +25,7 @@ namespace Dryv
                     parameterValues.Add(parameter.Name, value);
                 }
 
-                result.Add(rule.Parameters, new DryvParameters(parameterValues));
+                result[rule.Parameters] = new DryvParameters(parameterValues);
             }
 
             return result;

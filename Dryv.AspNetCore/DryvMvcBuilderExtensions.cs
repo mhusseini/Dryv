@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Dryv.AspNetCore.DynamicControllers.Endpoints;
 using Dryv.AspNetCore.Internal;
+using Dryv.AspNetCore.Json;
 using Dryv.Configuration;
 using Dryv.RuleDetection;
 using Dryv.Rules;
@@ -38,8 +39,12 @@ namespace Dryv.AspNetCore
             {
                 var jsonOptions = new JsonSerializerOptions
                 {
-                    Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                    Converters =
+                    {
+                        new JsonStringEnumConverter(JsonNamingPolicy.CamelCase),
+                        new ValueTupleFactory()
+                    },
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 };
 
                 options.JsonConversion = v => JsonSerializer.Serialize(v, jsonOptions);

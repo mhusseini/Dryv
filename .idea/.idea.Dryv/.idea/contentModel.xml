@@ -206,6 +206,12 @@
           <e p="Md5Helper.cs" t="Include" />
           <e p="RegisteringDryvServiceCollection.cs" t="Include" />
         </e>
+        <e p="Json" t="Include">
+          <e p="ValueTupleConverter`.cs" t="Include" />
+          <e p="ValueTupleConverter``.cs" t="Include" />
+          <e p="ValueTupleConverter```.cs" t="Include" />
+          <e p="ValueTupleFactory.cs" t="Include" />
+        </e>
         <e p="Middlewares" t="Include">
           <e p="DryvClientCodeMiddleware.cs" t="Include" />
         </e>
