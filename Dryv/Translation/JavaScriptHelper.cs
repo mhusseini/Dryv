@@ -12,8 +12,8 @@ namespace Dryv.Translation
                 string txt => $"\"{JavaScriptEscape(txt)}\"",
                 bool b => (b ? "true" : "false"),
                 null => "null",
-                DateTime dateTime => $@"""{dateTime.ToString(CultureInfo.CurrentCulture)}""",
-                DateTimeOffset dateTime => $@"""{dateTime.ToString(CultureInfo.CurrentCulture)}""",
+                DateTime dateTime => $@"""{dateTime.ToString(CultureInfo.CurrentUICulture)}""",
+                DateTimeOffset dateTime => $@"""{dateTime.ToString(CultureInfo.CurrentUICulture)}""",
                 _ => null
             };
         }

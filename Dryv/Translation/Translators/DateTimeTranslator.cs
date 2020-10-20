@@ -28,7 +28,7 @@ namespace Dryv.Translation.Translators
                 return false;
             }
 
-            var culture = CultureInfo.CurrentCulture;
+            var culture = CultureInfo.CurrentUICulture;
 
             TranslateDate(context, binary.Left, culture);
             context.Writer.Write(" ");
