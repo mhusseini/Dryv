@@ -26,6 +26,7 @@ namespace Dryv.SampleVue.Models
             //.Rule<DryvParameters>(a => a.ZipCode, (a, p) => p.Get<string>("A") == a.ZipCode ? "error" : null)
             .Rule<AsyncValidator>(a => a.ZipCode, (a, v) => a.City == null ? null : v.IsValid(a.ZipCode) ? null : "error",
                 async svc => await svc.ValidateZipCode("123", "xyz") == null)
+            //.Rule(m=>m.Date, m=> m.Date < DateTime.Now ? "falsh" : null)
             ;
     }
     
@@ -33,6 +34,8 @@ namespace Dryv.SampleVue.Models
     public class Address
     {
         public string City { get; set; }
+        
+        public DateTime Date { get; set; }
 
         public string ZipCode { get; set; }
 

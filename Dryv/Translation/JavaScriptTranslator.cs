@@ -158,10 +158,20 @@ namespace Dryv.Translation
 
         public override string TranslateValue(object value)
         {
-            return JavaScriptHelper.TranslateValue(value) ?? value switch
+            return TranslateValue(value, this.Options);
+        }
+
+        public static string TranslateValue2(object value, DryvOptions options)
+        {
+            return TranslateValue(value, options);
+        }
+
+        public static string TranslateValue(object value, DryvOptions options)
+        {
+            return JavaScriptHelper.TranslateValue(value, options.CurrentCulture()) ?? value switch
             {
-                DryvValidationResult result => this.TranslateValidationResultObject(result),
-                _ => (this.Options.JsonConversion == null ? value.ToString() : this.Options.JsonConversion(value))
+                DryvValidationResult result => TranslateValidationResultObject(result, options),
+                _ => (options.JsonConversion == null ? value.ToString() : options.JsonConversion(value))
             };
         }
 
@@ -683,7 +693,7 @@ namespace Dryv.Translation
             throw new DryvMethodNotSupportedException(expression);
         }
 
-        private string TranslateValidationResultObject(DryvValidationResult result)
+        private static string TranslateValidationResultObject(DryvValidationResult result, DryvOptions options)
         {
             if (result.Type == DryvResultType.Success)
             {
@@ -708,7 +718,7 @@ namespace Dryv.Translation
             if (result.Data != null)
             {
                 sb.Append("data: ");
-                sb.Append(this.Options.JsonConversion(result.Data));
+                sb.Append(options.JsonConversion(result.Data));
             }
             sb.Append("}");
 

@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
@@ -14,6 +15,8 @@ namespace Dryv.SampleVue
 
         public static void Main(string[] args)
         {
+            CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("de-DE");
+            CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("de-DE");
             CreateHostBuilder(args).Build().Run();
         }
     }

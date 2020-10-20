@@ -1,7 +1,7 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq.Expressions;
 using System.Text;
@@ -18,6 +18,8 @@ namespace Dryv.Translation
         private string DebugView => this.StringBuilder?.Length > 0 ? this.StringBuilder.ToString() : "PARENT: " + this.ParentContext?.DebugView;
         public List<Func<Expression, TranslationContext, bool>> DynamicTranslation { get; private set; } = new List<Func<Expression, TranslationContext, bool>>();
         public string Group { get; set; }
+
+        public CultureInfo Culture { get; set; }
 
         public bool IsAsync
         {
@@ -45,12 +47,13 @@ namespace Dryv.Translation
         internal StringBuilder StringBuilder { get; set; }
 
         public virtual T Clone<T>(StringBuilder sb = null)
-        where T : TranslationContext, new()
+            where T : TranslationContext, new()
         {
             return new T
             {
                 ParentContext = this,
                 Group = this.Group,
+                Culture = this.Culture,
                 ModelType = this.ModelType,
                 InjectedExpressions = this.InjectedExpressions,
                 InjectedServiceTypes = this.InjectedServiceTypes,

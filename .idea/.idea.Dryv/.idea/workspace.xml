@@ -35,6 +35,22 @@
   <component name="ChangeListManager">
     <list default="true" id="81fd7ff9-3930-4c09-a8cb-036017f14ba0" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv/Configuration/DryvOptions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/Configuration/DryvOptions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv/DryvTranslator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/DryvTranslator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv/Extensions/ServiceProviderExtensions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/Extensions/ServiceProviderExtensions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv/Rules/DryvCompiledRule.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/Rules/DryvCompiledRule.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv/Translation/ExpressionInjectionHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/Translation/ExpressionInjectionHelper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv/Translation/JavaScriptHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/Translation/JavaScriptHelper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv/Translation/JavaScriptTranslator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/Translation/JavaScriptTranslator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv/Translation/TranslationCompiler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/Translation/TranslationCompiler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv/Translation/TranslationContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/Translation/TranslationContext.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv/Translation/TranslationResult.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/Translation/TranslationResult.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv/Translation/Translator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/Translation/Translator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv/Translation/Translators/DateTimeTranslator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/Translation/Translators/DateTimeTranslator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv/Validation/DryvClientValidationFunctionWriter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/Validation/DryvClientValidationFunctionWriter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv/Validation/DryvClientValidationSetWriter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/Validation/DryvClientValidationSetWriter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SampleVue/Models/Address.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SampleVue/Models/Address.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SampleVue/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SampleVue/Program.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,28 +76,19 @@
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/E007F98B-FAF6-4B61-8606-9397C1AC3679/24/LambdaExpression.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/munirhusseini/Development/Projects/Dryv/Dryv/Validation/DryvClientValidationSetWriter.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/B040A37C-41D0-474D-A152-F1FA7760E8F1/36/JsonSerializer.Write.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/munirhusseini/Development/Projects/Dryv/Dryv.AspNetCore/DryvMvcBuilderExtensions.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/SampleVue/Views/Home/Index.cshtml" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/SampleConsole/Program.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock:///Users/munirhusseini/Development/Projects/Dryv/Dryv/DryvParametersHelper.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/munirhusseini/Development/Projects/Dryv/Dryv/Translation/JavaScriptHelper.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Dryv.AspNetCore/HtmlExtension.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/B040A37C-41D0-474D-A152-F1FA7760E8F1/36/JsonSerializer.Write.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/SampleVue/Views/Home/Index.cshtml" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/munirhusseini/Development/Projects/Dryv/Dryv/Translation/Translators/DateTimeTranslator.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/9FCAADD9-58A4-4900-9D68-546D5ECFE219/277/MethodBase.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/SampleConsole/Program.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/B040A37C-41D0-474D-A152-F1FA7760E8F1/3B/JsonSerializer.Write.Helpers.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/92EC1C6B-080B-4DA4-A456-EC4CE287187B/C/SafeLibraryHandle.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/SampleConsole/Program.cs" />
-        <option value="$PROJECT_DIR$/SampleVue/Views/Home/Index.cshtml" />
-        <option value="$PROJECT_DIR$/SampleVue/wwwroot/demo.js" />
-        <option value="$PROJECT_DIR$/Dryv/RuleDetection/DryvRuleFinder.cs" />
-        <option value="$PROJECT_DIR$/Dryv.AspNetCore/PreLoading/DryvPreloadAttribute.cs" />
         <option value="$PROJECT_DIR$/Dryv.AspNetCore/PreLoading/DryvSetAttribute.cs" />
         <option value="$PROJECT_DIR$/Dryv/DryvSetAttribute.cs" />
         <option value="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/FilterExpressionValidator.cs" />
@@ -109,13 +116,30 @@
         <option value="$PROJECT_DIR$/Dryv/TaskValueHelper.cs" />
         <option value="$PROJECT_DIR$/Dryv/TaskRetype.cs" />
         <option value="$PROJECT_DIR$/Dryv/GenerateRuleMethods.ps1" />
-        <option value="$PROJECT_DIR$/Dryv/DryvTranslator.cs" />
-        <option value="$PROJECT_DIR$/Dryv/Rules/DryvCompiledRule.cs" />
         <option value="$PROJECT_DIR$/Dryv/DryvValidator.cs" />
         <option value="$PROJECT_DIR$/Dryv/DryvCompiler.cs" />
-        <option value="$PROJECT_DIR$/SampleVue/Models/Address.cs" />
         <option value="$PROJECT_DIR$/Dryv.AspNetCore/Dryv.AspNetCore.csproj" />
+        <option value="$PROJECT_DIR$/Dryv/Translation/Translators/StringTranslator.cs" />
+        <option value="$PROJECT_DIR$/Dryv.Tests/StringTests.cs" />
         <option value="$PROJECT_DIR$/Dryv/Dryv.csproj" />
+        <option value="$PROJECT_DIR$/Dryv/Translation/JavaScriptHelper.cs" />
+        <option value="$PROJECT_DIR$/Dryv/Configuration/DryvOptions.cs" />
+        <option value="$PROJECT_DIR$/Dryv/Validation/DryvClientValidationSetWriter.cs" />
+        <option value="$PROJECT_DIR$/Dryv/Validation/DryvClientValidationFunctionWriter.cs" />
+        <option value="$PROJECT_DIR$/Dryv/Translation/Translators/DryvValidationResultTranslator.cs" />
+        <option value="$PROJECT_DIR$/Dryv/Translation/IDryvCustomTranslator.cs" />
+        <option value="$PROJECT_DIR$/Dryv/Translation/TranslationContext.cs" />
+        <option value="$PROJECT_DIR$/Dryv/Translation/Translators/DateTimeTranslator.cs" />
+        <option value="$PROJECT_DIR$/Dryv/Translation/ExpressionInjectionHelper.cs" />
+        <option value="$PROJECT_DIR$/SampleVue/Program.cs" />
+        <option value="$PROJECT_DIR$/SampleVue/Models/Address.cs" />
+        <option value="$PROJECT_DIR$/Dryv/Extensions/ServiceProviderExtensions.cs" />
+        <option value="$PROJECT_DIR$/Dryv/DryvTranslator.cs" />
+        <option value="$PROJECT_DIR$/Dryv/Rules/DryvCompiledRule.cs" />
+        <option value="$PROJECT_DIR$/Dryv/Translation/TranslationResult.cs" />
+        <option value="$PROJECT_DIR$/Dryv/Translation/Translator.cs" />
+        <option value="$PROJECT_DIR$/Dryv/Translation/JavaScriptTranslator.cs" />
+        <option value="$PROJECT_DIR$/Dryv/Translation/TranslationCompiler.cs" />
       </list>
     </option>
   </component>
@@ -131,8 +155,8 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
-    <property name="DebuggerViewTab_PTCS_FirstProportionKey" value="0.34962186" />
-    <property name="DebuggerViewTab_PTCS_LastProportionKey" value="0.2995928" />
+    <property name="DebuggerViewTab_PTCS_FirstProportionKey" value="0.3497364" />
+    <property name="DebuggerViewTab_PTCS_LastProportionKey" value="0.2993556" />
     <property name="JavaScriptWeakerCompletionTypeGuess" value="true" />
     <property name="Rider.ProjectViewActivator.IsNotFirstRun" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
@@ -211,6 +235,7 @@
       <workItem from="1600873510355" duration="1061000" />
       <workItem from="1601042112553" duration="13277000" />
       <workItem from="1601331164021" duration="14512000" />
+      <workItem from="1603227714955" duration="4586000" />
     </task>
     <task id="LOCAL-00001" summary="Renamed and moved DryvPreloadAttribute (now DryvSetAttribute).">
       <created>1601042302266</created>
@@ -282,7 +307,14 @@
       <option name="project" value="LOCAL" />
       <updated>1601410108469</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Changed CurrentCulture to CurrentUICulture">
+      <created>1603227951529</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1603227951529</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -314,116 +346,117 @@
     <MESSAGE value="Version bump" />
     <MESSAGE value="Added missing files" />
     <MESSAGE value="Updated JSON settings." />
-    <option name="LAST_COMMIT_MESSAGE" value="Updated JSON settings." />
+    <MESSAGE value="Changed CurrentCulture to CurrentUICulture" />
+    <option name="LAST_COMMIT_MESSAGE" value="Changed CurrentCulture to CurrentUICulture" />
   </component>
   <component name="WindowStateProjectService">
     <state x="958" y="336" key="#xdebugger.evaluate" timestamp="1601337195220">
       <screen x="0" y="23" width="1792" height="1041" />
     </state>
     <state x="958" y="336" key="#xdebugger.evaluate/0.23.1792.1041@0.23.1792.1041" timestamp="1601337195220" />
-    <state width="518" height="464" key="DebuggerActiveHint" timestamp="1601336779410">
+    <state width="574" height="464" key="DebuggerActiveHint" timestamp="1603229846622">
       <screen x="0" y="23" width="1792" height="1041" />
     </state>
-    <state width="518" height="464" key="DebuggerActiveHint/0.23.1792.1041@0.23.1792.1041" timestamp="1601336779410" />
-    <state width="1750" height="378" key="GridCell.Tab.0.bottom" timestamp="1601417327422">
+    <state width="574" height="464" key="DebuggerActiveHint/0.23.1792.1041@0.23.1792.1041" timestamp="1603229846622" />
+    <state width="1738" height="378" key="GridCell.Tab.0.bottom" timestamp="1603231781487">
       <screen x="0" y="23" width="1792" height="1041" />
     </state>
-    <state width="1750" height="378" key="GridCell.Tab.0.bottom/0.23.1792.1041@0.23.1792.1041" timestamp="1601417327422" />
+    <state width="1738" height="378" key="GridCell.Tab.0.bottom/0.23.1792.1041@0.23.1792.1041" timestamp="1603231781487" />
     <state width="1750" height="379" key="GridCell.Tab.0.bottom/0.23.1792.1043@0.23.1792.1043" timestamp="1601242619656" />
-    <state width="1750" height="378" key="GridCell.Tab.0.center" timestamp="1601417327422">
+    <state width="1738" height="378" key="GridCell.Tab.0.center" timestamp="1603231781487">
       <screen x="0" y="23" width="1792" height="1041" />
     </state>
-    <state width="1750" height="378" key="GridCell.Tab.0.center/0.23.1792.1041@0.23.1792.1041" timestamp="1601417327422" />
+    <state width="1738" height="378" key="GridCell.Tab.0.center/0.23.1792.1041@0.23.1792.1041" timestamp="1603231781487" />
     <state width="1750" height="379" key="GridCell.Tab.0.center/0.23.1792.1043@0.23.1792.1043" timestamp="1601242619655" />
-    <state width="1750" height="378" key="GridCell.Tab.0.left" timestamp="1601417327421">
+    <state width="1738" height="378" key="GridCell.Tab.0.left" timestamp="1603231781486">
       <screen x="0" y="23" width="1792" height="1041" />
     </state>
-    <state width="1750" height="378" key="GridCell.Tab.0.left/0.23.1792.1041@0.23.1792.1041" timestamp="1601417327421" />
+    <state width="1738" height="378" key="GridCell.Tab.0.left/0.23.1792.1041@0.23.1792.1041" timestamp="1603231781486" />
     <state width="1750" height="379" key="GridCell.Tab.0.left/0.23.1792.1043@0.23.1792.1043" timestamp="1601242619655" />
-    <state width="1750" height="378" key="GridCell.Tab.0.right" timestamp="1601417327422">
+    <state width="1738" height="378" key="GridCell.Tab.0.right" timestamp="1603231781487">
       <screen x="0" y="23" width="1792" height="1041" />
     </state>
-    <state width="1750" height="378" key="GridCell.Tab.0.right/0.23.1792.1041@0.23.1792.1041" timestamp="1601417327422" />
+    <state width="1738" height="378" key="GridCell.Tab.0.right/0.23.1792.1041@0.23.1792.1041" timestamp="1603231781487" />
     <state width="1750" height="379" key="GridCell.Tab.0.right/0.23.1792.1043@0.23.1792.1043" timestamp="1601242619656" />
-    <state width="1750" height="378" key="GridCell.Tab.1.bottom" timestamp="1601417327422">
+    <state width="1738" height="378" key="GridCell.Tab.1.bottom" timestamp="1603231781490">
       <screen x="0" y="23" width="1792" height="1041" />
     </state>
-    <state width="1750" height="378" key="GridCell.Tab.1.bottom/0.23.1792.1041@0.23.1792.1041" timestamp="1601417327422" />
+    <state width="1738" height="378" key="GridCell.Tab.1.bottom/0.23.1792.1041@0.23.1792.1041" timestamp="1603231781490" />
     <state width="1750" height="379" key="GridCell.Tab.1.bottom/0.23.1792.1043@0.23.1792.1043" timestamp="1601242619543" />
-    <state width="1750" height="378" key="GridCell.Tab.1.center" timestamp="1601417327422">
+    <state width="1738" height="378" key="GridCell.Tab.1.center" timestamp="1603231781490">
       <screen x="0" y="23" width="1792" height="1041" />
     </state>
-    <state width="1750" height="378" key="GridCell.Tab.1.center/0.23.1792.1041@0.23.1792.1041" timestamp="1601417327422" />
+    <state width="1738" height="378" key="GridCell.Tab.1.center/0.23.1792.1041@0.23.1792.1041" timestamp="1603231781490" />
     <state width="1750" height="379" key="GridCell.Tab.1.center/0.23.1792.1043@0.23.1792.1043" timestamp="1601242619543" />
-    <state width="1750" height="378" key="GridCell.Tab.1.left" timestamp="1601417327422">
+    <state width="1738" height="378" key="GridCell.Tab.1.left" timestamp="1603231781490">
       <screen x="0" y="23" width="1792" height="1041" />
     </state>
-    <state width="1750" height="378" key="GridCell.Tab.1.left/0.23.1792.1041@0.23.1792.1041" timestamp="1601417327422" />
+    <state width="1738" height="378" key="GridCell.Tab.1.left/0.23.1792.1041@0.23.1792.1041" timestamp="1603231781490" />
     <state width="1750" height="379" key="GridCell.Tab.1.left/0.23.1792.1043@0.23.1792.1043" timestamp="1601242619543" />
-    <state width="1750" height="378" key="GridCell.Tab.1.right" timestamp="1601417327422">
+    <state width="1738" height="378" key="GridCell.Tab.1.right" timestamp="1603231781490">
       <screen x="0" y="23" width="1792" height="1041" />
     </state>
-    <state width="1750" height="378" key="GridCell.Tab.1.right/0.23.1792.1041@0.23.1792.1041" timestamp="1601417327422" />
+    <state width="1738" height="378" key="GridCell.Tab.1.right/0.23.1792.1041@0.23.1792.1041" timestamp="1603231781490" />
     <state width="1750" height="379" key="GridCell.Tab.1.right/0.23.1792.1043@0.23.1792.1043" timestamp="1601242619543" />
-    <state width="1750" height="378" key="GridCell.Tab.2.bottom" timestamp="1601417327423">
+    <state width="1738" height="378" key="GridCell.Tab.2.bottom" timestamp="1603231781488">
       <screen x="0" y="23" width="1792" height="1041" />
     </state>
-    <state width="1750" height="378" key="GridCell.Tab.2.bottom/0.23.1792.1041@0.23.1792.1041" timestamp="1601417327423" />
+    <state width="1738" height="378" key="GridCell.Tab.2.bottom/0.23.1792.1041@0.23.1792.1041" timestamp="1603231781488" />
     <state width="1750" height="379" key="GridCell.Tab.2.bottom/0.23.1792.1043@0.23.1792.1043" timestamp="1601242619544" />
-    <state width="1750" height="378" key="GridCell.Tab.2.center" timestamp="1601417327423">
+    <state width="1738" height="378" key="GridCell.Tab.2.center" timestamp="1603231781488">
       <screen x="0" y="23" width="1792" height="1041" />
     </state>
-    <state width="1750" height="378" key="GridCell.Tab.2.center/0.23.1792.1041@0.23.1792.1041" timestamp="1601417327423" />
+    <state width="1738" height="378" key="GridCell.Tab.2.center/0.23.1792.1041@0.23.1792.1041" timestamp="1603231781488" />
     <state width="1750" height="379" key="GridCell.Tab.2.center/0.23.1792.1043@0.23.1792.1043" timestamp="1601242619543" />
-    <state width="1750" height="378" key="GridCell.Tab.2.left" timestamp="1601417327423">
+    <state width="1738" height="378" key="GridCell.Tab.2.left" timestamp="1603231781488">
       <screen x="0" y="23" width="1792" height="1041" />
     </state>
-    <state width="1750" height="378" key="GridCell.Tab.2.left/0.23.1792.1041@0.23.1792.1041" timestamp="1601417327423" />
+    <state width="1738" height="378" key="GridCell.Tab.2.left/0.23.1792.1041@0.23.1792.1041" timestamp="1603231781488" />
     <state width="1750" height="379" key="GridCell.Tab.2.left/0.23.1792.1043@0.23.1792.1043" timestamp="1601242619543" />
-    <state width="1750" height="378" key="GridCell.Tab.2.right" timestamp="1601417327423">
+    <state width="1738" height="378" key="GridCell.Tab.2.right" timestamp="1603231781488">
       <screen x="0" y="23" width="1792" height="1041" />
     </state>
-    <state width="1750" height="378" key="GridCell.Tab.2.right/0.23.1792.1041@0.23.1792.1041" timestamp="1601417327423" />
+    <state width="1738" height="378" key="GridCell.Tab.2.right/0.23.1792.1041@0.23.1792.1041" timestamp="1603231781488" />
     <state width="1750" height="379" key="GridCell.Tab.2.right/0.23.1792.1043@0.23.1792.1043" timestamp="1601242619544" />
-    <state width="1750" height="378" key="GridCell.Tab.3.bottom" timestamp="1601417327424">
+    <state width="1738" height="378" key="GridCell.Tab.3.bottom" timestamp="1603231781489">
       <screen x="0" y="23" width="1792" height="1041" />
     </state>
-    <state width="1750" height="378" key="GridCell.Tab.3.bottom/0.23.1792.1041@0.23.1792.1041" timestamp="1601417327424" />
+    <state width="1738" height="378" key="GridCell.Tab.3.bottom/0.23.1792.1041@0.23.1792.1041" timestamp="1603231781489" />
     <state width="1750" height="379" key="GridCell.Tab.3.bottom/0.23.1792.1043@0.23.1792.1043" timestamp="1601242619544" />
-    <state width="1750" height="378" key="GridCell.Tab.3.center" timestamp="1601417327423">
+    <state width="1738" height="378" key="GridCell.Tab.3.center" timestamp="1603231781489">
       <screen x="0" y="23" width="1792" height="1041" />
     </state>
-    <state width="1750" height="378" key="GridCell.Tab.3.center/0.23.1792.1041@0.23.1792.1041" timestamp="1601417327423" />
+    <state width="1738" height="378" key="GridCell.Tab.3.center/0.23.1792.1041@0.23.1792.1041" timestamp="1603231781489" />
     <state width="1750" height="379" key="GridCell.Tab.3.center/0.23.1792.1043@0.23.1792.1043" timestamp="1601242619544" />
-    <state width="1750" height="378" key="GridCell.Tab.3.left" timestamp="1601417327423">
+    <state width="1738" height="378" key="GridCell.Tab.3.left" timestamp="1603231781489">
       <screen x="0" y="23" width="1792" height="1041" />
     </state>
-    <state width="1750" height="378" key="GridCell.Tab.3.left/0.23.1792.1041@0.23.1792.1041" timestamp="1601417327423" />
+    <state width="1738" height="378" key="GridCell.Tab.3.left/0.23.1792.1041@0.23.1792.1041" timestamp="1603231781489" />
     <state width="1750" height="379" key="GridCell.Tab.3.left/0.23.1792.1043@0.23.1792.1043" timestamp="1601242619544" />
-    <state width="1750" height="378" key="GridCell.Tab.3.right" timestamp="1601417327423">
+    <state width="1738" height="378" key="GridCell.Tab.3.right" timestamp="1603231781489">
       <screen x="0" y="23" width="1792" height="1041" />
     </state>
-    <state width="1750" height="378" key="GridCell.Tab.3.right/0.23.1792.1041@0.23.1792.1041" timestamp="1601417327423" />
+    <state width="1738" height="378" key="GridCell.Tab.3.right/0.23.1792.1041@0.23.1792.1041" timestamp="1603231781489" />
     <state width="1750" height="379" key="GridCell.Tab.3.right/0.23.1792.1043@0.23.1792.1043" timestamp="1601242619544" />
-    <state width="1750" height="378" key="GridCell.Tab.4.bottom" timestamp="1601417327424">
+    <state width="1738" height="378" key="GridCell.Tab.4.bottom" timestamp="1603231781490">
       <screen x="0" y="23" width="1792" height="1041" />
     </state>
-    <state width="1750" height="378" key="GridCell.Tab.4.bottom/0.23.1792.1041@0.23.1792.1041" timestamp="1601417327424" />
+    <state width="1738" height="378" key="GridCell.Tab.4.bottom/0.23.1792.1041@0.23.1792.1041" timestamp="1603231781490" />
     <state width="1750" height="379" key="GridCell.Tab.4.bottom/0.23.1792.1043@0.23.1792.1043" timestamp="1601242619545" />
-    <state width="1750" height="378" key="GridCell.Tab.4.center" timestamp="1601417327424">
+    <state width="1738" height="378" key="GridCell.Tab.4.center" timestamp="1603231781489">
       <screen x="0" y="23" width="1792" height="1041" />
     </state>
-    <state width="1750" height="378" key="GridCell.Tab.4.center/0.23.1792.1041@0.23.1792.1041" timestamp="1601417327424" />
+    <state width="1738" height="378" key="GridCell.Tab.4.center/0.23.1792.1041@0.23.1792.1041" timestamp="1603231781489" />
     <state width="1750" height="379" key="GridCell.Tab.4.center/0.23.1792.1043@0.23.1792.1043" timestamp="1601242619545" />
-    <state width="1750" height="378" key="GridCell.Tab.4.left" timestamp="1601417327424">
+    <state width="1738" height="378" key="GridCell.Tab.4.left" timestamp="1603231781489">
       <screen x="0" y="23" width="1792" height="1041" />
     </state>
-    <state width="1750" height="378" key="GridCell.Tab.4.left/0.23.1792.1041@0.23.1792.1041" timestamp="1601417327424" />
+    <state width="1738" height="378" key="GridCell.Tab.4.left/0.23.1792.1041@0.23.1792.1041" timestamp="1603231781489" />
     <state width="1750" height="379" key="GridCell.Tab.4.left/0.23.1792.1043@0.23.1792.1043" timestamp="1601242619544" />
-    <state width="1750" height="378" key="GridCell.Tab.4.right" timestamp="1601417327424">
+    <state width="1738" height="378" key="GridCell.Tab.4.right" timestamp="1603231781489">
       <screen x="0" y="23" width="1792" height="1041" />
     </state>
-    <state width="1750" height="378" key="GridCell.Tab.4.right/0.23.1792.1041@0.23.1792.1041" timestamp="1601417327424" />
+    <state width="1738" height="378" key="GridCell.Tab.4.right/0.23.1792.1041@0.23.1792.1041" timestamp="1603231781489" />
     <state width="1750" height="379" key="GridCell.Tab.4.right/0.23.1792.1043@0.23.1792.1043" timestamp="1601242619545" />
     <state x="496" y="283" key="Rider.ProjectTemplateDialog.Size" timestamp="1601237759448">
       <screen x="0" y="23" width="1792" height="1043" />
@@ -437,28 +470,28 @@
       <screen x="0" y="23" width="1792" height="1043" />
     </state>
     <state x="100" y="123" width="1592" height="843" key="VCS.FileHistoryDialog/0.23.1792.1043@0.23.1792.1043" timestamp="1600945377872" />
-    <state x="496" y="271" key="Vcs.Push.Dialog.v2" timestamp="1601410128132">
+    <state x="496" y="271" key="Vcs.Push.Dialog.v2" timestamp="1603227957809">
       <screen x="0" y="23" width="1792" height="1041" />
     </state>
-    <state x="496" y="271" key="Vcs.Push.Dialog.v2/0.23.1792.1041@0.23.1792.1041" timestamp="1601410128132" />
+    <state x="496" y="271" key="Vcs.Push.Dialog.v2/0.23.1792.1041@0.23.1792.1041" timestamp="1603227957809" />
     <state x="496" y="271" key="Vcs.Push.Dialog.v2/0.23.1792.1043@0.23.1792.1043" timestamp="1601246666351" />
     <state width="896" height="521" key="XDebugger.FullValuePopup" timestamp="1601238388601">
       <screen x="0" y="23" width="1792" height="1043" />
     </state>
     <state width="896" height="521" key="XDebugger.FullValuePopup/0.23.1792.1043@0.23.1792.1043" timestamp="1601238388601" />
-    <state x="438" y="287" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1601339908307">
+    <state x="438" y="287" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1603228858382">
       <screen x="0" y="23" width="1792" height="1041" />
     </state>
-    <state x="438" y="287" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2/0.23.1792.1041@0.23.1792.1041" timestamp="1601339908307" />
-    <state x="533" y="298" width="726" height="490" key="find.popup" timestamp="1601332099130">
+    <state x="438" y="287" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2/0.23.1792.1041@0.23.1792.1041" timestamp="1603228858382" />
+    <state x="533" y="298" width="726" height="490" key="find.popup" timestamp="1603229395946">
       <screen x="0" y="23" width="1792" height="1041" />
     </state>
-    <state x="533" y="298" width="726" height="490" key="find.popup/0.23.1792.1041@0.23.1792.1041" timestamp="1601332099130" />
+    <state x="533" y="298" width="726" height="490" key="find.popup/0.23.1792.1041@0.23.1792.1041" timestamp="1603229395946" />
     <state x="533" y="299" width="726" height="490" key="find.popup/0.23.1792.1043@0.23.1792.1043" timestamp="1601239207610" />
-    <state x="559" y="252" width="672" height="677" key="search.everywhere.popup" timestamp="1601367573357">
+    <state x="559" y="252" width="672" height="677" key="search.everywhere.popup" timestamp="1603231661040">
       <screen x="0" y="23" width="1792" height="1041" />
     </state>
-    <state x="559" y="252" width="672" height="677" key="search.everywhere.popup/0.23.1792.1041@0.23.1792.1041" timestamp="1601367573357" />
+    <state x="559" y="252" width="672" height="677" key="search.everywhere.popup/0.23.1792.1041@0.23.1792.1041" timestamp="1603231661040" />
     <state x="559" y="252" width="672" height="678" key="search.everywhere.popup/0.23.1792.1043@0.23.1792.1043" timestamp="1601044541633" />
   </component>
   <component name="XDebuggerManager">
@@ -490,9 +523,24 @@
           </properties>
           <option name="timeStamp" value="2" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Dryv/Translation/JavaScriptTranslator.cs</url>
+          <line>165</line>
+          <properties documentPath="$PROJECT_DIR$/Dryv/Translation/JavaScriptTranslator.cs" initialLine="165">
+            <startOffsets>
+              <option value="6799" />
+            </startOffsets>
+            <endOffsets>
+              <option value="6837" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="10" />
+        </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
-        <breakpoint enabled="true" type="DotNet Exception Breakpoints" />
+        <breakpoint enabled="true" type="DotNet Exception Breakpoints">
+          <properties justMyCode="true" />
+        </breakpoint>
       </default-breakpoints>
     </breakpoint-manager>
   </component>

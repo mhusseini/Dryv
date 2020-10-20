@@ -19,7 +19,7 @@ namespace Dryv.Translation
         protected Translator(DryvOptions options)
         {
             this.Options = options;
-            this.translationCompiler = new TranslationCompiler(this);
+            this.translationCompiler = new TranslationCompiler();
         }
 
         protected DryvOptions Options { get; }
@@ -177,6 +177,7 @@ namespace Dryv.Translation
                 Writer = writer,
                 InjectedExpressions = optionDelegates,
                 ModelType = rule.ModelType,
+                Culture = Options.CurrentCulture(),
                 PropertyExpression = propertyExpression?.Expression,
                 Group = rule.Group,
                 StringBuilder = sb,

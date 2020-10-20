@@ -28,19 +28,18 @@ namespace Dryv.Translation.Translators
                 return false;
             }
 
-            var culture = CultureInfo.CurrentUICulture;
-
-            TranslateDate(context, binary.Left, culture);
+            TranslateDate(context, binary.Left);
             context.Writer.Write(" ");
             context.Translator.TryWriteTerminal(context.Expression, context.Writer);
             context.Writer.Write(" ");
-            TranslateDate(context, binary.Right, culture);
+            TranslateDate(context, binary.Right);
 
             return true;
         }
 
-        private static void TranslateDate(TranslationContext context, Expression node, CultureInfo culture)
+        private static void TranslateDate(TranslationContext context, Expression node)
         {
+            var culture = context.Culture;
             var timeZone = node.Type == typeof(DateTimeOffset) || node.Type == typeof(DateTimeOffset?)
                 ? " zzz"
                 : string.Empty;

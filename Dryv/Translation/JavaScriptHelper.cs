@@ -5,15 +5,15 @@ namespace Dryv.Translation
 {
     public static class JavaScriptHelper
     {
-        public static string TranslateValue(object value)
+        public static string TranslateValue(object value, CultureInfo cultureInfo)
         {
             return value switch
             {
                 string txt => $"\"{JavaScriptEscape(txt)}\"",
                 bool b => (b ? "true" : "false"),
                 null => "null",
-                DateTime dateTime => $@"""{dateTime.ToString(CultureInfo.CurrentUICulture)}""",
-                DateTimeOffset dateTime => $@"""{dateTime.ToString(CultureInfo.CurrentUICulture)}""",
+                DateTime dateTime => $@"""{dateTime.ToString(cultureInfo)}""",
+                DateTimeOffset dateTime => $@"""{dateTime.ToString(cultureInfo)}""",
                 _ => null
             };
         }

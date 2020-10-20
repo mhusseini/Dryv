@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Dryv.Configuration;
 using Dryv.Extensions;
 
 namespace Dryv.Rules
@@ -28,7 +29,7 @@ namespace Dryv.Rules
         public IDictionary<PropertyInfo, string> RelatedProperties { get; internal set; }
         public RuleType RuleType { get; internal set; } = RuleType.Validation;
         public Type[] ServiceTypes { get; internal set; }
-        public Func<Func<Type, object>, object[], string> TranslatedValidationExpression { get; internal set; }
+        public Func<Func<Type, object>, object[], DryvOptions, string> TranslatedValidationExpression { get; internal set; }
         public Exception TranslationError { get; internal set; }
         public LambdaExpression ValidationExpression { get; internal set; }
         internal string UniquePath { get; set; }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Dryv.Configuration;
 using Dryv.Extensions;
 using Dryv.RuleDetection;
 using Dryv.Rules;
@@ -66,7 +67,8 @@ namespace Dryv
         private static TranslatedRule Translate(DryvCompiledRule rule, Func<Type, object> serviceProvider, IReadOnlyDictionary<IReadOnlyList<DryvCompiledRule>, DryvParameters> parameters)
         {
             var services = serviceProvider.GetServices(rule, parameters);
-
+            var options = serviceProvider.GetService<DryvOptions>();
+            
             // index 0 was used to transpose the path. It isn't used anymore,
             // but it was too cumbersome to update all that code :-)
             // TODO: Update all that code.
@@ -75,7 +77,7 @@ namespace Dryv
 
             try
             {
-                var code = rule.TranslatedValidationExpression(_ => null, arguments);
+                var code = rule.TranslatedValidationExpression(_ => null, arguments, options);
 
                 return new TranslatedRule {Rule = rule, ClientCode = code};
             }

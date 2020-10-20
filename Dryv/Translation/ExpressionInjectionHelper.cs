@@ -61,7 +61,7 @@ namespace Dryv.Translation
             }
 
             var memberExpression = expression as MemberExpression;
-            while (memberExpression != null)
+            while (memberExpression?.Expression != null)
             {
                 if (typeof(Task).IsAssignableFrom(memberExpression.Expression.Type))
                 {
