@@ -18,6 +18,18 @@ namespace Dryv.Extensions
             DefaultMethod = typeof(ExpressionExtensions).GetMethods().First(m => m.Name == nameof(GetDefaultValue) && m.IsGenericMethod);
         }
 
+        public static bool IsStaticMemberAccess(this Expression expression)
+        {
+            return expression is MemberExpression me && me
+                .Iterate(e => e.Expression as MemberExpression)
+                .Any(e => e.Member switch
+                {
+                    PropertyInfo m => m.GetMethod.IsStatic,
+                    FieldInfo m => m.IsStatic,
+                    MethodInfo m => m.IsStatic,
+                });
+        }
+
         public static T GetDefaultValue<T>()
         {
             return default(T);

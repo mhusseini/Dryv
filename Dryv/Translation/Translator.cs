@@ -177,7 +177,6 @@ namespace Dryv.Translation
                 Writer = writer,
                 InjectedExpressions = optionDelegates,
                 ModelType = rule.ModelType,
-                Culture = Options.CurrentCulture(),
                 PropertyExpression = propertyExpression?.Expression,
                 Group = rule.Group,
                 StringBuilder = sb,

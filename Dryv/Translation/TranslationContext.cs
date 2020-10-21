@@ -19,8 +19,6 @@ namespace Dryv.Translation
         public List<Func<Expression, TranslationContext, bool>> DynamicTranslation { get; private set; } = new List<Func<Expression, TranslationContext, bool>>();
         public string Group { get; set; }
 
-        public CultureInfo Culture { get; set; }
-
         public bool IsAsync
         {
             get => this.isAsync;
@@ -53,7 +51,6 @@ namespace Dryv.Translation
             {
                 ParentContext = this,
                 Group = this.Group,
-                Culture = this.Culture,
                 ModelType = this.ModelType,
                 InjectedExpressions = this.InjectedExpressions,
                 InjectedServiceTypes = this.InjectedServiceTypes,

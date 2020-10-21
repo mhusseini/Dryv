@@ -13,7 +13,7 @@ namespace Dryv.Translation
     {
         private static readonly MethodInfo FormatMethod = typeof(string).GetMethod(nameof(string.Format), typeof(string), typeof(object[]));
 
-        private static readonly MethodInfo TranslateValueMethod = typeof(JavaScriptTranslator).GetMethod(nameof(JavaScriptTranslator.TranslateValue2), typeof(object), typeof(DryvOptions));
+        private static readonly MethodInfo TranslateValueMethod = typeof(JavaScriptTranslator).GetMethod(nameof(JavaScriptTranslator.TranslateValue), typeof(object), typeof(DryvOptions));
 
         public TranslationResult GenerateTranslationDelegate(string code, IEnumerable<InjectedExpression> optionDelegates, IList<Type> serviceTypes)
         {
@@ -70,6 +70,9 @@ namespace Dryv.Translation
                         memberExpression = null;
                         yield return pex.Type;
                         break;
+
+                    default:
+                        yield break;
                 }
             }
         }
@@ -81,7 +84,7 @@ namespace Dryv.Translation
             ref string code)
         {
             var arrayItems = new List<Expression>();
-            var arrayIndexes = new ConcurrentDictionary<string, int>();
+            var arrayIndexes = new ConcurrentDictionary<int, int>();
 
             // The first item is the model path.
             arrayItems.Add(Expression.ArrayAccess(parameter, Expression.Constant(0)));
@@ -92,10 +95,7 @@ namespace Dryv.Translation
 
             foreach (var injectedExpression in injectedExpressions)
             {
-                var type = GetTypeChain(injectedExpression.LambdaExpression.Body).LastOrDefault();
-                var key = type?.Name ?? injectedExpression.Index.ToString();
-
-                var index = arrayIndexes.GetOrAdd(key, t =>
+                var index = arrayIndexes.GetOrAdd(injectedExpression.Index, t =>
                 {
                     // get item from input array (properly casted)
                     var arguments = from p2 in injectedExpression.LambdaExpression.Parameters

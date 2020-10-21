@@ -11,19 +11,17 @@ namespace Dryv.Translation
     {
         public static bool CanInjectMethodCall(MethodCallExpression expression, TranslationContext context)
         {
-            return CanInjectMethodCall(expression, context, out _);
+            var parameters = ExpressionNodeFinder<ParameterExpression>.FindChildrenStatic(expression.Object);
+            return CanInjectMethodCall(expression, context, parameters);
         }
 
-        public static bool CanInjectMethodCall(MethodCallExpression expression, TranslationContext context, out IList<ParameterExpression> parameters)
+        public static bool CanInjectMethodCall(MethodCallExpression expression, TranslationContext context, IList<ParameterExpression> parameters)
         {
-            parameters = null;
-
             if (!expression.Type.IsSystemType())
             {
                 return false;
             }
 
-            parameters = ExpressionNodeFinder<ParameterExpression>.FindChildrenStatic(expression.Object);
             if (parameters.Any(p => !context.InjectedServiceTypes.Contains(p.Type)))
             {
                 return false;
@@ -45,12 +43,12 @@ namespace Dryv.Translation
                 return false;
             }
 
-            if (!parameters.Any() && parameterExpressions.Any())
+            if (parameterExpressions.Any(p => !context.InjectedServiceTypes.Contains(p.Type)))
             {
-                parameters = parameterExpressions.Where(p => context.InjectedServiceTypes.Contains(p.Type)).ToList();
+                return false;
             }
 
-            return parameters.Any();
+            return true; //parameters.Any();
         }
 
         public static IList<ParameterExpression> GetInjectionParameters(Expression expression, TranslationContext context)
@@ -63,6 +61,7 @@ namespace Dryv.Translation
             var memberExpression = expression as MemberExpression;
             while (memberExpression?.Expression != null)
             {
+                // TODO: can we delete nect block?
                 if (typeof(Task).IsAssignableFrom(memberExpression.Expression.Type))
                 {
                     return null;

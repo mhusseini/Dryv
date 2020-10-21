@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using Dryv.Validation;
 
 namespace Dryv.Configuration
@@ -16,6 +15,5 @@ namespace Dryv.Configuration
         public Func<object, string> JsonConversion { get; set; }
         public TranslationErrorBehavior TranslationErrorBehavior { get; set; }
         public virtual DryvServiceCollection Translators { get; } = new DryvServiceCollection();
-        public CultureInfo CurrentCulture() => CultureInfo.CurrentUICulture;
     }
 }

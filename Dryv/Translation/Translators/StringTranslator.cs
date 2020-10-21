@@ -34,19 +34,19 @@ namespace Dryv.Translation.Translators
         protected static bool GetIsCaseInsensitive(MethodCallExpression expression)
         {
             var stringComparison = (from exp in expression.Arguments
-                                    let constExp = exp as ConstantExpression
-                                    where constExp?.Value is StringComparison
-                                    select (StringComparison?)constExp.Value).FirstOrDefault();
+                let constExp = exp as ConstantExpression
+                where constExp?.Value is StringComparison
+                select (StringComparison?) constExp.Value).FirstOrDefault();
 
             if (stringComparison == null)
             {
                 return false;
             }
 
-            switch ((int)stringComparison.Value)
+            switch ((int) stringComparison.Value)
             {
-                case (int)StringComparison.CurrentCultureIgnoreCase:
-                case (int)StringComparison.OrdinalIgnoreCase:
+                case (int) StringComparison.CurrentCultureIgnoreCase:
+                case (int) StringComparison.OrdinalIgnoreCase:
                 case 3: // StringComparison.InvariantCultureIgnoreCase:
                     // As stated above, locale hadling isn't very easy on the client side, so we'll just
                     // strick to simple case-insensitive sring comparison here.
@@ -78,6 +78,7 @@ namespace Dryv.Translation.Translators
             {
                 throw new DryvMethodNotSupportedException(context.Expression, "Only override without any indexes can be translated to JavaScript");
             }
+
             var arguments = context.Expression.Arguments;
             context.Translator.Translate(arguments.FirstOrDefault(), context);
             var isCaseInsensitive = ArgumentIs(context, 2, true) || GetIsCaseInsensitive(context.Expression);
@@ -187,7 +188,7 @@ namespace Dryv.Translation.Translators
             context.Writer.Write(context.Negated ? "!==" : " === ");
 
 
-            WriteArguments(context.Translator, new[] { value2 }, context);
+            WriteArguments(context.Translator, new[] {value2}, context);
             if (isCaseInsensitive)
             {
                 context.Writer.Write(".toLowerCase()");
@@ -206,22 +207,21 @@ namespace Dryv.Translation.Translators
              √ public static String Format(String format, object arg0, object arg1);
              Х public static String Format(IFormatProvider provider, String format, object arg0, object arg1);
              */
-            if (!(context.Expression.Arguments.First() is ConstantExpression pattern))
+
+            var patternIndex = context.Expression.Method.GetParameters().First().ParameterType == typeof(IFormatProvider)
+                ? 1
+                : 0;
+
+            if (!(context.Expression.Arguments.Skip(patternIndex).FirstOrDefault() is ConstantExpression pattern))
             {
                 throw new DryvExpressionNotSupportedException(context.Expression, "Calls to string.Format with non-constant pattern strings are not supported.");
             }
 
-            if (context.Expression.Method.GetParameters().First().ParameterType == typeof(IFormatProvider))
-            {
-                throw new DryvMethodNotSupportedException(context.Expression, "Only override with first parameter being a string can be translated to JavaScript");
-            }
+            var skipped = context.Expression.Arguments.Skip(patternIndex + 1);
+            var arguments = skipped.FirstOrDefault() is NewArrayExpression nar
+                ? nar.Expressions.Cast<object>().ToArray()
+                : skipped.Cast<object>().ToArray();
 
-            if (context.Expression.Arguments.OfType<NewArrayExpression>().Any())
-            {
-                throw new DryvExpressionNotSupportedException(context.Expression, "Calls to string.Format with arguments being an array are not supported.");
-            }
-
-            var arguments = context.Expression.Arguments.Skip(1).Cast<object>().ToArray();
             var parts = StringFormatDissector.Recombine(pattern.Value.ToString(), arguments);
 
             for (var index = 0; index < parts.Count; index++)

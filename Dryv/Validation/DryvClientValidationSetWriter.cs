@@ -50,7 +50,7 @@ namespace Dryv.Validation
                 writer.Write("\"");
                 writer.Write(parameter.Key.ToCamelCase());
                 writer.Write("\":");
-                var jsValue = JavaScriptHelper.TranslateValue(parameter.Value, options.CurrentCulture()) ?? this.options.JsonConversion(parameter.Value);
+                var jsValue = JavaScriptHelper.TranslateValue(parameter.Value) ?? this.options.JsonConversion(parameter.Value);
                 writer.Write(jsValue);
                 sep = ",";
             }

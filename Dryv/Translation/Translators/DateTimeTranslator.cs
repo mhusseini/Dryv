@@ -6,6 +6,10 @@ namespace Dryv.Translation.Translators
 {
     public class DateTimeTranslator : IDryvCustomTranslator
     {
+        private static readonly Expression<Func<string>> CultureNameExpression = ()=> CultureInfo.CurrentUICulture.Name;
+        private static readonly Expression<Func<string>> DateTimeOffsetFormatExpression = ()=> MomentJsFormatConverter.ConvertFormat($"{CultureInfo.CurrentUICulture.DateTimeFormat.ShortDatePattern} {CultureInfo.CurrentUICulture.DateTimeFormat.LongTimePattern} zzz");
+        private static readonly Expression<Func<string>> DateTimeFormatExpression = ()=> MomentJsFormatConverter.ConvertFormat($"{CultureInfo.CurrentUICulture.DateTimeFormat.ShortDatePattern} {CultureInfo.CurrentUICulture.DateTimeFormat.LongTimePattern}");
+        
         public int? OrderIndex { get; set; }
         public bool? AllowSurroundingBrackets(Expression expression)
         {
@@ -39,20 +43,16 @@ namespace Dryv.Translation.Translators
 
         private static void TranslateDate(TranslationContext context, Expression node)
         {
-            var culture = context.Culture;
-            var timeZone = node.Type == typeof(DateTimeOffset) || node.Type == typeof(DateTimeOffset?)
-                ? " zzz"
-                : string.Empty;
-            
-            var format = $"{culture.DateTimeFormat.ShortDatePattern} {culture.DateTimeFormat.LongTimePattern}{timeZone}";
+            var format = node.Type == typeof(DateTimeOffset) || node.Type == typeof(DateTimeOffset?)
+                ? DateTimeOffsetFormatExpression
+                : DateTimeFormatExpression;
 
             context.Writer.Write("$ctx.dryv.valueOfDate(");
             context.Translator.Translate(node, context);
-            context.Writer.Write(",\"");
-            context.Writer.Write(culture.Name);
-            context.Writer.Write("\",\"");
-            context.Writer.Write(MomentJsFormatConverter.ConvertFormat(format));
-            context.Writer.Write("\"");
+            context.Writer.Write(",");
+            context.Translator.Translate(CultureNameExpression.Body, context);
+            context.Writer.Write(",");
+            context.Translator.Translate(format.Body, context);
             context.Writer.Write(")");
         }
     }

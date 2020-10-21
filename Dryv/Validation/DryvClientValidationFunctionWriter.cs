@@ -33,13 +33,13 @@ namespace Dryv.Validation
                 if (!string.IsNullOrWhiteSpace(rule.Rule.Name))
                 {
                     keyWriter.Write("name:");
-                    writer.Write(JavaScriptHelper.TranslateValue(rule.Rule.Name, options.CurrentCulture()));
+                    writer.Write(JavaScriptHelper.TranslateValue(rule.Rule.Name));
                 }
 
                 if (!string.IsNullOrWhiteSpace(rule.Rule.Group))
                 {
                     keyWriter.Write("group:");
-                    writer.Write(JavaScriptHelper.TranslateValue(rule.Rule.Group, options.CurrentCulture()));
+                    writer.Write(JavaScriptHelper.TranslateValue(rule.Rule.Group));
                 }
 
                 if (rule.Rule.IsAsync)
@@ -99,7 +99,7 @@ namespace Dryv.Validation
                 foreach (var item in items)
                 {
                     writer.Write(sep);
-                    writer.Write(JavaScriptHelper.TranslateValue(item, options.CurrentCulture()) ?? this.options.JsonConversion(item));
+                    writer.Write(JavaScriptHelper.TranslateValue(item) ?? this.options.JsonConversion(item));
                     sep = ",";
                 }
             }
@@ -120,7 +120,7 @@ namespace Dryv.Validation
                     writer.Write("\"");
                     writer.Write(parameter.Key.ToCamelCase());
                     writer.Write("\":");
-                    writer.Write(JavaScriptHelper.TranslateValue(parameter.Value, options.CurrentCulture()) ?? this.options.JsonConversion(parameter.Value));
+                    writer.Write(JavaScriptHelper.TranslateValue(parameter.Value) ?? this.options.JsonConversion(parameter.Value));
                     sep = ",";
                 }
             }

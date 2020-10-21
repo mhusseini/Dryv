@@ -143,7 +143,7 @@ namespace Dryv.Translation
             if (!this.customTranslators.Any(t => t.TryTranslate(context2)) &&
                 !context.DynamicTranslation.Any(t => t(expression, context2)))
             {
-                this.Visit((dynamic)expression, context2, negated);
+                this.Visit((dynamic) expression, context2, negated);
             }
             else if (context2.IsAsync)
             {
@@ -161,14 +161,9 @@ namespace Dryv.Translation
             return TranslateValue(value, this.Options);
         }
 
-        public static string TranslateValue2(object value, DryvOptions options)
-        {
-            return TranslateValue(value, options);
-        }
-
         public static string TranslateValue(object value, DryvOptions options)
         {
-            return JavaScriptHelper.TranslateValue(value, options.CurrentCulture()) ?? value switch
+            return JavaScriptHelper.TranslateValue(value) ?? value switch
             {
                 DryvValidationResult result => TranslateValidationResultObject(result, options),
                 _ => (options.JsonConversion == null ? value.ToString() : options.JsonConversion(value))
@@ -222,7 +217,7 @@ namespace Dryv.Translation
                 if (!TryWriteTerminal(expression, context.Writer))
                 {
                     throw expression.Method != null
-                        ? (Exception)new DryvMethodNotSupportedException(expression)
+                        ? (Exception) new DryvMethodNotSupportedException(expression)
                         : new DryvExpressionNotSupportedException(expression);
                 }
             }
@@ -404,6 +399,7 @@ namespace Dryv.Translation
                 {
                     this.Translate(argument, context);
                 }
+
                 sep = ", ";
             }
 
@@ -460,16 +456,7 @@ namespace Dryv.Translation
 
         public override void Visit(MethodCallExpression expression, TranslationContext context, bool negated = false)
         {
-            if (expression.Method.IsStatic && expression.Arguments.Any() != true)
-            {
-                if (context.WhatIfMode) return;
-
-                var value = expression.Method.Invoke(null, null);
-                context.Writer.Write(this.TranslateValue(value));
-                return;
-            }
-
-            if (TryWriteInjectedMethod(expression, context))
+            if (TryWriteInjectedExpression(expression, context))
             {
                 return;
             }
@@ -512,6 +499,7 @@ namespace Dryv.Translation
             {
                 this.Translate(child, context);
             }
+
             context.Writer.Write("]");
         }
 
@@ -537,6 +525,7 @@ namespace Dryv.Translation
             {
                 this.Translate(expression.SwitchValue, context);
             }
+
             context.Writer.WriteLine("){");
             foreach (var expressionCase in expression.Cases)
             {
@@ -553,6 +542,7 @@ namespace Dryv.Translation
                 context.Writer.WriteLine("break;");
                 context.Writer.WriteLine("}");
             }
+
             context.Writer.Write("}");
         }
 
@@ -607,26 +597,8 @@ namespace Dryv.Translation
 
         private static bool TryWriteInjectedExpression(Expression expression, TranslationContext context)
         {
-            var children = ExpressionInjectionHelper.GetInjectionParameters(expression, context);
-            if (children == null)
-            {
-                return false;
-            }
-
-            context.InjectRuntimeExpression(expression, children);
-
-            return true;
-        }
-
-        private static bool TryWriteInjectedMethod(MethodCallExpression expression, TranslationContext context)
-        {
-            if (!ExpressionInjectionHelper.CanInjectMethodCall(expression, context, out var parameters))
-            {
-                return false;
-            }
-
-            context.InjectRuntimeExpression(expression, parameters);
-            return true;
+            var parameters = ExpressionInjectionHelper.GetInjectionParameters(expression, context);
+            return context.InjectRuntimeExpression(expression, parameters);
         }
 
         private bool GetNeedsBrackets(Expression expression)
@@ -720,6 +692,7 @@ namespace Dryv.Translation
                 sb.Append("data: ");
                 sb.Append(options.JsonConversion(result.Data));
             }
+
             sb.Append("}");
 
             return sb.ToString();
@@ -731,25 +704,24 @@ namespace Dryv.Translation
             {
                 return;
             }
-
-            if (expression.Expression is ConstantExpression ||
-                expression.Expression == null)
+            
+            if (expression.Expression is ConstantExpression)
             {
                 var instance = (expression.Expression as ConstantExpression)?.Value;
                 switch (expression.Member)
                 {
                     case PropertyInfo property:
-                        {
-                            var value = property.GetValue(instance);
-                            context.Writer.Write(this.TranslateValue(value));
-                            break;
-                        }
+                    {
+                        var value = property.GetValue(instance);
+                        context.Writer.Write(this.TranslateValue(value));
+                        break;
+                    }
                     case FieldInfo field:
-                        {
-                            var value = field.GetValue(instance);
-                            context.Writer.Write(this.TranslateValue(value));
-                            break;
-                        }
+                    {
+                        var value = field.GetValue(instance);
+                        context.Writer.Write(this.TranslateValue(value));
+                        break;
+                    }
                 }
             }
             else
