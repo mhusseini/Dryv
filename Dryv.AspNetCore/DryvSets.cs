@@ -7,9 +7,10 @@ namespace Dryv.AspNetCore
 {
     public static class DryvSets
     {
-        private static readonly List<(Type Type, string Name)> Sets;
+        private static List<(Type Type, string Name)> _sets;
 
-        static DryvSets() => Sets = (
+        private static List<(Type t, string Name)> ReadSets() =>
+        (
             from a in AppDomain.CurrentDomain.GetAssemblies()
             from t in a.GetTypes()
             orderby t.FullName
@@ -18,6 +19,6 @@ namespace Dryv.AspNetCore
             select (t, attr.Name)
         ).ToList();
 
-        public static List<(Type Type, string Name)> GetDryvSets() => Sets;
+        public static List<(Type Type, string Name)> GetDryvSets() => _sets ??= ReadSets();
     }
 }

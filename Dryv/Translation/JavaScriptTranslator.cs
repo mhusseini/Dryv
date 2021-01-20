@@ -189,8 +189,8 @@ namespace Dryv.Translation
             var leftType = EnumComparisionModifier.GetTypeOrNullable(expression.Left.Type).GetTypeInfo();
             var rightType = EnumComparisionModifier.GetTypeOrNullable(expression.Right.Type).GetTypeInfo();
 
-            var leftIsNull = !leftType.IsValueType && (isEquals || isNotEquals) && expression.Left is ConstantExpression c1 && c1.Value == null;
-            var rightIsNull = !rightType.IsValueType && (isEquals || isNotEquals) && expression.Right is ConstantExpression c2 && c2.Value == null;
+            var leftIsNull = /*!leftType.IsValueType && (isEquals || isNotEquals) &&*/ expression.Left is ConstantExpression c1 && c1.Value == null;
+            var rightIsNull = /*!rightType.IsValueType && (isEquals || isNotEquals) &&*/ expression.Right is ConstantExpression c2 && c2.Value == null;
 
             if ((leftIsNull || rightIsNull) && !(isNotEquals ^ negated))
             {
@@ -572,19 +572,30 @@ namespace Dryv.Translation
                     break;
 
                 case ExpressionType.Convert:
-                    if (string.IsNullOrWhiteSpace(context.Group) || !Equals(expression.Method, DryvValidationResultImplicitConvert) ||
-                        expression.Operand is ConstantExpression constant && constant.Value == null)
+                    if (!(expression.Operand is ConstantExpression constant) || constant.Value == null)
                     {
                         break;
                     }
 
-                    context.Writer.Write("{ type:\"error\", text:");
-                    this.Translate(expression.Operand, context);
-                    context.Writer.Write(", group: ");
-                    context.Writer.Write(MethodCallTranslator.QuoteValue(context.Group));
-                    context.Writer.Write("}");
+                    if (expression.Type == typeof(DryvValidationResult) && string.IsNullOrWhiteSpace(context.Group))
+                    {
+                        context.Writer.Write("{ type:\"error\", text:");
+                        this.Translate(expression.Operand, context);
+                        context.Writer.Write(", group: ");
+                        context.Writer.Write(MethodCallTranslator.QuoteValue(context.Group));
+                        context.Writer.Write("}");
 
-                    return;
+                        return;
+                    }
+                    else if (expression.Type.GetTypeInfo().IsEnum)
+                    {
+                        var value = Enum.ToObject(expression.Type, expression.GetValue());
+                        //var value = Convert.ChangeType(constant.Value, expression.Type);
+                        context.Writer.Write(this.TranslateValue(value));
+                        return;
+                    }
+
+                    break;
             }
 
             if (!negatedExpression)
@@ -704,7 +715,7 @@ namespace Dryv.Translation
             {
                 return;
             }
-            
+
             if (expression.Expression is ConstantExpression)
             {
                 var instance = (expression.Expression as ConstantExpression)?.Value;

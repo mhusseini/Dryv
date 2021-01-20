@@ -24,6 +24,12 @@ namespace Dryv.Translation.Translators
                 return false;
             }
 
+            if (binary.Left is ConstantExpression cl && cl.Value == null ||
+                binary.Right is ConstantExpression cr && cr.Value == null)
+            {
+                return false;
+            }
+
             if ((binary.Left.Type != typeof(DateTime) || binary.Right.Type != typeof(DateTime)) &&
                 (binary.Left.Type != typeof(DateTimeOffset) || binary.Right.Type != typeof(DateTimeOffset)) &&
                 (binary.Left.Type != typeof(DateTime?) || binary.Right.Type != typeof(DateTime?)) &&
