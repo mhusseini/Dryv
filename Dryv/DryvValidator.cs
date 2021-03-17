@@ -114,7 +114,7 @@ namespace Dryv
 
         private bool IsSubtreeDisabled(object model, string modelPath, IReadOnlyDictionary<string, List<DryvCompiledRule>> disablingRules, Func<Type, object> serviceProvider, Dictionary<IReadOnlyList<DryvCompiledRule>, DryvParameters> parameters)
         {
-            return disablingRules.TryGetValue(modelPath, out var disablers) && disablers.Any(rule =>
+            return FindDisablingRules(modelPath, disablingRules)?.Any(rule =>
             {
                 try
                 {
@@ -127,16 +127,31 @@ namespace Dryv
                 {
                     throw this.ThrowValidationException(model, rule, ex, RuleType.Disabling);
                 }
-            });
+            }) == true;
+        }
+
+        private List<DryvCompiledRule> FindDisablingRules(string modelPath, IReadOnlyDictionary<string, List<DryvCompiledRule>> disablingRules)
+        {
+            var parts = modelPath.Split('.');
+
+            foreach (var part in Enumerable
+                .Range(1, parts.Length)
+                .Select(i => string.Join(".", parts.Take(i))))
+            {
+                if (disablingRules.TryGetValue(part, out var result))
+                {
+                    return result;
+                }
+            }
+
+            return null;
         }
 
         private Exception ThrowValidationException(object model, DryvCompiledRule rule, Exception innerException, RuleType ruleType)
         {
             var json = this.options.JsonConversion(model);
             var expressionText = rule.ValidationExpression.ToString();
-
             var sb = new StringBuilder($"An error occurred executing the {ruleType.ToString().ToLowerInvariant()} expression '{expressionText}' for property '{rule.Property.DeclaringType.Name}.{rule.Property.Name}'. See the inner exception for details.");
-
             if (this.options.IncludeModelDataInExceptions)
             {
                 sb.AppendLine("The model being validated is:");
@@ -149,6 +164,7 @@ namespace Dryv
         private class GroupedValidation
         {
             public Dictionary<string, List<DryvCompiledRule>> DisablingRules { get; set; }
+
             public Dictionary<string, List<DryvCompiledRule>> ValidationRules { get; set; }
         }
     }
