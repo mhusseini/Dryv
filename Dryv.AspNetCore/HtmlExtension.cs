@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Dryv.Extensions;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -8,14 +9,29 @@ namespace Dryv.AspNetCore
 {
     public static class HtmlExtensions
     {
-        public static Task<IHtmlContent> DryvValidation<TModel>(this IHtmlHelper<TModel> htmlHelper, string validationSetName) => htmlHelper.GetDryvClientWriter().WriteDryvValidation<TModel>(validationSetName, htmlHelper.ViewContext.HttpContext.RequestServices.GetService);
+        public static Task<IHtmlContent> DryvValidation<TModel>(this IHtmlHelper<TModel> htmlHelper, string validationSetName, IReadOnlyDictionary<string, object> parameters = null)
+        {
+            return htmlHelper.GetDryvClientWriter().WriteDryvValidation<TModel>(validationSetName, htmlHelper.ViewContext.HttpContext.RequestServices.GetService, parameters);
+        }
 
-        public static Task<IHtmlContent> DryvValidation<TModel>(this IHtmlHelper htmlHelper, string validationSetName) => htmlHelper.GetDryvClientWriter().WriteDryvValidation<TModel>(validationSetName, htmlHelper.ViewContext.HttpContext.RequestServices.GetService);
+        public static Task<IHtmlContent> DryvValidation<TModel>(this IHtmlHelper htmlHelper, string validationSetName, IReadOnlyDictionary<string, object> parameters = null)
+        {
+            return htmlHelper.GetDryvClientWriter().WriteDryvValidation<TModel>(validationSetName, htmlHelper.ViewContext.HttpContext.RequestServices.GetService, parameters);
+        }
 
-        public static Task<IHtmlContent> DryvValidation<TModel>(this IHtmlHelper htmlHelper) => DryvValidation<TModel>(htmlHelper, typeof(TModel).Name.ToCamelCase());
+        public static Task<IHtmlContent> DryvValidation<TModel>(this IHtmlHelper htmlHelper, IReadOnlyDictionary<string, object> parameters = null)
+        {
+            return DryvValidation<TModel>(htmlHelper, typeof(TModel).Name.ToCamelCase(), parameters);
+        }
 
-        public static Task<IHtmlContent> DryvValidation<TModel>(this IHtmlHelper<TModel> htmlHelper) => DryvValidation<TModel>((IHtmlHelper)htmlHelper);
+        public static Task<IHtmlContent> DryvValidation<TModel>(this IHtmlHelper<TModel> htmlHelper, IReadOnlyDictionary<string, object> parameters = null)
+        {
+            return DryvValidation<TModel>((IHtmlHelper)htmlHelper, parameters);
+        }
 
-        private static DryvClientWriter GetDryvClientWriter(this IHtmlHelper htmlHelper) => htmlHelper.ViewContext.HttpContext.RequestServices.GetService<DryvClientWriter>();
+        private static DryvClientWriter GetDryvClientWriter(this IHtmlHelper htmlHelper)
+        {
+            return htmlHelper.ViewContext.HttpContext.RequestServices.GetService<DryvClientWriter>();
+        }
     }
 }

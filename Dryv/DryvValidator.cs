@@ -24,7 +24,7 @@ namespace Dryv
             this.options = options;
         }
 
-        public async Task<IDictionary<string, DryvValidationResult>> Validate(object model, Func<Type, object> serviceProvider)
+        public async Task<IDictionary<string, DryvValidationResult>> Validate(object model, Func<Type, object> serviceProvider, IReadOnlyDictionary<string, object> parameters = null)
         {
             if (model == null)
             {
@@ -35,10 +35,10 @@ namespace Dryv
             var validation = Cache.GetOrAdd(modelType, this.GroupValidation);
 
             var rules = validation.ValidationRules.SelectMany(i => i.Value).Union(validation.DisablingRules.SelectMany(i => i.Value));
-            var parameters = await DryvParametersHelper.GetDryvParameters(rules, serviceProvider);
+            var ruleParameters = await DryvParametersHelper.GetDryvParameters(rules, serviceProvider, parameters);
             var taskResults = await Task.WhenAll(from kvp in validation.ValidationRules
-                                                 where !this.IsSubtreeDisabled(model, kvp.Key, validation.DisablingRules, serviceProvider, parameters)
-                                                 select this.GetFirstValidationError(model, serviceProvider, kvp, parameters));
+                                                 where !this.IsSubtreeDisabled(model, kvp.Key, validation.DisablingRules, serviceProvider, ruleParameters)
+                                                 select this.GetFirstValidationError(model, serviceProvider, kvp, ruleParameters));
 
             return (from result in taskResults
                     where result.HasValue

@@ -22,33 +22,33 @@ namespace Dryv.AspNetCore
             this.setWriter = setWriter ?? throw new ArgumentNullException(nameof(setWriter));
         }
 
-        public async Task<IHtmlContent> WriteDryvValidation<TModel>(string validationSetName, Func<Type, object> serviceProvider)
+        public async Task<IHtmlContent> WriteDryvValidation<TModel>(string validationSetName, Func<Type, object> serviceProvider, IReadOnlyDictionary<string, object> parameters)
         {
-            var translation = await this.translator.TranslateValidationRules(typeof(TModel), serviceProvider);
-            var parameters = translation.Parameters;
+            var translation = await this.translator.TranslateValidationRules(typeof(TModel), serviceProvider, parameters);
+            var ruleParameters = translation.Parameters;
             var validators = translation.ValidationFunctions.ToDictionary(i => i.Key, i => this.functionWriter.GetValidationFunction(i.Value));
             var disablers = translation.DisablingFunctions.ToDictionary(i => i.Key, i => this.functionWriter.GetValidationFunction(i.Value));
 
             return new LazyHtmlContent(writer =>
             {
                 this.setWriter.WriteBegin(writer);
-                this.setWriter.WriteValidationSet(writer, validationSetName, validators, disablers, parameters);
+                this.setWriter.WriteValidationSet(writer, validationSetName, validators, disablers, ruleParameters);
                 this.setWriter.WriteEnd(writer);
             });
         }
 
-        public async Task<IHtmlContent> WriteDryvValidation(IEnumerable<KeyValuePair<string, Type>> validationSets, Func<Type, object> serviceProvider)
+        public async Task<IHtmlContent> WriteDryvValidation(IEnumerable<KeyValuePair<string, Type>> validationSets, Func<Type, object> serviceProvider, IReadOnlyDictionary<string, object> parameters)
         {
             var resultSet = new Dictionary<string, (Dictionary<string, Action<TextWriter>> validators, Dictionary<string, Action<TextWriter>> disablers, Dictionary<string, object> parameters)>();
 
             foreach (var (setName, type) in validationSets)
             {
-                var translation = await this.translator.TranslateValidationRules(type, serviceProvider);
-                var parameters = translation.Parameters;
+                var translation = await this.translator.TranslateValidationRules(type, serviceProvider, parameters);
+                var ruleParameters = translation.Parameters;
                 var validators = translation.ValidationFunctions.ToDictionary(i => i.Key, i => this.functionWriter.GetValidationFunction(i.Value));
                 var disablers = translation.DisablingFunctions.ToDictionary(i => i.Key, i => this.functionWriter.GetValidationFunction(i.Value));
 
-                resultSet.Add(setName, (validators, disablers, parameters));
+                resultSet.Add(setName, (validators, disablers, ruleParameters));
             }
 
             return new LazyHtmlContent(writer =>

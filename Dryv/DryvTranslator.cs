@@ -20,7 +20,7 @@ namespace Dryv
             this.ruleFinder = ruleFinder;
         }
 
-        public async Task<TranslationResult> TranslateValidationRules(Type modelType, Func<Type, object> serviceProvider)
+        public async Task<TranslationResult> TranslateValidationRules(Type modelType, Func<Type, object> serviceProvider, IReadOnlyDictionary<string, object> parameters = null)
         {
             var validationRules = this.ruleFinder
                 .FindValidationRulesInTree(modelType, RuleType.Validation)
@@ -32,29 +32,29 @@ namespace Dryv
                 .Where(r => r.EvaluationLocation.HasFlag(DryvEvaluationLocation.Client))
                 .ToList();
 
-            var parameters = await DryvParametersHelper.GetDryvParameters(validationRules.Union(disablingRules), serviceProvider);
+            var ruleParameters = await DryvParametersHelper.GetDryvParameters(validationRules.Union(disablingRules), serviceProvider, parameters);
 
             var validationTasks = validationRules.Select(rule =>
-                IsRuleEnabled(rule, serviceProvider, parameters)
+                IsRuleEnabled(rule, serviceProvider, ruleParameters)
                     .ContinueWith(task => task.Result ? rule : null));
             
             var clientValidation = from rule in await Task.WhenAll(validationTasks)
                 where rule != null
-                select Translate(rule, serviceProvider, parameters);
+                select Translate(rule, serviceProvider, ruleParameters);
             
             var disablingTasks = disablingRules.Select(rule =>
-                IsRuleEnabled(rule, serviceProvider, parameters)
+                IsRuleEnabled(rule, serviceProvider, ruleParameters)
                     .ContinueWith(task => task.Result ? rule : null));
             
             var clientDisablers = from rule in await Task.WhenAll(disablingTasks)
                 where rule != null
-                select Translate(rule, serviceProvider, parameters);
+                select Translate(rule, serviceProvider, ruleParameters);
 
             return new TranslationResult
             {
                 ValidationFunctions = clientValidation.GroupBy(c => c.Rule.ModelPath, c => c).ToDictionary(i => i.Key, i => i.ToList()),
                 DisablingFunctions = clientDisablers.GroupBy(c => c.Rule.ModelPath, c => c).ToDictionary(i => i.Key, i => i.ToList()),
-                Parameters = parameters.Values.Select(p => p.Values).Merge()
+                Parameters = ruleParameters.Values.Select(p => p.Values).Merge()
             };
         }
 

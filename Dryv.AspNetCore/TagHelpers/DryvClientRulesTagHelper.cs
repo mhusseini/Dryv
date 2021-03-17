@@ -29,6 +29,8 @@ namespace Dryv.AspNetCore.TagHelpers
         [HtmlAttributeNotBound]
         public ViewContext ViewContext { get; set; }
 
+        public IReadOnlyDictionary<string, object> Parameters { get; set; }
+
         public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
         {
             var modelTypes = this.GetModelTypes();
@@ -40,7 +42,8 @@ namespace Dryv.AspNetCore.TagHelpers
             output.TagName = "script";
             output.TagMode = TagMode.StartTagAndEndTag;
 
-            var content = await this.clientWriter.WriteDryvValidation(modelTypes, this.ViewContext.HttpContext.RequestServices.GetService);
+            var content = await this.clientWriter.WriteDryvValidation(modelTypes, this.ViewContext.HttpContext.RequestServices.GetService, this.Parameters);
+            
             output.Content.AppendHtml(content);
         }
 
