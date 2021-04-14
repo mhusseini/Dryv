@@ -48,7 +48,25 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
             var httpMethod = this.options.Value.GetHttpMethod(new DryvControllerGenerationContext(controller, action, context.Rule)).ToString().ToUpper();
             var modelProperties = FindModelPropertiesInExpression(context, expression);
 
-            this.controllerCallWriter.Write(context, translator, url, httpMethod, modelProperties);
+            if (modelProperties.Count > 0)
+            {
+                this.controllerCallWriter.Write(context, translator, url, httpMethod, modelProperties);
+            }
+            else
+            {
+                var modelParameter = ExpressionNodeFinder<ParameterExpression>.FindChildrenStatic(expression)
+                    .FirstOrDefault(p => p.Type == context.ModelType);
+
+                if (modelParameter != null)
+                {
+                    this.controllerCallWriter.Write(context, translator, url, httpMethod, modelParameter);
+                }
+                else
+                {
+                    this.controllerCallWriter.Write(context, translator, url, httpMethod);
+                }
+            }
+
         }
 
         private static List<MemberExpression> FindModelPropertiesInExpression(TranslationContext context, Expression expression)

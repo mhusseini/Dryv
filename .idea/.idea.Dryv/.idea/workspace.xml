@@ -36,11 +36,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="81fd7ff9-3930-4c09-a8cb-036017f14ba0" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/riderModule.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/contentModel.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/contentModel.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DryvApplicationBuilderExtensions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv.AspNetCore/DryvApplicationBuilderExtensions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/Translation/DryvClientServerCallWriter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/Translation/DryvClientServerCallWriter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/Translation/DryvDynamicControllerTranslatorBase.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/Translation/DryvDynamicControllerTranslatorBase.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/Translation/IDryvClientServerCallWriter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/Translation/IDryvClientServerCallWriter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv/DryvValidator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/DryvValidator.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -81,6 +82,13 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/92EC1C6B-080B-4DA4-A456-EC4CE287187B/C/SafeLibraryHandle.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/SampleVue/Views/Home/Index.cshtml" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/B040A37C-41D0-474D-A152-F1FA7760E8F1/3B/JsonSerializer.Write.Helpers.cs" root0="SKIP_HIGHLIGHTING" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <changedPaths>
+      <option value="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/Translation/IDryvClientServerCallWriter.cs" />
+      <option value="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/Translation/DryvClientServerCallWriter.cs" />
+      <option value="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/Translation/DryvDynamicControllerTranslatorBase.cs" />
+    </changedPaths>
   </component>
   <component name="JsFlowSettings">
     <service-enabled>true</service-enabled>
@@ -216,6 +224,7 @@
       <workItem from="1604478392378" duration="1177000" />
       <workItem from="1611148722095" duration="2916000" />
       <workItem from="1615564399839" duration="639000" />
+      <workItem from="1618385708666" duration="3588000" />
     </task>
     <task id="LOCAL-00001" summary="Renamed and moved DryvPreloadAttribute (now DryvSetAttribute).">
       <created>1601042302266</created>

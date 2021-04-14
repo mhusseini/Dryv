@@ -80,7 +80,7 @@ namespace Dryv
                     var result = await TryGetValidationResult(model, rule, services);
                     if (result == null)
                     {
-                        return null;
+                        continue;
                     }
 
                     result.Group = rule.Group;

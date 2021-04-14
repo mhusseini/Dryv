@@ -13,7 +13,46 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
 {
     internal class DryvClientServerCallWriter : IDryvClientServerCallWriter
     {
-        public void Write(TranslationContext context, ITranslator translator, string url, string httpMethod, IList<MemberExpression> members)
+        public void Write(TranslationContext context, ITranslator translator, string url, string httpMethod, IList<MemberExpression> modelMembers)
+        {
+            WritePre(context, url, httpMethod);
+
+            var parameter = modelMembers
+                .SelectMany(ExpressionNodeFinder<ParameterExpression>.FindChildrenStatic)
+                .First(p => p.Type == context.ModelType);
+            
+            var visitor = new ObjectWriter(translator, context, modelMembers.ToDictionary(m => m.Member, m => (Expression)m), context.Writer);
+            visitor.Write(parameter.Type);
+
+            WritePost(context, parameter);
+        }
+        
+        public void Write(TranslationContext context, ITranslator translator, string url, string httpMethod, ParameterExpression modelParameter)
+        {
+            WritePre(context, url, httpMethod);
+            WritePost(context, modelParameter);
+        }
+
+        public void Write(TranslationContext context, ITranslator translator, string url, string httpMethod)
+        {
+            WritePre(context, url, httpMethod);
+            WritePost(context, null);
+        }
+
+        private static void WritePost(TranslationContext context, ParameterExpression parameter)
+        {
+            var w = context.Writer;
+
+            w.Write(@").then(function($r){return $ctx.dryv.handleResult($ctx,");
+            w.Write(parameter?.Name ?? "{}");
+            w.Write(",");
+            w.Write(context.Translator.TranslateValue(context.Rule.ModelPath));
+            w.Write(",");
+            w.Write(context.Translator.TranslateValue(context.Rule.Name));
+            w.Write(",$r);})");
+        }
+
+        private static void WritePre(TranslationContext context, string url, string httpMethod)
         {
             var w = context.Writer;
 
@@ -22,20 +61,6 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
             w.Write("','");
             w.Write(httpMethod);
             w.Write("',");
-
-            var parameter = members
-                .SelectMany(ExpressionNodeFinder<ParameterExpression>.FindChildrenStatic)
-                .First(p => p.Type == context.ModelType);
-            var visitor = new ObjectWriter(translator, context, members.ToDictionary(m => m.Member, m => (Expression) m), w);
-            visitor.Write(parameter.Type);
-
-            w.Write(@").then(function($r){return $ctx.dryv.handleResult($ctx,");
-            w.Write(parameter.Name);
-            w.Write(",");
-            w.Write(context.Translator.TranslateValue(context.Rule.ModelPath));
-            w.Write(",");
-            w.Write(context.Translator.TranslateValue(context.Rule.Name));
-            w.Write(",$r);})");
         }
 
         private class ObjectWriter
@@ -58,7 +83,7 @@ namespace Dryv.AspNetCore.DynamicControllers.Translation
                     m => GetMemberKey(m.Key),
                     m => m.Value,
                     StringComparer.OrdinalIgnoreCase);
-                
+
                 this.translator = translator;
                 this.context = context;
                 this.writer = writer;

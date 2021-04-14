@@ -156,6 +156,7 @@
         <e p="DryvDynamicControllerBuilderExtensions.cs" t="Include" />
         <e p="DryvMvcBuilderExtensions.cs" t="Include" />
         <e p="DryvPreloaderBuilderExtensions.cs" t="Include" />
+        <e p="DryvRuntimeException.cs" t="Include" />
         <e p="DryvSets.cs" t="Include" />
         <e p="DryvValidationFilterAttribute.cs" t="Include" />
         <e p="DynamicControllers" t="Include">
@@ -199,6 +200,7 @@
           <e p="TypeExtensions.cs" t="Include" />
         </e>
         <e p="HtmlExtension.cs" t="Include" />
+        <e p="IDryParameterProvider.cs" t="Include" />
         <e p="Internal" t="Include">
           <e p="DryvMvcBuilder.cs" t="Include" />
           <e p="DryvMvcCoreOptions.cs" t="Include" />
