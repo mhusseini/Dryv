@@ -47,7 +47,7 @@ namespace Dryv.Translation.Translators
             if (!string.IsNullOrWhiteSpace(context.Group))
             {
                 context.Writer.Write(", group: ");
-                context.Writer.Write(QuoteValue(context.Group));
+                context.Writer.Write(JavaScriptHelper.TranslateValue(context.Group));
             }
 
             if (data != null)

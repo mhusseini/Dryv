@@ -255,7 +255,7 @@ namespace Dryv.Translation
 
         public override void Visit(ConstantExpression expression, TranslationContext context, bool negated = false)
         {
-            var text = MethodCallTranslator.QuoteValue(expression.Value);
+            var text = JavaScriptHelper.TranslateValue(expression.Value);
 
             context.Writer.Write(text);
         }
@@ -263,7 +263,7 @@ namespace Dryv.Translation
         public override void Visit(DefaultExpression expression, TranslationContext context, bool negated = false)
         {
             var value = this.GetDefaultValue(expression.Type);
-            var text = MethodCallTranslator.QuoteValue(value);
+            var text = JavaScriptHelper.TranslateValue(value);
 
             context.Writer.Write(text);
         }
@@ -582,7 +582,7 @@ namespace Dryv.Translation
                         context.Writer.Write("{ type:\"error\", text:");
                         this.Translate(expression.Operand, context);
                         context.Writer.Write(", group: ");
-                        context.Writer.Write(MethodCallTranslator.QuoteValue(context.Group));
+                        context.Writer.Write(JavaScriptHelper.TranslateValue(context.Group));
                         context.Writer.Write("}");
 
                         return;

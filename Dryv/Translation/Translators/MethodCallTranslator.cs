@@ -16,15 +16,6 @@ namespace Dryv.Translation.Translators
 
         public int? OrderIndex { get; set; }
 
-        public static string QuoteValue(object value)
-        {
-            return value == null
-                ? "null"
-                : value.GetType().GetTypeInfo().IsPrimitive
-                    ? value.ToString()
-                    : $@"""{value.ToString().Trim('\"')}""";
-        }
-
         public static void WriteArguments(ITranslator translator, IEnumerable<Expression> arguments, TranslationContext context)
         {
             var sep = string.Empty;

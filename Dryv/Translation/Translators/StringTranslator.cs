@@ -235,7 +235,7 @@ namespace Dryv.Translation.Translators
                             context.Writer.Write(" + ");
                         }
 
-                        context.Writer.Write(QuoteValue(text));
+                        context.Writer.Write(JavaScriptHelper.TranslateValue(text));
 
                         if (index < parts.Count - 1)
                         {

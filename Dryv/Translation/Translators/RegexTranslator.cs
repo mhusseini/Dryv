@@ -103,6 +103,11 @@ namespace Dryv.Translation.Translators
                 throw new DryvMethodNotSupportedException(context.Expression, "Could not determine regular context.Expression.");
             }
 
+            if (context.Negated)
+            {
+                context.Writer.Write("!");
+            }
+            
             var clientRegexp = $"/{result.Pattern}/{TranslateRegexOptions(result.Options)}";
             context.Writer.Write(clientRegexp);
             context.Writer.Write(".test(");

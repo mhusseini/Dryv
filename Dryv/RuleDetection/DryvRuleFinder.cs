@@ -39,7 +39,7 @@ namespace Dryv.RuleDetection
             this.compiler = compiler;
             this.treeBuilder = treeBuilder;
             this.translator = translator;
-            this.annotators = annotators ?? new ArraySegment<IDryvRuleAnnotator>();
+            this.annotators = annotators ?? new IDryvRuleAnnotator[0];
             this.options = options;
         }
 
@@ -54,9 +54,12 @@ namespace Dryv.RuleDetection
 
                 foreach (var rule in rules)
                 {
-                    foreach (var annotator in this.annotators)
+                    if (this.annotators != null)
                     {
-                        annotator.Annotate(rule, rule.ValidationExpression);
+                        foreach (var annotator in this.annotators)
+                        {
+                            annotator.Annotate(rule, rule.ValidationExpression);
+                        }
                     }
 
                     var nodes = GetNodesForRule(flatTree, rule);
