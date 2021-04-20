@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Dryv.Extensions;
 using Dryv.Reflection;
 using Dryv.Translation.Visitors;
 
@@ -13,6 +14,31 @@ namespace Dryv.Translation
         {
             var parameters = ExpressionNodeFinder<ParameterExpression>.FindChildrenStatic(expression.Object);
             return CanInjectMethodCall(expression, context, parameters);
+        }
+
+        public static bool CanInjectProperty(Expression expression, TranslationContext context, IList<ParameterExpression> parameters)
+        {
+            if (!expression.Type.IsSystemType())
+            {
+                return false;
+            }
+
+            if (parameters.Count == 0)
+            {
+                return expression.IsStaticMemberAccess();
+            }
+
+            var expressionParams = ExpressionNodeFinder<ParameterExpression>.FindChildrenStatic(expression);
+            if (expressionParams.Any(p => p.Type == context.ModelType))
+            {
+                return false;
+            }
+
+            var parameter = GetInjectionParameters(expression, context)?.FirstOrDefault();
+
+            return parameter != null && context.InjectedServiceTypes.Contains(parameter.Type)
+                   || expression.IsStaticMemberAccess();
+
         }
 
         public static bool CanInjectMethodCall(MethodCallExpression expression, TranslationContext context, IList<ParameterExpression> parameters)
@@ -33,22 +59,17 @@ namespace Dryv.Translation
             }
 
             var finder = new ExpressionNodeFinder<ParameterExpression>();
+
             var parameterExpressions = (from a in expression.Arguments
                                         from p in finder.FindChildren(a)
                                         where p != null
                                         select p).ToList();
 
-            if (parameterExpressions.Any(p => p.Type == context.ModelType))
-            {
-                return false;
-            }
+            var notInlinable = from p in parameterExpressions
+                               where p.Type == context.ModelType || !context.InjectedServiceTypes.Contains(p.Type)
+                               select p;
 
-            if (parameterExpressions.Any(p => !context.InjectedServiceTypes.Contains(p.Type)))
-            {
-                return false;
-            }
-
-            return true; //parameters.Any();
+            return !notInlinable.Any();
         }
 
         public static IList<ParameterExpression> GetInjectionParameters(Expression expression, TranslationContext context)

@@ -29,10 +29,10 @@ namespace Dryv.Translation
         public static bool InjectRuntimeExpression(this TranslationContext context, Expression expression, bool isRawOutput, IList<ParameterExpression> parameters)
         {
             parameters ??= new ParameterExpression[0];
-            
+
             var canInject = expression is MethodCallExpression mex
                 ? ExpressionInjectionHelper.CanInjectMethodCall(mex, context, parameters)
-                : expression.IsStaticMemberAccess();
+                : ExpressionInjectionHelper.CanInjectProperty(expression, context, parameters);
             
             if (!canInject)
             {
