@@ -23,7 +23,7 @@ namespace Dryv.Tests
         public void InlineLambdaExpreession()
         {
             var expression = Expression(m => ((Func<TestModel, string>)(m2 => m2.Text))(m));
-            var translation = Translate(expression);
+            var translation = Translate<TestModel>(expression);
 
             Assert.IsNotNull(translation);
         }
@@ -36,7 +36,7 @@ namespace Dryv.Tests
             var expression = Expression(m => x(m));
             try
             {
-                var translation = Translate(expression);
+                var translation = Translate<TestModel>(expression);
                 Assert.Fail();
             }
             catch (DryvExpressionNotSupportedException)
@@ -248,7 +248,7 @@ namespace Dryv.Tests
         public void PreevaluateStaticMethod()
         {
             var expression = Expression(model => GetText());
-            var script = Translate(expression);
+            var script = Translate<TestModel>(expression);
 
             var engine = new Jurassic.ScriptEngine();
             var result = engine.Evaluate($"({script})()");

@@ -254,6 +254,7 @@
       <e p="Dryv.Tests" t="IncludeRecursive">
         <e p="AnyMethodTests.cs" t="Include" />
         <e p="bin" t="ExcludeRecursive" />
+        <e p="BooleanTranslationTests.cs" t="Include" />
         <e p="Dryv.Tests.csproj" t="IncludeRecursive" />
         <e p="DryvResultTranslatorTests.cs" t="Include" />
         <e p="EnumerbaleTests.cs" t="Include" />

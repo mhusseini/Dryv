@@ -13,7 +13,7 @@ namespace Dryv.Tests
         {
             var value = "hello";
             var rule = TestWithOptionsModel.Rules.ValidationRules.First();
-            var jsProgram = GetTranslatedAst(rule.ValidationExpression, null, new object[]
+            var jsProgram = GetTranslatedAst<TestWithOptionsModel>(rule.ValidationExpression, null, new object[]
             {
                 Options.Create(new TestOptions
                 {

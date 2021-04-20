@@ -17,7 +17,7 @@ namespace Dryv.Tests
         private DryvRuleFinder sut;
 
         [TestInitialize]
-        private void Initialize()
+        public void Initialize()
         {
             var methodCallTranslators = new Collection<IDryvMethodCallTranslator>
             {

@@ -22,6 +22,10 @@ namespace Dryv.Tests
         protected static System.Linq.Expressions.Expression<Func<TModel, DryvValidationResult>> Expression<TModel>(System.Linq.Expressions.Expression<Func<TModel, DryvValidationResult>> exp) =>
             exp;
 
+        protected static System.Linq.Expressions.Expression<Func<object>> Expression(System.Linq.Expressions.Expression<Func<object>> exp) =>
+            exp;
+
+        
         protected static T GetBodyExpression<T>(FunctionExpression jsProgram)
             where T : Expression =>
             ((jsProgram.Body as BlockStatement)?.Body.First() as ReturnStatement)?.Argument as T;
@@ -32,27 +36,44 @@ namespace Dryv.Tests
             return (member?.Object, (member?.Property as Identifier)?.Name);
         }
 
-        protected static FunctionExpression GetTranslatedAst(
+        protected static FunctionExpression GetTranslatedAst<TModel>(
             System.Linq.Expressions.Expression expression,
             object[] translators = null,
             object[] validationOptions = null)
         {
-            var translation = Translate(expression, translators, validationOptions);
+            var translation = Translate<TModel>(expression, translators, validationOptions);
             var jsParser = new JavaScriptParser();
 
             return jsParser.ParseFunctionExpression(translation);
         }
 
-        protected static string Translate(System.Linq.Expressions.Expression expression, object[] translators = null, object[] validationOptions = null)
+
+        protected static FunctionExpression GetTranslatedAst(
+            System.Linq.Expressions.Expression expression,
+            object[] translators = null,
+            object[] validationOptions = null)
+        {
+            var translation = Translate<TestModel>(expression, translators, validationOptions);
+            var jsParser = new JavaScriptParser();
+
+            return jsParser.ParseFunctionExpression(translation);
+        }
+
+        protected static string Translate<TModel>(System.Linq.Expressions.Expression expression, object[] translators = null, object[] validationOptions = null)
         {
             if (validationOptions == null)
             {
                 validationOptions = new object[0];
             }
 
+            var rule = new DryvCompiledRule
+            {
+                ModelType = typeof(TModel)
+            };
+
             var args = new object[] { "" }.Union(validationOptions).ToArray();
             var translator = CreateTranslator(translators);
-            var translation = translator.Translate(expression, null, new DryvCompiledRule()).Factory(null, args, new DryvOptions());
+            var translation = translator.Translate(expression, null, rule).Factory(null, args, new DryvOptions());
             return translation;
         }
 
@@ -85,8 +106,11 @@ namespace Dryv.Tests
         protected abstract class TestModel
         {
             public bool BooleanValue { get; set; }
+
             public IEnumerable<int> IntItems { get; set; }
+
             public IEnumerable<string> Items { get; set; }
+
             public abstract string Text { get; set; }
         }
     }

@@ -45,13 +45,13 @@ namespace Dryv.Tests
                     ? "fail"
                     : DryvValidationResult.Success);
 
-            var translation = Translate(expression);
+            var translation = Translate<TestModel>(expression);
             var model = @"{text:'zzzzzzzXY'}";
             var engine = new Jurassic.ScriptEngine();
             var script = $"({translation})({model})";
             var result = engine.Evaluate(script) as string;
 
-            Assert.AreEqual("fail", result);
+            Assert.IsNull(result);
         }
 
         [TestMethod]
@@ -62,7 +62,7 @@ namespace Dryv.Tests
                     ? "fail"
                     : DryvValidationResult.Success);
 
-            var translation = Translate(expression);
+            var translation = Translate<TestModel>(expression);
             var model = @"{text:'ab'}";
             var engine = new Jurassic.ScriptEngine();
             var script = $"({translation})({model})";
