@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Dryv.Configuration;
 using Dryv.Extensions;
 using Dryv.Rules;
@@ -16,6 +18,14 @@ namespace Dryv.Tests
 {
     public class JavascriptTranslatorTestsBase
     {
+        private static readonly JsonSerializerOptions Options = new JsonSerializerOptions
+        {
+            Converters =
+            {
+                new JsonStringEnumConverter()
+            }
+        };
+
         protected static System.Linq.Expressions.Expression<Func<TestModel, DryvValidationResult>> Expression(System.Linq.Expressions.Expression<Func<TestModel, DryvValidationResult>> exp) =>
             exp;
 
@@ -100,7 +110,10 @@ namespace Dryv.Tests
                 customTranslators.AddRange(translators.OfType<IDryvCustomTranslator>());
             }
 
-            return new JavaScriptTranslator(customTranslators, methodCallTranslators, new DryvOptions());
+            return new JavaScriptTranslator(customTranslators, methodCallTranslators, new DryvOptions
+            {
+                JsonConversion = v => JsonSerializer.Serialize(v, Options)
+            });
         }
 
         protected abstract class TestModel

@@ -10,6 +10,7 @@ namespace Dryv.Translation
             return value switch
             {
                 string txt => $"\"{JavaScriptEscape(txt)}\"",
+                Enum _ => null,
                 bool b => (b ? "true" : "false"),
                 null => "null",
                 DateTime dateTime => $@"""{dateTime.ToString(CultureInfo.CurrentUICulture)}""",
@@ -18,7 +19,7 @@ namespace Dryv.Translation
             };
         }
 
-        public  static string JavaScriptEscape(string text)
+        public static string JavaScriptEscape(string text)
         {
             return text
                 .Replace("\n", string.Empty)

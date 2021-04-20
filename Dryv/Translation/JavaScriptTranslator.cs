@@ -587,11 +587,19 @@ namespace Dryv.Translation
 
                         return;
                     }
-                    else if (expression.Type.GetTypeInfo().IsEnum)
+                    else if (expression.Type.IsEnumOrNullableEnum(out var enumType))
                     {
-                        var value = Enum.ToObject(expression.Type, expression.GetValue());
-                        //var value = Convert.ChangeType(constant.Value, expression.Type);
-                        context.Writer.Write(this.TranslateValue(value));
+                        var value = expression.GetValue();
+                        if (value == null)
+                        {
+                            context.Writer.Write(this.TranslateValue(null));
+                        }
+                        else
+                        {
+                            var enumValue = Enum.ToObject(enumType, value);
+                            context.Writer.Write(this.TranslateValue(enumValue));
+                        }
+                        
                         return;
                     }
 

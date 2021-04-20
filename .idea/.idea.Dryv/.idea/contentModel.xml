@@ -258,6 +258,7 @@
         <e p="Dryv.Tests.csproj" t="IncludeRecursive" />
         <e p="DryvResultTranslatorTests.cs" t="Include" />
         <e p="EnumerbaleTests.cs" t="Include" />
+        <e p="EnumTranslationTests.cs" t="Include" />
         <e p="JavascriptTranslatorTests.cs" t="Include" />
         <e p="JavascriptTranslatorTestsBase.cs" t="Include" />
         <e p="LocalizationTests.cs" t="Include" />
