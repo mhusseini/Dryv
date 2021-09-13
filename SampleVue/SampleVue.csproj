@@ -5,12 +5,21 @@
     <RootNamespace>Dryv.SampleVue</RootNamespace>
   </PropertyGroup>
 
+  <Target Name="BuildJavascript" BeforeTargets="Build">
+    <!-- Ensure Node.js is installed -->
+    <Exec Command="npm install" />
+    <Exec Command="npm run build" ContinueOnError="false">
+      <Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
+    </Exec>
+  </Target>
+
   <ItemGroup>
     <Content Remove="wwwroot\favicon.ico" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="wwwroot\favicon.ico" />
+    <None Include="wwwroot\main.js" />
   </ItemGroup>
 
   <ItemGroup>

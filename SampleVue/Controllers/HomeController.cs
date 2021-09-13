@@ -1,9 +1,12 @@
-﻿using Dryv.AspNetCore.Extensions;
+﻿using Dryv.AspNetCore;
+using Dryv.AspNetCore.Extensions;
 using Dryv.SampleVue.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace Dryv.SampleVue.Controllers
 {
+    [DryvValidationFilter]
     public class HomeController : Controller
     {
         public IActionResult Index()
@@ -14,15 +17,13 @@ namespace Dryv.SampleVue.Controllers
         [HttpPost]
         public IActionResult Index([FromBody] HomeModel _)
         {
-            return this.DryvValidationActionResult();
+            var result = this.GetDryvValidationResults(DryvResultType.Error);
+            if (result.Any())
+            {
+                return Json(new { success = false, messages = result });
+            }
 
-            //return this.ModelState.IsValid
-            //    ? this.Json(new { success = true })
-            //    : this.Json(new
-            //    {
-            //        success = false,
-            //        results = this.ModelState.ToDictionary(
-            //            s => string.Join('.', s.Key.Split
+            return Ok();
         }
     }
 }

@@ -12,7 +12,7 @@
 <body>
     <dryv-client-rules name="demo-form" />
 
-    <div id="app" v-dryv-set="'demo-form'">
+    <div id="app" v-dryv-set="{ name: 'demo-form', path: 'model' }">
         <h1>Form validation with Vue.js and Dryv.</h1>
         <form v-on:submit="validateForm" method="post">
             <div class="form-content">
@@ -20,19 +20,12 @@
                     <h3>Personal Data</h3>
 
                     <dryv-group>
-                        <div slot-scope="{allErrors, allWanings, errors, warnings}">
-                            <form-input label="First name" v-model="person.firstName"></form-input>
-                            <form-input label="Last name" v-model="person.lastName"></form-input>
+                        <div slot-scope="{errors, warnings}">
+                            <form-input label="First name" v-model="model.person.firstName"></form-input>
+                            <form-input label="Last name" v-model="model.person.lastName"></form-input>
 
-                            <div v-for="text in allErrors" :key="text" class="form-item-error">{{text}}</div>
-                            <div v-for="text in allWanings" :key="text" class="form-item-warning">{{text}}</div>
-
-                            @*<div v-if="errors['name']">
-                                    <div v-for="text in errors['name']" :key="text" class="form-item-error">{{text}}</div>
-                                </div>
-                                <div v-if="warnings['name']">
-                                    <div v-for="text in warnings['name']" :key="text" class="form-item-warning">#{{text}}#</div>
-                                </div>*@
+                            <div v-for="text in errors" :key="text" class="form-item-error">{{text}}</div>
+                            <div v-for="text in warnings" :key="text" class="form-item-warning">{{text}}</div>
                         </div>
                     </dryv-group>
                 </div>
@@ -40,23 +33,37 @@
                 <div class="form-block">
                     <h3>Shipping Address</h3>
 
-                    <form-input label="ZIP code" v-model="shippingAddress.zipCode"></form-input>
-                    <form-input label="City" v-model="shippingAddress.city"></form-input>
-                </div>
+                    <dryv-group>
+                        <div slot-scope="{errors, warnings}">
+                            <form-input label="ZIP code" v-model="model.shippingAddress.zipCode"></form-input>
+                            <form-input label="City" v-model="model.shippingAddress.city"></form-input>
 
+                            <div v-for="text in errors" :key="text" class="form-item-error">{{text}}</div>
+                            <div v-for="text in warnings" :key="text" class="form-item-warning">{{text}}</div>
+                        </div>
+                    </dryv-group>
+                </div>
                 <div class="form-block">
                     <h3>Billing Address</h3>
 
                     <div class="form-item">
                         <label for="billingAddress-deactivate">Billing address equals shipping address.</label>
-                        <input id="billingAddress-deactivate" type="checkbox" v-model="billingEqualsShipping" />
+                        <input id="billingAddress-deactivate" type="checkbox" v-model="model.billingEqualsShipping" />
                     </div>
 
-                    <div v-show="!billingEqualsShipping">
-                        <form-input label="ZIP code" v-model="billingAddress.zipCode"></form-input>
-                        <form-input label="City" v-model="billingAddress.city"></form-input>
+                    <div v-show="!model.billingEqualsShipping">
+                        <dryv-group>
+                            <div slot-scope="{errors, warnings}">
+                                <form-input label="ZIP code" v-model="model.billingAddress.zipCode"></form-input>
+                                <form-input label="City" v-model="model.billingAddress.city"></form-input>
+
+                                <div v-for="text in errors" :key="text" class="form-item-error">{{text}}</div>
+                                <div v-for="text in warnings" :key="text" class="form-item-warning">{{text}}</div>
+                            </div>
+                        </dryv-group>
                     </div>
                 </div>
+
             </div>
             <div class="form-block">
                 <input type="submit" value="Submit" />
@@ -72,83 +79,6 @@
         </form>
     </div>
 
-    <script type="text/x-template" id="form-input">
-        <div class="form-item" v-dryv>
-            <div>
-                <div class="form-input-label">
-                    <label>{{ label }}</label>
-                </div>
-                <div class="form-input-control">
-                    <input v-bind:value="value" v-on:input="$emit('input', $event.target.value)">
-                </div>
-            </div>
-            <div class="form-item-warning" v-if="warning">{{ warning }}</div>
-            <div class="form-item-error" v-if="error">{{ error }}</div>
-        </div>
-    </script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.11/vue.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js"></script>
-    <script src="dryvue.js"></script>
-    <script>
-        Vue.use(Dryvue,
-            {
-                get: axios.get,
-                post: axios.post
-            });
-
-        Vue.component('form-input',
-            {
-                props: ['value', 'type', 'name', 'label'],
-                template: '#form-input',
-                data() {
-                    return {
-                        error: null,
-                        warning: null
-                    };
-                }
-            });
-
-        const app = new Vue({
-            el: '#app',
-            data: {
-                isValid: null,
-                lastValidationWarning: null,
-                billingEqualsShipping: true,
-                person: {
-                    firstName: null,
-                    lastName: null
-                },
-                shippingAddress: {
-                    zipCode: null,
-                    city: null
-                },
-                billingAddress: {
-                    zipCode: null,
-                    city: null
-                },
-                config: {}
-            },
-            mounted() {
-                this.config = this.$dryv.parameters;
-            },
-            methods: {
-                async validateForm(e) {
-                    e.preventDefault();
-                    this.isValid = true;
-                    const validation = await this.$dryv.validate();
-
-                    if (!validation.hasErrors && (!validation.hasWarnings || validation.warningHash === this.lastValidationWarning)) {
-                        const result = await axios.post(e.srcElement.action, this.$data);
-                        this.isValid = this.$dryv.setValidationResult(result.data.messages);
-                        this.lastValidationWarning = null;
-                    } else {
-                        this.isValid = false;
-                        this.lastValidationWarning = validation.warningHash;
-                    }
-                }
-            }
-        });
-    </script>
+    <script type="text/javascript" src="~/main.js"></script>
 </body>
 </html>
