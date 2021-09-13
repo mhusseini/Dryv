@@ -11,7 +11,7 @@ namespace Dryv.RuleDetection
     {
         public ModelTreeNode Build(Type type)
         {
-            return this.Build(type, string.Empty, string.Empty, new HashSet<Type>(), new Stack<MemberInfo>());
+            return this.Build(type, string.Empty, string.Empty, new Dictionary<Type, ModelTreeNode>(), new Stack<MemberInfo>());
         }
 
         private static IEnumerable<PropertyInfo> GetProperties(Type type)
@@ -21,11 +21,9 @@ namespace Dryv.RuleDetection
                    select property;
         }
 
-        private ModelTreeNode Build(Type type, string uniquePath, string modelPath, ICollection<Type> processed, Stack<MemberInfo> hierarchy)
+        private ModelTreeNode Build(Type type, string uniquePath, string modelPath, IDictionary<Type, ModelTreeNode> processed, Stack<MemberInfo> hierarchy)
         {
-            var isRecursive = processed.Contains(type);
-
-            processed.Add(type);
+            var isRecursive = processed.TryGetValue(type, out var originalNode);
 
             var node = new ModelTreeNode
             {
@@ -38,26 +36,33 @@ namespace Dryv.RuleDetection
 
             if (!isRecursive)
             {
+                processed.Add(type, node);
+
                 node.Children = GetProperties(type).Select(p =>
                 {
                     hierarchy.Push(p);
 
                     var result = this.BuildEdge(node, p, processed, hierarchy);
+
                     hierarchy.Pop();
 
                     return result;
                 }).ToList();
             }
+            else
+            {
+                node.Children = originalNode.CopyChildren(node, originalNode.ModelPath, originalNode.UniquePath, node.ModelPath, node.UniquePath);
+            }
 
             return node;
         }
 
-        private ModelTreeEdge BuildEdge(ModelTreeNode parent, PropertyInfo property, ICollection<Type> processed, Stack<MemberInfo> hierarchy)
+        private ModelTreeEdge BuildEdge(ModelTreeNode parent, PropertyInfo property, IDictionary<Type, ModelTreeNode> processed, Stack<MemberInfo> hierarchy)
         {
             var index = parent.UniquePath.LastIndexOf(":", StringComparison.OrdinalIgnoreCase);
             if (index < 0) index = 0;
             var uniquePath = parent.UniquePath.Substring(0, index) + ":" + property.DeclaringType.GetNonGenericName();
-            
+
             return new ModelTreeEdge
             {
                 Parent = parent,
