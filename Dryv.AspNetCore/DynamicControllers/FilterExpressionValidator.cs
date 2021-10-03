@@ -4,7 +4,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using Dryv.AspNetCore.DynamicControllers.CodeGeneration;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Dryv.AspNetCore.DynamicControllers
 {
@@ -12,7 +11,8 @@ namespace Dryv.AspNetCore.DynamicControllers
     {
         public static void ValidateFilterExpressions(Func<DryvControllerGenerationContext, IEnumerable<Expression<Func<Attribute>>>> filters)
         {
-            var dummyContext = new DryvControllerGenerationContext(typeof(FilterExpressionValidator.TestControllerDummy), typeof(FilterExpressionValidator.TestControllerDummy).GetMethods().First());
+            var dummyRule = DryvRules.For<DummyModel>().Rule(m => m.DummyProperty, m => DryvValidationResult.Success).ValidationRules.First();
+            var dummyContext = new DryvControllerGenerationContext(typeof(DummyController), nameof(DummyController.DummyAction), dummyRule);
 
             foreach (var expression in from filter in filters(dummyContext)
                                        where filter != null
@@ -22,9 +22,15 @@ namespace Dryv.AspNetCore.DynamicControllers
             }
         }
 
-        private class TestControllerDummy
+        // ReSharper disable once ClassNeverInstantiated.Local
+        private abstract class DummyModel
         {
-            public IActionResult Test(string test) { throw new NotSupportedException(); }
+            public string DummyProperty { get; set; }
+        }
+
+        private abstract class DummyController
+        {
+            public IActionResult DummyAction() => throw new NotSupportedException();
         }
     }
 }

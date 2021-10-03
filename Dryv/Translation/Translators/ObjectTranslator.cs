@@ -3,9 +3,10 @@ using System.Linq.Expressions;
 
 namespace Dryv.Translation.Translators
 {
-    public class ObjectTranslator : ICustomTranslator
+    public class ObjectTranslator : IDryvCustomTranslator
     {
-        public bool? AllowSurroundingBrackets(Expression expression) => null;
+        public int? OrderIndex { get; set; }
+        public bool? AllowSurroundingBrackets(Expression expression) => false;
 
         public bool TryTranslate(CustomTranslationContext context)
         {
@@ -14,14 +15,13 @@ namespace Dryv.Translation.Translators
                 return false;
             }
 
-            if (methodCallExpression.Method.Name != nameof(object.ToString) || methodCallExpression.Arguments.Any())
+            if (methodCallExpression.Method.Name != nameof(this.ToString) || methodCallExpression.Arguments.Any())
             {
                 return false;
             }
 
-            context.Writer.Write("String(");
             context.Translator.Translate(methodCallExpression.Object, context);
-            context.Writer.Write(")");
+            context.Writer.Write(".toString()");
 
             return true;
         }

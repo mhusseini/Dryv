@@ -1,5 +1,12 @@
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
+using Dryv.Configuration;
 using Dryv.RuleDetection;
+using Dryv.Rules;
+using Dryv.Translation;
+using Dryv.Translation.Translators;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Dryv.Tests
@@ -7,7 +14,33 @@ namespace Dryv.Tests
     [TestClass]
     public class RuleDiscovery2Tests
     {
-        private DryvRulesFinder sut = new DryvRulesFinder();
+        private DryvRuleFinder sut;
+
+        [TestInitialize]
+        public void Initialize()
+        {
+            var methodCallTranslators = new Collection<IDryvMethodCallTranslator>
+            {
+                new RegexTranslator(),
+                new DryvValidationResultTranslator(),
+                new StringTranslator(),
+                new EnumerableTranslator()
+            };
+
+            var customTranslators = new Collection<IDryvCustomTranslator>
+            {
+                new RegexTranslator(),
+                new DryvValidationResultTranslator(),
+                new ObjectTranslator()
+            };
+
+            var options = new DryvOptions();
+            var treeBuilder = new ModelTreeBuilder();
+            var compiler = new DryvCompiler();
+            var translator = new JavaScriptTranslator(customTranslators, methodCallTranslators, options);
+
+            sut = new DryvRuleFinder(treeBuilder, compiler, translator, null, options);
+        }
 
         private interface IModel
         {
@@ -18,10 +51,18 @@ namespace Dryv.Tests
         public void FindeRuleOnParentNode()
         {
             var property = typeof(Model9).GetProperty(nameof(Model9.Text));
-            var rules = this.sut.GetRulesForProperty(typeof(Model8), property, RuleType.Default);
+            var allRules = this.sut.FindValidationRulesInTree(typeof(Model8), RuleType.Validation);
+            var rules = GetRulesForProperty(allRules, property);
 
-            Assert.IsNotNull(rules);
             Assert.IsTrue(rules.Any());
+        }
+
+        private static IEnumerable<DryvCompiledRule> GetRulesForProperty(IEnumerable<DryvCompiledRule> allRules, PropertyInfo property)
+        {
+            Assert.IsNotNull(allRules);
+
+            var rules = allRules.Where(r => r.Property == property);
+            return rules;
         }
 
         [TestMethod]
@@ -29,7 +70,9 @@ namespace Dryv.Tests
         {
             var model = new Model();
             var property = model.GetType().GetProperty(nameof(model.Text));
-            var rules = this.sut.GetRulesForProperty(model.GetType(), property, RuleType.Default);
+
+            var allRules = this.sut.FindValidationRulesInTree(model.GetType(), RuleType.Validation);
+            var rules = GetRulesForProperty(allRules, property);
 
             Assert.IsNotNull(rules);
             Assert.IsTrue(rules.Any());
@@ -40,7 +83,9 @@ namespace Dryv.Tests
         {
             var model = new Model3();
             var property = model.GetType().GetProperty(nameof(model.Text));
-            var rules = this.sut.GetRulesForProperty(model.GetType(), property, RuleType.Default);
+
+            var allRules = this.sut.FindValidationRulesInTree(model.GetType(), RuleType.Validation);
+            var rules = GetRulesForProperty(allRules, property);
 
             Assert.IsNotNull(rules);
             Assert.IsTrue(rules.Any());
@@ -51,7 +96,9 @@ namespace Dryv.Tests
         {
             var model = new Model5();
             var property = model.GetType().GetProperty(nameof(model.Text));
-            var rules = this.sut.GetRulesForProperty(model.GetType(), property, RuleType.Default);
+
+            var allRules = this.sut.FindValidationRulesInTree(model.GetType(), RuleType.Validation);
+            var rules = GetRulesForProperty(allRules, property);
 
             Assert.IsNotNull(rules);
             Assert.IsTrue(rules.Any());
@@ -62,7 +109,9 @@ namespace Dryv.Tests
         {
             var model = new Model2();
             var property = model.GetType().GetProperty(nameof(model.Text));
-            var rules = this.sut.GetRulesForProperty(model.GetType(), property, RuleType.Default);
+
+            var allRules = this.sut.FindValidationRulesInTree(model.GetType(), RuleType.Validation);
+            var rules = GetRulesForProperty(allRules, property);
 
             Assert.IsNotNull(rules);
             Assert.IsTrue(rules.Any());
@@ -72,7 +121,9 @@ namespace Dryv.Tests
         public void FindeRuleTree()
         {
             var property = typeof(Model7).GetProperty(nameof(Model7.Text));
-            var rules = this.sut.GetRulesForProperty(typeof(Model7), property, RuleType.Default);
+
+            var allRules = this.sut.FindValidationRulesInTree(typeof(Model7), RuleType.Validation);
+            var rules = GetRulesForProperty(allRules, property);
 
             Assert.IsNotNull(rules);
             Assert.IsTrue(rules.Any());
@@ -83,7 +134,9 @@ namespace Dryv.Tests
         {
             var model = new Model4();
             var property = model.GetType().GetProperty(nameof(model.Text));
-            var rules = this.sut.GetRulesForProperty(model.GetType(), property, RuleType.Default);
+
+            var allRules = this.sut.FindValidationRulesInTree(model.GetType(), RuleType.Validation);
+            var rules = GetRulesForProperty(allRules, property);
 
             Assert.IsNotNull(rules);
             Assert.IsTrue(rules.Any());
@@ -102,7 +155,9 @@ namespace Dryv.Tests
             };
 
             var property = typeof(Model11).GetProperty(nameof(Model11.Text));
-            var rules = this.sut.GetRulesForProperty(model.GetType(), property, RuleType.Default);
+
+            var allRules = this.sut.FindValidationRulesInTree(model.GetType(), RuleType.Validation);
+            var rules = GetRulesForProperty(allRules, property);
 
             Assert.IsNotNull(rules);
             Assert.IsTrue(rules.Any());
@@ -114,8 +169,8 @@ namespace Dryv.Tests
                 .For<IModel>()
                 .Rule(m => m.Text,
                     m => m.Text != null
-                        ? DryvResultMessage.Success
-                        : DryvResultMessage.Error("error"));
+                        ? DryvValidationResult.Success
+                        : DryvValidationResult.Error("error"));
         }
 
         private class Model : IModel
@@ -124,10 +179,9 @@ namespace Dryv.Tests
                 .For<IModel>()
                 .Rule(m => m.Text,
                     m => m.Text != null
-                        ? DryvResultMessage.Success
-                        : DryvResultMessage.Error("error"));
+                        ? DryvValidationResult.Success
+                        : DryvValidationResult.Error("error"));
 
-            [DryvRules]
             public string Text { get; set; }
         }
 
@@ -144,7 +198,6 @@ namespace Dryv.Tests
                         ? "error"
                         : null);
 
-            [DryvRules]
             public string Text { get; set; }
         }
 
@@ -152,7 +205,6 @@ namespace Dryv.Tests
         {
             public static DryvRules Rules = CommonRules.Text;
 
-            [DryvRules]
             public string Text { get; set; }
         }
 
@@ -160,7 +212,6 @@ namespace Dryv.Tests
         {
             public static DryvRules Rules => CommonRules.Text;
 
-            [DryvRules]
             public string Text { get; set; }
         }
 
@@ -170,10 +221,9 @@ namespace Dryv.Tests
                 .For<ModelBase>()
                 .Rule(m => m.Text,
                     m => m.Text != null
-                        ? DryvResultMessage.Success
-                        : DryvResultMessage.Error("error"));
+                        ? DryvValidationResult.Success
+                        : DryvValidationResult.Error("error"));
 
-            [DryvRules]
             public override string Text { get; set; }
         }
 
@@ -183,8 +233,8 @@ namespace Dryv.Tests
                 .For<Model5>()
                 .Rule(m => m.Text,
                     m => m.Text != null
-                        ? DryvResultMessage.Success
-                        : DryvResultMessage.Error("error"));
+                        ? DryvValidationResult.Success
+                        : DryvValidationResult.Error("error"));
         }
 
         private class Model6
@@ -193,10 +243,9 @@ namespace Dryv.Tests
                 .For<Model6>()
                 .Rule(m => m.Child.Child.Text,
                     m => m.Child.Child.Text != null
-                        ? DryvResultMessage.Success
-                        : DryvResultMessage.Error("error"));
+                        ? DryvValidationResult.Success
+                        : DryvValidationResult.Error("error"));
 
-            [DryvRules]
             public Model7 Child { get; set; }
         }
 
@@ -206,12 +255,11 @@ namespace Dryv.Tests
                 .For<Model7>()
                 .Rule(m => m.Text,
                     m => m.Text != null
-                        ? DryvResultMessage.Success
-                        : DryvResultMessage.Error("error"));
+                        ? DryvValidationResult.Success
+                        : DryvValidationResult.Error("error"));
 
             public Model7 Child { get; set; }
 
-            [DryvRules]
             public string Text { get; set; }
         }
 
@@ -229,13 +277,11 @@ namespace Dryv.Tests
 
         private class Model9
         {
-            [DryvRules]
             public string Text { get; set; }
         }
 
         private abstract class ModelBase
         {
-            [DryvRules]
             public virtual string Text { get; set; }
         }
     }

@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Dryv.Extensions;
-using Dryv.Validation;
+using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,36 +9,29 @@ namespace Dryv.AspNetCore
 {
     public static class HtmlExtensions
     {
-        public static DryvClientValidationItem DryvClientValidationFor<TModel>(this IHtmlHelper<TModel> htmlHelper, Expression<Func<TModel, object>> propertyExpression)
+        public static Task<IHtmlContent> DryvValidation<TModel>(this IHtmlHelper<TModel> htmlHelper, string validationSetName, IReadOnlyDictionary<string, object> parameters = null)
         {
-            var loader = htmlHelper.ViewContext.HttpContext.RequestServices.GetService<DryvClientValidationLoader>();
-            return loader.GetDryvClientValidation<TModel>(propertyExpression);
+            return htmlHelper.GetDryvClientWriter().WriteDryvValidation<TModel>(validationSetName, htmlHelper.ViewContext.HttpContext.RequestServices.GetService, parameters);
         }
 
-        public static IEnumerable<DryvClientValidationItem> GetDryvClientValidationForModel<TModel>(this IHtmlHelper<TModel> htmlHelper)
+        public static Task<IHtmlContent> DryvValidation<TModel>(this IHtmlHelper htmlHelper, string validationSetName, IReadOnlyDictionary<string, object> parameters = null)
         {
-            var loader = htmlHelper.ViewContext.HttpContext.RequestServices.GetService<DryvClientValidationLoader>();
-            return loader.GetDryvClientValidation(typeof(TModel));
+            return htmlHelper.GetDryvClientWriter().WriteDryvValidation<TModel>(validationSetName, htmlHelper.ViewContext.HttpContext.RequestServices.GetService, parameters);
         }
 
-        public static IDictionary<string, string> GetDryvClientValidationFunctions<TModel>(this IHtmlHelper<TModel> htmlHelper)
+        public static Task<IHtmlContent> DryvValidation<TModel>(this IHtmlHelper htmlHelper, IReadOnlyDictionary<string, object> parameters = null)
         {
-            return (from val in htmlHelper.GetDryvClientValidationForModel()
-                    where !string.IsNullOrWhiteSpace(val.ValidationFunction)
-                    select val)
-                .ToDictionary(
-                    val => val.ModelPath + (string.IsNullOrWhiteSpace(val.ModelPath) ? string.Empty : ".") + val.Property.Name.ToCamelCase(),
-                    val => val.ValidationFunction);
+            return DryvValidation<TModel>(htmlHelper, typeof(TModel).Name.ToCamelCase(), parameters);
         }
 
-        public static IDictionary<string, string> GetDryvClientDisablingFunctions<TModel>(this IHtmlHelper<TModel> htmlHelper)
+        public static Task<IHtmlContent> DryvValidation<TModel>(this IHtmlHelper<TModel> htmlHelper, IReadOnlyDictionary<string, object> parameters = null)
         {
-            return (from val in htmlHelper.GetDryvClientValidationForModel()
-                    where !string.IsNullOrWhiteSpace(val.DisablingFunction)
-                    select val)
-                .ToDictionary(
-                    val => val.ModelPath + (string.IsNullOrWhiteSpace(val.ModelPath) ? string.Empty : ".") + val.Property.Name.ToCamelCase(),
-                    val => val.DisablingFunction);
+            return DryvValidation<TModel>((IHtmlHelper)htmlHelper, parameters);
+        }
+
+        private static DryvClientWriter GetDryvClientWriter(this IHtmlHelper htmlHelper)
+        {
+            return htmlHelper.ViewContext.HttpContext.RequestServices.GetService<DryvClientWriter>();
         }
     }
 }

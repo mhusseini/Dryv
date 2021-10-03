@@ -1,6 +1,6 @@
 ﻿body {
     font-family: 'Dosis', sans-serif;
-    background-color: #07abfb;
+    background-color: #ceecfb;
 }
 
 #app {
@@ -39,7 +39,11 @@ lable, input, .validation-feedback {
     }
 
 .form-item-error {
-    color: #F88C30;
+    color: #b22222;
+}
+
+.form-item-warning {
+    color: #1683f8;
 }
 
 .form-content {

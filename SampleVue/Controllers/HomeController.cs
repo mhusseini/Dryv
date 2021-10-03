@@ -1,16 +1,12 @@
-﻿using System;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
-using Dryv.Extensions;
-using Dryv.Internal;
-using Dryv.SampleVue.CustomValidation;
+﻿using Dryv.AspNetCore;
+using Dryv.AspNetCore.Extensions;
 using Dryv.SampleVue.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace Dryv.SampleVue.Controllers
 {
+    [DryvValidationFilter]
     public class HomeController : Controller
     {
         public IActionResult Index()
@@ -19,17 +15,15 @@ namespace Dryv.SampleVue.Controllers
         }
 
         [HttpPost]
-        public IActionResult Index([FromBody]HomeModel _)
+        public IActionResult Index([FromBody] HomeModel _)
         {
-            return this.ModelState.IsValid
-                ? this.Json(new { success = true })
-                : this.Json(new
-                {
-                    success = false,
-                    errors = this.ModelState.ToDictionary(
-                        s => string.Join('.', s.Key.Split('.').Select(v => v.ToCamelCase())),
-                        s => s.Value.Errors.Select(e => e.ErrorMessage).First())
-                });
+            var result = this.GetDryvValidationResults(DryvResultType.Error);
+            if (result.Any())
+            {
+                return Json(new { success = false, messages = result });
+            }
+
+            return Ok();
         }
     }
 }

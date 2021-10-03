@@ -1,4 +1,6 @@
 ﻿using System.Linq;
+using System.Linq.Expressions;
+using Dryv.Extensions;
 using Dryv.Reflection;
 
 namespace Dryv.Translation.Translators
@@ -80,6 +82,7 @@ namespace Dryv.Translation.Translators
                 var defaultValue = (enumType.GetGenericArguments().FirstOrDefault() ?? typeof(object)).GetDefaultValue();
                 context.Writer.Write(context.Translator.TranslateValue(defaultValue));
             }
+
             context.Writer.Write("];})(");
             context.Writer.Write("(");
             context.Translator.Translate(array, context);
@@ -126,6 +129,7 @@ namespace Dryv.Translation.Translators
             {
                 context.Translator.Translate(array, context);
             }
+
             context.Writer.Write(")[0]");
         }
 
@@ -182,14 +186,17 @@ namespace Dryv.Translation.Translators
         private static void Reduce(MethodTranslationContext context, string reducer)
         {
             var array = context.Expression.Arguments.First();
-            var func = context.Expression.Arguments.Skip(1).FirstOrDefault();
+            var lambda = context.Expression.Arguments.Count > 1
+                ? context.Expression.Arguments.Skip(1).OfType<LambdaExpression>().FirstOrDefault()
+                : null;
 
             context.Translator.Translate(array, context);
-            if (func != null)
+            if (lambda != null)
             {
-                context.Writer.Write(".map(");
-                context.Translator.Translate(func, context);
-                context.Writer.Write(")");
+                var parameter = GetLambdaArgument(lambda);
+                context.Writer.Write($".map(function({parameter}){{ return ");
+                context.Translator.Translate(lambda.Body, context);
+                context.Writer.Write("})");
             }
 
             context.Writer.Write($".reduce(function(a,b){{{reducer}}})");
@@ -199,11 +206,19 @@ namespace Dryv.Translation.Translators
         {
             var array = context.Expression.Arguments.First();
             var func = context.Expression.Arguments.Skip(1).FirstOrDefault();
+            var lambda = func as LambdaExpression ?? throw new DryvConfigurationException("The second parameter of the expression must be a lammbda function.");
+            var parameter = GetLambdaArgument(lambda);
 
             context.Translator.Translate(array, context);
-            context.Writer.Write($".{funcName}(");
-            context.Translator.Translate(func, context);
-            context.Writer.Write(")");
+            context.Writer.Write($".{funcName}(function({parameter}){{ return ");
+            context.Translator.Translate(lambda.Body, context);
+            context.Writer.Write("})");
+        }
+
+        private static string GetLambdaArgument(LambdaExpression lambda)
+        {
+
+            return lambda.Parameters.Select(p => p.Name).First();
         }
 
         private static void TranslateSelect(MethodTranslationContext context, string selector)

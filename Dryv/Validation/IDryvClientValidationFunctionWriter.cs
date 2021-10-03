@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using Dryv.RuleDetection;
+using System.IO;
 
 namespace Dryv.Validation
 {
     public interface IDryvClientValidationFunctionWriter
     {
-        string GetValidationFunction(IDictionary<DryvRuleTreeNode, string> translatedRules);
+        Action<TextWriter> GetValidationFunction(IEnumerable<TranslatedRule> translatedRules);
     }
 }

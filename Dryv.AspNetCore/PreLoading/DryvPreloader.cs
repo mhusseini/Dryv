@@ -1,20 +1,22 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using Dryv.RuleDetection;
+using Dryv.Rules;
 using Microsoft.Extensions.Options;
 
 namespace Dryv.AspNetCore.PreLoading
 {
     internal class DryvPreloader : IDisposable
     {
-        private readonly IOptions<DryvPreloaderOptions> options;
-        private readonly DryvClientValidationLoader preLoader;
+        private readonly IOptions<DryvPreloadingOptions> options;
+        private readonly DryvRuleFinder ruleFinder;
         private bool hasStarted;
 
-        public DryvPreloader(IOptions<DryvPreloaderOptions> options, DryvClientValidationLoader preLoader)
+        public DryvPreloader(DryvRuleFinder ruleFinder, IOptions<DryvPreloadingOptions> options)
         {
+            this.ruleFinder = ruleFinder;
             this.options = options;
-            this.preLoader = preLoader;
         }
 
         public void Dispose()
@@ -35,19 +37,17 @@ namespace Dryv.AspNetCore.PreLoading
             this.Preload(AppDomain.CurrentDomain.GetAssemblies());
         }
 
-        public void Preload(params Assembly[] assemblies)
+        private void Preload(params Assembly[] assemblies)
         {
             if (!this.options.Value.IsEnabled)
             {
                 return;
             }
 
-            foreach (var type in from t in assemblies.SelectMany(a => a.GetTypes())
-                                 let props = t.GetProperties(BindingFlags.Instance | BindingFlags.FlattenHierarchy | BindingFlags.Public)
-                                 where props.Any(p => p.GetCustomAttribute<DryvRulesAttribute>() != null)
-                                 select t)
+            foreach (var (type, _) in DryvSets.GetDryvSets())
             {
-                this.preLoader.GetDryvClientValidation(type);
+                this.ruleFinder.FindValidationRulesInTree(type, RuleType.Validation);
+                this.ruleFinder.FindValidationRulesInTree(type, RuleType.Disabling);
             }
         }
 

@@ -10,13 +10,11 @@ namespace Dryv.SampleConsole.Models
             .Rule(a => a.ZipCode, a => !a.Deactivated && a.ZipCode.Trim().Length < 5 ? "ZIP code must have at least 5 characters." : null)
             .Rule(a => a.City, a => !a.Deactivated && string.IsNullOrWhiteSpace(a.City) ? "Please enter a city." : null)
             .ServerRule<ZipCodeValidator>(a => a.ZipCode, a => a.City, (a, validator) => a.Deactivated
-                ? Task.FromResult(DryvResultMessage.Success)
+                ? Task.FromResult(DryvValidationResult.Success)
                 : validator.ValidateZipCode(a.ZipCode, a.City));
 
-        [DryvRules]
         public string ZipCode { get; set; }
 
-        [DryvRules]
         public string City { get; set; }
 
         public bool Deactivated { get; set; }

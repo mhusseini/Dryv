@@ -1,38 +1,31 @@
 ﻿using System;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
 using System.Threading.Tasks;
-using Dryv.AspNetCore.DynamicControllers;
-using Dryv.AspNetCore.DynamicControllers.CodeGeneration;
-using Dryv.Compilation;
+using Dryv;
 using Dryv.Configuration;
 using Dryv.RuleDetection;
 using Dryv.SampleConsole.Models;
-using Dryv.SampleVue;
-using Dryv.SampleVue.CustomValidation;
-using Dryv.Validation;
-using Microsoft.Extensions.Options;
 
-namespace Dryv.SampleConsole
+internal class Program
 {
-    class Program
+    private static async Task Main()
     {
-        static void Main()
+        var model = new HomeModel
         {
-            Expression<Func<Address, AsyncValidator, SampleOptions, Task<DryvResultMessage>>> f = (a, v, o) => v.ValidateZipCode(a.ZipCode, a.City, o.ZipCodeLength + 1);
+            Person = new Person(),
+            ShippingAddress = new Address(),
+            BillingAddress = new Address { Deactivated = true },
+        };
 
-            var g = new ControllerGenerator(new OptionsWrapper<DryvDynamicControllerOptions>(new DryvDynamicControllerOptions
-            {
-                HttpMethod = DryvDynamicControllerMethods.Get
-            }));
+        var options = new DryvOptions();
+        var validator = new DryvValidator(new DryvRuleFinder(new ModelTreeBuilder(), new DryvCompiler(), null, null, options), options);
 
-            var ass = g.CreateControllerAssembly(f.Body as MethodCallExpression, typeof(Address));
-            var t = ass.GetTypes().First();
-            var c = Activator.CreateInstance(t, new AsyncValidator(), new SampleOptions());
-            var m = c.GetType().GetMethods().First(m => !m.Attributes.HasFlag(MethodAttributes.HideBySig));
+        var errors = await validator.Validate(model, Activator.CreateInstance);
 
-            //var x = m.Invoke(c, new object[] { "1234", "Doooomcity" });
+        foreach (var error in from e in errors
+                              select e.Value.Type + " " + e.Key + ": " + e.Value.Text)
+        {
+            Console.WriteLine(error);
         }
     }
 }

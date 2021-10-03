@@ -3,12 +3,9 @@ using Dryv.AspNetCore.DynamicControllers;
 using Dryv.AspNetCore.DynamicControllers.CodeGeneration;
 using Dryv.AspNetCore.DynamicControllers.Endpoints;
 using Dryv.AspNetCore.DynamicControllers.Translation;
-using Dryv.AspNetCore.Internal;
 using Dryv.Translation;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -19,15 +16,16 @@ namespace Dryv.AspNetCore
     {
         public static IDryvMvcBuilder AddDryvDynamicControllers(this IDryvMvcBuilder dryvBuilder, Action<DryvDynamicControllerOptions> setupAction = null)
         {
-            var services = dryvBuilder.Services;
-            var options = new DryvDynamicControllerOptions();
+            dryvBuilder.Options.Translators.Add<DryvDynamicControllerTranslator>();
+            dryvBuilder.Options.Translators.Add<DryvDynamicControllerMethodTranslator>();
 
+            var options = new DryvDynamicControllerOptions();
             setupAction?.Invoke(options);
 
+            var services = dryvBuilder.MvcBuilder.Services;
             services.AddSingleton(Options.Create(options));
             services.AddSingleton<ControllerGenerator>();
             services.AddSingleton<DryvDynamicControllerRegistration>();
-            services.AddSingleton<ICustomTranslator, DryvDynamicControllerTranslator>();
             services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.TryAddSingleton(typeof(IDryvClientServerCallWriter), options.DynamicControllerCallWriterType ?? typeof(DryvClientServerCallWriter));
 
@@ -35,47 +33,39 @@ namespace Dryv.AspNetCore
             services.AddSingleton<IActionDescriptorChangeProvider>(actionDescriptorChangeProvider);
             services.AddSingleton(actionDescriptorChangeProvider);
 
-            SetupEndpointMapping(services);
+            SetupEndpoints(services);
 
             return dryvBuilder;
         }
 
-        private static void DefaultEndpointMapping(DryvControllerGenerationContext context, IEndpointRouteBuilder builder)
-        {
-            builder.MapControllerRoute(
-                context.ControllerFullName,
-                $"validation/{context.Controller}/{context.Action}",
-                new { controller = context.Controller, action = context.Action });
-        }
-
-        private static string DefaultTemplateMapping(DryvControllerGenerationContext context)
-        {
-            return $"validation/{context.Controller}/{context.Action}";
-        }
-
-        private static void SetupEndpointMapping(IServiceCollection serviceCollection)
+        private static void SetupEndpoints(IServiceCollection serviceCollection)
         {
             var serviceProvider = serviceCollection.BuildServiceProvider();
             var mvcOptions = serviceProvider.GetService<IOptions<MvcOptions>>().Value;
             var dynamicControllerOptions = serviceProvider.GetService<IOptions<DryvDynamicControllerOptions>>().Value;
 
-            if (mvcOptions.EnableEndpointRouting && dynamicControllerOptions.MapEndpoint == null && dynamicControllerOptions.MapRouteTemplate != null)
+            if (mvcOptions.EnableEndpointRouting && dynamicControllerOptions.SetEndpoint == null && dynamicControllerOptions.GetRoute != null)
             {
-                throw new DryvConfigurationException("When MvcOptions.EnableEndpointRouting is true, DryvDynamicControllerOptions.MapRouteTemplate cannot be used. Instead, please specify DryvDynamicControllerOptions.MapEndpoint or leave DryvDynamicControllerOptions.MapTemplate and DryvDynamicControllerOptions.MapEndpoint empty for default values.");
+                throw new DryvConfigurationException($"When MvcOptions.EnableEndpointRouting is true, {nameof(DryvDynamicControllerOptions)}.{nameof(DryvDynamicControllerOptions.GetRoute)} cannot be used. Instead, please use {nameof(DryvDynamicControllerOptions)}.{nameof(DryvDynamicControllerOptions.SetEndpoint)} instead.");
             }
 
-            if (!mvcOptions.EnableEndpointRouting && dynamicControllerOptions.MapEndpoint != null && dynamicControllerOptions.MapRouteTemplate == null)
+            if (!mvcOptions.EnableEndpointRouting && dynamicControllerOptions.SetEndpoint != null && dynamicControllerOptions.GetRoute == null)
             {
-                throw new DryvConfigurationException("When MvcOptions.EnableEndpointRouting is false, DryvDynamicControllerOptions.MapEndpoint cannot be used. Instead, please specify DryvDynamicControllerOptions.MapRouteTemplate or leave DryvDynamicControllerOptions.MapTemplate and DryvDynamicControllerOptions.MapEndpoint empty for default values.");
+                throw new DryvConfigurationException($"When MvcOptions.EnableEndpointRouting is false, {nameof(DryvDynamicControllerOptions)}.{nameof(DryvDynamicControllerOptions.SetEndpoint)} cannot be used. Instead, please use {nameof(DryvDynamicControllerOptions)}.{nameof(DryvDynamicControllerOptions.GetRoute)} instead.");
             }
 
-            if (mvcOptions.EnableEndpointRouting && dynamicControllerOptions.MapEndpoint == null)
+            if (mvcOptions.EnableEndpointRouting && dynamicControllerOptions.SetEndpoint == null)
             {
-                dynamicControllerOptions.MapEndpoint = DefaultEndpointMapping;
+                dynamicControllerOptions.SetEndpoint = CustomizationDefaults.DefaultEndpoint;
             }
-            else if (!mvcOptions.EnableEndpointRouting && dynamicControllerOptions.MapRouteTemplate == null)
+            else if (!mvcOptions.EnableEndpointRouting && dynamicControllerOptions.GetRoute == null)
             {
-                dynamicControllerOptions.MapRouteTemplate = DefaultTemplateMapping;
+                dynamicControllerOptions.GetRoute = CustomizationDefaults.DefaultRoute;
+            }
+
+            if (dynamicControllerOptions.GetHttpMethod == null)
+            {
+                dynamicControllerOptions.GetHttpMethod = CustomizationDefaults.DefaultHttpMethod;
             }
         }
     }

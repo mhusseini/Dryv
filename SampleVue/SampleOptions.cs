@@ -2,6 +2,6 @@
 {
     public class SampleOptions
     {
-        public int ZipCodeLength { get; set; } = 4;
+        public int ZipCodeLength { get; set; } = 5;
     }
 }

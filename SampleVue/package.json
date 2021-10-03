@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "build": "webpack ./Views/Home/Home.js -o ./wwwroot"
+  },
+  "devDependencies": {
+    "@softwareproduction/dryvue": "^1.0.0-pre.18",
+    "axios": "^0.21.4",
+    "vue": "^2.6.14",
+    "webpack": "^5.52.1",
+    "webpack-cli": "^4.8.0"
+  }
+}

@@ -1,20 +1,11 @@
-using System;
-using System.Linq.Expressions;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Dryv.AspNetCore;
-using Dryv.AspNetCore.DynamicControllers;
-using Dryv.Configuration;
 using Dryv.SampleVue.CustomValidation;
-using Dryv.Validation;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 
 namespace Dryv.SampleVue
 {
@@ -29,29 +20,15 @@ namespace Dryv.SampleVue
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Error");
-                app.UseHsts();
-            }
-
+            app.UseDeveloperExceptionPage();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
             app.UseRouting();
-
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    "home",
-                    "/",
-                    new { controller = "Home", action = "Index" });
+                endpoints.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
             });
 
             app.UseDryv();
@@ -59,22 +36,33 @@ namespace Dryv.SampleVue
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<AsyncValidator>();
-            services.AddSingleton(new SampleOptions());
-
-            services
-                .AddMvc(options =>
-                {
-                    options.EnableEndpointRouting = true;
-                })
-                .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)))
-                .AddDryv(options => options.UseClientFunctionWriter<DryvAsyncClientValidationFunctionWriter>())
-                .AddDryvDynamicControllers(options=>options.HttpMethod = DryvDynamicControllerMethods.Get)
-                .AddDryvPreloading()
-                //.AddTranslator<AsyncValidatorTranslator>()
-                ;
-
             services.AddRouting();
+            services
+                .AddMvc(options => { options.EnableEndpointRouting = true; })
+                .AddRazorRuntimeCompilation()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+                })
+                .AddDryv(options => options.JsonConversion = text => JsonSerializer.Serialize(text, new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    Converters =
+                    {
+                        new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
+                    }
+                }))
+                .AddDryvDynamicControllers(options =>
+                {
+                    // options.GeneratedAssemblyOutput = ass => new Lokad.ILPack.AssemblyGenerator().GenerateAssembly(ass, ass.GetName().Name + ".dll");
+                })
+            //.AddDryvPreloading()
+            ;
+
+            services.AddSingleton<AsyncValidator>();
+            services.AddSingleton<SyncValidator>();
+            services.AddOptions<SampleOptions>();
         }
     }
 }

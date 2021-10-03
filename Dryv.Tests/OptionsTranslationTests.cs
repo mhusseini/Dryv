@@ -12,8 +12,8 @@ namespace Dryv.Tests
         public void InlineOptions()
         {
             var value = "hello";
-            var rule = TestWithOptionsModel.Rules.PropertyRules.First();
-            var jsProgram = GetTranslatedAst(rule.ValidationExpression, null, new object[]
+            var rule = TestWithOptionsModel.Rules.ValidationRules.First();
+            var jsProgram = GetTranslatedAst<TestWithOptionsModel>(rule.ValidationExpression, null, new object[]
             {
                 Options.Create(new TestOptions
                 {
@@ -40,10 +40,9 @@ namespace Dryv.Tests
                 .Rule<IOptions<TestOptions>>(
                     m => m.Text,
                     (m, o) => m.Text == o.Value.Text
-                        ? DryvResultMessage.Success
+                        ? DryvValidationResult.Success
                         : "fail");
 
-            [DryvRules]
             public abstract string Text { get; set; }
         }
     }

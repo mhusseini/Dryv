@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.2</TargetFramework>
-    <Version>5.0.0</Version>
+    <Version>6.0.0</Version>
     <Copyright>2020 Munir Husseini</Copyright>
     <PackageProjectUrl>https://github.com/mhusseini/Dryv</PackageProjectUrl>
     <PackageLicense>https://github.com/mhusseini/Dryv/blob/master/LICENSE</PackageLicense>
@@ -14,9 +14,10 @@
     <Company>Munir husseini</Company>
     <PackageIcon>dryv.png</PackageIcon>
     <ApplicationIcon>dryv.ico</ApplicationIcon>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <LangVersion>8</LangVersion>
+    <IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -25,13 +26,6 @@
 
   <ItemGroup>
     <None Include="dryv.png" Pack="true" PackagePath="\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="tools\**\*">
-      <Pack>true</Pack>
-      <PackagePath>tools\</PackagePath>
-    </Content>
   </ItemGroup>
   
   <ItemGroup>
@@ -47,6 +41,9 @@
     </Reference>
     <Reference Include="System.Diagnostics.TraceSource">
       <HintPath>..\..\..\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\3.1.0\ref\netcoreapp3.1\System.Diagnostics.TraceSource.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Thread">
+      <HintPath>..\..\..\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\3.1.0\ref\netcoreapp3.1\System.Threading.Thread.dll</HintPath>
     </Reference>
   </ItemGroup>
 

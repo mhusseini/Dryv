@@ -1,84 +1,43 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using System.Linq;
 using System.Reflection;
 using Dryv.Reflection;
 
 namespace Dryv.Extensions
 {
-    public static class TypeExtensions
+    internal static class TypeExtensions
     {
-        private static readonly TypeInfo EnumerableTypeInfo = typeof(IEnumerable).GetTypeInfo();
-
-        public static string GetJavaScriptType(this Type type)
+        public static string GetNonGenericName(this Type type)
         {
-            switch (type.Name)
-            {
-                case nameof(Int16):
-                case nameof(Int32):
-                case nameof(Int64):
-                case nameof(UInt16):
-                case nameof(UInt32):
-                case nameof(UInt64):
-                case nameof(Byte):
-                case nameof(SByte):
-                case nameof(Decimal):
-                case nameof(Double):
-                case nameof(Single):
-                    return "number";
-
-                case nameof(String):
-                    return "string";
-
-                case nameof(Boolean):
-                    return "boolean";
-
-                default:
-                    return "object";
-            }
+            return type.FullName;
+            //return type.GenericTypeArguments.Length == 0 ? type.FullName : type.GetGenericArguments().First().FullName;
         }
 
-        internal static Type GetElementType(this PropertyInfo property)
+        public static bool IsEnumOrNullableEnum(this Type type, out Type enumType)
         {
-            var type = property.PropertyType;
-            return GetElementType(type);
-        }
-
-        internal static Type GetElementType(this Type type)
-        {
+            enumType = null;
+            
             var typeInfo = type.GetTypeInfo();
-
-            while (type != typeof(string) && EnumerableTypeInfo.IsAssignableFrom(typeInfo) && typeInfo.IsGenericType)
+            if (typeInfo.IsEnum)
             {
-                type = typeInfo.GenericTypeArguments.First();
-                typeInfo = type.GetTypeInfo();
+                enumType = type;
+                return true;
             }
 
-            return type;
-        }
+            if (!typeInfo.IsGenericType || typeInfo.GetGenericTypeDefinition() != typeof(Nullable<>))
+            {
+                return false;
+            }
+            
+            var innerType = typeInfo.GenericTypeArguments.First();
+            if (!innerType.GetTypeInfo().IsEnum)
+            {
+                return false;
+            }
+            
+            enumType = innerType;
+            return true;
 
-        internal static IEnumerable<PropertyInfo> GetInheritedProperties(this PropertyInfo property)
-        {
-            return from type in property.DeclaringType.GetTypeHierarchyAndInterfaces()
-                   from p in type.GetProperties()
-                   where p.Name == property.Name
-                   select p;
-        }
-
-        internal static IEnumerable<Type> GetTypeHierarchyAndInterfaces(this Type type)
-        {
-            var typeHierarchy = type.Iterrate(t => t.GetBaseType()).ToList();
-
-            return (from t in typeHierarchy
-                    from i in t.GetInterfaces()
-                    select i).Union(typeHierarchy);
-        }
-
-        internal static bool IsNavigationProperty(this PropertyInfo property)
-        {
-            var type = property.GetElementType();
-            return type.IsClass() && type.Namespace != "System";
         }
     }
 }

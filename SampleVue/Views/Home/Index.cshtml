@@ -1,6 +1,5 @@
-﻿@using System.Linq
-@using Dryv.AspNetCore
-@using Dryv.SampleVue.Models
+﻿@using Dryv.SampleVue.Models
+@namespace Dryv.SampleVue
 
 @model HomeModel
 
@@ -8,58 +7,66 @@
 <head>
     <title>Form validation with VueJS and Dryv.</title>
     <link rel="stylesheet" href="styles.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@200;400;700&family=Roboto:wght@300&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@200;400;700&family=Roboto:wght@300&display=swap" rel="stylesheet" />
 </head>
 <body>
+    <dryv-client-rules name="demo-form" />
 
-    <script>
-        (function(dryv) {
-            dryv.validators = {
-                @Html.Raw(string.Join(",\n", from val in Html.GetDryvClientValidationFunctions()
-                                                      select $@"""{val.Key}"": {val.Value}"))
-            };
-            dryv.disablers = {
-                @Html.Raw(string.Join(",\n", from val in Html.GetDryvClientDisablingFunctions()
-                                                      select $@"""{val.Key}"": {val.Value}"))
-            };
-        })(window.dryv || (window.dryv = {}));
-    </script>
-
-    <div id="app" v-dryv>
-        <h1>Form validation with VueJS and Dryv.</h1>
+    <div id="app" v-dryv-set="{ name: 'demo-form', path: 'model' }">
+        <h1>Form validation with Vue.js and Dryv.</h1>
         <form v-on:submit="validateForm" method="post">
             <div class="form-content">
-                @*<input v-model="person.firstName" v-dryv="person.firstName"/>*@
                 <div class="form-block">
                     <h3>Personal Data</h3>
 
-                    <form-input label="First name" v-model="person.firstName"></form-input>
-                    <form-input label="Last name" v-model="person.lastName"></form-input>
+                    <dryv-group>
+                        <div slot-scope="{errors, warnings}">
+                            <form-input label="First name" v-model="model.person.firstName"></form-input>
+                            <form-input label="Last name" v-model="model.person.lastName"></form-input>
+
+                            <div v-for="text in errors" :key="text" class="form-item-error">{{text}}</div>
+                            <div v-for="text in warnings" :key="text" class="form-item-warning">{{text}}</div>
+                        </div>
+                    </dryv-group>
                 </div>
 
                 <div class="form-block">
                     <h3>Shipping Address</h3>
 
-                    <form-input label="ZIP code" v-model="shippingAddress.zipCode"></form-input>
-                    <form-input label="City" v-model="shippingAddress.city"></form-input>
-                </div>
+                    <dryv-group>
+                        <div slot-scope="{errors, warnings}">
+                            <form-input label="ZIP code" v-model="model.shippingAddress.zipCode"></form-input>
+                            <form-input label="City" v-model="model.shippingAddress.city"></form-input>
 
+                            <div v-for="text in errors" :key="text" class="form-item-error">{{text}}</div>
+                            <div v-for="text in warnings" :key="text" class="form-item-warning">{{text}}</div>
+                        </div>
+                    </dryv-group>
+                </div>
                 <div class="form-block">
                     <h3>Billing Address</h3>
 
                     <div class="form-item">
                         <label for="billingAddress-deactivate">Billing address equals shipping address.</label>
-                        <input id="billingAddress-deactivate" type="checkbox" v-model="billingEqualsShipping">
+                        <input id="billingAddress-deactivate" type="checkbox" v-model="model.billingEqualsShipping" />
                     </div>
 
-                    <div v-show="!billingEqualsShipping">
-                        <form-input label="ZIP code" v-model="billingAddress.zipCode"></form-input>
-                        <form-input label="City" v-model="billingAddress.city"></form-input>
+                    <div v-show="!model.billingEqualsShipping">
+                        <dryv-group>
+                            <div slot-scope="{errors, warnings}">
+                                <form-input label="ZIP code" v-model="model.billingAddress.zipCode"></form-input>
+                                <form-input label="City" v-model="model.billingAddress.city"></form-input>
+
+                                <div v-for="text in errors" :key="text" class="form-item-error">{{text}}</div>
+                                <div v-for="text in warnings" :key="text" class="form-item-warning">{{text}}</div>
+                            </div>
+                        </dryv-group>
                     </div>
                 </div>
+
             </div>
             <div class="form-block">
-                <input type="submit" value="Submit">
+                <input type="submit" value="Submit" />
 
                 <div v-if="isValid === true" class="validation-feedback" style="background-color: lightgreen">
                     Valid
@@ -72,72 +79,6 @@
         </form>
     </div>
 
-    <script type="text/x-template" id="form-input">
-        <div class="form-item" v-dryv-field>
-            <div>
-                <div class="form-input-label">
-                    <label>{{ label }}</label>
-                </div>
-                <div class="form-input-control">
-                    <input v-bind:value="value" v-on:input="$emit('input', $event.target.value)">
-                </div>
-            </div>
-            <div class="form-item-error" v-if="error">{{ error }}</div>
-        </div>
-    </script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.11/vue.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js"></script>
-    <script src="demo.js"></script>
-<script>
-    Vue.use(Dryv,
-        {
-            get: axios.get,
-            post: axios.post
-        });
-
-    Vue.component('form-input',
-        {
-            props: ['value', 'type', 'name', 'label'],
-            template: '#form-input',
-            data() {
-                return {
-                    error: null
-                };
-            }
-        });
-
-    const app = new Vue({
-        el: '#app',
-        data: {
-            isValid: null,
-            billingEqualsShipping: true,
-            person: {
-                firstName: null,
-                lastName: null
-            },
-            shippingAddress: {
-                zipCode: null,
-                city: null
-            },
-            billingAddress: {
-                zipCode: null,
-                city: null
-            }
-        },
-        methods: {
-            async validateForm(e) {
-                e.preventDefault();
-
-                if (await this.$dryv.validate()) {
-                    const result = axios.post(e.currentTarget.action, this.$data);
-                    if (result.data) {
-                        this.$dryv.setValidationResult(result.data.errors);
-                    }
-                }
-            }
-        }
-    });
-</script>
+    <script type="text/javascript" src="~/main.js"></script>
 </body>
 </html>

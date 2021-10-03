@@ -1,5 +1,6 @@
 ﻿using System;
 using Dryv.Rules;
+using Dryv.SampleVue.CustomValidation;
 
 namespace Dryv.SampleConsole.Models
 {
@@ -13,10 +14,8 @@ namespace Dryv.SampleConsole.Models
                 m => m.LastName,
                 m => m.FirstName.Equals(m.LastName, StringComparison.OrdinalIgnoreCase) ? $"First and last name cannot both be '{m.FirstName}'." : null);
 
-        [DryvRules]
         public string FirstName { get; set; }
 
-        [DryvRules]
         public string LastName { get; set; }
     }
 }

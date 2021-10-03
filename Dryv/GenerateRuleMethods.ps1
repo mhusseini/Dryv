@@ -25,11 +25,18 @@ function WriteMethod($propCount, $optionCount, $methodPrefix)
 	}
 
 	if($optionCount -gt 0){
-		$ruleSwitch = ",`r`n         			Expression<Func<$($gen2)bool>> ruleSwitch = null";
+		$ruleSwitch = ",`r`n         			Func<$($gen2)bool> ruleSwitch";
+		$ruleSwitchAsync = ",`r`n         			Func<$($gen2)Task<bool>> ruleSwitch";
 		$ruleSwitchArgument = "ruleSwitch";
 	}
 	else {
 		$ruleSwitchArgument = "null";
+	}
+
+	$gen3 = "";
+	for($i = 1; $i -le $optionCount; $i++)
+	{
+		$gen3 += ", typeof(TOptions$i)";
 	}
 
 	if(-Not($methodPrefix)){
@@ -39,55 +46,106 @@ $parameters			Expression<Func<TModel, $($gen2)bool>> rule$ruleSwitch)
         {
 			this.Disable(rule,
 				new[] { $properties},
-				$ruleSwitchArgument);
-			return this;
-        }
-		
-		public DryvRules<TModel> DisableRules$gen(
-$parameters			Expression<Func<TModel, $($gen2)Task<bool>>> rule$ruleSwitch)
-        {
-			this.Disable(rule,
-				new[] { $properties},
-				$ruleSwitchArgument);
+				$ruleSwitchArgument
+				$gen3);
 			return this;
         }
 "@ | Add-Content $fn
+        if($ruleSwitch) {
+            @"
+            public DryvRules<TModel> DisableRules$gen(
+    $parameters			Expression<Func<TModel, $($gen2)bool>> rule)
+            {
+                this.Disable(rule,
+                    new[] { $properties},
+                    null
+                    $gen3);
+                return this;
+            }
+            
+            public DryvRules<TModel> DisableRules$gen(
+    $parameters			Expression<Func<TModel, $($gen2)bool>> rule$ruleSwitchAsync)
+            {
+                this.Disable(rule,
+                    new[] { $properties},
+                    $ruleSwitchArgument
+                    $gen3);
+                return this;
+            }
+"@ | Add-Content $fn
+        }
 	}
 
 	@"
 		public DryvRules<TModel> $($methodPrefix)Rule$gen(
-$parameters			Expression<Func<TModel, $($gen2)DryvResultMessage>> rule$ruleSwitch)
+$parameters			Expression<Func<TModel, $($gen2)DryvValidationResult>> rule$ruleSwitch, DryvRuleSettings settings = null)
         {
-			this.Add$($methodPrefix)(null, rule,
+			this.Add$($methodPrefix)(rule,
 				new[] { $properties},
-				$ruleSwitchArgument);
+				$ruleSwitchArgument,
+				settings
+				$gen3);
 			return this;
         }
-		public DryvRules<TModel> $($methodPrefix)Rule$gen(string groupName,
-$parameters			Expression<Func<TModel, $($gen2)DryvResultMessage>> rule$ruleSwitch)
-        {
-			this.Add$($methodPrefix)(groupName, rule,
-				new[] { $properties},
-				$ruleSwitchArgument);
-			return this;
-        }
+        
 		public DryvRules<TModel> $($methodPrefix)Rule$gen(
-$parameters			Expression<Func<TModel, $($gen2)Task<DryvResultMessage>>> rule$ruleSwitch)
+$parameters			Expression<Func<TModel, $($gen2)Task<DryvValidationResult>>> rule$ruleSwitch, DryvRuleSettings settings = null)
         {
-			this.Add$($methodPrefix)(null, rule,
+			this.Add$($methodPrefix)(rule,
 				new[] { $properties},
-				$ruleSwitchArgument);
-			return this;
-        }
-		public DryvRules<TModel> $($methodPrefix)Rule$gen(string groupName,
-$parameters			Expression<Func<TModel, $($gen2)Task<DryvResultMessage>>> rule$ruleSwitch)
-        {
-			this.Add$($methodPrefix)(groupName, rule,
-				new[] { $properties},
-				$ruleSwitchArgument);
+				$ruleSwitchArgument,
+				settings
+				$gen3);
 			return this;
         }
 "@ | Add-Content $fn;
+    if($ruleSwitch){
+        @"
+        
+            public DryvRules<TModel> $($methodPrefix)Rule$gen(
+    $parameters			Expression<Func<TModel, $($gen2)Task<DryvValidationResult>>> rule, DryvRuleSettings settings = null)
+            {
+                this.Add$($methodPrefix)(rule,
+                    new[] { $properties},
+                    null,
+                    settings
+                    $gen3);
+                return this;
+            }
+            
+            public DryvRules<TModel> $($methodPrefix)Rule$gen(
+    $parameters			Expression<Func<TModel, $($gen2)DryvValidationResult>> rule, DryvRuleSettings settings = null)
+            {
+                this.Add$($methodPrefix)(rule,
+                    new[] { $properties},
+                    null,
+                    settings
+                    $gen3);
+                return this;
+            }
+            
+            public DryvRules<TModel> $($methodPrefix)Rule$gen(
+    $parameters			Expression<Func<TModel, $($gen2)DryvValidationResult>> rule$ruleSwitchAsync, DryvRuleSettings settings = null)
+            {
+                this.Add$($methodPrefix)(rule,
+                    new[] { $properties},
+                    $ruleSwitchArgument,
+                    settings
+                    $gen3);
+                return this;
+            }
+            public DryvRules<TModel> $($methodPrefix)Rule$gen(
+    $parameters			Expression<Func<TModel, $($gen2)Task<DryvValidationResult>>> rule$ruleSwitchAsync, DryvRuleSettings settings = null)
+            {
+                this.Add$($methodPrefix)(rule,
+                    new[] { $properties},
+                    $ruleSwitchArgument,
+                    settings
+                    $gen3);
+                return this;
+            }
+"@ | Add-Content $fn;
+    }
 }
 
 'using System;
@@ -101,11 +159,11 @@ namespace Dryv.Rules
     {
 ' | Out-File $fn
 
-$prefixes = @("","Server","Client")
+$prefixes = @("","Client")
 
-for($i = 1; $i -lt 10; $i++) {
-	for($o = 0; $o -lt 9; $o++)	{
-		foreach ($prefix in $prefixes) {
+foreach ($prefix in $prefixes) {
+    for($o = 0; $o -lt 6; $o++)	{
+		for($i = 1; $i -lt 6; $i++) {
 			WriteMethod -propCount $i -optionCount $o -methodPrefix $prefix;
 		}
 	}

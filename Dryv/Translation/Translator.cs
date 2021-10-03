@@ -1,9 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using Dryv.Configuration;
+using Dryv.Extensions;
+using Dryv.Rules;
+using Dryv.Translation.Visitors;
 
 namespace Dryv.Translation
 {
@@ -11,15 +16,23 @@ namespace Dryv.Translation
     {
         private readonly TranslationCompiler translationCompiler;
 
-        protected Translator()
+        protected Translator(DryvOptions options)
         {
-            this.translationCompiler = new TranslationCompiler(this);
+            this.Options = options;
+            this.translationCompiler = new TranslationCompiler();
         }
 
-        public virtual TranslationResult Translate(Expression expression, MemberExpression propertyExpression)
+        protected DryvOptions Options { get; }
+
+        public virtual string FormatIdentifier(string name)
         {
-            var result = this.GenerateJavaScriptCode(expression, propertyExpression);
-            return this.translationCompiler.GenerateTranslationDelegate(result.Code, result.OptionDelegates, result.OptionTypes);
+            return name;
+        }
+
+        public virtual TranslationResult Translate(Expression expression, MemberExpression propertyExpression, DryvCompiledRule rule)
+        {
+            var result = this.GenerateJavaScriptCode(expression, propertyExpression, rule);
+            return this.translationCompiler.GenerateTranslationDelegate(result.Code, result.OptionDelegates, result.InjectedServiceTypes);
         }
 
         public virtual void Translate(Expression expression, TranslationContext context, bool negated = false)
@@ -31,7 +44,9 @@ namespace Dryv.Translation
             return value?.ToString();
         }
 
-        public virtual void Visit(BinaryExpression expression, TranslationContext context, bool negated = false)
+        public abstract bool TryWriteTerminal(Expression expression, TextWriter writer);
+
+        public virtual void Visit(BinaryExpression expression, TranslationContext context, bool negated = false, bool leftOnly = false)
         {
         }
 
@@ -146,46 +161,52 @@ namespace Dryv.Translation
 
         private GeneratedJavaScriptCode GenerateJavaScriptCode(
             Expression expression,
-            MemberExpression propertyExpression)
+            MemberExpression propertyExpression,
+            DryvCompiledRule rule)
         {
-            // Find all option types used in the validation expression.
-            var optionTypes = ((LambdaExpression)expression).GetOptionTypes();
+            // Find all service types used in the validation expression.
+            var serviceTypes = ((LambdaExpression)expression).GetInjectedServiceTypes();
             // Collect delegates that use options from withing the validation expression.
-            var optionDelegates = new Dictionary<int, OptionDelegate>();
+            var optionDelegates = new Dictionary<int, InjectedExpression>();
             var sb = new StringBuilder();
 
-            using var writer = new IndentingStringWriter(sb);
+            using var writer = new StringWriter(sb);
             var context = new TranslationContext
             {
-                OptionsTypes = optionTypes,
+                InjectedServiceTypes = serviceTypes,
                 Writer = writer,
-                OptionDelegates = optionDelegates,
-                ModelType = propertyExpression?.Expression.GetExpressionType(),
-                PropertyExpression = propertyExpression?.Expression
+                InjectedExpressions = optionDelegates,
+                ModelType = rule.ModelType,
+                PropertyExpression = propertyExpression?.Expression,
+                Group = rule.Group,
+                StringBuilder = sb,
+                Rule = rule,
             };
 
+            expression = new EnumComparisionModifier().Visit(expression);
+            expression = new ConditionConversionModifier().Visit(expression);
             this.Translate(expression, context);
 
             return new GeneratedJavaScriptCode
             (
                 sb.ToString(),
-                optionTypes,
-                context.OptionDelegates.Values.ToList()
+                serviceTypes,
+                context.InjectedExpressions.Values.ToList()
             );
         }
 
         private struct GeneratedJavaScriptCode
         {
-            public GeneratedJavaScriptCode(string code, IList<Type> optionTypes, IList<OptionDelegate> optionDelegates)
+            public GeneratedJavaScriptCode(string code, IList<Type> injectedServiceTypes, IList<InjectedExpression> optionDelegates)
             {
                 this.Code = code;
-                this.OptionTypes = optionTypes;
+                this.InjectedServiceTypes = injectedServiceTypes;
                 this.OptionDelegates = optionDelegates;
             }
 
             public string Code { get; }
-            public IList<OptionDelegate> OptionDelegates { get; }
-            public IList<Type> OptionTypes { get; }
+            public IList<InjectedExpression> OptionDelegates { get; }
+            public IList<Type> InjectedServiceTypes { get; }
         }
     }
 }

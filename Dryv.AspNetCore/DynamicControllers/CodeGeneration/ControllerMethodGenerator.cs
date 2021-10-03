@@ -4,20 +4,29 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Threading.Tasks;
+using Dryv.AspNetCore.DynamicControllers.Runtime;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
 {
     internal class ControllerMethodGenerator
     {
-        public static void GenerateWrapperMethodGet(MethodInfo methodInfo, Type modelType, MethodCallExpression methodExpression, LambdaExpression lambda, TypeBuilder typeBuilder, FieldInfo delegateField, IDictionary<ParameterExpression, FieldBuilder> innerFields, DryvControllerGenerationContext context, DryvDynamicControllerOptions options)
+        private static readonly Type ControllerBaseType = typeof(DryvDynamicController);
+
+        private static readonly MethodInfo JsonAsyncMethod = ControllerBaseType.GetMethod(nameof(DryvDynamicController.JsonAsync));
+
+        private static readonly MethodInfo JsonMethod = ControllerBaseType.GetMethod(nameof(DryvDynamicController.JsonSync));
+
+        public static void GenerateWrapperMethodGet(Type modelType, string action, Expression expression, LambdaExpression lambda, TypeBuilder typeBuilder, FieldInfo delegateField, IDictionary<ParameterExpression, FieldBuilder> innerFields, DryvControllerGenerationContext context, DryvDynamicControllerOptions options)
         {
+            var isAsync = IsTaskType(lambda);
             var memberFinder = new ControllerGenerator.MemberFinder(modelType);
-            memberFinder.Visit(methodExpression);
+            memberFinder.Visit(expression);
             var properties = memberFinder.FoundMemberExpressions.Select(e => e.Member).Distinct().OfType<PropertyInfo>().ToList();
 
             var method = lambda.Type.GetMethod("Invoke");
-            var methodBuilder = CreateMethodBuilder(typeBuilder, methodInfo.Name, lambda.ReturnType, properties.Select(p => p.PropertyType).ToArray(), context, options);
+            var methodBuilder = CreateMethodBuilder(typeBuilder, action, GetReturnType(lambda), properties.Select(p => p.PropertyType).ToArray(), context, options);
             var index = 1;
             var parameterBuilders = properties.ToDictionary(
                 p => p,
@@ -44,7 +53,7 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
             il.Emit(OpCodes.Stloc_S, modelVariable);
 
             il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Ldfld, delegateField);
+            il.Emit(OpCodes.Ldsfld, delegateField);
 
             foreach (var parameter in lambda.Parameters)
             {
@@ -60,24 +69,30 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
             }
 
             il.Emit(OpCodes.Callvirt, method);
+            if (method.ReturnType.IsValueType)
+            {
+                il.Emit(OpCodes.Box, method.ReturnType);
+            }
+            il.Emit(OpCodes.Callvirt, isAsync ? JsonAsyncMethod : JsonMethod);
 
             il.Emit(OpCodes.Ret);
         }
 
-        public static void GenerateWrapperMethodPost(MethodInfo methodInfo, Type modelType, LambdaExpression lambda, TypeBuilder typeBuilder, FieldInfo delegateField, IDictionary<ParameterExpression, FieldBuilder> innerFields, DryvControllerGenerationContext context, DryvDynamicControllerOptions options)
+        public static void GenerateWrapperMethodPost(Type modelType, string action, LambdaExpression lambda, TypeBuilder typeBuilder, FieldInfo delegateField, IDictionary<ParameterExpression, FieldBuilder> innerFields, DryvControllerGenerationContext context, DryvDynamicControllerOptions options)
         {
+            var isAsync = IsTaskType(lambda);
             var method = lambda.Type.GetMethod("Invoke");
-            var methodBuilder = ControllerMethodGenerator.CreateMethodBuilder(typeBuilder, methodInfo.Name, lambda.ReturnType, new[] { modelType }, context, options);
+            var methodBuilder = CreateMethodBuilder(typeBuilder, action, GetReturnType(lambda), new[] { modelType }, context, options);
             var parameterBuilder = methodBuilder.DefineParameter(1, ParameterAttributes.None, "model");
             parameterBuilder.SetCustomAttribute(ControllerAttributeGenerator.CreateAttributeBuilder<FromBodyAttribute>());
 
             ControllerAttributeGenerator.SetAttribute<HttpPostAttribute>(methodBuilder);
-            ControllerMethodGenerator.AddRoutingAttribute(methodBuilder, context, options);
+            AddRoutingAttribute(methodBuilder, context, options);
 
             var il = methodBuilder.GetILGenerator();
 
             il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Ldfld, delegateField);
+            il.Emit(OpCodes.Ldsfld, delegateField);
 
             foreach (var parameter in lambda.Parameters)
             {
@@ -93,28 +108,42 @@ namespace Dryv.AspNetCore.DynamicControllers.CodeGeneration
             }
 
             il.Emit(OpCodes.Callvirt, method);
+            if (method.ReturnType.IsValueType)
+            {
+                il.Emit(OpCodes.Box, method.ReturnType);
+            }
+            il.Emit(OpCodes.Callvirt, isAsync ? JsonAsyncMethod : JsonMethod);
+
             il.Emit(OpCodes.Ret);
         }
 
         private static void AddRoutingAttribute(MethodBuilder methodBuilder, DryvControllerGenerationContext context, DryvDynamicControllerOptions options)
         {
-            if (options.MapRouteTemplate == null)
+            if (options.GetRoute != null)
             {
-                return;
+                ControllerAttributeGenerator.SetAttribute<RouteAttribute>(methodBuilder, options.GetRoute(context));
             }
-
-            var template = options.MapRouteTemplate(context);
-
-            ControllerAttributeGenerator.SetAttribute<RouteAttribute>(methodBuilder, template);
         }
 
         private static MethodBuilder CreateMethodBuilder(TypeBuilder typeBuilder, string methodName, Type returnType, Type[] parameterTypes, DryvControllerGenerationContext context, DryvDynamicControllerOptions options)
         {
             var methodBuilder = typeBuilder.DefineMethod(methodName, MethodAttributes.Public, returnType, parameterTypes);
 
-            ControllerAttributeGenerator.AddCustomAttributes(context, options.MapActionFilters, methodBuilder.SetCustomAttribute);
+            ControllerAttributeGenerator.AddCustomAttributes(context, methodBuilder.SetCustomAttribute, options.GetActionFilters);
 
             return methodBuilder;
+        }
+
+        private static Type GetReturnType(LambdaExpression lambda)
+        {
+            return IsTaskType(lambda)
+                ? typeof(Task<IActionResult>)
+                : typeof(IActionResult);
+        }
+
+        private static bool IsTaskType(LambdaExpression lambda)
+        {
+            return typeof(Task).IsAssignableFrom(lambda.Body.Type);
         }
     }
 }
