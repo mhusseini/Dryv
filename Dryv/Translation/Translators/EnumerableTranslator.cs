@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using System.Linq.Expressions;
 using Dryv.Extensions;
-using Dryv.Reflection;
 
 namespace Dryv.Translation.Translators
 {
@@ -40,7 +39,16 @@ namespace Dryv.Translation.Translators
 
         protected static void Any(MethodTranslationContext context)
         {
-            Translate(context, "some");
+            var func = context.Expression.Arguments.Skip(1).FirstOrDefault();
+            if (func != null)
+            {
+                Translate(context, "some");
+                return;
+            }
+
+            var array = context.Expression.Arguments.First();
+            context.Translator.Translate(array, context);
+            context.Writer.Write(".length");
         }
 
         protected static void Average(MethodTranslationContext context)

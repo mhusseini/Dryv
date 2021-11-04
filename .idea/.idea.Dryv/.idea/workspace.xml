@@ -36,13 +36,32 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="81fd7ff9-3930-4c09-a8cb-036017f14ba0" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/Dryv.Tests/EnumTranslationTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/contentModel.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/contentModel.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Dryv.Tests/ValidationTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/contentModel.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/indexLayout.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/indexLayout.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/riderModule.iml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.Tests/JavascriptTranslatorTestsBase.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv.Tests/JavascriptTranslatorTestsBase.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Dryv/riderModule.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv.Tests/EnumTranslationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv.Tests/EnumTranslationTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv.Tests/ReflectionTests.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv.Tests/RuleDiscovery2Tests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv.Tests/RuleDiscovery2Tests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv/Dryv.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/Dryv.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv/DryvValidator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/DryvValidator.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Dryv/Extensions/TypeExtensions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/Extensions/TypeExtensions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/JavaScriptHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/Translation/JavaScriptHelper.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/JavaScriptTranslator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/Translation/JavaScriptTranslator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv/Reflection/TypeExtensions.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv/RuleDetection/DryvRuleFinder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/RuleDetection/DryvRuleFinder.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv/RuleDetection/ModelTreeBuilder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/RuleDetection/ModelTreeBuilder.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv/RuleDetection/ModelTreeEdge.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/RuleDetection/ModelTreeEdge.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv/RuleDetection/ModelTreeNode.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/RuleDetection/ModelTreeNode.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv/Rules/DryvCompiledRule.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/Rules/DryvCompiledRule.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv/TaskRetype.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/TaskRetype.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv/Translation/TranslationCompiler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/Translation/TranslationCompiler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv/Translation/Translators/DryvValidationResultTranslator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/Translation/Translators/DryvValidationResultTranslator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv/Translation/Translators/EnumerableTranslator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/Translation/Translators/EnumerableTranslator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv/Translation/Translators/MethodCallTranslator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/Translation/Translators/MethodCallTranslator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv/Translation/Translators/StringTranslator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/Translation/Translators/StringTranslator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv/Translation/Visitors/EnumComparisionModifier.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/Translation/Visitors/EnumComparisionModifier.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -80,16 +99,28 @@
     </file-type-list>
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/E007F98B-FAF6-4B61-8606-9397C1AC3679/24/LambdaExpression.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Dryv.AspNetCore/HtmlExtension.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/SampleConsole/Program.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/B27B5127-42C3-446E-9278-529B4ACCE4FE/251/TaskAwaiter.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/B27B5127-42C3-446E-9278-529B4ACCE4FE/3A4/List.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/7F843AF7-849D-4B1D-BC86-DD6A71AA376C/1E/Expression.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/C158E430-C142-4741-ADAB-56A022C4B7B0/D/AnyAll.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/9FCAADD9-58A4-4900-9D68-546D5ECFE219/277/MethodBase.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/B040A37C-41D0-474D-A152-F1FA7760E8F1/36/JsonSerializer.Write.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/92EC1C6B-080B-4DA4-A456-EC4CE287187B/C/SafeLibraryHandle.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/SampleVue/Views/Home/Index.cshtml" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/C158E430-C142-4741-ADAB-56A022C4B7B0/D/AnyAll.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/AAF9EE24-4AE0-419D-A9A3-02771A760733/2E/ToCollection.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/B27B5127-42C3-446E-9278-529B4ACCE4FE/CD/ThrowHelper.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/B040A37C-41D0-474D-A152-F1FA7760E8F1/3B/JsonSerializer.Write.Helpers.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/92EC1C6B-080B-4DA4-A456-EC4CE287187B/C/SafeLibraryHandle.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/B040A37C-41D0-474D-A152-F1FA7760E8F1/36/JsonSerializer.Write.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/AAF9EE24-4AE0-419D-A9A3-02771A760733/28/SelectMany.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Dryv.AspNetCore/HtmlExtension.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/AB459DEC-1089-48A5-B911-622CFA5F50A8/9a/8678054d/Assert.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/91374B35-F7C0-4E40-95E2-0890ABBC2773/28/MemberExpression.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/B27B5127-42C3-446E-9278-529B4ACCE4FE/3A1/KeyValuePair.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/53E18F62-D971-41B9-90B3-88780DB27743/1E/Socket.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/SampleVue/Views/Home/Index.cshtml" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/AAF9EE24-4AE0-419D-A9A3-02771A760733/30/Where.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/B27B5127-42C3-446E-9278-529B4ACCE4FE/2E/RuntimeType.CoreCLR.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/E007F98B-FAF6-4B61-8606-9397C1AC3679/24/LambdaExpression.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/B27B5127-42C3-446E-9278-529B4ACCE4FE/37/Type.CoreCLR.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="IdeDocumentHistory">
     <changedPaths>
@@ -102,22 +133,36 @@
       <option value="$PROJECT_DIR$/Dryv/Translation/Translators/RegexTranslator.cs" />
       <option value="$PROJECT_DIR$/Dryv.Tests/JavascriptTranslatorTests.cs" />
       <option value="$PROJECT_DIR$/Dryv/Translation/TranslationContextExtensions.cs" />
-      <option value="$PROJECT_DIR$/Dryv/RuleDetection/DryvRuleFinder.cs" />
-      <option value="$PROJECT_DIR$/Dryv.Tests/RuleDiscovery2Tests.cs" />
       <option value="$PROJECT_DIR$/Dryv.Tests/StringTests.cs" />
       <option value="$PROJECT_DIR$/Dryv.Tests/OptionsTranslationTests.cs" />
-      <option value="$PROJECT_DIR$/Dryv/Translation/Translators/MethodCallTranslator.cs" />
-      <option value="$PROJECT_DIR$/Dryv/Translation/Translators/DryvValidationResultTranslator.cs" />
-      <option value="$PROJECT_DIR$/Dryv/Translation/Translators/StringTranslator.cs" />
       <option value="$PROJECT_DIR$/Dryv/Translation/JavaScriptTranslator.cs" />
       <option value="$PROJECT_DIR$/Dryv/Dryv.csproj" />
       <option value="$PROJECT_DIR$/Dryv/Translation/JavaScriptHelper.cs" />
-      <option value="$PROJECT_DIR$/Dryv/Translation/Translators/EnumerableTranslator.cs" />
       <option value="$PROJECT_DIR$/Dryv.Tests/EnumerbaleTests.cs" />
       <option value="$PROJECT_DIR$/Dryv/Translation/ExpressionInjectionHelper.cs" />
       <option value="$PROJECT_DIR$/Dryv.Tests/BooleanTranslationTests.cs" />
-      <option value="$PROJECT_DIR$/Dryv.Tests/EnumTranslationTests.cs" />
       <option value="$PROJECT_DIR$/Dryv.Tests/JavascriptTranslatorTestsBase.cs" />
+      <option value="$PROJECT_DIR$/Dryv/RuleDetection/ModelTreeEdge.cs" />
+      <option value="$PROJECT_DIR$/Dryv/Reflection/TypeExtensions.cs" />
+      <option value="$PROJECT_DIR$/Dryv/TaskRetype.cs" />
+      <option value="$PROJECT_DIR$/Dryv/Translation/TranslationCompiler.cs" />
+      <option value="$PROJECT_DIR$/Dryv/Translation/Translators/DryvValidationResultTranslator.cs" />
+      <option value="$PROJECT_DIR$/Dryv/Translation/Visitors/EnumComparisionModifier.cs" />
+      <option value="$PROJECT_DIR$/Dryv/Translation/Translators/MethodCallTranslator.cs" />
+      <option value="$PROJECT_DIR$/Dryv.Tests/AnyMethodTests.cs" />
+      <option value="$PROJECT_DIR$/Dryv/Translation/Translators/EnumerableTranslator.cs" />
+      <option value="$PROJECT_DIR$/Dryv/RuleDetection/ModelTreeBuilder.cs" />
+      <option value="$PROJECT_DIR$/Dryv/RuleDetection/ModelTreeNode.cs" />
+      <option value="$PROJECT_DIR$/Dryv/DryvValidator.cs" />
+      <option value="$PROJECT_DIR$/Dryv.Tests/ValidationTests.cs" />
+      <option value="$PROJECT_DIR$/Dryv/Translation/Translators/StringTranslator.cs" />
+      <option value="$PROJECT_DIR$/Dryv.Tests/EnumTranslationTests.cs" />
+      <option value="$PROJECT_DIR$/Dryv.Tests/ReflectionTests.cs" />
+      <option value="$PROJECT_DIR$/Dryv/RuleDetection/ModelTreeNodeExtensions.cs" />
+      <option value="$PROJECT_DIR$/Dryv/Rules/DryvCompiledRule.cs" />
+      <option value="$PROJECT_DIR$/Dryv/Extensions/TypeExtensions.cs" />
+      <option value="$PROJECT_DIR$/Dryv.Tests/RuleDiscovery2Tests.cs" />
+      <option value="$PROJECT_DIR$/Dryv/RuleDetection/DryvRuleFinder.cs" />
     </changedPaths>
   </component>
   <component name="JsFlowSettings">
@@ -132,12 +177,13 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
-    <property name="DebuggerViewTab_PTCS_FirstProportionKey" value="0.34962186" />
+    <property name="DebuggerViewTab_PTCS_FirstProportionKey" value="0.46487767" />
     <property name="DebuggerViewTab_PTCS_LastProportionKey" value="0.0" />
     <property name="JavaScriptWeakerCompletionTypeGuess" value="true" />
     <property name="Rider.ProjectViewActivator.IsNotFirstRun" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="XThreadsFramesViewSplitterKey" value="0.35396826" />
     <property name="last_opened_file_path" value="C:/kundenprojekte/enbw/src/VTP/Yello/VTP-Yello.sln" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
@@ -259,6 +305,9 @@
       <workItem from="1618860326156" duration="2212000" />
       <workItem from="1618862603747" duration="13885000" />
       <workItem from="1618880220747" duration="2732000" />
+      <workItem from="1635803832498" duration="18577000" />
+      <workItem from="1636048222475" duration="11139000" />
+      <workItem from="1636060579093" duration="4169000" />
     </task>
     <task id="LOCAL-00001" summary="Renamed and moved DryvPreloadAttribute (now DryvSetAttribute).">
       <created>1601042302266</created>
@@ -464,81 +513,16 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Dryv.Tests/RuleDiscovery2Tests.cs</url>
-          <line>56</line>
-          <properties documentPath="$PROJECT_DIR$/Dryv.Tests/RuleDiscovery2Tests.cs" initialLine="56" containingFunctionPresentation="method 'FindeRuleOnParentNode'">
-            <startOffsets>
-              <option value="1783" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1810" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="36" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Dryv.Tests/RuleDiscovery2Tests.cs</url>
-          <line>77</line>
+          <line>81</line>
           <properties documentPath="$PROJECT_DIR$/Dryv.Tests/RuleDiscovery2Tests.cs" initialLine="77" containingFunctionPresentation="method 'FinderulesForInterface'">
             <startOffsets>
-              <option value="2521" />
+              <option value="2799" />
             </startOffsets>
             <endOffsets>
-              <option value="2548" />
+              <option value="2826" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="37" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Dryv.Tests/EnumerbaleTests.cs</url>
-          <line>183</line>
-          <properties documentPath="$PROJECT_DIR$/Dryv.Tests/EnumerbaleTests.cs" initialLine="183" containingFunctionPresentation="method 'TranslateAverage'">
-            <startOffsets>
-              <option value="6939" />
-            </startOffsets>
-            <endOffsets>
-              <option value="6966" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="53" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Dryv.Tests/EnumerbaleTests.cs</url>
-          <line>181</line>
-          <properties documentPath="$PROJECT_DIR$/Dryv.Tests/EnumerbaleTests.cs" initialLine="181" containingFunctionPresentation="method 'TranslateAverage'">
-            <startOffsets>
-              <option value="6888" />
-            </startOffsets>
-            <endOffsets>
-              <option value="6925" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="54" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Dryv.Tests/EnumerbaleTests.cs</url>
-          <line>196</line>
-          <properties documentPath="$PROJECT_DIR$/Dryv.Tests/EnumerbaleTests.cs" initialLine="196" containingFunctionPresentation="method 'TranslateMax'">
-            <startOffsets>
-              <option value="7412" />
-            </startOffsets>
-            <endOffsets>
-              <option value="7441" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="56" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Dryv.Tests/EnumerbaleTests.cs</url>
-          <line>221</line>
-          <properties documentPath="$PROJECT_DIR$/Dryv.Tests/EnumerbaleTests.cs" initialLine="221" containingFunctionPresentation="method 'TranslateNotAll'">
-            <startOffsets>
-              <option value="8345" />
-            </startOffsets>
-            <endOffsets>
-              <option value="8401" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="57" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Dryv.Tests/EnumerbaleTests.cs</url>
@@ -554,17 +538,43 @@
           <option name="timeStamp" value="58" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Dryv/Translation/JavaScriptHelper.cs</url>
-          <line>12</line>
-          <properties documentPath="$PROJECT_DIR$/Dryv/Translation/JavaScriptHelper.cs" initialLine="12" containingFunctionPresentation="method 'TranslateValue'">
+          <url>file://$PROJECT_DIR$/Dryv.Tests/ValidationTests.cs</url>
+          <line>50</line>
+          <properties documentPath="$PROJECT_DIR$/Dryv.Tests/ValidationTests.cs" initialLine="36" containingFunctionPresentation="method 'ValidateChildList'">
             <startOffsets>
-              <option value="323" />
+              <option value="1751" />
             </startOffsets>
             <endOffsets>
-              <option value="327" />
+              <option value="1752" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="61" />
+          <option name="timeStamp" value="90" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Dryv.Tests/EnumTranslationTests.cs</url>
+          <line>18</line>
+          <properties documentPath="$PROJECT_DIR$/Dryv.Tests/EnumTranslationTests.cs" initialLine="18" containingFunctionPresentation="method 'EnumsAreSerializedAsConfigured'">
+            <startOffsets>
+              <option value="650" />
+            </startOffsets>
+            <endOffsets>
+              <option value="682" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="115" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Dryv.Tests/RuleDiscovery2Tests.cs</url>
+          <line>78</line>
+          <properties documentPath="$PROJECT_DIR$/Dryv.Tests/RuleDiscovery2Tests.cs" initialLine="74" containingFunctionPresentation="method 'FinderulesForInterface'">
+            <startOffsets>
+              <option value="2696" />
+            </startOffsets>
+            <endOffsets>
+              <option value="2748" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="117" />
         </line-breakpoint>
         <breakpoint suspend="NONE" type="DotNet Exception Breakpoints">
           <properties exception="System.DllNotFoundException" isInternal="false" displayValue="DllNotFoundException" namespaceName="System">
@@ -572,11 +582,21 @@
           </properties>
           <option name="timeStamp" value="11" />
         </breakpoint>
+        <breakpoint enabled="true" suspend="NONE" type="DotNet Exception Breakpoints">
+          <properties exception="System.ObjectDisposedException" isInternal="false" displayValue="ObjectDisposedException" namespaceName="System">
+            <option name="internal" value="false" />
+          </properties>
+          <option name="timeStamp" value="87" />
+        </breakpoint>
+        <breakpoint enabled="true" suspend="NONE" type="DotNet Exception Breakpoints">
+          <properties exception="System.Threading.Tasks.TaskCanceledException" isInternal="false" displayValue="TaskCanceledException" namespaceName="System.Threading.Tasks">
+            <option name="internal" value="false" />
+          </properties>
+          <option name="timeStamp" value="88" />
+        </breakpoint>
       </breakpoints>
       <default-breakpoints>
-        <breakpoint enabled="true" type="DotNet Exception Breakpoints">
-          <properties justMyCode="true" />
-        </breakpoint>
+        <breakpoint enabled="true" type="DotNet Exception Breakpoints" />
       </default-breakpoints>
     </breakpoint-manager>
   </component>

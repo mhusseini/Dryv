@@ -9,12 +9,12 @@ namespace Dryv.Tests
         [TestMethod]
         public void EnumsAreSerializedAsConfigured()
         {
-            var expression = Expression<Model>(m => m.Prop1 != MyEnum.Two ? null : "fail");
-            var translation = Translate<TestModel>(expression);
+            var expression = Expression<Model>(m => m.Prop1 == MyEnum.One ? "fail" : null);
+            var translation = Translate<Model>(expression);
             var model = @"{prop1:'One'}";
             var engine = new Jurassic.ScriptEngine();
-            var script = $"({translation})({model})";
-            var result = engine.Evaluate(script) as string;
+            var script = $"(({translation})({model}) || {{}}).text";
+            var result = engine.Evaluate(script);
 
             Assert.AreEqual("fail", result);
         }

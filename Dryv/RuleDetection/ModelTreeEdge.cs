@@ -7,7 +7,7 @@ namespace Dryv.RuleDetection
     public class ModelTreeEdge
     {
         public ModelTreeNode Child { get; set; }
-        public string Name => this.Property?.Name;
+        public string Name { get; set; }
         public ModelTreeNode Parent { get; set; }
         public PropertyInfo Property { get; set; }
     }

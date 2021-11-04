@@ -61,7 +61,11 @@ namespace Dryv.Tests
         {
             Assert.IsNotNull(allRules);
 
-            var rules = allRules.Where(r => r.Property == property);
+            var rules = allRules.Where(r =>
+                property.PropertyType == r.Property.PropertyType
+                //&& property.PropertyType.IsAssignableFrom(r.Property.PropertyType)
+                && property.Name.Equals(r.Property.Name)
+                && r.Property.DeclaringType?.IsAssignableFrom(property.DeclaringType) == true);
             return rules;
         }
 
@@ -147,7 +151,7 @@ namespace Dryv.Tests
         {
             var model = new Model10
             {
-                Children = new[]
+                Children =
                 {
                     new Model11(),
                     new Model11(),
@@ -187,7 +191,7 @@ namespace Dryv.Tests
 
         private class Model10
         {
-            public Model11[] Children { get; set; }
+            public List<Model11> Children { get; set; } = new List<Model11>();
         }
 
         private class Model11

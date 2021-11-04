@@ -269,7 +269,6 @@ namespace Dryv.Translation.Translators
                 throw new DryvMethodNotSupportedException(context.Expression, "Only override without any indexes can be translated to JavaScript");
             }
 
-            var arguments = context.Expression.Arguments;
             context.Translator.Translate(context.Expression.Object, context);
             var isCaseInsensitive = GetIsCaseInsensitive(context.Expression);
             if (isCaseInsensitive)
@@ -278,7 +277,7 @@ namespace Dryv.Translation.Translators
             }
 
             context.Writer.Write(".indexOf(");
-            context.Translator.Translate(arguments[1], context);
+            context.Translator.Translate(context.Expression.Arguments[0], context);
             if (isCaseInsensitive)
             {
                 context.Writer.Write(".toLowerCase()");
@@ -341,7 +340,8 @@ namespace Dryv.Translation.Translators
             }
 
             context.Writer.Write(".indexOf(");
-            WriteArguments(context.Translator, context.Expression.Arguments, context);
+            context.Translator.Translate(context.Expression.Arguments[0], context);
+            
             if (isCaseInsensitive)
             {
                 context.Writer.Write(".toLowerCase()");

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,7 @@ namespace Dryv
 {
     public class DryvValidator
     {
-        private static readonly ConcurrentDictionary<Type, GroupedValidation> Cache = new ConcurrentDictionary<Type, GroupedValidation>();
+        private static readonly ConcurrentDictionary<Type, GroupedValidation> Cache = new();
         private readonly DryvOptions options;
         private readonly DryvRuleFinder ruleFinder;
 
@@ -26,24 +27,58 @@ namespace Dryv
 
         public async Task<IDictionary<string, DryvValidationResult>> Validate(object model, Func<Type, object> serviceProvider, IReadOnlyDictionary<string, object> parameters = null)
         {
-            if (model == null)
-            {
-                return new Dictionary<string, DryvValidationResult>();
-            }
+            var errors = new Dictionary<string, DryvValidationResult>();
+            var processed = new HashSet<object>();
 
             var modelType = model.GetType();
             var validation = Cache.GetOrAdd(modelType, this.GroupValidation);
 
             var rules = validation.ValidationRules.SelectMany(i => i.Value).Union(validation.DisablingRules.SelectMany(i => i.Value));
             var ruleParameters = await DryvParametersHelper.GetDryvParameters(rules, serviceProvider, parameters);
-            var taskResults = await Task.WhenAll(from kvp in validation.ValidationRules
-                                                 where !this.IsSubtreeDisabled(model, kvp.Key, validation.DisablingRules, serviceProvider, ruleParameters)
-                                                 select this.GetFirstValidationError(model, serviceProvider, kvp, ruleParameters));
+            var currentRules = validation.ValidationRules;
 
-            return (from result in taskResults
-                    where result.HasValue
-                    select result.Value)
-                .ToDictionary(i => i.Key, i => i.Value);
+            await Validate(model, string.Empty, serviceProvider, processed, currentRules, validation, ruleParameters, errors);
+
+            return errors;
+        }
+
+        private async Task Validate(object model, string path, Func<Type, object> serviceProvider, HashSet<object> processed, Dictionary<string, List<DryvCompiledRule>> currentRules, GroupedValidation validation, Dictionary<IReadOnlyList<DryvCompiledRule>, DryvParameters> ruleParameters, Dictionary<string, DryvValidationResult> errors)
+        {
+            if (model == null || processed.Contains(model))
+            {
+                return;
+            }
+
+            processed.Add(model);
+            var modelType = model.GetType();
+
+            var taskResults = await Task.WhenAll(
+                from kvp in currentRules
+                let rs = kvp.Value.Where(rule => rule.ModelType == modelType).ToList()
+                where rs.Any()
+                where !this.IsSubtreeDisabled(model, kvp.Key, validation.DisablingRules, serviceProvider, ruleParameters)
+                select this.GetFirstValidationError(model, kvp.Key, rs, serviceProvider, ruleParameters));
+
+            errors.AddRange(from result in taskResults
+                            where result.HasValue
+                            select new KeyValuePair<string, DryvValidationResult>(path + result.Value.Key, result.Value.Value));
+
+            foreach (var prop in from prop in modelType.GetProperties()
+                                 where prop.IsNavigationList()
+                                 select prop)
+            {
+                if (prop.GetValue(model) is not IEnumerable l)
+                {
+                    continue;
+                }
+
+                var index = 0;
+
+                foreach (var child in l.Cast<object>())
+                {
+                    await Validate(child, $"{path}{prop.Name.ToCamelCase()}[{index++}].", serviceProvider, processed, currentRules, validation, ruleParameters, errors);
+                }
+            }
         }
 
         private static async Task<DryvValidationResult> TryGetValidationResult(object model, DryvCompiledRule rule, object[] services)
@@ -65,9 +100,9 @@ namespace Dryv
             }
         }
 
-        private async Task<KeyValuePair<string, DryvValidationResult>?> GetFirstValidationError(object model, Func<Type, object> serviceProvider, KeyValuePair<string, List<DryvCompiledRule>> kvp, Dictionary<IReadOnlyList<DryvCompiledRule>, DryvParameters> parameters)
+        private async Task<KeyValuePair<string, DryvValidationResult>?> GetFirstValidationError(object model, string key, List<DryvCompiledRule> rules, Func<Type, object> serviceProvider, Dictionary<IReadOnlyList<DryvCompiledRule>, DryvParameters> parameters)
         {
-            foreach (var rule in kvp.Value)
+            foreach (var rule in rules)
             {
                 try
                 {
@@ -85,7 +120,7 @@ namespace Dryv
 
                     result.Group = rule.Group;
 
-                    return new KeyValuePair<string, DryvValidationResult>(kvp.Key, result);
+                    return new KeyValuePair<string, DryvValidationResult>(key, result);
                 }
                 catch (Exception ex)
                 {
@@ -98,16 +133,16 @@ namespace Dryv
 
         private GroupedValidation GroupValidation(Type type)
         {
-            return new GroupedValidation
+            return new()
             {
                 ValidationRules = this.ruleFinder.FindValidationRulesInTree(type, RuleType.Validation)
                     .Where(r => r.EvaluationLocation.HasFlag(DryvEvaluationLocation.Server))
-                    .GroupBy(r => r.ModelPath)
+                    .GroupBy(r => r.ModelPath) // RegexGroup.Replace(r.ModelPath, string.Empty))
                     .ToDictionary(g => g.Key, g => g.ToList()),
 
                 DisablingRules = this.ruleFinder.FindValidationRulesInTree(type, RuleType.Disabling)
                     .Where(r => r.EvaluationLocation.HasFlag(DryvEvaluationLocation.Server))
-                    .GroupBy(r => r.ModelPath)
+                    .GroupBy(r => r.ModelPath) //RegexGroup.Replace(r.ModelPath, string.Empty))
                     .ToDictionary(g => g.Key, g => g.ToList())
             };
         }

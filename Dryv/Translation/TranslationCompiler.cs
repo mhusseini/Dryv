@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Dryv.Configuration;
+using Dryv.Extensions;
 using Dryv.Reflection;
 
 namespace Dryv.Translation

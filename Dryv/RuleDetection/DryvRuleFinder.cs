@@ -101,10 +101,22 @@ namespace Dryv.RuleDetection
 
             foreach (var rule in from property in rootType.GetProperties(BindingFlagsForProperties)
                                  where property.PropertyType.Namespace != typeof(object).Namespace
-                                 from rule in FindRulesInModelTree(property.PropertyType, ruleType, processed)
+                                 from childType in BreakupType(property.PropertyType)
+                                 from rule in FindRulesInModelTree(childType, ruleType, processed)
                                  select rule)
             {
                 yield return rule;
+            }
+        }
+
+        private static IEnumerable<Type> BreakupType(Type type)
+        {
+            yield return type;
+
+            var elementType = TypeExtensions.GetElementType(type);
+            if (elementType != type)
+            {
+                yield return elementType;
             }
         }
 
@@ -147,8 +159,14 @@ namespace Dryv.RuleDetection
 
         private static IEnumerable<ModelTreeNode> GetNodesForRule(List<ModelTreeNode> flatTree, DryvCompiledRule rule)
         {
+            var propType = rule.PropertyPath + ":" + rule.Property.PropertyType.GetNonGenericName();
             var path = rule.UniquePath + ":" + rule.Property.PropertyType.GetNonGenericName();
-            return flatTree.FindAll(n => n.UniquePath.EndsWith(path));
+            return flatTree.FindAll(n => n.ModelType
+                .Iterate(t => t.GetBaseType())
+                .SelectMany(t => t.GetTypeInfo().WithImplementedInterfaces())
+                .Where(t => t.Namespace != "System")
+                .Select(t => ":" + t.AsType().GetNonGenericName() + propType)
+                .Any(uniquePath => uniquePath.EndsWith(path)));
         }
 
         private static IEnumerable<DryvCompiledRule> GetRulesOfType(DryvRules rules, RuleType ruleType)
@@ -199,25 +217,15 @@ namespace Dryv.RuleDetection
 
         private DryvCompiledRule ApplyRuleToNode(ModelTreeNode node, DryvCompiledRule rule)
         {
-            LambdaExpression newValidationExpression;
-            Type modelType;
             string transposedPath = null;
+            var newValidationExpression = rule.ValidationExpression;
+            var modelType = rule.ModelType;
 
-            if (node.UniquePath != rule.UniquePath)
+            if (node.UniquePath != rule.UniquePath
+                && !node.ModelPath.Contains("[]")
+                && !rule.ModelType.GetTypeInfo().IsAssignableFrom(node.ModelType.GetTypeInfo()))
             {
                 modelType = TransposeExpressions(node, rule, out newValidationExpression, out transposedPath);
-            }
-            else
-            {
-                newValidationExpression = rule.ValidationExpression;
-                modelType = rule.ModelType;
-            }
-
-            if (rule.RelatedProperties != null)
-            {
-                foreach (var relatedProperty in rule.RelatedProperties)
-                {
-                }
             }
 
             var transposedRule = new DryvCompiledRule
@@ -236,6 +244,7 @@ namespace Dryv.RuleDetection
                 ModelPath = GetEffectiveModelPath(rule.ModelPath, transposedPath, rule.Property),
                 Property = rule.Property,
                 UniquePath = rule.UniquePath,
+                PropertyPath = rule.PropertyPath,
                 Parameters = rule.Parameters,
                 Annotations = rule.Annotations,
                 RelatedProperties = rule.RelatedProperties?.ToDictionary(

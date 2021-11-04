@@ -16,7 +16,7 @@
     <ApplicationIcon>dryv.ico</ApplicationIcon>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <LangVersion>8</LangVersion>
+    <LangVersion>9</LangVersion>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 
