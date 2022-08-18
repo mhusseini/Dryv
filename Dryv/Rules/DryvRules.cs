@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
@@ -7,14 +6,35 @@ namespace Dryv.Rules
 {
     public partial class DryvRules<TModel> : DryvRules
     {
-        public IReadOnlyList<DryvRule> DisablingRules => this.InternalDisablingRules;
+        public DryvRules<TModel> Disable(
+            Expression<Func<TModel, object>> property,
+            Expression<Func<TModel, bool>> rule,
+            Action<DryvRuleBuilder<TModel, Expression<Func<TModel, bool>>,  Expression<Func<TModel,Task<bool>>>, Func<TModel, bool>>> configure = null)
+        {
+            var builder = new DryvRuleBuilder<TModel, Expression<Func<TModel, bool>>,  Expression<Func<TModel,Task<bool>>>, Func<TModel, bool>>(DryvEvaluationLocation.Client | DryvEvaluationLocation.Server)
+                .Property(property)
+                .Disable(rule);
+            configure?.Invoke(builder);
 
-        public IReadOnlyList<DryvRule> ValidationRules => this.InternalValidationRules;
+            this.InternalRules.Add(builder.Rule);
 
-        private List<DryvRule> InternalDisablingRules { get; } = new List<DryvRule>();
+            return this;
+        }
+        public DryvRules<TModel> Disable(
+            Expression<Func<TModel, object>> property,
+            Expression<Func<TModel, Task<bool>>> rule,
+            Action<DryvRuleBuilder<TModel, Expression<Func<TModel, bool>>,  Expression<Func<TModel,Task<bool>>>, Func<TModel, bool>>> configure = null)
+        {
+            var builder = new DryvRuleBuilder<TModel, Expression<Func<TModel, bool>>,  Expression<Func<TModel,Task<bool>>>, Func<TModel, bool>>(DryvEvaluationLocation.Client | DryvEvaluationLocation.Server)
+                .Property(property)
+                .DisableAsync(rule);
+            configure?.Invoke(builder);
 
-        private List<DryvRule> InternalValidationRules { get; } = new List<DryvRule>();
+            this.InternalRules.Add(builder.Rule);
 
+            return this;
+        }
+        
         public DryvRules<TModel> Rule(
             Expression<Func<TModel, object>> property,
             Expression<Func<TModel, DryvValidationResult>> rule,
@@ -25,7 +45,7 @@ namespace Dryv.Rules
                 .Validate(rule);
             configure?.Invoke(builder);
 
-            this.InternalValidationRules.Add(builder.Rule);
+            this.InternalRules.Add(builder.Rule);
 
             return this;
         }
@@ -38,7 +58,7 @@ namespace Dryv.Rules
                 .Property(property);
             configure?.Invoke(builder);
 
-            this.InternalValidationRules.Add(builder.Rule);
+            this.InternalRules.Add(builder.Rule);
 
             return this;
         }
@@ -51,7 +71,7 @@ namespace Dryv.Rules
                 .Property(property);
             configure?.Invoke(builder);
 
-            this.InternalValidationRules.Add(builder.Rule);
+            this.InternalRules.Add(builder.Rule);
 
             return this;
         }
@@ -66,7 +86,7 @@ namespace Dryv.Rules
                 .Validate(rule);
             configure?.Invoke(builder);
 
-            this.InternalValidationRules.Add(builder.Rule);
+            this.InternalRules.Add(builder.Rule);
 
             return this;
         }
@@ -81,7 +101,7 @@ namespace Dryv.Rules
                 .ValidateAsync(rule);
             configure?.Invoke(builder);
 
-            this.InternalValidationRules.Add(builder.Rule);
+            this.InternalRules.Add(builder.Rule);
 
             return this;
         }
@@ -96,7 +116,7 @@ namespace Dryv.Rules
                 .Validate(rule);
             configure?.Invoke(builder);
 
-            this.InternalValidationRules.Add(builder.Rule);
+            this.InternalRules.Add(builder.Rule);
 
             return this;
         }
@@ -109,7 +129,7 @@ namespace Dryv.Rules
                 .Property(property);
             configure?.Invoke(builder);
 
-            this.InternalValidationRules.Add(builder.Rule);
+            this.InternalRules.Add(builder.Rule);
 
             return this;
         }

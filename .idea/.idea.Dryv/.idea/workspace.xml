@@ -36,222 +36,26 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="81fd7ff9-3930-4c09-a8cb-036017f14ba0" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/Dryv/Rules/DryvRule.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Dryv/Rules/DryvRuleBuilder.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Dryv/Rules/DryvRules.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Dryv/Rules/GenerateRuleMethods.ps1" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/contentModel.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/indexLayout.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/indexLayout.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/riderModule.iml" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/Dryv.Tests/RuleTreeBuilderTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Dryv/Extensions/IterationExtensions.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Dryv/Extensions/TypeExtensions.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Dryv/Properties/AssemblyInfo.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Dryv/Rules/DryvRuleProperty.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Dryv/Rules/DryvRuleSet.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Dryv/Rules/DryvRuleTreeBuilder.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Dryv/Rules/DryvRuleType.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Dryv/Rules/DryveRuleTreeNode.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Dryv/Rules/IDryvRuleSource.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Dryv/Rules/IDryvRuleTreeBuilder.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Dryv/Rules/Sources/ReflectionDryvRuleSource.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Dryv/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Dryv/riderModule.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore.Tests/Dryv.AspNetCore.Tests.csproj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/Configuration/IDryvMvcBuilder.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/CustomizationDefaults.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/Dryv.AspNetCore.csproj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DryvApplicationBuilderExtensions.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DryvClientWriter.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DryvDisableAttribute.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DryvDynamicControllerBuilderExtensions.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DryvMvcBuilderExtensions.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DryvPreloaderBuilderExtensions.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DryvRuntimeException.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DryvSets.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DryvValidationFilterAttribute.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/CodeGeneration/ControllerAttributeGenerator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/CodeGeneration/ControllerCtorGenerator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/CodeGeneration/ControllerFilterHelper.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/CodeGeneration/ControllerGenerator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/CodeGeneration/ControllerMethodGenerator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/CodeGeneration/DryvPocoGenerator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/CodeGeneration/ParameterFinder.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/DryvControllerGenerationContext.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/DryvDynamicControllerMethods.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/DryvDynamicControllerOptions.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/DryvDynamicControllerOptionsExtensions.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/Endpoints/DryvDynamicActionDescriptorChangeProvider.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/Endpoints/DryvDynamicControllerRegistration.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/Endpoints/DryvEndpointRouteBuilderProvider.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/FilterExpressionValidator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/Runtime/DryvControllerInfoAttribute.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/Runtime/DryvDynamicController.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/Runtime/DryvDynamicControllerFilterAttribute.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/Translation/DryvClientServerCallWriter.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/Translation/DryvDynamicControllerMethodTranslator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/Translation/DryvDynamicControllerTranslator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/Translation/DryvDynamicControllerTranslatorBase.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/Translation/IDryvClientServerCallWriter.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/Translation/MemberExpressionComparer.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/DynamicControllers/Translation/PropertyComparer.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/Extensions/HttpContextExtensions.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/Extensions/ModelPathExtensions.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/Extensions/TypeExtensions.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/HtmlExtension.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/IDryParameterProvider.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/Internal/DryvMvcBuilder.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/Internal/DryvMvcCoreOptions.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/Internal/DryvMvcInitializer.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/Internal/Md5Helper.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/Internal/RegisteringDryvServiceCollection.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/Json/ValueTupleConverter`.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/Json/ValueTupleConverter``.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/Json/ValueTupleConverter```.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/Json/ValueTupleFactory.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/Middlewares/DryvClientCodeMiddleware.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/PreLoading/DryvPreloader.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/PreLoading/DryvPreloadingOptions.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/Properties/AssemblyInfo.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/Properties/launchSettings.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/Razor/LazyHtmlContent.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/TagHelpers/DryvClientRulesTagHelper.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.AspNetCore/dryv.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.Tests/AnyMethodTests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.Tests/BooleanTranslationTests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.Tests/Dryv.Tests.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv.Tests/Dryv.Tests.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.Tests/DryvResultTranslatorTests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.Tests/EnumTranslationTests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.Tests/EnumerbaleTests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.Tests/JavascriptTranslatorTests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.Tests/JavascriptTranslatorTestsBase.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.Tests/LocalizationTests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.Tests/LocalizedStrings.Designer.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.Tests/LocalizedStrings.resx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.Tests/ModelTreeBuilderTests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.Tests/OptionsTranslationTests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.Tests/ReflectionTests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.Tests/RegularExpressionTests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.Tests/RuleDiscovery2Tests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.Tests/RuleDiscoveryTests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.Tests/StringFormatDissectorTests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.Tests/StringTests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.Tests/TaskValueHelperTests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv.sln" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv.sln" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Configuration/DryvOptions.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Configuration/DryvOptionsExtension.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Configuration/DryvServiceCollection.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Configuration/IDryvBuilder.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Configuration/TranslationErrorBehavior.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Dryv.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/Dryv.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/DryvCompiler.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/DryvDependencyInjectionException.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/DryvException.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/DryvParametersHelper.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/DryvRuleSettings.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/DryvRules.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/DryvRules`.g.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/DryvRules`.parameters.g.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/DryvRules`.server.g.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/DryvSetAttribute.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/DryvTranslator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/DryvValidationAttribute.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/DryvValidationResult.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/DryvValidationResult.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/DryvValidator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Extensions/CollectionExtensions.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Extensions/DictionaryExtensions.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Extensions/ExpressionExtensions.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Extensions/IterationExtensions.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Extensions/MemberInfoExtensions.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Extensions/ResultExtensions.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Extensions/ServiceProviderExtensions.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Extensions/StringExtensions.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Extensions/TypeExtensions.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/GenerateRuleMethods.ps1" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/GenerateRuleParameters.ps1" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/GenerateRuleServer.ps1" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Properties/AssemblyInfo.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Reflection/BindingFlags.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Reflection/TypeExtensions.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/RuleDetection/DryvRuleFinder.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/RuleDetection/ModelTreeBuilder.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/RuleDetection/ModelTreeEdge.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/RuleDetection/ModelTreeNode.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/RuleDetection/ModelTreeNodeExtensions.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Rules/DryvClientCode.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Rules/DryvCompiledRule.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Rules/DryvParameters.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Rules/DryvRules`.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Rules/IDryvRuleAnnotator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Rules/RuleType.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/TaskRetype.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/TaskValueHelper.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/TranslatedRule.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/CustomTranslationContext.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/DryvConfigurationException.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/DryvExpressionNotSupportedException.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/DryvMethodNotSupportedException.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/DryvTranslationException.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/ExpressionInjectionHelper.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/IDryvCustomTranslator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/IDryvMethodCallTranslator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/ITranslator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/JavaScriptHelper.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/JavaScriptTranslator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/MethodTranslationContext.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/OptionDelegate.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/TranslationCompiler.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/TranslationContext.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/TranslationContextExtensions.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/TranslationResult.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/Translator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/Translators/AllMethodCallTranslator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/Translators/CustomCodeTranslator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/Translators/DateTimeTranslator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/Translators/DryvValidationResultTranslator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/Translators/EnumerableTranslator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/Translators/MethodCallTranslator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/Translators/MomentJsFormatConverter.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/Translators/ObjectTranslator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/Translators/RegexTranslator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/Translators/StringFormatDissector.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/Translators/StringTranslator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/Translators/ToStringTranslator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/Visitors/AsyncBinaryFinder.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/Visitors/AsyncBinarySwitcher.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/Visitors/AsyncMethodCallFinder.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/Visitors/AsyncMethodCallModifier.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/Visitors/ConditionConversionModifier.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/Visitors/EnumComparisionModifier.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/Visitors/ExpressionNodeFinder.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/Visitors/ExpressionVisitor.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Translation/Visitors/NodeReplacer.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/TranslationResult.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Validation/DryvClientValidationFunctionWriter.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Validation/DryvClientValidationSetWriter.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Validation/DryvValidationException.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Validation/IDryvClientValidationFunctionWriter.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/Validation/IDryvClientValidationSetWriter.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/dryv.ico" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dryv/dryv.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SampleConsole/AsyncValidator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SampleConsole/Models/Address.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SampleConsole/Models/HomeModel.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SampleConsole/Models/Person.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SampleConsole/Program.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SampleConsole/SampleConsole.csproj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SampleConsole/SampleOptions.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SampleConsole/ZipCodeValidator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SampleVue/.npmrc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SampleVue/Controllers/HomeController.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SampleVue/CustomValidation/AsyncValidator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SampleVue/CustomValidation/SyncValidator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SampleVue/Models/Address.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SampleVue/Models/HomeModel.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SampleVue/Models/Person.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SampleVue/Program.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SampleVue/Properties/launchSettings.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SampleVue/SampleOptions.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SampleVue/SampleVue.csproj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SampleVue/Startup.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SampleVue/Views/Home/Home.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SampleVue/Views/Home/Index.cshtml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SampleVue/Views/_ViewImports.cshtml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SampleVue/appsettings.Development.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SampleVue/appsettings.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SampleVue/package-lock.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SampleVue/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SampleVue/wwwroot/favicon.ico" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SampleVue/wwwroot/styles.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv.Tests/RulesBuilderTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv.Tests/RulesBuilderTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv/DryvRules.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/DryvRules.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv/Rules/DryvRule.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/Rules/DryvRule.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv/Rules/DryvRuleBuilder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/Rules/DryvRuleBuilder.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv/Rules/DryvRules.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/Rules/DryvRules.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv/Rules/DryvRules.g.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/Rules/DryvRules.g.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dryv/Rules/GenerateRuleMethods.ps1" beforeDir="false" afterPath="$PROJECT_DIR$/Dryv/Rules/GenerateRuleMethods.ps1" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -294,12 +98,14 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/7F843AF7-849D-4B1D-BC86-DD6A71AA376C/1E/Expression.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/9FCAADD9-58A4-4900-9D68-546D5ECFE219/277/MethodBase.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/C158E430-C142-4741-ADAB-56A022C4B7B0/D/AnyAll.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3DA0403A-E6E5-40A7-A792-83E509F3945B/300/RtFieldInfo.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/AAF9EE24-4AE0-419D-A9A3-02771A760733/2E/ToCollection.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/B27B5127-42C3-446E-9278-529B4ACCE4FE/CD/ThrowHelper.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/B040A37C-41D0-474D-A152-F1FA7760E8F1/3B/JsonSerializer.Write.Helpers.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/92EC1C6B-080B-4DA4-A456-EC4CE287187B/C/SafeLibraryHandle.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/B040A37C-41D0-474D-A152-F1FA7760E8F1/36/JsonSerializer.Write.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/AAF9EE24-4AE0-419D-A9A3-02771A760733/28/SelectMany.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/munirhusseini/Development/Projects/Dryv/Dryv/Rules/DryvRuleBuilder.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/AB459DEC-1089-48A5-B911-622CFA5F50A8/9a/8678054d/Assert.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/91374B35-F7C0-4E40-95E2-0890ABBC2773/28/MemberExpression.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/B27B5127-42C3-446E-9278-529B4ACCE4FE/3A1/KeyValuePair.cs" root0="SKIP_HIGHLIGHTING" />
@@ -342,14 +148,27 @@
       <option value="$PROJECT_DIR$/Dryv/Rules/DryvCompiledRule.cs" />
       <option value="$PROJECT_DIR$/Dryv/Class1.cs" />
       <option value="$PROJECT_DIR$/Dryv/Rules/DryvRules.overloads.cs" />
-      <option value="$PROJECT_DIR$/Dryv/DryvRules.cs" />
       <option value="$PROJECT_DIR$/Dryv.Tests/UnitTest1.cs" />
+      <option value="$PROJECT_DIR$/Dryv/IDryvRuleSource.cs" />
+      <option value="$PROJECT_DIR$/Dryv/Rules/DryvValidationSet.cs" />
+      <option value="$PROJECT_DIR$/Dryv/Rules/DryvRuleSet.cs" />
+      <option value="$PROJECT_DIR$/Dryv/Rules/IDryvRuleSource.cs" />
+      <option value="$PROJECT_DIR$/Dryv/Rules/IDryvRuleTreeBuilder.cs" />
+      <option value="$PROJECT_DIR$/Dryv.Tests/RulesBuilderTests.cs" />
+      <option value="$PROJECT_DIR$/Dryv/Properties/AssemblyInfo.cs" />
+      <option value="$PROJECT_DIR$/Dryv/DryvRules.cs" />
+      <option value="$PROJECT_DIR$/Dryv/Rules/DryvRules.cs" />
+      <option value="$PROJECT_DIR$/Dryv/Rules/DryvRules.g.cs" />
+      <option value="$PROJECT_DIR$/Dryv/Rules/GenerateRuleMethods.ps1" />
+      <option value="$PROJECT_DIR$/Dryv/Extensions/IterationExtensions.cs" />
+      <option value="$PROJECT_DIR$/Dryv/Extensions/TypeExtensions.cs" />
+      <option value="$PROJECT_DIR$/Dryv/Rules/Sources/ReflectionDryvRuleSource.cs" />
       <option value="$PROJECT_DIR$/Dryv/Rules/DryvRule.cs" />
       <option value="$PROJECT_DIR$/Dryv/Rules/DryvRuleBuilder.cs" />
-      <option value="$PROJECT_DIR$/Dryv/Rules/DryvRules.g.cs" />
-      <option value="$PROJECT_DIR$/Dryv.Tests/RulesBuilderTests.cs" />
-      <option value="$PROJECT_DIR$/Dryv/Rules/DryvRules.cs" />
-      <option value="$PROJECT_DIR$/Dryv/Rules/GenerateRuleMethods.ps1" />
+      <option value="$PROJECT_DIR$/Dryv/Rules/DryvRuleProperty.cs" />
+      <option value="$PROJECT_DIR$/Dryv.Tests/RuleTreeBuilderTests.cs" />
+      <option value="$PROJECT_DIR$/Dryv/Rules/DryveRuleTreeNode.cs" />
+      <option value="$PROJECT_DIR$/Dryv/Rules/DryvRuleTreeBuilder.cs" />
     </changedPaths>
   </component>
   <component name="JsFlowSettings">
@@ -364,7 +183,7 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
-    <property name="DebuggerViewTab_PTCS_FirstProportionKey" value="0.34983853" />
+    <property name="DebuggerViewTab_PTCS_FirstProportionKey" value="0.3801282" />
     <property name="DebuggerViewTab_PTCS_LastProportionKey" value="0.0" />
     <property name="JavaScriptWeakerCompletionTypeGuess" value="true" />
     <property name="Rider.ProjectViewActivator.IsNotFirstRun" value="true" />
@@ -372,7 +191,6 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="XThreadsFramesViewSplitterKey" value="0.35396826" />
     <property name="last_opened_file_path" value="C:/kundenprojekte/enbw/src/VTP/Yello/VTP-Yello.sln" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
@@ -495,7 +313,7 @@
       <workItem from="1618860326156" duration="2212000" />
       <workItem from="1618862603747" duration="13885000" />
       <workItem from="1618880220747" duration="2732000" />
-      <workItem from="1637967118233" duration="15756000" />
+      <workItem from="1637967118233" duration="43365000" />
     </task>
     <task id="LOCAL-00001" summary="Renamed and moved DryvPreloadAttribute (now DryvSetAttribute).">
       <created>1601042302266</created>
@@ -616,11 +434,78 @@
       <option name="project" value="LOCAL" />
       <updated>1618878157133</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="Added Rule Builders">
+      <created>1638134468729</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1638134468730</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="UnitTestsCoverage.Settings">
+    <option name="coveragePercentColumnWidth" value="112" />
+    <option name="sortOrder" value="DESCENDING" />
+    <option name="sortedColumn" value="1" />
+    <option name="symbolColumnWidth" value="419" />
+    <coverage-tree-state>
+      <expand>
+        <path>
+          <item name="rootNode" type="c53c71d1:RiderDotCoverCoverageTreeModel$RootNode" />
+          <item name="Total 2% 918/941" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+        </path>
+        <path>
+          <item name="rootNode" type="c53c71d1:RiderDotCoverCoverageTreeModel$RootNode" />
+          <item name="Total 2% 918/941" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Dryv 2% 828/844" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+        </path>
+        <path>
+          <item name="rootNode" type="c53c71d1:RiderDotCoverCoverageTreeModel$RootNode" />
+          <item name="Total 2% 918/941" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Dryv 2% 828/844" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="(1.0.0.0, .NETStandard,Version=v2.0) 2% 828/844" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+        </path>
+        <path>
+          <item name="rootNode" type="c53c71d1:RiderDotCoverCoverageTreeModel$RootNode" />
+          <item name="Total 2% 918/941" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Dryv 2% 828/844" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="(1.0.0.0, .NETStandard,Version=v2.0) 2% 828/844" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Dryv 2% 828/844" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+        </path>
+        <path>
+          <item name="rootNode" type="c53c71d1:RiderDotCoverCoverageTreeModel$RootNode" />
+          <item name="Total 2% 918/941" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Dryv 2% 828/844" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="(1.0.0.0, .NETStandard,Version=v2.0) 2% 828/844" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Dryv 2% 828/844" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Rules 2% 782/797" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+        </path>
+        <path>
+          <item name="rootNode" type="c53c71d1:RiderDotCoverCoverageTreeModel$RootNode" />
+          <item name="Total 2% 918/941" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Dryv 2% 828/844" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="(1.0.0.0, .NETStandard,Version=v2.0) 2% 828/844" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Dryv 2% 828/844" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Rules 2% 782/797" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="DryvRuleBuilder&lt;TModel,TValidationFunction,TAsyncValidationFunction,TSwitchFunction&gt; 7% 71/76" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+        </path>
+        <path>
+          <item name="rootNode" type="c53c71d1:RiderDotCoverCoverageTreeModel$RootNode" />
+          <item name="Total 2% 918/941" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Dryv 2% 828/844" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="(1.0.0.0, .NETStandard,Version=v2.0) 2% 828/844" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Dryv 2% 828/844" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Rules 2% 782/797" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="DryvRuleBuilder&lt;TModel,TValidationFunction,TAsyncValidationFunction,TSwitchFunction&gt; 7% 71/76" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Property(Expression&lt;Func&lt;TModel,object&gt;&gt;) 14% 19/22" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+        </path>
+      </expand>
+      <select />
+    </coverage-tree-state>
   </component>
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="UnityUnitTestConfiguration" currentTestLauncher="NUnit" />
@@ -655,7 +540,8 @@
     <MESSAGE value="Fixed translation of !Regex.IsMatch() and literal booleans." />
     <MESSAGE value="Broadend selection of injected expressions." />
     <MESSAGE value="Fixed enumerable, string and other translations." />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed enumerable, string and other translations." />
+    <MESSAGE value="Added Rule Builders" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added Rule Builders" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -731,13 +617,39 @@
           <line>15</line>
           <properties documentPath="$PROJECT_DIR$/Dryv.Tests/UnitTest1.cs" initialLine="15" containingFunctionPresentation="lambda expression inside method 'Test1'">
             <startOffsets>
-              <option value="419" />
+              <option value="431" />
             </startOffsets>
             <endOffsets>
-              <option value="420" />
+              <option value="432" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="62" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Dryv.Tests/RuleTreeBuilderTests.cs</url>
+          <line>14</line>
+          <properties documentPath="$PROJECT_DIR$/Dryv.Tests/RuleTreeBuilderTests.cs" initialLine="15" containingFunctionPresentation="method 'Build'">
+            <startOffsets>
+              <option value="379" />
+            </startOffsets>
+            <endOffsets>
+              <option value="380" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="65" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Dryv/Rules/DryvRuleTreeBuilder.cs</url>
+          <line>31</line>
+          <properties documentPath="$PROJECT_DIR$/Dryv/Rules/DryvRuleTreeBuilder.cs" initialLine="31" containingFunctionPresentation="method 'Build'">
+            <startOffsets>
+              <option value="983" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1019" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="69" />
         </line-breakpoint>
         <breakpoint suspend="NONE" type="DotNet Exception Breakpoints">
           <properties exception="System.DllNotFoundException" isInternal="false" displayValue="DllNotFoundException" namespaceName="System">

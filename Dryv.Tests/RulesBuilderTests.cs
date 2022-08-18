@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Linq.Expressions;
+using System.Xml.Serialization;
 using Xunit;
 
 namespace Dryv.Tests
@@ -12,8 +13,8 @@ namespace Dryv.Tests
             var rules = DryvRules.For<Model>()
                 .Rule(m => m.Name);
 
-            Assert.Single(rules.ValidationRules);
-            Assert.Collection(rules.ValidationRules, rule =>
+            Assert.Single(rules.Rules);
+            Assert.Collection(rules.Rules, rule =>
             {
                 Assert.Single(rule.Properties);
             });
@@ -25,7 +26,7 @@ namespace Dryv.Tests
             var rules = DryvRules.For<Model>()
                 .Rule(m => m.Name);
 
-            Assert.Collection(rules.ValidationRules, rule =>
+            Assert.Collection(rules.Rules, rule =>
             {
                 Assert.Equal(DryvEvaluationLocation.Client | DryvEvaluationLocation.Server, rule.EvaluationLocation);
             });
@@ -37,7 +38,7 @@ namespace Dryv.Tests
             var rules = DryvRules.For<Model>()
                 .ServerRule(m => m.Name);
 
-            Assert.Collection(rules.ValidationRules, rule =>
+            Assert.Collection(rules.Rules, rule =>
             {
                 Assert.Equal(DryvEvaluationLocation.Server, rule.EvaluationLocation);
             });
@@ -49,7 +50,7 @@ namespace Dryv.Tests
             var rules = DryvRules.For<Model>()
                 .ClientRule(m => m.Name);
 
-            Assert.Collection(rules.ValidationRules, rule =>
+            Assert.Collection(rules.Rules, rule =>
             {
                 Assert.Equal(DryvEvaluationLocation.Client, rule.EvaluationLocation);
             });
@@ -61,7 +62,7 @@ namespace Dryv.Tests
             var rules = DryvRules.For<Model>()
                 .Rule(m => m.Name, m => m.Name == null ? null : "error");
 
-            Assert.Collection(rules.ValidationRules, rule =>
+            Assert.Collection(rules.Rules, rule =>
             {
                 Assert.Equal(ExpressionType.Lambda, rule.ValidationFunctionExpression.NodeType);
             });
@@ -74,7 +75,7 @@ namespace Dryv.Tests
                 .Rule(m => m.Name, config => config
                     .Property(m => m.Address));
 
-            Assert.Collection(rules.ValidationRules, rule =>
+            Assert.Collection(rules.Rules, rule =>
             {
                 Assert.Equal(2, rule.Properties.Count);
             });
@@ -88,10 +89,10 @@ namespace Dryv.Tests
                     .Property(m => m.Address)
                     .Property(m => m.Address));
 
-            Assert.Collection(rules.ValidationRules, rule =>
+            Assert.Collection(rules.Rules, rule =>
             {
                 Assert.Equal(2, rule.Properties.Count);
-                var names = rule.Properties.Select(p => p.Member.Name).ToList();
+                var names = rule.Properties.Select(p => p.Property.Name).ToList();
                 Assert.Contains(nameof(Model.Name), names);
                 Assert.Contains(nameof(Model.Address), names);
             });
@@ -104,7 +105,7 @@ namespace Dryv.Tests
                 .Rule(m => m.Name, config => config
                     .Group("group"));
 
-            Assert.Collection(rules.ValidationRules, rule =>
+            Assert.Collection(rules.Rules, rule =>
             {
                 Assert.Equal("group", rule.Group);
             });
@@ -117,7 +118,7 @@ namespace Dryv.Tests
                 .Rule(m => m.Name, config => config
                     .Annotation("key1", "value1"));
 
-            Assert.Collection(rules.ValidationRules, rule =>
+            Assert.Collection(rules.Rules, rule =>
             {
                 Assert.True(rule.Annotations.ContainsKey("key1"));
                 Assert.Equal("value1", rule.Annotations["key1"]);
